@@ -68,6 +68,7 @@ V1 explicitly excludes airline portal login, schedule scraping, public nearby cr
 - [Private Beta Operating Plan](docs/PRIVATE_BETA_OPERATING_PLAN.md)
 - [Milestone Execution Plan](docs/MILESTONE_EXECUTION_PLAN.md)
 - [Landing Page Waitlist Plan](docs/LANDING_PAGE_WAITLIST_PLAN.md)
+- [M0 Validation Operating Packet](docs/M0_VALIDATION_OPERATING_PACKET.md)
 - [Legal Policy Requirements](docs/LEGAL_POLICY_REQUIREMENTS.md)
 - [Docs Consistency Review](docs/DOCS_CONSISTENCY_REVIEW.md)
 - [Research Notes](docs/RESEARCH_NOTES.md)
