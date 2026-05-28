@@ -259,6 +259,290 @@ These notes summarize public web research used to refine the planning docs. Sour
 - Supports: Vercel supports zero-configuration deployment for Next.js and adds scalability/performance capabilities.
 - Product-plan impact: supported Vercel plus managed Postgres/Supabase deployment recommendation.
 
+## Legal and Policy Requirements Sources
+
+These sources were used for `docs/LEGAL_POLICY_REQUIREMENTS.md`. Date accessed: May 28, 2026.
+
+### USPTO - Trademark basics
+
+- URL: https://www.uspto.gov/trademarks/basics
+- Source type: government
+- Supports: Trademarks identify source of goods or services, and federal trademark rights require review of mark use and registration requirements.
+- Policy impact: reinforced that "Deadhead Club" must remain a working name pending legal/trademark clearance and that public launch needs a documented clearance decision.
+- Limitations: general public guidance, not a clearance search or legal opinion.
+
+### USPTO - Likelihood of confusion
+
+- URL: https://www.uspto.gov/trademarks/search/likelihood-confusion
+- Source type: government
+- Supports: Trademark conflicts can arise when marks are similar and goods/services are related enough to create consumer confusion.
+- Policy impact: informed counsel questions about software, online social networking, aviation, travel, recruiting, marketplace, apparel, merch, domain, social handle, and common-law conflicts.
+- Limitations: does not determine whether Deadhead Club is available or registrable.
+
+### USPTO - Search trademark database
+
+- URL: https://www.uspto.gov/trademarks/search
+- Source type: government
+- Supports: USPTO provides search tools for reviewing federal trademark records.
+- Policy impact: added requirement for a counsel-reviewed USPTO search before public launch under the name.
+- Limitations: federal database search is not a full common-law, domain, app-store, or market clearance.
+
+### FTC - Start with Security: A Guide for Business
+
+- URL: https://www.ftc.gov/business-guidance/resources/start-security-guide-business
+- Source type: government
+- Supports: Businesses should build security into products, limit access, require secure authentication, store sensitive information securely, and plan for incidents.
+- Policy impact: informed privacy, access-control, upload, incident-response, and sensitive verification artifact requirements.
+- Limitations: general security guidance, not aviation-specific or legal advice.
+
+### FTC - Protecting Personal Information: A Guide for Business
+
+- URL: https://www.ftc.gov/business-guidance/resources/protecting-personal-information-guide-business
+- Source type: government
+- Supports: Businesses should know what personal information they have, scale down collection, protect needed information, properly dispose of unneeded information, and plan for incidents.
+- Policy impact: supported data minimization, purpose limitation, retention/deletion, verification artifact deletion, and manual deletion/export processes.
+- Limitations: broad guidance; specific legal obligations depend on facts and jurisdictions.
+
+### FTC - Data Security
+
+- URL: https://www.ftc.gov/business-guidance/privacy-security/data-security
+- Source type: government
+- Supports: FTC business guidance covers protecting personal information and data-security practices.
+- Policy impact: reinforced private handling of sensitive identity, verification artifacts, admin access, and incident response.
+- Limitations: general federal consumer-protection guidance, not a complete compliance checklist.
+
+### FTC - Endorsements, Influencers, and Reviews
+
+- URL: https://www.ftc.gov/business-guidance/advertising-marketing/endorsements-influencers-reviews
+- Source type: government
+- Supports: Material connections and endorsements should be disclosed clearly.
+- Policy impact: informed sponsored deal, affiliate, ambassador, and vendor-listing disclosure recommendations.
+- Limitations: does not draft platform-specific sponsored-content terms.
+
+### FTC - Native Advertising: A Guide for Businesses
+
+- URL: https://www.ftc.gov/business-guidance/resources/native-advertising-guide-businesses
+- Source type: government
+- Supports: Advertising that resembles surrounding content should be clearly identified so users understand it is advertising.
+- Policy impact: supported clear labels for sponsored NonRev Deals and featured vendor placements.
+- Limitations: specific implementation requires attorney and product review.
+
+### FTC - Dot Com Disclosures
+
+- URL: https://www.ftc.gov/business-guidance/resources/dot-com-disclosures-information-about-online-advertising
+- Source type: government
+- Supports: Online advertising disclosures should be clear, conspicuous, and placed close to relevant claims.
+- Policy impact: informed recommendation that sponsored/affiliate labels should not be buried only in terms or footers.
+- Limitations: guidance must be applied to the eventual UI and offer flows.
+
+### TSA - Sensitive Security Information
+
+- URL: https://www.tsa.gov/for-industry/sensitive-security-information
+- Source type: government/regulatory
+- Supports: Sensitive Security Information is information that would be detrimental to transportation security if publicly released.
+- Policy impact: supported banned content rules for airport security procedures and emergency escalation for aviation/security-sensitive disclosures.
+- Limitations: not a full moderation taxonomy and not tailored to worker community apps.
+
+### eCFR - 49 CFR Part 1520, Protection of Sensitive Security Information
+
+- URL: https://www.ecfr.gov/current/title-49/subtitle-B/chapter-XII/subchapter-C/part-1520
+- Source type: government/regulatory
+- Supports: Federal rules define and protect certain transportation security information.
+- Policy impact: reinforced conservative takedown and escalation for airport security procedure disclosures.
+- Limitations: legal applicability and interpretation require qualified counsel.
+
+### NIST Privacy Framework
+
+- URL: https://www.nist.gov/privacy-framework
+- Source type: government/standards
+- Supports: Privacy risk management framework covering identifying, governing, controlling, communicating, and protecting privacy risks.
+- Policy impact: informed data minimization, purpose limitation, retention/deletion, user request, and privacy governance requirements.
+- Limitations: voluntary framework, not a legal determination.
+
+### NIST AI Risk Management Framework
+
+- URL: https://www.nist.gov/itl/ai-risk-management-framework
+- Source type: government/standards
+- Supports: AI risk management should be governed, mapped, measured, and managed, with attention to trustworthy AI characteristics.
+- Policy impact: informed AI use disclosure, human review for high-impact outcomes, AI logging/evaluation, and limitations on AI authority.
+- Limitations: voluntary framework; implementation details remain product-specific.
+
+### NIST Cybersecurity Framework
+
+- URL: https://www.nist.gov/cyberframework
+- Source type: government/standards
+- Supports: Cybersecurity risk management functions include govern, identify, protect, detect, respond, and recover.
+- Policy impact: informed incident response, owner assignment, evidence preservation, response timing, and post-incident review requirements.
+- Limitations: voluntary framework and not a substitute for a company incident response plan.
+
+### OWASP Logging Cheat Sheet
+
+- URL: https://cheatsheetseries.owasp.org/cheatsheets/Logging_Cheat_Sheet.html
+- Source type: standards
+- Supports: Applications should log security-relevant events in a structured way while avoiding sensitive data overexposure.
+- Policy impact: informed audit logging for moderation, verification reviews, sensitive artifact access, appeals, and emergency escalations.
+- Limitations: technical guidance, not legal or policy language.
+
+### OWASP File Upload Cheat Sheet
+
+- URL: https://cheatsheetseries.owasp.org/cheatsheets/File_Upload_Cheat_Sheet.html
+- Source type: standards
+- Supports: File uploads should use allowed extensions, type validation, filename controls, size limits, storage controls, and malware scanning where appropriate.
+- Policy impact: informed verification artifact upload requirements and the blocker around accepting manual badge uploads before safe handling exists.
+- Limitations: technical security reference; specific architecture decisions remain future implementation work.
+
+### OWASP Top 10 for Large Language Model Applications
+
+- URL: https://owasp.org/www-project-top-10-for-large-language-model-applications/
+- Source type: standards
+- Supports: LLM applications face risks including prompt injection, sensitive information disclosure, excessive agency, and insecure output handling.
+- Policy impact: informed AI policy requirements: retrieved content is untrusted, hidden prompts are not enough, and AI cannot approve verification or final bans.
+- Limitations: security-risk taxonomy, not product-specific legal advice.
+
+### OWASP Application Security Verification Standard
+
+- URL: https://owasp.org/www-project-application-security-verification-standard/
+- Source type: standards
+- Supports: ASVS provides application security verification requirements and levels.
+- Policy impact: reinforced security-review and authorization baseline for future implementation milestones.
+- Limitations: not a legal compliance standard by itself.
+
+### OpenAI - Best Practices for API Key Safety
+
+- URL: https://help.openai.com/en/articles/5112595-best-practices-for-api-key-safety
+- Source type: official docs
+- Supports: API keys should not be exposed client-side and should be routed through server-side code.
+- Policy impact: supported server-side-only AI requirement.
+- Limitations: vendor guidance, not a full AI governance policy.
+
+### OpenAI - Structured Outputs
+
+- URL: https://platform.openai.com/docs/guides/structured-outputs
+- Source type: official docs
+- Supports: Structured outputs can make model responses follow developer-supplied schemas and support more predictable validation.
+- Policy impact: supported structured outputs for Jumpseat Brief and moderation-assist use cases where practical.
+- Limitations: structured outputs reduce but do not eliminate safety and policy risk.
+
+### OpenAI - Moderation endpoint help
+
+- URL: https://help.openai.com/en/articles/4936833
+- Source type: official docs
+- Supports: OpenAI provides moderation capabilities for API users.
+- Policy impact: informed AI Safety Filter and moderation-assistant planning while preserving human final review.
+- Limitations: moderation tooling is assistive and does not replace Deadhead Club policy enforcement.
+
+### Supabase - Row Level Security
+
+- URL: https://supabase.com/docs/guides/database/postgres/row-level-security
+- Source type: official docs
+- Supports: Row Level Security enables granular database authorization and should be enabled for exposed tables.
+- Policy impact: reinforced policy requirement that sensitive data needs RLS plus server-side authorization in future implementation.
+- Limitations: implementation guidance, not a legal policy source.
+
+### Supabase - Storage access control
+
+- URL: https://supabase.com/docs/guides/storage/security/access-control
+- Source type: official docs
+- Supports: Storage access can be controlled with authorization rules and private access patterns.
+- Policy impact: informed private verification artifact storage, signed/admin-limited access, and no public file paths.
+- Limitations: final storage design depends on implementation.
+
+### Next.js - Data Security
+
+- URL: https://nextjs.org/docs/app/guides/data-security
+- Source type: official docs
+- Supports: Framework guidance distinguishes server-side data handling from client exposure risks.
+- Policy impact: supported server-side authorization and AI-key privacy requirements.
+- Limitations: framework-specific technical guidance.
+
+### Vercel - Security
+
+- URL: https://vercel.com/docs/security
+- Source type: official docs
+- Supports: Deployment platforms provide security features and shared-responsibility controls.
+- Policy impact: informed future launch review around environment variables, deployment security, and platform controls.
+- Limitations: platform documentation only; does not secure application logic.
+
+### GitHub Docs - Security hardening for GitHub Actions
+
+- URL: https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
+- Source type: official docs
+- Supports: CI workflows should use secure token permissions, secret handling, and dependency controls.
+- Policy impact: reinforced future CI/security gates before deployment.
+- Limitations: applies when GitHub Actions are created; no CI files exist in this documentation-only repo.
+
+### California Attorney General - California Consumer Privacy Act
+
+- URL: https://oag.ca.gov/privacy/ccpa
+- Source type: government
+- Supports: California provides consumer privacy rights and business obligations under qualifying circumstances.
+- Policy impact: informed deletion/export and state-privacy-rights review items without asserting applicability.
+- Limitations: applicability depends on thresholds, data use, entity details, and legal review.
+
+### California Privacy Protection Agency
+
+- URL: https://cppa.ca.gov/
+- Source type: government
+- Supports: California privacy regulator provides resources about state privacy rights and rules.
+- Policy impact: reinforced that privacy-policy drafting must include state-law review rather than generic wording.
+- Limitations: not all requirements apply to all businesses.
+
+### StaffTraveler - How do I prove that I work(ed) for an airline?
+
+- URL: https://support.stafftraveler.com/help/how-to-prove-that-i-work-for-an-airline
+- Source type: competitor page
+- Supports: Airline-worker proof can involve corporate email, ID, screenshots, or other evidence depending on circumstances.
+- Policy impact: informed verification consent requirements and redaction/private handling recommendations.
+- Limitations: competitor support guidance, not legal advice or a universal standard.
+
+### Blind FAQ
+
+- URL: https://us.teamblind.com/faq
+- Source type: competitor page
+- Supports: Blind uses work email verification for professional communities and notes employer email logging caveats.
+- Policy impact: informed work-email verification caveat and anonymous-but-accountable identity model.
+- Limitations: competitor policy, not necessarily suitable unchanged for aviation workers.
+
+### Blind Community Guidelines
+
+- URL: https://www.teamblind.com/community-guidelines/
+- Source type: competitor page
+- Supports: Anonymous professional communities need rules against harassment, confidential information, and harmful conduct.
+- Policy impact: informed community guidelines, anonymous discussion boundaries, and moderation expectations.
+- Limitations: not aviation-specific and not a legal authority.
+
+### SheerID Employment FAQ
+
+- URL: https://verify.sheerid.com/employment-faq/?pid=5ee238c1ea26521a9e0a9455
+- Source type: vendor docs
+- Supports: Employment verification may request personal information and documentation showing current affiliation.
+- Policy impact: informed Tier 5 later-stage verification and consent requirements.
+- Limitations: vendor-specific process and marketing/support content.
+
+### Truework 101
+
+- URL: https://help.truework.com/hc/en-us/articles/4403451702935-Truework-101
+- Source type: vendor docs
+- Supports: Employment/income verification can involve automated networks, third-party providers, manual outreach, and authorization workflows.
+- Policy impact: reinforced that employment/payroll verification APIs should not be a V1 dependency.
+- Limitations: vendor-specific and employment/income oriented, not airline-community verification.
+
+### Argyle Consumer FAQ
+
+- URL: https://www.argyle.com/consumers/faq
+- Source type: vendor docs
+- Supports: Payroll/employment data connectivity involves user authorization to access source systems.
+- Policy impact: informed privacy and consent concerns around advanced verification APIs.
+- Limitations: vendor-specific and broader than aviation-worker affiliation.
+
+### Atomic Verify
+
+- URL: https://atomic.financial/verify/
+- Source type: vendor docs
+- Supports: Atomic markets employment and income verification through payroll connectivity.
+- Policy impact: supported deferring payroll/API verification to a later stage with vendor-risk review.
+- Limitations: vendor marketing, not a legal standard.
+
 ### Stripe Subscriptions Docs
 
 - URL: https://docs.stripe.com/billing/subscriptions/overview
