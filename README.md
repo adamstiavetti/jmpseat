@@ -75,6 +75,7 @@ V1 explicitly excludes airline portal login, schedule scraping, public nearby cr
 - [Problem/Solution Validation Matrix](docs/PROBLEM_SOLUTION_VALIDATION_MATRIX.md)
 - [Discovery Research Report 001](docs/DISCOVERY_RESEARCH_REPORT_001.md)
 - [App Foundation Notes](docs/APP_FOUNDATION_NOTES.md)
+- [Deployment and Waitlist Readiness](docs/DEPLOYMENT_AND_WAITLIST_READINESS.md)
 - [Legal Policy Requirements](docs/LEGAL_POLICY_REQUIREMENTS.md)
 - [Docs Consistency Review](docs/DOCS_CONSISTENCY_REVIEW.md)
 - [Research Notes](docs/RESEARCH_NOTES.md)
