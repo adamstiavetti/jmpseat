@@ -23,6 +23,8 @@ Use this order when implementation begins:
 
 The detailed backlog below includes supporting storage, authorization, and policy tickets around that sequence, but the sequence above should guide the first build pass.
 
+Sequencing guardrail: Crew Rooms, Base Boards, and posts/comments may be implemented structurally before moderation is complete only in a local, non-user-facing, non-beta state. Real anonymous posting, member-generated content exposure, or beta use must remain blocked until auth/authorization, aviation-worker verification, reporting, moderation queue, emergency escalation, trust/safety rules, and admin controls are ready.
+
 ## Milestone 0: Product Readiness
 
 ### DHC-001: Research Review and PRD Lock
@@ -416,6 +418,7 @@ Acceptance criteria:
 - Anonymous display follows room rules.
 - Removed content is hidden from ordinary users.
 - Stored XSS and unauthorized edit/delete tests are covered.
+- Real anonymous posting remains disabled for beta users until reporting, moderation queue, emergency escalation, and admin controls are ready.
 
 Dependencies: DHC-015, DHC-016, DHC-017.
 

@@ -29,12 +29,14 @@ This plan is based on:
 - [TRUST_AND_SAFETY.md](TRUST_AND_SAFETY.md)
 - [DATA_MODEL.md](DATA_MODEL.md)
 - [FEATURE_ROADMAP.md](FEATURE_ROADMAP.md)
+- [LEGAL_POLICY_REQUIREMENTS.md](LEGAL_POLICY_REQUIREMENTS.md)
 
 Primary inputs:
 
 - `BUILD_TICKETS.md` defines the ticket inventory and implementation slices.
 - `BETA_READINESS_CHECKLIST.md` defines launch gates and blockers.
 - `PRIVATE_BETA_OPERATING_PLAN.md` defines how the first controlled beta should be seeded and operated.
+- `LEGAL_POLICY_REQUIREMENTS.md` defines minimum private-beta and public-launch policy gates, legal/trademark questions, verification consent, AI notice, vendor disclosure, and incident response requirements.
 
 ## 3. Execution Principles
 
@@ -66,7 +68,7 @@ V1 exclusions remain:
 
 | Milestone ID | Name | Goal | Ticket IDs Covered | Estimate | Risk | Exit Criteria |
 | --- | --- | --- | --- | --- | --- | --- |
-| M0 | Product Validation and Legal/Policy Prep | Resolve beta operating decisions before implementation | DHC-001 to DHC-006, DHC-030 to DHC-031 | 3-5 days | High | First beta community, first 50 plan, policy owners, and legal/trademark path documented |
+| M0 | Product Validation and Legal/Policy Prep | Resolve beta operating and policy decisions before implementation | DHC-001 to DHC-006, DHC-030 to DHC-031 | 3-5 days | High | First beta community, first 50 plan, minimum private-beta policy set, policy owners, and legal/trademark path documented |
 | M1 | App Foundation | Create the approved app foundation only after explicit approval | DHC-007, DHC-006, DHC-032, DHC-033 | 3-5 days | Medium | App runs locally with TypeScript strict, linting, CI/security baseline, and accessibility baseline |
 | M2 | Auth, Profiles, and Authorization | Establish identity, profile, and access-control foundation | DHC-008 to DHC-011 | 4-7 days | High | Auth, profile model, central authorization helpers, and RLS/server-side authorization plan are tested |
 | M3 | Verification System | Build private verification and admin review | DHC-010, DHC-012 to DHC-014, DHC-029 | 5-8 days | High | Work email/manual verification, artifact handling, retention/deletion, and admin review work without AI approval |
@@ -75,7 +77,7 @@ V1 exclusions remain:
 | M6 | Jumpseat Brief MVP | Add constrained AI layover planning | DHC-005, DHC-025 to DHC-026 | 4-7 days | High | Server-side AI, structured output, safety filters, logs, and limited/demo beta mode are ready |
 | M7 | Deals Directory MVP | Add controlled crew-friendly deals | DHC-027 to DHC-028 | 3-5 days | Medium | Basic deals directory works with admin review and no marketplace payments |
 | M8 | Admin Console | Consolidate admin operations | DHC-014, DHC-023, DHC-029, DHC-031 | 5-8 days | High | Admin can review verification, moderation, trust states, audit/security events, and beta operations |
-| M9 | Private Beta Readiness | Prove beta can launch safely | DHC-030, DHC-032, DHC-033 plus beta checklist | 3-6 days | High | Beta checklist, seed content, first 50 users, moderation coverage, reviews, and rollback plan are complete |
+| M9 | Private Beta Readiness | Prove beta can launch safely | DHC-030, DHC-032, DHC-033 plus beta checklist and legal/policy gates | 3-6 days | High | Beta checklist, minimum private-beta policy set, seed content, first 50 users, moderation coverage, reviews, and rollback plan are complete |
 
 ## 5. Required Milestones
 
@@ -90,7 +92,8 @@ Scope:
 - First 50 user plan.
 - Ambassador plan.
 - Trademark/legal path.
-- Privacy policy, terms of service, community guidelines, verification consent, and AI disclaimer ownership.
+- Minimum private-beta policy set from `LEGAL_POLICY_REQUIREMENTS.md`: beta participation terms, privacy notice, community rules, verification consent language, AI use notice if AI is enabled, no-official-affiliation disclaimer, emergency/safety escalation process, and working-name status note.
+- Public-launch policy owner path for full terms, full privacy policy, community guidelines, moderation rules, appeal process, vendor/sponsored-content rules, deletion/export process, incident response, and trademark/name clearance decision.
 
 Ticket coverage:
 
@@ -109,7 +112,8 @@ Exit criteria:
 - First 50 beta user profile is finalized.
 - Ambassador roster target is documented.
 - Legal/trademark clearance path is assigned.
-- Terms/privacy/community guideline owners are assigned.
+- Minimum private-beta policy set owner and reviewer are assigned.
+- Terms/privacy/community guideline, verification consent, AI notice, incident response, vendor disclosure, and trademark/name-clearance owners are assigned.
 - Verification retention decision is drafted for legal/privacy review.
 - Landing page/waitlist plan is written if beta recruitment needs it.
 
@@ -343,6 +347,7 @@ Goal: prove the private beta can launch safely and usefully.
 Scope:
 
 - Beta checklist.
+- Minimum private-beta policy set from `LEGAL_POLICY_REQUIREMENTS.md`.
 - Seed content.
 - First 50 users.
 - Moderation coverage.
@@ -362,6 +367,7 @@ Exit criteria:
 - First beta community is selected.
 - First 50 list is approved.
 - Ambassador targets are confirmed.
+- Beta participation terms, privacy notice, community rules, verification consent language, AI use notice if AI is live, no-affiliation disclaimer, emergency/safety escalation process, and working-name status note are ready for beta use.
 - Seed content exists for Crew Rooms, Base Boards, Layover Boards, safety pins, onboarding, and Jumpseat Brief examples.
 - Moderation coverage and emergency owner are assigned.
 - Security, privacy, accessibility, RLS/access-control, and AI safety reviews are complete.
@@ -415,6 +421,7 @@ Dependency rules:
 Private beta blockers:
 
 - Product Scope Gate: M0, M1 through M9.
+- Legal/Policy Gate: M0, M9.
 - Verification Gate: M2, M3, M8.
 - Privacy Gate: M2, M3, M8, M9.
 - Aviation Safety Gate: M0, M5, M9.
@@ -432,11 +439,15 @@ Public launch blockers:
 - Terms of service finalized.
 - Privacy policy finalized.
 - Community guidelines finalized.
+- Moderation rules and appeal process operational.
+- Vendor/sponsored content rules finalized if monetization is active.
+- Data deletion/export process operational.
+- Incident response process finalized.
+- Trademark/name clearance decision documented before public launch under the working name.
 - Legal/trademark path advanced without claiming clearance unless confirmed.
 - Security review complete with no unaccepted high/critical findings.
 - Accessibility review complete with known issues triaged.
 - Retention/deletion and export support paths tested.
-- Appeals process operational.
 - Sponsored deal/vendor removal policy finalized if monetization is active.
 
 ## 9. Recommended Build Order
@@ -475,15 +486,15 @@ Rationale:
 
 ## 11. Next Three Codex Tasks
 
-1. Create a documentation-only landing page and waitlist planning doc.
+1. Execute M0 validation/no-code waitlist preparation.
    - Use Plan/Goals: yes.
-   - Output: `docs/LANDING_PAGE_WAITLIST_PLAN.md`.
-   - Purpose: define waitlist copy, invite flow, verification expectation setting, privacy messaging, and first-base beta recruitment without building the page.
+   - Output: waitlist tool decision, finalized privacy-safe form fields, outreach list, interview script, ambassador screening flow, and data handling owner.
+   - Purpose: validate concentrated demand and first-base/community readiness before app-code work.
 
-2. Create a documentation-only legal/policy requirements brief.
+2. Create a counsel/security review packet.
    - Use Plan/Goals: yes.
-   - Output: `docs/LEGAL_POLICY_REQUIREMENTS.md`.
-   - Purpose: list required terms, privacy policy, verification consent, AI disclaimer, community guidelines, and trademark/name-clearance questions for counsel or policy owner.
+   - Output: summarized open questions for trademark/name clearance, privacy, verification consent, manual upload handling, AI notice, incident response, and vendor disclosure.
+   - Purpose: prepare qualified review before private beta.
 
 3. Start M1 App Foundation only if explicitly approved.
    - Use Plan/Goals: yes.

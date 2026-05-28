@@ -25,7 +25,7 @@ V1 should not compete directly with roster/schedule apps, non-rev load request t
 - Tier 4: peer-vouched by verified members, gated behind admin controls.
 - Tier 5: employment/payroll/API verified later, not required for V1.
 
-V1 verification should support work email and manual review. It should not depend on advanced vendors such as SheerID, Truework, Argyle, or Atomic.
+V1 verification should support work email and manual review. Tier 3 manual review can be non-upload review during private beta if upload controls are not ready, such as live call review, founder/admin-known verification, work email plus manual context, or non-stored visual confirmation. Manual badge/document uploads are allowed only if private storage, validation, short-lived admin links, access logging, and delete-after-review controls are ready. V1 should not depend on advanced vendors such as SheerID, Truework, Argyle, or Atomic.
 
 ### Airline, Role, and Base Profile
 

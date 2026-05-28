@@ -193,14 +193,16 @@ Accepted verification methods:
 
 - Basic email verification.
 - Aviation work email verification where the user is comfortable using it.
-- Manual badge/document verification as a controlled exception.
+- Tier 3 manual verification through non-upload manual review when upload controls are not ready.
+- Manual badge/document upload verification only as a controlled exception after upload safety controls are ready.
 - Founder/admin-known verification for a limited number of trusted first-wave users.
 - Peer vouching only as a supplemental signal, not as the sole verification method for unknown users.
 
 Decision on manual badge/document uploads:
 
 - Manual badge/document uploads may be allowed in private beta only after private storage, upload validation, short-lived admin links, access logging, and deletion-after-review process are ready.
-- If those controls are not ready, manual badge/document uploads are deferred and replaced with non-upload manual review, founder/admin-known verification, work email verification, or a live review process that does not retain artifacts.
+- If those controls are not ready, manual badge/document uploads are deferred and replaced with non-upload manual review, founder/admin-known verification, work email plus manual context, live call review, or non-stored visual confirmation that does not retain artifacts.
+- Badge uploads, IDs, schedules, or other sensitive verification documents must not be collected on the public waitlist page.
 
 Minimum-safe handling rules if uploads are allowed:
 
@@ -218,7 +220,7 @@ Verification review steps:
 
 1. User creates account and verifies basic email.
 2. User selects verification method.
-3. User sees privacy caveat for work email or upload method.
+3. User sees privacy caveat for work email, non-upload manual review, or upload method.
 4. User submits verification.
 5. Admin reviews only the minimum necessary information.
 6. Admin approves, rejects, or requests more information.
@@ -540,11 +542,11 @@ Do not scaffold the app yet unless explicitly approved.
 
 Recommended next Codex task:
 
-- Create a documentation-only milestone execution plan that maps `BUILD_TICKETS.md`, `BETA_READINESS_CHECKLIST.md`, and this operating plan into implementation milestones, estimates, risks, and beta acceptance dependencies.
+- Execute M0 validation/no-code waitlist preparation: finalize the waitlist tool choice, privacy-safe form fields, outreach list, interview script, ambassador screening flow, and data handling owner.
 
 Alternative documentation-only task:
 
-- Create a landing page / waitlist planning doc that defines copy, invite flow, verification expectation setting, and privacy messaging without building the page.
+- Create a counsel/security review packet covering trademark/name clearance, privacy, verification consent, manual upload handling, AI notice, incident response, and vendor disclosure.
 
 ## Unresolved Decisions
 
@@ -552,6 +554,6 @@ Alternative documentation-only task:
 - First 50 beta users.
 - Ambassador roster.
 - Exact verification-document retention period after legal/privacy review.
-- Whether upload controls are ready enough for private beta manual badge/document uploads.
+- Whether private beta uses only non-upload Tier 3 manual review or upload controls are ready enough for manual badge/document uploads.
 - Policy owner for terms, privacy policy, community guidelines, verification consent, and AI disclaimer.
 - Legal/trademark clearance path for the Deadhead Club working name.

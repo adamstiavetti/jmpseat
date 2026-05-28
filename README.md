@@ -64,6 +64,8 @@ V1 explicitly excludes airline portal login, schedule scraping, public nearby cr
 - [Technical Architecture](docs/TECHNICAL_ARCHITECTURE.md)
 - [Competitive Positioning](docs/COMPETITIVE_POSITIONING.md)
 - [Build Tickets](docs/BUILD_TICKETS.md)
+- [Beta Readiness Checklist](docs/BETA_READINESS_CHECKLIST.md)
+- [Private Beta Operating Plan](docs/PRIVATE_BETA_OPERATING_PLAN.md)
 - [Milestone Execution Plan](docs/MILESTONE_EXECUTION_PLAN.md)
 - [Landing Page Waitlist Plan](docs/LANDING_PAGE_WAITLIST_PLAN.md)
 - [Legal Policy Requirements](docs/LEGAL_POLICY_REQUIREMENTS.md)
@@ -72,7 +74,7 @@ V1 explicitly excludes airline portal login, schedule scraping, public nearby cr
 
 ## Current Repo Boundary
 
-This repo is a planning source of truth for future build work. The next implementation task may create the app foundation from these documents, but implementation remains out of scope until explicitly requested.
+This repo is a planning source of truth for future build work. App foundation work remains out of scope until explicitly approved, and no product-feature implementation should begin until the relevant validation, policy, safety, and sequencing gates are accepted.
 
 ## Engineering Standards Baseline
 

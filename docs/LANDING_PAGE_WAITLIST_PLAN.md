@@ -455,19 +455,19 @@ Avoid for this phase:
 
 ## 17. Recommended Next Codex Tasks
 
-1. Create a documentation-only legal/policy requirements brief.
+1. Execute M0 validation/no-code waitlist preparation.
    - Use Plan/Goals: yes.
-   - Output: `docs/LEGAL_POLICY_REQUIREMENTS.md`.
-   - Purpose: define the required terms, privacy policy, community guidelines, verification consent, AI disclaimer, and trademark/name-clearance questions for counsel or policy owner.
+   - Output: waitlist tool decision, finalized privacy-safe form fields, outreach list, interview script, ambassador screening flow, and data handling owner.
+   - Purpose: validate concentrated demand and first-base/community readiness before app-code work.
 
-2. Create a documentation-only beta research script and interview guide.
+2. Create a counsel/security review packet.
    - Use Plan/Goals: yes.
-   - Output: `docs/BETA_RESEARCH_INTERVIEW_GUIDE.md`.
-   - Purpose: standardize first-50-user interviews and ambassador screening around utility, trust, verification, privacy, and feature demand.
+   - Output: summarized open questions for trademark/name clearance, privacy, verification consent, manual upload handling, AI notice, incident response, and vendor disclosure.
+   - Purpose: prepare qualified review before private beta.
 
-3. Create the actual no-code landing page only if approved.
+3. Start M1 App Foundation only if explicitly approved.
    - Use Plan/Goals: yes.
-   - Output: no-code tool setup instructions or implementation branch, depending on approval.
-   - Purpose: publish the waitlist using Carrd/Framer plus Tally or equivalent, without building the app.
+   - Output: app foundation branch only, if approved.
+   - Purpose: create the minimal app foundation with no product features, no database schema, no verification upload flow, and no V1-excluded features.
 
-The first recommended task remains documentation/planning unless the user explicitly approves creating a real landing page.
+The first recommended task remains no-code validation unless the user explicitly approves app-code work.

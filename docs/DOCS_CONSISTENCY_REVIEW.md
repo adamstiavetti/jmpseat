@@ -252,17 +252,17 @@ First safe scaffold task, if explicitly approved later:
 
 ## 14. Recommended Next Codex Task
 
-Recommended next task: targeted docs correction pass for the P1 issues in this review.
+Recommended next task after the P1 correction pass: execute M0 validation/no-code waitlist preparation.
 
 Use Plan/Goals: yes.
 
 Scope:
 
-- Update `BUILD_TICKETS.md` sequencing language.
-- Update `DATA_MODEL.md` deferred/covered entity notes.
-- Standardize manual verification upload/non-upload wording.
-- Add `LEGAL_POLICY_REQUIREMENTS.md` to milestone source/gate references.
-- Refresh stale "Recommended Next Tasks" sections.
+- Finalize the waitlist tool choice.
+- Finalize privacy-safe form fields.
+- Draft outreach and interview flow for first-base/community validation.
+- Draft ambassador screening flow.
+- Assign the waitlist data handling owner.
 - Do not create app code.
 - Do not expand V1 scope.
 - Do not create production legal documents.

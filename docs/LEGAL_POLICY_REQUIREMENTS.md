@@ -108,7 +108,7 @@ Deadhead Club must avoid collecting sensitive data it does not need. V1 should n
 
 ## 7. Verification Consent Requirements
 
-V1 verification should rely on practical, privacy-aware methods: basic email, aviation work email where comfortable, and controlled manual review only when safe upload handling exists. Tier 5 employment/payroll/API verification remains later-stage.
+V1 verification should rely on practical, privacy-aware methods: basic email, aviation work email where comfortable, and controlled manual review. During private beta, Tier 3 manual review can use non-upload methods such as live call review, founder/admin-known verification, work email plus manual context, or non-stored visual confirmation if upload controls are not ready. Manual badge/document uploads should be accepted only when safe upload handling exists. Tier 5 employment/payroll/API verification remains later-stage.
 
 | Checklist item | Recommended approach for Deadhead Club | Research/source basis | Confidence level | Required before private beta | Required before public launch | Owner/reviewer | Notes or open questions |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -119,7 +119,7 @@ V1 verification should rely on practical, privacy-aware methods: basic email, av
 | Revocation/re-review | Define when status can be revoked or re-reviewed: fraud, impersonation, role change, abuse, expired evidence, or user request. | Verification vendor workflow patterns; Trust and Safety plan. | Medium | Yes | Yes | Policy owner | Include appeal or correction path. |
 | What users should not upload | Ban uploads of passport, government ID unless explicitly approved, full schedules, passenger data, portal screenshots with sensitive data, employee numbers, or confidential documents. | FTC minimization; TSA/aviation-sensitive guidance; StaffTraveler examples with redaction caution. | High | Yes | Yes | Attorney, security reviewer | Use redaction instructions before upload. |
 | No AI approval | AI must not approve, reject, or score verification artifacts. | NIST AI RMF; OWASP LLM Top 10; product safety principle. | High | Yes | Yes | Engineer, policy owner | No AI processing of verification documents in V1. |
-| Private beta manual review | Allow uploads only if private storage, validation, signed links, access logging, and deletion workflow exist; otherwise use work email or non-retained live/manual review. | OWASP file upload; Supabase storage; FTC security. | High | Yes | Yes | Founder, security reviewer | This is a beta blocker if manual uploads are required. |
+| Private beta manual review | Allow uploads only if private storage, validation, signed links, access logging, and deletion workflow exist; otherwise use work email, founder/admin-known verification, work email plus manual context, non-stored visual confirmation, or non-retained live/manual review. | OWASP file upload; Supabase storage; FTC security. | High | Yes | Yes | Founder, security reviewer | This is a beta blocker if manual uploads are required. |
 
 ## 8. Community Guidelines Requirements
 
@@ -267,6 +267,6 @@ Incident response must cover both conventional security/privacy incidents and av
 
 ## 19. Recommended Next Tasks
 
-1. Run a review-only consistency pass across all docs to align policy gates, beta readiness, build tickets, and milestone sequencing. Use Plan/Goals.
-2. Create a no-code waitlist validation packet: landing page copy, waitlist form schema, interview script, ambassador outreach templates, and privacy-safe data handling checklist. Use Plan/Goals.
-3. Create a counsel/security review packet summarizing open legal, privacy, verification, trademark, AI, and incident-response questions. Use Plan/Goals.
+1. Execute M0 validation/no-code waitlist preparation: finalize the waitlist tool choice, privacy-safe form fields, outreach list, interview script, ambassador screening flow, and data handling owner. Use Plan/Goals.
+2. Create a counsel/security review packet summarizing open legal, privacy, verification, trademark, AI, and incident-response questions. Use Plan/Goals.
+3. Start M1 App Foundation only if explicitly approved after M0 blockers are accepted or resolved. Use Plan/Goals.

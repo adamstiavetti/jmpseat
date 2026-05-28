@@ -504,6 +504,26 @@ Relationships:
 - Belongs to User.
 - May be referenced by Verification.
 
+## Subscription
+
+Deferred paid-account or premium-access entity.
+
+V1 status:
+
+- Do not model Subscription in V1 unless payments or premium features are explicitly approved.
+- Do not add payment, billing, Stripe customer, or subscription lifecycle fields until Stripe/payments enter scope.
+- If premium subscriptions are approved later, model Subscription separately from core verification, trust, and posting access so paid status cannot override safety or verification rules.
+
+## AuditLog
+
+Product/audit abstraction rather than a required standalone V1 table.
+
+V1 strategy:
+
+- Audit requirements should be backed by SecurityEvent, ModerationAction, verification decision history, admin action history, and relevant timestamp/reviewer fields.
+- Do not duplicate sensitive logs into a separate AuditLog table unless there is a clear query, retention, compliance, or operational purpose.
+- If a distinct AuditLog is added later, it must align with SecurityEvent and ModerationAction semantics and avoid copying raw verification artifacts, private notes, or sensitive content unnecessarily.
+
 ## Relationship Summary
 
 - User owns Profile, Verification records, content, saved items, reports, moderation actions, AI briefs, and trust level.
@@ -516,10 +536,12 @@ Relationships:
 - Reports and ModerationActions enforce accountability across content and accounts.
 - SecurityEvent records sensitive audit trails.
 - UploadArtifact separates private file metadata from public profile and content records.
+- Subscription is deferred until payments or premium features are explicitly in scope.
+- AuditLog is covered by SecurityEvent, ModerationAction, verification decision history, and admin action history unless a later design needs a distinct table.
 
 ## Model Boundaries for V1
 
-Do not model airline portal credentials, scraped schedules, live crew locations, flight-load request infrastructure, payments, native mobile device records, or roster/calendar integrations in V1.
+Do not model airline portal credentials, scraped schedules, live crew locations, flight-load request infrastructure, payments, subscriptions, native mobile device records, or roster/calendar integrations in V1.
 
 ## Data Modeling Best Practices
 
