@@ -64,6 +64,7 @@ V1 explicitly excludes airline portal login, schedule scraping, public nearby cr
 - [Technical Architecture](docs/TECHNICAL_ARCHITECTURE.md)
 - [Competitive Positioning](docs/COMPETITIVE_POSITIONING.md)
 - [Build Tickets](docs/BUILD_TICKETS.md)
+- [Milestone Execution Plan](docs/MILESTONE_EXECUTION_PLAN.md)
 - [Research Notes](docs/RESEARCH_NOTES.md)
 
 ## Current Repo Boundary
