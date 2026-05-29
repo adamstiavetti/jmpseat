@@ -129,6 +129,24 @@ Pending:
 - Review mobile UX.
 - Record first trusted-contact feedback.
 
+Tracked visual backlog:
+
+- **Redesign public waitlist page into premium 3JS Airside Access journey**
+  - Status: deferred / tracked / not blocking validation.
+  - Reason: the current live waitlist page is acceptable for validation and outreach, but it is not the final visual experience. Prior Three.js/WebGL attempts were useful technical and creative spikes, but did not meet the top-tier visual bar for a future public-facing brand experience.
+  - Target: future Epoch 01 continuation or a dedicated visual redesign epoch before broader public launch.
+  - Requirements:
+    - Mobile-first vertical scroll journey.
+    - Three.js/WebGL-led experience.
+    - Inspired by high-end immersive sites such as Lando Norris and igloo-style brand experiences.
+    - Strong airport, airline, and airside visual identity without implying official affiliation.
+    - Boarding pass / access card as the iconic hero object.
+    - Story path: scattered intel -> system online -> verified access -> privacy boundary -> private beta boarding.
+    - Must not look like primitive boxes, subtle background animation, generic SaaS, or low-quality demo geometry.
+    - Must preserve waitlist CTA, Tally link, disclaimers, accessibility, and reduced-motion fallback.
+    - Must not add auth, database, API persistence, verification, community features, AI, payments, or other product features as part of the visual redesign.
+  - Operating rule: this redesign must not block trusted-contact feedback, FA interviews, or waitlist validation. Future implementation requires explicit approval, a dedicated branch, acceptance criteria, checks, screenshots, and preview proof.
+
 Exit criteria:
 
 - Production loads.
