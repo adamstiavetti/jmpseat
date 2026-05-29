@@ -2,9 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Deadhead Club | Off-duty network for airline people",
-  description:
-    "Base intel, layover knowledge, and honest crew talk built for verified aviation workers.",
+  title: "Deadhead Club",
+  description: "Deadhead Club application shell.",
 };
 
 export default function RootLayout({
