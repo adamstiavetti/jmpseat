@@ -71,6 +71,7 @@ V1 explicitly excludes airline portal login, schedule scraping, public nearby cr
 - [M0 Validation Operating Packet](docs/M0_VALIDATION_OPERATING_PACKET.md)
 - [No-Code Waitlist Execution](docs/NO_CODE_WAITLIST_EXECUTION.md)
 - [Product Delivery Operating Model](docs/PRODUCT_DELIVERY_OPERATING_MODEL.md)
+- [Naming and Information Architecture](docs/NAMING_AND_INFORMATION_ARCHITECTURE.md)
 - [Discovery Research Plan](docs/DISCOVERY_RESEARCH_PLAN.md)
 - [Problem/Solution Validation Matrix](docs/PROBLEM_SOLUTION_VALIDATION_MATRIX.md)
 - [Discovery Research Report 001](docs/DISCOVERY_RESEARCH_REPORT_001.md)
