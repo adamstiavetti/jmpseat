@@ -693,13 +693,13 @@ export default function LiveGlobeProofPage() {
 
     const computeTargetProgress = () => {
       const viewportHeight = Math.max(window.innerHeight, 1);
-      const distanceMultiplier = isMobileViewport ? 0.68 : 0.34;
+      const distanceMultiplier = isMobileViewport ? 1.35 : 0.95;
       const transitionDistance = viewportHeight * distanceMultiplier;
       targetProgress = prefersReducedMotion ? 0 : THREE.MathUtils.clamp(window.scrollY / transitionDistance, 0, 1);
     };
 
     const tick = () => {
-      const ease = isMobileViewport ? 0.14 : 0.2;
+      const ease = isMobileViewport ? 0.16 : 0.2;
       smoothedProgress = THREE.MathUtils.lerp(smoothedProgress, targetProgress, ease);
       if (Math.abs(targetProgress - smoothedProgress) < 0.0006) {
         smoothedProgress = targetProgress;
@@ -987,7 +987,7 @@ function LiveGlobeCanvas({
       const progress = readOrbProgress();
       currentOrbProgress = progress;
       const finalScale = isMobileLayout ? 0.24 : 0.23;
-      const finalY = isMobileLayout ? 0.86 : 1.12;
+      const finalY = isMobileLayout ? 0.78 : 1.12;
       globeRig.position.set(0, baseGlobeY + THREE.MathUtils.lerp(0, finalY, progress), 0);
       globeRig.scale.setScalar(baseGlobeScale * THREE.MathUtils.lerp(1, finalScale, progress));
       for (const material of routeShaderMaterials) {

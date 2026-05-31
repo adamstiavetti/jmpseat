@@ -17,8 +17,9 @@
   position: relative;
   isolation: isolate;
   min-width: 320px;
-  min-height: 190vh;
-  min-height: 190svh;
+  min-height: 300vh;
+  min-height: 300svh;
+  min-height: 300dvh;
   overflow-x: hidden;
   background: #01060d;
 }
@@ -26,8 +27,12 @@
 .heroStage {
   position: fixed;
   inset: 0;
+  height: 100vh;
+  height: 100svh;
+  height: 100dvh;
   min-height: 100vh;
   min-height: 100svh;
+  min-height: 100dvh;
   overflow: hidden;
   isolation: isolate;
 }
@@ -67,7 +72,11 @@
 
 .cornerLogo {
   z-index: 5;
-  inset: clamp(14px, 2.8vw, 34px) auto auto clamp(14px, 2.8vw, 34px);
+  inset:
+    calc(env(safe-area-inset-top, 0px) + clamp(14px, 2.8vw, 34px))
+    auto
+    auto
+    calc(env(safe-area-inset-left, 0px) + clamp(14px, 2.8vw, 34px));
   pointer-events: none;
 }
 
@@ -448,7 +457,11 @@
 
 @media (max-width: 759px) {
   .cornerLogo {
-    inset: clamp(10px, 3.2vw, 16px) auto auto clamp(10px, 3.2vw, 16px);
+    inset:
+      calc(env(safe-area-inset-top, 0px) + clamp(10px, 3.2vw, 16px))
+      auto
+      auto
+      calc(env(safe-area-inset-left, 0px) + clamp(10px, 3.2vw, 16px));
   }
 
   .cornerLogoImage {
@@ -468,7 +481,11 @@
   }
 
   .scrollCue {
-    inset: auto 0 clamp(2.2vh, 4.2vh, 6.2vh) 0;
+    inset:
+      auto
+      max(0px, env(safe-area-inset-right, 0px))
+      calc(env(safe-area-inset-bottom, 0px) + clamp(34px, 8vh, 78px))
+      max(0px, env(safe-area-inset-left, 0px));
   }
 
   .topGlowLayer {
@@ -530,7 +547,11 @@
 
 .scrollCue {
   z-index: 6;
-  inset: auto clamp(14px, 2.2vw, 30px) clamp(1.8vh, 3.6vh, 5.2vh) auto;
+  inset:
+    auto
+    calc(env(safe-area-inset-right, 0px) + clamp(14px, 2.2vw, 30px))
+    calc(env(safe-area-inset-bottom, 0px) + clamp(1.8vh, 3.6vh, 5.2vh))
+    auto;
   display: flex;
   align-items: center;
   justify-content: flex-end;
@@ -664,6 +685,7 @@
   .page {
     min-height: 100vh;
     min-height: 100svh;
+    min-height: 100dvh;
   }
 
   .heroStage {
@@ -698,7 +720,11 @@
 
 @media (max-width: 759px) {
   .scrollCue {
-    inset: auto clamp(10px, 3vw, 14px) clamp(1.6vh, 3.2vh, 4.2vh) auto;
+    inset:
+      auto
+      calc(env(safe-area-inset-right, 0px) + clamp(10px, 3vw, 14px))
+      calc(env(safe-area-inset-bottom, 0px) + clamp(34px, 8vh, 78px))
+      auto;
   }
 
   .scrollCueText {
