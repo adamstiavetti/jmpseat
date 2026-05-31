@@ -645,9 +645,110 @@ const AIRCRAFT_TRAFFIC = buildAircraftTrafficConfigs(ROUTE_ARCS);
 
 export default function LiveGlobeProofPage() {
   const [isGlobeReady, setIsGlobeReady] = useState(false);
+  const [areUiAssetsReady, setAreUiAssetsReady] = useState(false);
+  const [isHeroVisible, setIsHeroVisible] = useState(false);
+  const [isLoaderFading, setIsLoaderFading] = useState(false);
+  const [isLoaderHidden, setIsLoaderHidden] = useState(false);
   const pageRef = useRef<HTMLElement | null>(null);
+  const orbProgressRef = useRef(0);
+  const loaderStartRef = useRef<number | null>(null);
   const handleGlobeReady = useCallback(() => setIsGlobeReady(true), []);
   const { textureSetName, gradeName, routesMode, aircraftMode } = useLiveGlobeOverrides();
+  const isPageReady = isGlobeReady && areUiAssetsReady;
+
+  useEffect(() => {
+    if (loaderStartRef.current === null) {
+      loaderStartRef.current = Date.now();
+    }
+  }, []);
+
+  useEffect(() => {
+    const html = document.documentElement;
+    const body = document.body;
+
+    if (isHeroVisible) {
+      html.style.overflow = "";
+      body.style.overflow = "";
+      body.style.touchAction = "";
+      return;
+    }
+
+    html.style.overflow = "hidden";
+    body.style.overflow = "hidden";
+    body.style.touchAction = "none";
+
+    return () => {
+      html.style.overflow = "";
+      body.style.overflow = "";
+      body.style.touchAction = "";
+    };
+  }, [isHeroVisible]);
+
+  useEffect(() => {
+    if (!isPageReady) {
+      return;
+    }
+
+    const startTime = loaderStartRef.current ?? Date.now();
+    const elapsed = Date.now() - startTime;
+    const holdForMs = Math.max(0, 4000 - elapsed);
+    const loaderFadeMs = 840;
+
+    const fadeLoaderTimeout = window.setTimeout(() => {
+      setIsLoaderFading(true);
+    }, holdForMs);
+    const hideLoaderTimeout = window.setTimeout(() => {
+      setIsLoaderHidden(true);
+    }, holdForMs + loaderFadeMs + 20);
+      const revealTimeout = window.setTimeout(() => {
+        setIsHeroVisible(true);
+      }, holdForMs + loaderFadeMs + 80);
+
+    return () => {
+      window.clearTimeout(fadeLoaderTimeout);
+      window.clearTimeout(hideLoaderTimeout);
+      window.clearTimeout(revealTimeout);
+    };
+  }, [isPageReady]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const preloadImage = (src: string) =>
+      new Promise<void>((resolve) => {
+        const image = new Image();
+        image.decoding = "async";
+        image.onload = () => resolve();
+        image.onerror = () => resolve();
+        image.src = src;
+        if (image.complete) {
+          resolve();
+        }
+      });
+
+    const fontReady = "fonts" in document ? (document.fonts.ready as Promise<unknown>).catch(() => undefined) : Promise.resolve();
+
+    Promise.all([
+      preloadImage("/cinematic/backgrounds/boarding-portal-entry-background.png"),
+      preloadImage("/cinematic/branding/optimized/skybyrd-logo-ui.png"),
+      preloadImage("/cinematic/branding/optimized/skybyrd-logo-loader.png"),
+      preloadImage("/cinematic/branding/skybyrd-wordmark-8k.png"),
+      fontReady,
+    ]).then(() => {
+      if (cancelled) {
+        return;
+      }
+      window.requestAnimationFrame(() => {
+        if (!cancelled) {
+          setAreUiAssetsReady(true);
+        }
+      });
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     const page = pageRef.current;
@@ -660,9 +761,11 @@ export default function LiveGlobeProofPage() {
     let targetProgress = 0;
     let smoothedProgress = 0;
     let ticking = false;
+    let lastTickTime = 0;
     let isMobileViewport = window.matchMedia("(max-width: 760px)").matches;
+    const getViewportHeight = () => Math.max(window.visualViewport?.height ?? window.innerHeight, 1);
 
-    const applyProgressStyles = (rawProgress: number) => {
+    const applyProgressStyles = (rawProgress: number, viewportHeight: number) => {
       const clampedProgress = THREE.MathUtils.clamp(rawProgress, 0, 1);
       const orbProgress = 1 - Math.pow(1 - clampedProgress, 3);
       const collapseProgress = THREE.MathUtils.smoothstep(clampedProgress, 0.34, 0.82);
@@ -674,37 +777,45 @@ export default function LiveGlobeProofPage() {
       const gapCloseProgress = THREE.MathUtils.smoothstep(clampedProgress, 0, 0.76);
       const wordmarkMouthY = Math.min(54, 32 * fastPullProgress + 32 * gapCloseProgress);
       const absorptionMouthY = Math.min(26, 15 * fastPullProgress + 19 * gapCloseProgress);
-      page.style.setProperty("--orb-progress", orbProgress.toFixed(4));
-      page.style.setProperty("--wordmark-y", `${(-wordmarkMouthY).toFixed(3)}vh`);
-      page.style.setProperty("--wordmark-scale", (1 - clampedProgress * 0.1).toFixed(4));
-      page.style.setProperty("--wordmark-collapse-x", Math.max(0.045, 1 - collapseProgress * 0.955).toFixed(4));
-      page.style.setProperty("--wordmark-width", `${(58 - widthCollapseProgress * 53.5).toFixed(3)}vw`);
-      page.style.setProperty("--wordmark-opacity", Math.max(0, 1 - wordmarkExit).toFixed(4));
-      page.style.setProperty("--absorb-opacity", Math.max(0, absorbProgress * 0.92).toFixed(4));
-      page.style.setProperty("--absorb-y", `${(-absorptionMouthY).toFixed(3)}vh`);
-      page.style.setProperty("--absorb-scale-x", Math.max(0.06, 1 - widthCollapseProgress * 0.94).toFixed(4));
-      page.style.setProperty("--absorb-cone-opacity", Math.max(0, absorbProgress * 0.62).toFixed(4));
-      page.style.setProperty("--sucked-word-y", `${(-28 * suckedWordProgress - 28 * gapCloseProgress).toFixed(3)}vh`);
-      page.style.setProperty("--sucked-gap-close", gapCloseProgress.toFixed(4));
-      page.style.setProperty("--sucked-word-collapse-x", Math.max(0.028, 1 - widthCollapseProgress * 0.972).toFixed(4));
-      page.style.setProperty("--sucked-word-opacity", Math.max(0, absorbProgress * (1 - wordmarkExit * 0.95)).toFixed(4));
+      const wordmarkYpx = -(wordmarkMouthY / 100) * viewportHeight;
+      const absorbYpx = -(absorptionMouthY / 100) * viewportHeight;
+      const suckedWordYvh = -28 * suckedWordProgress - 28 * gapCloseProgress;
+      const suckedWordYpx = (suckedWordYvh / 100) * viewportHeight;
+      page.style.setProperty("--orb-progress", `${orbProgress}`);
+      page.style.setProperty("--wordmark-y", `${wordmarkYpx}px`);
+      page.style.setProperty("--wordmark-scale", `${1 - clampedProgress * 0.1}`);
+      page.style.setProperty("--wordmark-collapse-x", `${Math.max(0.045, 1 - collapseProgress * 0.955)}`);
+      page.style.setProperty("--wordmark-width", `${58 - widthCollapseProgress * 53.5}vw`);
+      page.style.setProperty("--wordmark-opacity", `${Math.max(0, 1 - wordmarkExit)}`);
+      page.style.setProperty("--absorb-opacity", `${Math.max(0, absorbProgress * 0.92)}`);
+      page.style.setProperty("--absorb-y", `${absorbYpx}px`);
+      page.style.setProperty("--absorb-scale-x", `${Math.max(0.06, 1 - widthCollapseProgress * 0.94)}`);
+      page.style.setProperty("--absorb-cone-opacity", `${Math.max(0, absorbProgress * 0.62)}`);
+      page.style.setProperty("--sucked-word-y", `${suckedWordYpx}px`);
+      page.style.setProperty("--sucked-gap-close", `${gapCloseProgress}`);
+      page.style.setProperty("--sucked-word-collapse-x", `${Math.max(0.028, 1 - widthCollapseProgress * 0.972)}`);
+      page.style.setProperty("--sucked-word-opacity", `${Math.max(0, absorbProgress * (1 - wordmarkExit * 0.95))}`);
       page.style.setProperty("--scroll-cue-opacity", "1");
+      orbProgressRef.current = orbProgress;
     };
 
     const computeTargetProgress = () => {
-      const viewportHeight = Math.max(window.innerHeight, 1);
-      const distanceMultiplier = isMobileViewport ? 1.35 : 0.95;
+      const viewportHeight = getViewportHeight();
+      const distanceMultiplier = isMobileViewport ? 1.65 : 1.15;
       const transitionDistance = viewportHeight * distanceMultiplier;
       targetProgress = prefersReducedMotion ? 0 : THREE.MathUtils.clamp(window.scrollY / transitionDistance, 0, 1);
     };
 
-    const tick = () => {
-      const ease = isMobileViewport ? 0.16 : 0.2;
-      smoothedProgress = THREE.MathUtils.lerp(smoothedProgress, targetProgress, ease);
+    const tick = (timestamp: number) => {
+      const dt = lastTickTime === 0 ? 1 / 60 : THREE.MathUtils.clamp((timestamp - lastTickTime) / 1000, 1 / 180, 1 / 20);
+      lastTickTime = timestamp;
+      const smoothStrength = isMobileViewport ? 12 : 15;
+      const alpha = 1 - Math.exp(-smoothStrength * dt);
+      smoothedProgress = THREE.MathUtils.lerp(smoothedProgress, targetProgress, alpha);
       if (Math.abs(targetProgress - smoothedProgress) < 0.0006) {
         smoothedProgress = targetProgress;
       }
-      applyProgressStyles(smoothedProgress);
+      applyProgressStyles(smoothedProgress, getViewportHeight());
 
       if (Math.abs(targetProgress - smoothedProgress) > 0.0006) {
         frame = window.requestAnimationFrame(tick);
@@ -712,6 +823,7 @@ export default function LiveGlobeProofPage() {
       }
 
       frame = 0;
+      lastTickTime = 0;
       ticking = false;
     };
 
@@ -722,14 +834,17 @@ export default function LiveGlobeProofPage() {
         return;
       }
       ticking = true;
+      lastTickTime = 0;
       frame = window.requestAnimationFrame(tick);
     };
 
     computeTargetProgress();
     smoothedProgress = targetProgress;
-    applyProgressStyles(smoothedProgress);
+    applyProgressStyles(smoothedProgress, getViewportHeight());
     window.addEventListener("scroll", requestScrollProgress, { passive: true });
     window.addEventListener("resize", requestScrollProgress);
+    window.addEventListener("orientationchange", requestScrollProgress);
+    window.visualViewport?.addEventListener("scroll", requestScrollProgress);
     window.visualViewport?.addEventListener("resize", requestScrollProgress);
 
     return () => {
@@ -739,6 +854,8 @@ export default function LiveGlobeProofPage() {
       ticking = false;
       window.removeEventListener("scroll", requestScrollProgress);
       window.removeEventListener("resize", requestScrollProgress);
+      window.removeEventListener("orientationchange", requestScrollProgress);
+      window.visualViewport?.removeEventListener("scroll", requestScrollProgress);
       window.visualViewport?.removeEventListener("resize", requestScrollProgress);
     };
   }, []);
@@ -746,67 +863,85 @@ export default function LiveGlobeProofPage() {
   return (
     <main ref={pageRef} className={styles.page} aria-label="Deadhead live globe proof lab">
       <section className={styles.heroStage} aria-label="Skybyrd live globe hero">
-        <div className={styles.backgroundPlate} />
-        <div className={styles.wakeLayer} />
-        <div className={styles.cornerLogo} aria-hidden="true">
-          <img
-            src="/cinematic/branding/skybyrd-logo.png"
-            alt=""
-            className={styles.cornerLogoImage}
-            decoding="async"
-            loading="eager"
-            draggable={false}
-          />
-        </div>
-        <div className={styles.globeOrbRig}>
-          <LiveGlobeCanvas
-            onReady={handleGlobeReady}
-            textureSet={TEXTURE_SETS[textureSetName]}
-            grade={GRADE_CONFIGS[gradeName]}
-            routesEnabled={routesMode === "on"}
-            aircraftEnabled={aircraftMode === "on"}
-          />
-        </div>
-        <div className={styles.wordmark} aria-hidden="true">
-          <img
-            src="/cinematic/branding/skybyrd-wordmark-8k.png"
-            alt=""
-            className={styles.wordmarkImage}
-            decoding="async"
-            loading="eager"
-            draggable={false}
-          />
-        </div>
-        <div className={styles.wordmarkAbsorption} aria-hidden="true">
-          <span />
-          <span />
-          <span />
-          <span />
-          <span />
-          <span />
-          <span />
-          <span />
-          <span />
-          <span />
-          <span />
-          <span />
-          <span />
-          <span />
-        </div>
-        <div className={styles.topGlowLayer} />
-        <div className={styles.vignetteLayer} />
-        <div className={styles.scrollCue} aria-hidden="true">
-          <div className={styles.scrollCueIcon}>
-            <div className={styles.scrollCueRing} />
-            <div className={styles.scrollCueChevronTrack}>
-              <span className={styles.scrollCueChevron} />
-              <span className={`${styles.scrollCueChevron} ${styles.scrollCueChevronAlt}`} />
-            </div>
+        <div className={styles.heroContent}>
+          <div className={styles.backgroundPlate} />
+          <div className={styles.wakeLayer} />
+          <div className={styles.cornerLogo} aria-hidden="true">
+            <img
+              src="/cinematic/branding/optimized/skybyrd-logo-ui.png"
+              alt=""
+              className={styles.cornerLogoImage}
+              decoding="async"
+              loading="eager"
+              fetchPriority="high"
+              draggable={false}
+            />
           </div>
-          <span className={styles.scrollCueText}>SCROLL TO CONTINUE</span>
+          <div className={styles.globeOrbRig}>
+            <LiveGlobeCanvas
+              onReady={handleGlobeReady}
+              textureSet={TEXTURE_SETS[textureSetName]}
+              grade={GRADE_CONFIGS[gradeName]}
+              routesEnabled={routesMode === "on"}
+              aircraftEnabled={aircraftMode === "on"}
+              orbProgressRef={orbProgressRef}
+            />
+          </div>
+          <div className={styles.wordmark} aria-hidden="true">
+            <img
+              src="/cinematic/branding/skybyrd-wordmark-8k.png"
+              alt=""
+              className={styles.wordmarkImage}
+              decoding="async"
+              loading="eager"
+              draggable={false}
+            />
+          </div>
+          <div className={styles.wordmarkAbsorption} aria-hidden="true">
+            <span />
+            <span />
+            <span />
+            <span />
+            <span />
+            <span />
+            <span />
+            <span />
+            <span />
+            <span />
+            <span />
+            <span />
+            <span />
+            <span />
+          </div>
+          <div className={styles.topGlowLayer} />
+          <div className={styles.vignetteLayer} />
+          <div className={styles.scrollCue} aria-hidden="true">
+            <div className={styles.scrollCueIcon}>
+              <div className={styles.scrollCueRing} />
+              <div className={styles.scrollCueChevronTrack}>
+                <span className={styles.scrollCueChevron} />
+                <span className={`${styles.scrollCueChevron} ${styles.scrollCueChevronAlt}`} />
+              </div>
+            </div>
+            <span className={styles.scrollCueText}>SCROLL TO CONTINUE</span>
+          </div>
         </div>
-        <div className={`${styles.loadingLayer} ${isGlobeReady ? styles.loadingLayerReady : ""}`} aria-hidden="true">
-          <div className={styles.loadingOrb} />
+        <div className={`${styles.revealCurtain} ${isHeroVisible ? styles.revealCurtainOpen : ""}`} aria-hidden="true" />
+        <div
+          className={`${styles.loadingLayer} ${isLoaderFading ? styles.loadingLayerFading : ""} ${isLoaderHidden ? styles.loadingLayerHidden : ""}`}
+          aria-hidden="true"
+        >
+          <div className={styles.loadingOrb}>
+            <img
+              src="/cinematic/branding/optimized/skybyrd-logo-loader.png"
+              alt=""
+              className={styles.loadingOrbLogo}
+              decoding="sync"
+              loading="eager"
+              fetchPriority="high"
+              draggable={false}
+            />
+          </div>
           <div className={styles.loadingLine} />
         </div>
         <h1 className={styles.srOnly}>Live CGTrader Earth globe proof</h1>
@@ -895,12 +1030,14 @@ function LiveGlobeCanvas({
   grade,
   routesEnabled,
   aircraftEnabled,
+  orbProgressRef,
 }: {
   onReady: () => void;
   textureSet: TextureSet;
   grade: GradeConfig;
   routesEnabled: boolean;
   aircraftEnabled: boolean;
+  orbProgressRef: React.MutableRefObject<number>;
 }) {
   const mountRef = useRef<HTMLDivElement | null>(null);
 
@@ -980,8 +1117,7 @@ function LiveGlobeCanvas({
         return 0;
       }
 
-      const progress = Number.parseFloat(getComputedStyle(mount).getPropertyValue("--orb-progress"));
-      return Number.isFinite(progress) ? THREE.MathUtils.clamp(progress, 0, 1) : 0;
+      return THREE.MathUtils.clamp(orbProgressRef.current, 0, 1);
     };
     const applyGlobeOrbTransform = () => {
       const progress = readOrbProgress();
@@ -2062,7 +2198,7 @@ function LiveGlobeCanvas({
       }
       mount.removeChild(renderer.domElement);
     };
-  }, [aircraftEnabled, grade, onReady, routesEnabled, textureSet]);
+  }, [aircraftEnabled, grade, onReady, orbProgressRef, routesEnabled, textureSet]);
 
   return <div ref={mountRef} className={styles.canvasMount} aria-hidden="true" />;
 }

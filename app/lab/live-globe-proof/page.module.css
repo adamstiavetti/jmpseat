@@ -1,15 +1,15 @@
 .page {
   --orb-progress: 0;
-  --wordmark-y: 0vh;
+  --wordmark-y: 0px;
   --wordmark-scale: 1;
   --wordmark-collapse-x: 1;
   --wordmark-width: 58vw;
   --wordmark-opacity: 1;
   --absorb-opacity: 0;
-  --absorb-y: 0vh;
+  --absorb-y: 0px;
   --absorb-scale-x: 1;
   --absorb-cone-opacity: 0;
-  --sucked-word-y: 0vh;
+  --sucked-word-y: 0px;
   --sucked-word-collapse-x: 1;
   --sucked-word-opacity: 0;
   --sucked-gap-close: 0;
@@ -35,6 +35,26 @@
   min-height: 100dvh;
   overflow: hidden;
   isolation: isolate;
+}
+
+.heroContent {
+  position: absolute;
+  inset: 0;
+  transition:
+    opacity 1080ms cubic-bezier(0.16, 1, 0.3, 1),
+    filter 1080ms cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, filter;
+  transform: translateZ(0);
+}
+
+.heroContentHidden {
+  opacity: 0;
+  filter: blur(10px) saturate(0.9);
+}
+
+.heroContentVisible {
+  opacity: 1;
+  filter: blur(0) saturate(1);
 }
 
 .backgroundPlate,
@@ -498,24 +518,29 @@
 }
 
 .loadingLayer {
-  z-index: 5;
+  z-index: 20;
   display: grid;
   place-items: center;
   pointer-events: none;
   background:
-    radial-gradient(circle at 50% 31%, rgba(33, 145, 255, 0.16), transparent 20%),
-    linear-gradient(180deg, rgba(0, 4, 13, 0.94), rgba(0, 7, 18, 0.86));
+    radial-gradient(circle at 50% 31%, rgba(18, 95, 171, 0.24), transparent 26%),
+    linear-gradient(180deg, rgba(1, 6, 13, 1), rgba(1, 8, 18, 1));
   opacity: 1;
-  transition: opacity 900ms ease, visibility 900ms ease;
+  transition: opacity 840ms cubic-bezier(0.22, 0.61, 0.36, 1), visibility 840ms ease;
   visibility: visible;
 }
 
-.loadingLayerReady {
+.loadingLayerFading {
   opacity: 0;
   visibility: hidden;
 }
 
+.loadingLayerHidden {
+  display: none;
+}
+
 .loadingOrb {
+  position: relative;
   width: clamp(92px, 22vw, 148px);
   aspect-ratio: 1;
   border: 1px solid rgba(65, 168, 255, 0.64);
@@ -526,6 +551,18 @@
   box-shadow:
     0 0 16px rgba(15, 139, 255, 0.42),
     inset 0 0 24px rgba(27, 151, 255, 0.2);
+}
+
+.loadingOrbLogo {
+  position: absolute;
+  inset: 50% auto auto 50%;
+  width: clamp(38px, 9.6vw, 62px);
+  height: auto;
+  transform: translate(-50%, -50%);
+  object-fit: contain;
+  opacity: 0.95;
+  user-select: none;
+  -webkit-user-drag: none;
 }
 
 .loadingLine {
