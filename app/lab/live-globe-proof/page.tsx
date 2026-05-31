@@ -2,12 +2,14 @@
 
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import * as THREE from "three";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 
 import styles from "./page.module.css";
 
 type TextureSetName = "v2" | "v3" | "v4" | "cityrim" | "polar" | "atlantic" | "europe" | "cityhalo";
 type GradeName = "regressed" | "recovered" | "cityrim" | "polar" | "atlantic" | "europe" | "cityhalo";
 type RoutesMode = "on" | "off";
+type AircraftMode = "on" | "off";
 
 type TextureSet = {
   day: string;
@@ -55,6 +57,31 @@ type RouteArcConfig = {
   glowRadius: number;
   opacity: number;
   glowOpacity: number;
+};
+
+type AircraftPlacementConfig = {
+  routeIndex: number;
+  progress: number;
+  speed: number;
+  baseScale: number;
+};
+
+type RouteCurveEntry = {
+  routeIndex: number;
+  routeConfig: RouteArcConfig;
+  curve: THREE.CatmullRomCurve3;
+};
+
+type AircraftEntry = {
+  anchor: THREE.Group;
+  pose: THREE.Group;
+  visual: THREE.Group;
+  routeEntry: RouteCurveEntry;
+  progress: number;
+  speed: number;
+  baseScale: number;
+  materials: THREE.MeshPhongMaterial[];
+  trailPoints: THREE.Mesh[];
 };
 
 const TEXTURE_SETS: Record<TextureSetName, TextureSet> = {
@@ -319,6 +346,22 @@ const INITIAL_GLOBE_ROTATION = {
 const DEFAULT_TEXTURE_SET: TextureSetName = "cityhalo";
 const DEFAULT_GRADE: GradeName = "cityhalo";
 const DEFAULT_ROUTES_MODE: RoutesMode = "on";
+const DEFAULT_AIRCRAFT_MODE: AircraftMode = "off";
+const AIRCRAFT_MODEL_PATH = "/cinematic/models/deadhead-aircraft-v1.glb";
+const AIRCRAFT_CLEARANCE = 0;
+const AIRCRAFT_VISUAL_SIZE = 0.132;
+const AIRCRAFT_FORWARD_AXIS_CORRECTION = new THREE.Quaternion();
+const AIRCRAFT_TRAIL_STEPS = 6;
+const AIRCRAFT_TRAIL_STEP = 0.016;
+const AIRCRAFT_ROUTE_MIN_SCALE = 0.24;
+const AIRCRAFT_ROUTE_MAX_SCALE = 1.24;
+const AIRCRAFT_DEBUG_ROUTE = {
+  routeIndex: 10,
+  routeName: "Lagos -> Dallas",
+  progress: 0.01,
+  speed: 0.038,
+  baseScale: 1,
+} satisfies AircraftPlacementConfig & { routeName: string };
 
 const ROUTE_ARCS: RouteArcConfig[] = [
   {
@@ -568,7 +611,7 @@ const ROUTE_ARCS: RouteArcConfig[] = [
 export default function LiveGlobeProofPage() {
   const [isGlobeReady, setIsGlobeReady] = useState(false);
   const handleGlobeReady = useCallback(() => setIsGlobeReady(true), []);
-  const { textureSetName, gradeName, routesMode } = useLiveGlobeOverrides();
+  const { textureSetName, gradeName, routesMode, aircraftMode } = useLiveGlobeOverrides();
 
   return (
     <main className={styles.page} aria-label="Deadhead live globe proof lab">
@@ -579,6 +622,7 @@ export default function LiveGlobeProofPage() {
         textureSet={TEXTURE_SETS[textureSetName]}
         grade={GRADE_CONFIGS[gradeName]}
         routesEnabled={routesMode === "on"}
+        aircraftEnabled={aircraftMode === "on"}
       />
       <div className={styles.topGlowLayer} />
       <div className={styles.vignetteLayer} />
@@ -645,6 +689,14 @@ function getRoutesMode(value: string | null): RoutesMode {
   return DEFAULT_ROUTES_MODE;
 }
 
+function getAircraftMode(value: string | null): AircraftMode {
+  if (value === "on" || value === "off") {
+    return value;
+  }
+
+  return DEFAULT_AIRCRAFT_MODE;
+}
+
 function useLiveGlobeOverrides() {
   const search = useSyncExternalStore(subscribeToSearchParams, getClientSearch, getServerSearch);
   const params = new URLSearchParams(search);
@@ -653,6 +705,7 @@ function useLiveGlobeOverrides() {
     textureSetName: getTextureSetName(params.get("candidate")),
     gradeName: getGradeName(params.get("grade")),
     routesMode: getRoutesMode(params.get("routes")),
+    aircraftMode: getAircraftMode(params.get("aircraft")),
   };
 }
 
@@ -661,11 +714,13 @@ function LiveGlobeCanvas({
   textureSet,
   grade,
   routesEnabled,
+  aircraftEnabled,
 }: {
   onReady: () => void;
   textureSet: TextureSet;
   grade: GradeConfig;
   routesEnabled: boolean;
+  aircraftEnabled: boolean;
 }) {
   const mountRef = useRef<HTMLDivElement | null>(null);
 
@@ -693,6 +748,8 @@ function LiveGlobeCanvas({
     const routeDisposables: THREE.BufferGeometry[] = [];
     const routeMaterials: THREE.Material[] = [];
     const routeShaderMaterials: THREE.ShaderMaterial[] = [];
+    const aircraftMaterials: THREE.MeshPhongMaterial[] = [];
+    const aircraftEntries: AircraftEntry[] = [];
 
     renderer.setClearColor(0x000000, 0);
     renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -1198,12 +1255,185 @@ function LiveGlobeCanvas({
       return new THREE.CatmullRomCurve3(points, false, "catmullrom", 0.28);
     };
 
+    const aircraftUp = new THREE.Vector3();
+    const aircraftPoint = new THREE.Vector3();
+    const aircraftTangent = new THREE.Vector3();
+    const aircraftRight = new THREE.Vector3();
+    const aircraftForward = new THREE.Vector3();
+    const aircraftLookTarget = new THREE.Vector3();
+    const aircraftBasis = new THREE.Matrix4();
+    const aircraftWorldPosition = new THREE.Vector3();
+    const globeToCamera = new THREE.Vector3();
+    const aircraftNormal = new THREE.Vector3();
+    const aircraftFutureTangent = new THREE.Vector3();
+    const aircraftTrailPoint = new THREE.Vector3();
+    const aircraftTrailNormal = new THREE.Vector3();
+
+    const applyAircraftPose = (
+      entry: AircraftEntry,
+      progress: number,
+      camera: THREE.PerspectiveCamera,
+    ) => {
+      const clampedProgress = THREE.MathUtils.euclideanModulo(progress, 1);
+      entry.routeEntry.curve.getPointAt(clampedProgress, aircraftPoint);
+      entry.routeEntry.curve.getTangentAt(clampedProgress, aircraftTangent).normalize();
+      entry.routeEntry.curve.getTangentAt(THREE.MathUtils.euclideanModulo(clampedProgress + 0.008, 1), aircraftFutureTangent).normalize();
+      aircraftUp.copy(aircraftPoint).normalize();
+      aircraftLookTarget.copy(aircraftPoint).add(aircraftTangent);
+      aircraftForward.copy(aircraftLookTarget).sub(aircraftPoint).normalize();
+      aircraftRight.crossVectors(aircraftUp, aircraftForward).normalize();
+      aircraftForward.crossVectors(aircraftRight, aircraftUp).normalize();
+      aircraftBasis.makeBasis(aircraftRight, aircraftUp, aircraftForward);
+      entry.anchor.position.copy(aircraftPoint).addScaledVector(aircraftUp, AIRCRAFT_CLEARANCE);
+      entry.pose.quaternion.setFromRotationMatrix(aircraftBasis);
+      const bankAmount = THREE.MathUtils.clamp(
+        aircraftFutureTangent.sub(aircraftTangent).dot(aircraftRight) * 4.5,
+        -0.18,
+        0.18,
+      );
+      entry.visual.quaternion.copy(AIRCRAFT_FORWARD_AXIS_CORRECTION);
+      entry.visual.rotateZ(bankAmount);
+
+      entry.anchor.getWorldPosition(aircraftWorldPosition);
+      globeToCamera.copy(camera.position).sub(globeRig.position).normalize();
+      aircraftNormal.copy(aircraftWorldPosition).sub(globeRig.position).normalize();
+      const front = THREE.MathUtils.smoothstep(aircraftNormal.dot(globeToCamera), -0.12, 0.24);
+      const visibleHeight = THREE.MathUtils.smoothstep(1.46, 1.66, aircraftPoint.length());
+      const depthPresence = THREE.MathUtils.clamp(front * 0.82 + visibleHeight * 0.18, 0, 1);
+      const routeCenterPresence = Math.pow(Math.max(Math.sin(clampedProgress * Math.PI), 0), 1.16);
+      const routeProgressScale = THREE.MathUtils.lerp(
+        AIRCRAFT_ROUTE_MIN_SCALE,
+        AIRCRAFT_ROUTE_MAX_SCALE,
+        routeCenterPresence,
+      );
+      const depthScale = THREE.MathUtils.lerp(0.82, 1.34, depthPresence) * entry.baseScale;
+      entry.anchor.scale.setScalar(depthScale * routeProgressScale);
+      const opacity = THREE.MathUtils.lerp(0.22, 0.98, depthPresence);
+      for (const material of entry.materials) {
+        material.opacity = opacity;
+      }
+      for (const [index, trailPoint] of entry.trailPoints.entries()) {
+        const trailProgress = THREE.MathUtils.euclideanModulo(clampedProgress - (index + 1) * AIRCRAFT_TRAIL_STEP, 1);
+        entry.routeEntry.curve.getPointAt(trailProgress, aircraftTrailPoint);
+        aircraftTrailNormal.copy(aircraftTrailPoint).normalize();
+        trailPoint.position.copy(aircraftTrailPoint).addScaledVector(aircraftTrailNormal, 0.003);
+        const trailMaterial = trailPoint.material as THREE.MeshBasicMaterial;
+        trailMaterial.opacity = opacity * THREE.MathUtils.lerp(0.08, 0.012, index / Math.max(entry.trailPoints.length - 1, 1));
+      }
+    };
+
+    const buildAircraftModel = (source: THREE.Object3D) => {
+      const normalizedRoot = source.clone(true);
+      const materials: THREE.MeshPhongMaterial[] = [];
+      normalizedRoot.traverse((child) => {
+        if (!(child instanceof THREE.Mesh)) {
+          return;
+        }
+
+        const material = new THREE.MeshPhongMaterial({
+          color: new THREE.Color(0xf7fbff),
+          specular: new THREE.Color(0xffffff),
+          shininess: 54,
+          transparent: true,
+          opacity: 1,
+        });
+        aircraftMaterials.push(material);
+        materials.push(material);
+        child.castShadow = false;
+        child.receiveShadow = false;
+        child.renderOrder = 10;
+        child.material = material;
+      });
+
+      const bounds = new THREE.Box3().setFromObject(normalizedRoot);
+      const size = bounds.getSize(new THREE.Vector3());
+      const maxDimension = Math.max(size.x, size.y, size.z, 1e-4);
+      normalizedRoot.scale.setScalar(AIRCRAFT_VISUAL_SIZE / maxDimension);
+      normalizedRoot.updateMatrixWorld(true);
+      const centeredBounds = new THREE.Box3().setFromObject(normalizedRoot);
+      const centeredPosition = centeredBounds.getCenter(new THREE.Vector3());
+      const centeredSize = centeredBounds.getSize(new THREE.Vector3());
+      normalizedRoot.position.sub(centeredPosition);
+
+      const visual = new THREE.Group();
+      visual.name = "aircraft-visual";
+      visual.quaternion.copy(AIRCRAFT_FORWARD_AXIS_CORRECTION);
+      visual.add(normalizedRoot);
+      return { visual, materials, centeredSize };
+    };
+
+    const attachAircraftToRoutes = (routeGroup: THREE.Group, routeEntries: RouteCurveEntry[]) => {
+      const aircraftLoader = new GLTFLoader(loadingManager);
+      aircraftLoader.load(AIRCRAFT_MODEL_PATH, (gltf) => {
+        if (disposed) {
+          return;
+        }
+
+        const aircraftRig = new THREE.Group();
+        aircraftRig.name = "aircraft-rig";
+
+        const routeEntry = routeEntries.find((entry) => entry.routeIndex === AIRCRAFT_DEBUG_ROUTE.routeIndex);
+        if (!routeEntry) {
+          routeGroup.add(aircraftRig);
+          return;
+        }
+
+        const { visual, materials } = buildAircraftModel(gltf.scene);
+
+        const aircraftAnchor = new THREE.Group();
+        aircraftAnchor.name = "aircraft-anchor";
+        const aircraftPose = new THREE.Group();
+        aircraftPose.name = "aircraft-pose";
+        aircraftPose.add(visual);
+        aircraftAnchor.add(aircraftPose);
+        aircraftRig.add(aircraftAnchor);
+
+        const trailPoints: THREE.Mesh[] = [];
+        for (let index = 0; index < AIRCRAFT_TRAIL_STEPS; index += 1) {
+          const trailGeometry = new THREE.SphereGeometry(THREE.MathUtils.lerp(0.005, 0.002, index / Math.max(AIRCRAFT_TRAIL_STEPS - 1, 1)), 10, 10);
+          const trailMaterial = new THREE.MeshBasicMaterial({
+            color: 0xd8e7ff,
+            transparent: true,
+            opacity: 0.05,
+            depthWrite: false,
+            blending: THREE.AdditiveBlending,
+          });
+          const trailPointMesh = new THREE.Mesh(trailGeometry, trailMaterial);
+          trailPointMesh.renderOrder = 11;
+          trailPoints.push(trailPointMesh);
+          routeDisposables.push(trailGeometry);
+          routeMaterials.push(trailMaterial);
+          routeGroup.add(trailPointMesh);
+        }
+        aircraftEntries.push({
+          anchor: aircraftAnchor,
+          pose: aircraftPose,
+          visual,
+          routeEntry,
+          progress: AIRCRAFT_DEBUG_ROUTE.progress,
+          speed: AIRCRAFT_DEBUG_ROUTE.speed,
+          baseScale: AIRCRAFT_DEBUG_ROUTE.baseScale,
+          materials,
+          trailPoints,
+        });
+        window.console.info("[live-globe-proof] aircraft motion debug", {
+          route: AIRCRAFT_DEBUG_ROUTE.routeName,
+          initialT: AIRCRAFT_DEBUG_ROUTE.progress,
+          speed: AIRCRAFT_DEBUG_ROUTE.speed,
+          aircraftModelPath: AIRCRAFT_MODEL_PATH,
+        });
+        routeGroup.add(aircraftRig);
+      });
+    };
+
     const createRouteGroup = () => {
       const group = new THREE.Group();
       group.name = "route-arcs";
+      const routeEntries: RouteCurveEntry[] = [];
 
-      for (const route of ROUTE_ARCS) {
+      for (const [routeIndex, route] of ROUTE_ARCS.entries()) {
         const curve = createRouteCurve(route);
+        routeEntries.push({ routeIndex, routeConfig: route, curve });
 
         const glowGeometry = new THREE.TubeGeometry(curve, 160, route.glowRadius, 10, false);
         const glowMaterial = createRouteMaterial({
@@ -1229,7 +1459,7 @@ function LiveGlobeCanvas({
         group.add(glowMesh, coreMesh);
       }
 
-      return group;
+      return { group, routeEntries };
     };
 
     const addGlobeSphere = () => {
@@ -1246,7 +1476,10 @@ function LiveGlobeCanvas({
       cloudRig.name = "cloud-rig";
       globeRig.add(earth, cities, cityHalo, cloudRig, atmosphere);
       if (routeGroup) {
-        globeRig.add(routeGroup);
+        globeRig.add(routeGroup.group);
+        if (aircraftEnabled) {
+          attachAircraftToRoutes(routeGroup.group, routeGroup.routeEntries);
+        }
       }
     };
 
@@ -1273,7 +1506,8 @@ function LiveGlobeCanvas({
     };
 
     const animate = () => {
-      const elapsed = clock.getElapsedTime();
+      const delta = clock.getDelta();
+      const elapsed = clock.elapsedTime;
       const cloudRig = globeRig.getObjectByName("cloud-rig");
       if (!prefersReducedMotion) {
         globeRig.rotation.y = INITIAL_GLOBE_ROTATION.y + elapsed * 0.0118;
@@ -1281,6 +1515,10 @@ function LiveGlobeCanvas({
         globeRig.rotation.z = INITIAL_GLOBE_ROTATION.z;
         for (const material of routeShaderMaterials) {
           material.uniforms.globeCenter.value.copy(globeRig.position);
+        }
+        for (const entry of aircraftEntries) {
+          entry.progress = THREE.MathUtils.euclideanModulo(entry.progress + entry.speed * delta, 1);
+          applyAircraftPose(entry, entry.progress, camera);
         }
         if (cloudRig) {
           cloudRig.rotation.y = elapsed * 0.0028;
@@ -1295,6 +1533,9 @@ function LiveGlobeCanvas({
         }
       } else {
         globeRig.rotation.set(INITIAL_GLOBE_ROTATION.x, INITIAL_GLOBE_ROTATION.y, INITIAL_GLOBE_ROTATION.z);
+        for (const entry of aircraftEntries) {
+          applyAircraftPose(entry, entry.progress, camera);
+        }
         if (cloudRig) {
           cloudRig.rotation.set(0, 0, 0);
           const cloudBase = cloudRig.getObjectByName("cloud-base");
@@ -1335,9 +1576,12 @@ function LiveGlobeCanvas({
       for (const material of routeMaterials) {
         material.dispose();
       }
+      for (const material of aircraftMaterials) {
+        material.dispose();
+      }
       mount.removeChild(renderer.domElement);
     };
-  }, [grade, onReady, routesEnabled, textureSet]);
+  }, [aircraftEnabled, grade, onReady, routesEnabled, textureSet]);
 
   return <div ref={mountRef} className={styles.canvasMount} aria-hidden="true" />;
 }
