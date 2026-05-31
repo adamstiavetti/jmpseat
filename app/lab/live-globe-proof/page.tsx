@@ -653,6 +653,7 @@ export default function LiveGlobeProofPage() {
   const [isLoaderHidden, setIsLoaderHidden] = useState(false);
   const [isSceneMaterializing, setIsSceneMaterializing] = useState(false);
   const [isSceneMaterialized, setIsSceneMaterialized] = useState(false);
+  const [isScrollUnlocked, setIsScrollUnlocked] = useState(false);
   const pageRef = useRef<HTMLElement | null>(null);
   const orbProgressRef = useRef(0);
   const materializeSignalRef = useRef(0);
@@ -660,7 +661,7 @@ export default function LiveGlobeProofPage() {
   const handleGlobeReady = useCallback(() => setIsGlobeReady(true), []);
   const { textureSetName, gradeName, routesMode, aircraftMode } = useLiveGlobeOverrides();
   const isPageReady = isGlobeReady && areUiAssetsReady;
-  const isInteractionReady = isHeroVisible && isSceneMaterialized;
+  const isInteractionReady = isHeroVisible && isScrollUnlocked;
 
   useEffect(() => {
     if (loaderStartRef.current === null) {
@@ -710,11 +711,15 @@ export default function LiveGlobeProofPage() {
     const materializeTimeout = window.setTimeout(() => {
       setIsSceneMaterializing(true);
       setIsSceneMaterialized(false);
+      setIsScrollUnlocked(false);
       materializeSignalRef.current += 1;
     }, Math.max(0, holdForMs - materializePrerollMs));
+    const scrollUnlockTimeout = window.setTimeout(() => {
+      setIsScrollUnlocked(true);
+    }, Math.max(0, holdForMs - materializePrerollMs) + 3100);
     const materializedTimeout = window.setTimeout(() => {
       setIsSceneMaterialized(true);
-    }, Math.max(0, holdForMs - materializePrerollMs) + 4700);
+    }, Math.max(0, holdForMs - materializePrerollMs) + 4600);
     const revealTimeout = window.setTimeout(() => {
       setIsHeroVisible(true);
     }, holdForMs + loaderFadeMs + 80);
@@ -723,6 +728,7 @@ export default function LiveGlobeProofPage() {
       window.clearTimeout(fadeLoaderTimeout);
       window.clearTimeout(hideLoaderTimeout);
       window.clearTimeout(materializeTimeout);
+      window.clearTimeout(scrollUnlockTimeout);
       window.clearTimeout(materializedTimeout);
       window.clearTimeout(revealTimeout);
     };
@@ -785,18 +791,19 @@ export default function LiveGlobeProofPage() {
     const applyProgressStyles = (rawProgress: number, viewportHeight: number) => {
       const clampedProgress = THREE.MathUtils.clamp(rawProgress, 0, 1);
       const orbProgress = 1 - Math.pow(1 - clampedProgress, 3);
-      const collapseProgress = THREE.MathUtils.smoothstep(clampedProgress, 0.34, 0.82);
-      const widthCollapseProgress = THREE.MathUtils.smoothstep(clampedProgress, 0.3, 0.82);
-      const absorbProgress = THREE.MathUtils.smoothstep(clampedProgress, 0.24, 0.48) * (1 - THREE.MathUtils.smoothstep(clampedProgress, 0.96, 1));
+      const collapseProgress = THREE.MathUtils.smoothstep(clampedProgress, 0.02, 0.56);
+      const widthCollapseProgress = THREE.MathUtils.smoothstep(clampedProgress, 0.02, 0.58);
+      const absorbProgress = THREE.MathUtils.smoothstep(clampedProgress, 0, 0.3) * (1 - THREE.MathUtils.smoothstep(clampedProgress, 0.96, 1));
       const wordmarkExit = THREE.MathUtils.smoothstep(clampedProgress, 0.985, 1);
-      const suckedWordProgress = THREE.MathUtils.smoothstep(clampedProgress, 0.08, 1);
-      const fastPullProgress = 1 - Math.pow(1 - clampedProgress, 1.65);
-      const gapCloseProgress = THREE.MathUtils.smoothstep(clampedProgress, 0, 0.76);
-      const wordmarkMouthY = Math.min(54, 32 * fastPullProgress + 32 * gapCloseProgress);
-      const absorptionMouthY = Math.min(26, 15 * fastPullProgress + 19 * gapCloseProgress);
+      const suckedWordProgress = THREE.MathUtils.smoothstep(clampedProgress, 0.02, 0.82);
+      const particleLeadProgress = 1 - Math.pow(1 - clampedProgress, 1.3);
+      const fastPullProgress = 1 - Math.pow(1 - clampedProgress, 1.25);
+      const gapCloseProgress = THREE.MathUtils.smoothstep(clampedProgress, 0, 0.58);
+      const wordmarkMouthY = Math.min(52, 34 * fastPullProgress + 26 * gapCloseProgress);
+      const absorptionMouthY = Math.min(24, 15 * particleLeadProgress + 15 * gapCloseProgress);
       const wordmarkYpx = -(wordmarkMouthY / 100) * viewportHeight;
       const absorbYpx = -(absorptionMouthY / 100) * viewportHeight;
-      const suckedWordYvh = -28 * suckedWordProgress - 28 * gapCloseProgress;
+      const suckedWordYvh = -25 * suckedWordProgress - 25 * gapCloseProgress;
       const suckedWordYpx = (suckedWordYvh / 100) * viewportHeight;
       page.style.setProperty("--orb-progress", `${orbProgress}`);
       page.style.setProperty("--wordmark-y", `${wordmarkYpx}px`);
@@ -809,6 +816,7 @@ export default function LiveGlobeProofPage() {
       page.style.setProperty("--absorb-scale-x", `${Math.max(0.06, 1 - widthCollapseProgress * 0.94)}`);
       page.style.setProperty("--absorb-cone-opacity", `${Math.max(0, absorbProgress * 0.62)}`);
       page.style.setProperty("--sucked-word-y", `${suckedWordYpx}px`);
+      page.style.setProperty("--particle-lead-progress", `${particleLeadProgress}`);
       page.style.setProperty("--sucked-gap-close", `${gapCloseProgress}`);
       page.style.setProperty("--sucked-word-collapse-x", `${Math.max(0.028, 1 - widthCollapseProgress * 0.972)}`);
       page.style.setProperty("--sucked-word-opacity", `${Math.max(0, absorbProgress * (1 - wordmarkExit * 0.95))}`);

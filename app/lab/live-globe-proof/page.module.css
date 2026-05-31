@@ -25,6 +25,7 @@
   --sucked-word-collapse-x: 1;
   --sucked-word-opacity: 0;
   --sucked-gap-close: 0;
+  --particle-lead-progress: 0;
   --scroll-cue-opacity: 1;
   --scene-materialize-opacity: 0;
   --scene-materialize-background-opacity: 0.42;
@@ -202,7 +203,7 @@
   content: "";
   position: absolute;
   left: 50%;
-  top: clamp(36%, 39vh, 42%);
+  top: clamp(38%, 41vh, 44%);
   width: clamp(118px, 19vw, 280px);
   height: clamp(76px, 13vh, 170px);
   border-radius: 48% 48% 44% 44%;
@@ -219,7 +220,7 @@
 .wordmarkAbsorption span {
   position: absolute;
   left: calc(50% + var(--particle-x));
-  top: clamp(49%, 54vh, 57%);
+  top: clamp(45%, 49vh, 52%);
   width: var(--particle-w);
   height: var(--particle-h);
   border-radius: 999px;
@@ -233,7 +234,7 @@
   transform:
     translate3d(
       calc((var(--particle-drift) * var(--orb-progress)) - (var(--particle-x) * var(--orb-progress) * 0.72)),
-      calc((var(--particle-rise) * var(--orb-progress)) - (var(--sucked-gap-close) * 4vh)),
+      calc((var(--particle-rise) * var(--particle-lead-progress)) - (var(--sucked-gap-close) * 2.6vh)),
       0
     )
     rotate(var(--particle-tilt))
