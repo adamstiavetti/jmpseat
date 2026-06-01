@@ -32,6 +32,8 @@
   --background-perspective-scale: 1.018;
   --background-perspective-y: 0px;
   --background-extension-opacity: 0;
+  --hero-background-opacity: 1;
+  --transition-canvas-opacity: 0;
   --wake-layer-opacity: 1;
   --vignette-layer-opacity: 1;
   --final-background-opacity: 0;
@@ -128,6 +130,9 @@
   inset: 0;
   z-index: 3;
   pointer-events: none;
+  opacity: var(--transition-canvas-opacity);
+  transition: opacity 80ms linear;
+  will-change: opacity;
 }
 
 .backgroundTransitionMount canvas {
@@ -152,7 +157,7 @@
     linear-gradient(180deg, rgba(0, 2, 8, 0.22), rgba(0, 2, 8, 0.46)),
     url("/cinematic/backgrounds/boarding-portal-entry-background.png") center / cover no-repeat;
   filter: blur(14px) saturate(0.86) brightness(0.76);
-  opacity: calc(0.72 + var(--background-extension-opacity) * 0.28);
+  opacity: calc((0.72 + var(--background-extension-opacity) * 0.28) * var(--hero-background-opacity));
   transform:
     translate3d(0, calc(var(--background-perspective-y) * -0.34), 0)
     scale(1.13);
@@ -163,6 +168,7 @@
   background:
     linear-gradient(180deg, rgba(0, 2, 8, 0.14), rgba(0, 2, 8, 0.28)),
     url("/cinematic/backgrounds/boarding-portal-entry-background.png") center / cover no-repeat;
+  opacity: var(--hero-background-opacity);
   transform:
     translate3d(0, var(--background-perspective-y), 0)
     scale(var(--background-perspective-scale));
