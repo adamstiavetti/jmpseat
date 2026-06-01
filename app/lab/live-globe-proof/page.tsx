@@ -86,9 +86,25 @@ type AircraftEntry = {
   bank: number;
   materials: THREE.MeshPhongMaterial[];
   glowMaterials: THREE.Material[];
-  trailPoints: THREE.Mesh[];
+  trailPoints: THREE.Object3D[];
   revealScale: number;
   revealOpacity: number;
+};
+
+type HeroFlightMode = "ROUTE_IDLE" | "HERO_TRANSITION" | "JOURNEY_READY" | "HERO_RETURN";
+
+type HeroFlightController = {
+  mode: HeroFlightMode;
+  sourceEntry: AircraftEntry | null;
+  actor: AircraftEntry | null;
+  launchCurve: THREE.Curve<THREE.Vector3> | null;
+  returnCurve: THREE.Curve<THREE.Vector3> | null;
+  routeProgress: number;
+  snapshotScale: number;
+  snapshotOpacity: number;
+  launchStartTime: number;
+  returnStartTime: number;
+  transitionProgress: number;
 };
 
 const TEXTURE_SETS: Record<TextureSetName, TextureSet> = {
@@ -360,9 +376,15 @@ const AIRCRAFT_VISUAL_SIZE = 0.132;
 const AIRCRAFT_FORWARD_AXIS_CORRECTION = new THREE.Quaternion();
 const AIRCRAFT_TRAIL_STEPS = 6;
 const AIRCRAFT_TRAIL_STEP = 0.016;
+const HERO_CONTRAIL_STEPS = 18;
+const HERO_CONTRAIL_STEP = 0.026;
 const AIRCRAFT_ROUTE_MIN_SCALE = 0.24;
 const AIRCRAFT_ROUTE_MAX_SCALE = 1.24;
 const AIRCRAFT_ROUTE_COVERAGE_RATIO = 0.8;
+const HERO_LAUNCH_RESET_PROGRESS = 0.18;
+const HERO_LAUNCH_DURATION_SECONDS = 4.35;
+const HERO_RETURN_DURATION_SECONDS = 5;
+const HERO_RETURN_ARC_FADE_SECONDS = 0.36;
 
 const ROUTE_ARCS: RouteArcConfig[] = [
   {
@@ -656,6 +678,8 @@ export default function LiveGlobeProofPage() {
   const [isScrollUnlocked, setIsScrollUnlocked] = useState(false);
   const pageRef = useRef<HTMLElement | null>(null);
   const orbProgressRef = useRef(0);
+  const scrollProgressRef = useRef(0);
+  const autoCompleteActiveRef = useRef(false);
   const materializeSignalRef = useRef(0);
   const loaderStartRef = useRef<number | null>(null);
   const interactionReadyRef = useRef(false);
@@ -807,6 +831,7 @@ export default function LiveGlobeProofPage() {
     const AUTO_COMPLETE_REWIND_PROGRESS = 0.2;
     const AUTO_COMPLETE_DURATION_MS = 1300;
     const AUTO_COMPLETE_REWIND_DURATION_MS = 820;
+    autoCompleteActiveRef.current = false;
     const getViewportHeight = () => stableViewportHeight;
     const refreshStableViewportSize = (force = false) => {
       const nextWidth = window.innerWidth;
@@ -822,6 +847,7 @@ export default function LiveGlobeProofPage() {
 
     const applyProgressStyles = (rawProgress: number, viewportHeight: number) => {
       const clampedProgress = THREE.MathUtils.clamp(rawProgress, 0, 1);
+      scrollProgressRef.current = clampedProgress;
       const orbProgress = 1 - Math.pow(1 - clampedProgress, 3);
       const collapseProgress = THREE.MathUtils.smoothstep(clampedProgress, 0.02, 0.56);
       const widthCollapseProgress = THREE.MathUtils.smoothstep(clampedProgress, 0.02, 0.58);
@@ -877,6 +903,7 @@ export default function LiveGlobeProofPage() {
       if (autoCompleteTriggered) {
         if (scrollingBackward) {
           autoCompleteTriggered = false;
+          autoCompleteActiveRef.current = false;
           autoRewindTriggered = true;
           autoRewindStartMs = performance.now();
           autoRewindStartProgress = smoothedProgress;
@@ -892,6 +919,7 @@ export default function LiveGlobeProofPage() {
       targetProgress = sourceProgress;
       if (!prefersReducedMotion && targetProgress >= AUTO_COMPLETE_THRESHOLD) {
         autoCompleteTriggered = true;
+        autoCompleteActiveRef.current = true;
         autoCompleteStartMs = performance.now();
         autoCompleteStartProgress = Math.max(smoothedProgress, targetProgress);
       }
@@ -953,6 +981,7 @@ export default function LiveGlobeProofPage() {
       }
       if (autoCompleteTriggered && deltaY < -0.5) {
         autoCompleteTriggered = false;
+        autoCompleteActiveRef.current = false;
         autoRewindTriggered = true;
         autoRewindStartMs = performance.now();
         autoRewindStartProgress = smoothedProgress;
@@ -1013,6 +1042,7 @@ export default function LiveGlobeProofPage() {
     window.addEventListener("orientationchange", handleOrientationChange);
 
     return () => {
+      autoCompleteActiveRef.current = false;
       if (frame !== 0) {
         window.cancelAnimationFrame(frame);
       }
@@ -1060,6 +1090,8 @@ export default function LiveGlobeProofPage() {
             routesEnabled={routesMode === "on"}
             aircraftEnabled={aircraftMode === "on"}
             orbProgressRef={orbProgressRef}
+            scrollProgressRef={scrollProgressRef}
+            autoCompleteActiveRef={autoCompleteActiveRef}
             materializeSignalRef={materializeSignalRef}
           />
           </div>
@@ -1207,6 +1239,8 @@ function LiveGlobeCanvas({
   routesEnabled,
   aircraftEnabled,
   orbProgressRef,
+  scrollProgressRef,
+  autoCompleteActiveRef,
   materializeSignalRef,
 }: {
   onReady: () => void;
@@ -1215,6 +1249,8 @@ function LiveGlobeCanvas({
   routesEnabled: boolean;
   aircraftEnabled: boolean;
   orbProgressRef: React.MutableRefObject<number>;
+  scrollProgressRef: React.MutableRefObject<number>;
+  autoCompleteActiveRef: React.MutableRefObject<boolean>;
   materializeSignalRef: React.MutableRefObject<number>;
 }) {
   const mountRef = useRef<HTMLDivElement | null>(null);
@@ -1254,6 +1290,19 @@ function LiveGlobeCanvas({
     let lastMaterializeSignal = materializeSignalRef.current;
     let materializeStartTime = -1;
     let materializeProgress = 0;
+    const heroFlight: HeroFlightController = {
+      mode: "ROUTE_IDLE",
+      sourceEntry: null,
+      actor: null,
+      launchCurve: null,
+      returnCurve: null,
+      routeProgress: 0,
+      snapshotScale: 1,
+      snapshotOpacity: 1,
+      launchStartTime: -1,
+      returnStartTime: -1,
+      transitionProgress: 0,
+    };
 
     renderer.setClearColor(0x000000, 0);
     renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -1301,6 +1350,13 @@ function LiveGlobeCanvas({
 
       return THREE.MathUtils.clamp(orbProgressRef.current, 0, 1);
     };
+    const readScrollProgress = () => {
+      if (prefersReducedMotion) {
+        return 0;
+      }
+
+      return THREE.MathUtils.clamp(scrollProgressRef.current, 0, 1);
+    };
     const applyGlobeOrbTransform = () => {
       const progress = readOrbProgress();
       currentOrbProgress = progress;
@@ -1333,7 +1389,13 @@ function LiveGlobeCanvas({
     updatePixelRatio(initialBounds.width, true);
     mount.appendChild(renderer.domElement);
 
+    const heroPlaneRig = new THREE.Group();
+    heroPlaneRig.name = "hero-plane-rig";
+    const heroLaunchArcRig = new THREE.Group();
+    heroLaunchArcRig.name = "hero-launch-arc-rig";
     scene.add(globeRig);
+    scene.add(heroPlaneRig);
+    scene.add(heroLaunchArcRig);
     scene.add(new THREE.AmbientLight(0x08182a, grade.ambientLight));
 
     const coolFill = new THREE.DirectionalLight(0x4aa4ff, grade.coolFill);
@@ -2097,10 +2159,12 @@ function LiveGlobeCanvas({
 
     const aircraftGlowCoreTexture = createAircraftGlowTexture(128, 128, 2.4);
     const aircraftGlowStreakTexture = createAircraftGlowTexture(256, 80, 6.5);
+    const aircraftContrailTexture = createAircraftGlowTexture(192, 104, 3.4);
 
     const aircraftUp = new THREE.Vector3();
     const aircraftPoint = new THREE.Vector3();
     const aircraftTangent = new THREE.Vector3();
+    const aircraftTrailTangent = new THREE.Vector3();
     const aircraftRight = new THREE.Vector3();
     const aircraftForward = new THREE.Vector3();
     const aircraftLookTarget = new THREE.Vector3();
@@ -2117,6 +2181,436 @@ function LiveGlobeCanvas({
     const aircraftSpecularNear = new THREE.Color(0xd8e3f6);
     const aircraftSpecularFar = new THREE.Color(0x5e6f8f);
     const aircraftSpecularColor = new THREE.Color();
+    const heroGlowWarm = new THREE.Color(0xff7b22);
+    const heroGlowHot = new THREE.Color(0xffcf92);
+    const contrailFarColor = new THREE.Color(0xf6fbff);
+    const aircraftTargetQuaternion = new THREE.Quaternion();
+    const aircraftFinalQuaternion = new THREE.Quaternion();
+    const aircraftBankQuaternion = new THREE.Quaternion();
+    const aircraftTargetScale = new THREE.Vector3();
+    const aircraftWorldQuaternion = new THREE.Quaternion();
+    const parentWorldPosition = new THREE.Vector3();
+    const parentWorldQuaternion = new THREE.Quaternion();
+    const parentWorldScale = new THREE.Vector3();
+    const preservedWorldPosition = new THREE.Vector3();
+    const preservedWorldQuaternion = new THREE.Quaternion();
+    const preservedWorldScale = new THREE.Vector3();
+    const launchCurvePoint = new THREE.Vector3();
+    const launchCurveTangent = new THREE.Vector3();
+    const launchFutureTangent = new THREE.Vector3();
+    const launchControlA = new THREE.Vector3();
+    const launchControlB = new THREE.Vector3();
+    const launchTargetPoint = new THREE.Vector3();
+    const launchTargetDirection = new THREE.Vector3();
+    const launchTravelDirection = new THREE.Vector3();
+    const launchSurfaceNormal = new THREE.Vector3();
+    const launchCurveSafePoint = new THREE.Vector3();
+    const preferredAircraftUp = new THREE.Vector3();
+    const cameraFacingUp = new THREE.Vector3();
+    const blendUp = new THREE.Vector3();
+    const routeReturnPoint = new THREE.Vector3();
+    const routeReturnTangent = new THREE.Vector3();
+    const routeReturnWorldQuaternion = new THREE.Quaternion();
+    const routeReturnNormal = new THREE.Vector3();
+    const routeReturnOrbitPointA = new THREE.Vector3();
+    const routeReturnOrbitPointB = new THREE.Vector3();
+    const routeReturnOrbitPointC = new THREE.Vector3();
+    const routeReturnOrbitNormal = new THREE.Vector3();
+    const routeReturnRotation = new THREE.Quaternion();
+    const routeReturnRotationStep = new THREE.Quaternion();
+    const heroHiddenPoint = new THREE.Vector3();
+    let heroLaunchArcGlowMaterial: THREE.ShaderMaterial | null = null;
+    let heroLaunchArcCoreMaterial: THREE.ShaderMaterial | null = null;
+    let heroLaunchArcGlowMesh: THREE.Mesh | null = null;
+    let heroLaunchArcCoreMesh: THREE.Mesh | null = null;
+    const getHeroJourneyScale = () => (isMobileLayout ? 1.12 : 1.18);
+    const heroScaleNearDistance = () => globeRadius * globeRig.scale.x + 0.02;
+    const getHeroScaleFromDistance = (point: THREE.Vector3) => {
+      const heroJourneyScale = getHeroJourneyScale();
+      const nearDistance = heroScaleNearDistance();
+      const farDistance = Math.max(
+        launchTargetPoint.distanceTo(globeRig.position),
+        heroHiddenPoint.distanceTo(globeRig.position),
+        nearDistance + 0.01,
+      );
+      const distanceProgress = THREE.MathUtils.clamp(
+        (point.distanceTo(globeRig.position) - nearDistance) / Math.max(farDistance - nearDistance, 1e-4),
+        0,
+        1,
+      );
+      return THREE.MathUtils.lerp(
+        heroJourneyScale * 0.24,
+        heroJourneyScale,
+        Math.pow(distanceProgress, 0.92),
+      );
+    };
+    const worldUp = new THREE.Vector3(0, 1, 0);
+    const worldDown = new THREE.Vector3(0, -1, 0);
+    const worldForwardFallback = new THREE.Vector3(0, 0, 1);
+    const globeRadius = 1.42;
+    const heroLaunchSafeMargin = 0.08;
+
+    const getHeroJourneyStartPoint = () => {
+      launchTargetPoint.set(
+        isMobileLayout ? -0.28 : -0.54,
+        isMobileLayout ? 0.38 : 0.44,
+        isMobileLayout ? 0.84 : 0.92,
+      );
+      return launchTargetPoint;
+    };
+
+    const getHeroJourneyDirection = () => {
+      launchTargetDirection.copy(worldDown);
+      return launchTargetDirection;
+    };
+
+    const getHeroHiddenPoint = (lateralOffset: number, verticalOffset: number) => {
+      globeToCamera.copy(camera.position).sub(globeRig.position).normalize();
+      aircraftRight.crossVectors(worldUp, globeToCamera);
+      if (aircraftRight.lengthSq() < 1e-5) {
+        aircraftRight.set(1, 0, 0);
+      } else {
+        aircraftRight.normalize();
+      }
+      heroHiddenPoint
+        .copy(globeRig.position)
+        .addScaledVector(globeToCamera, -(globeRadius * globeRig.scale.x + 0.14))
+        .addScaledVector(aircraftRight, lateralOffset)
+        .addScaledVector(worldUp, verticalOffset);
+      return heroHiddenPoint;
+    };
+
+    const getHeroLaunchOriginPoint = () =>
+      getHeroHiddenPoint(0, isMobileLayout ? -0.04 : -0.06);
+
+    const getHeroLaunchArcOriginPoint = () => {
+      globeToCamera.copy(camera.position).sub(globeRig.position).normalize();
+      heroHiddenPoint
+        .copy(globeToCamera)
+        .multiplyScalar(0.34)
+        .addScaledVector(worldDown, 0.94)
+        .normalize()
+        .multiplyScalar(globeRadius * globeRig.scale.x + 0.026)
+        .add(globeRig.position);
+      return heroHiddenPoint;
+    };
+
+    const buildHeroLaunchDisplayCurve = (curve: THREE.Curve<THREE.Vector3>, progress: number) => {
+      const visibleStartProgress = 0.12;
+      const samples = Math.max(3, Math.round(6 + progress * 28));
+      const startProgress = Math.min(visibleStartProgress, progress);
+      const points: THREE.Vector3[] = [getHeroLaunchArcOriginPoint().clone()];
+      for (let index = 1; index <= samples; index += 1) {
+        const pointProgress = THREE.MathUtils.lerp(startProgress, progress, index / samples);
+        points.push(curve.getPointAt(pointProgress));
+      }
+      return new THREE.CatmullRomCurve3(points, false, "centripetal", 0.48);
+    };
+
+    const ensureHeroLaunchArc = (curve: THREE.Curve<THREE.Vector3>) => {
+      if (!heroLaunchArcGlowMaterial || !heroLaunchArcCoreMaterial || !heroLaunchArcGlowMesh || !heroLaunchArcCoreMesh) {
+        heroLaunchArcGlowMaterial = createRouteMaterial({
+          color: 0x8fe8ff,
+          opacity: 0,
+          additive: true,
+        });
+        heroLaunchArcGlowMaterial.userData.baseOpacity = 0.34;
+        heroLaunchArcCoreMaterial = createRouteMaterial({
+          color: 0x5fd6ff,
+          opacity: 0,
+          additive: true,
+        });
+        heroLaunchArcCoreMaterial.userData.baseOpacity = 0.92;
+        routeMaterials.push(heroLaunchArcGlowMaterial, heroLaunchArcCoreMaterial);
+        routeShaderMaterials.push(heroLaunchArcGlowMaterial, heroLaunchArcCoreMaterial);
+
+        heroLaunchArcGlowMesh = new THREE.Mesh(new THREE.TubeGeometry(curve, 220, 0.011, 12, false), heroLaunchArcGlowMaterial);
+        heroLaunchArcGlowMesh.renderOrder = 8;
+        heroLaunchArcCoreMesh = new THREE.Mesh(new THREE.TubeGeometry(curve, 220, 0.0047, 12, false), heroLaunchArcCoreMaterial);
+        heroLaunchArcCoreMesh.renderOrder = 9;
+        routeDisposables.push(heroLaunchArcGlowMesh.geometry as THREE.BufferGeometry, heroLaunchArcCoreMesh.geometry as THREE.BufferGeometry);
+        heroLaunchArcRig.add(heroLaunchArcGlowMesh, heroLaunchArcCoreMesh);
+      } else {
+        const nextGlowGeometry = new THREE.TubeGeometry(curve, 220, 0.011, 12, false);
+        const nextCoreGeometry = new THREE.TubeGeometry(curve, 220, 0.0047, 12, false);
+        routeDisposables.push(nextGlowGeometry, nextCoreGeometry);
+        (heroLaunchArcGlowMesh.geometry as THREE.BufferGeometry).dispose();
+        (heroLaunchArcCoreMesh.geometry as THREE.BufferGeometry).dispose();
+        heroLaunchArcGlowMesh.geometry = nextGlowGeometry;
+        heroLaunchArcCoreMesh.geometry = nextCoreGeometry;
+      }
+      heroLaunchArcGlowMaterial.uniforms.materializeProgress.value = 0;
+      heroLaunchArcCoreMaterial.uniforms.materializeProgress.value = 0;
+      heroLaunchArcGlowMaterial.uniforms.opacity.value = 0;
+      heroLaunchArcCoreMaterial.uniforms.opacity.value = 0;
+    };
+
+    const setHeroLaunchArcState = (progress: number, glowOpacity: number, coreOpacity: number) => {
+      if (!heroLaunchArcGlowMaterial || !heroLaunchArcCoreMaterial) {
+        return;
+      }
+      heroLaunchArcGlowMaterial.uniforms.materializeProgress.value = progress;
+      heroLaunchArcCoreMaterial.uniforms.materializeProgress.value = progress;
+      heroLaunchArcGlowMaterial.uniforms.opacity.value = glowOpacity;
+      heroLaunchArcCoreMaterial.uniforms.opacity.value = coreOpacity;
+    };
+
+    const getCameraFacingUpForDirection = (point: THREE.Vector3, direction: THREE.Vector3) => {
+      cameraFacingUp.copy(camera.position).sub(point);
+      const alongDirection = cameraFacingUp.dot(direction);
+      cameraFacingUp.addScaledVector(direction, -alongDirection);
+      if (cameraFacingUp.lengthSq() < 1e-5) {
+        cameraFacingUp.copy(worldUp);
+        if (Math.abs(cameraFacingUp.dot(direction)) > 0.96) {
+          cameraFacingUp.set(1, 0, 0);
+        }
+      }
+      return cameraFacingUp.normalize();
+    };
+
+    const reparentPreservingWorldTransform = (object: THREE.Object3D, newParent: THREE.Object3D) => {
+      object.updateMatrixWorld(true);
+      object.getWorldPosition(preservedWorldPosition);
+      object.getWorldQuaternion(preservedWorldQuaternion);
+      object.getWorldScale(preservedWorldScale);
+      object.removeFromParent();
+      newParent.add(object);
+      newParent.updateMatrixWorld(true);
+      newParent.getWorldPosition(parentWorldPosition);
+      newParent.getWorldQuaternion(parentWorldQuaternion);
+      newParent.getWorldScale(parentWorldScale);
+      object.position.copy(preservedWorldPosition.sub(parentWorldPosition).applyQuaternion(parentWorldQuaternion.clone().invert()));
+      object.position.divide(parentWorldScale);
+      object.quaternion.copy(parentWorldQuaternion.clone().invert().multiply(preservedWorldQuaternion));
+      object.scale.copy(preservedWorldScale.divide(parentWorldScale));
+      object.updateMatrixWorld(true);
+    };
+
+    const orientAircraftForFreeFlight = (
+      entry: AircraftEntry,
+      point: THREE.Vector3,
+      tangent: THREE.Vector3,
+      scale: number,
+      opacity: number,
+      elapsed: number,
+      curveProgress: number,
+      preferredUpVector?: THREE.Vector3,
+      rotationBlend = 0.12,
+    ) => {
+      launchTravelDirection.copy(tangent).normalize();
+      if (launchTravelDirection.lengthSq() < 1e-5) {
+        launchTravelDirection.copy(worldForwardFallback);
+      }
+      preferredAircraftUp.copy(preferredUpVector ?? worldUp);
+      if (Math.abs(preferredAircraftUp.dot(launchTravelDirection)) > 0.96) {
+        preferredAircraftUp.copy(worldUp);
+        if (Math.abs(preferredAircraftUp.dot(launchTravelDirection)) > 0.96) {
+          preferredAircraftUp.set(1, 0, 0);
+        }
+      }
+      aircraftRight.crossVectors(preferredAircraftUp, launchTravelDirection);
+      if (aircraftRight.lengthSq() < 1e-5) {
+        aircraftRight.set(1, 0, 0);
+      } else {
+        aircraftRight.normalize();
+      }
+      aircraftUp.crossVectors(launchTravelDirection, aircraftRight).normalize();
+      aircraftBasis.makeBasis(aircraftRight, aircraftUp, launchTravelDirection);
+      entry.anchor.position.copy(point);
+      aircraftTargetQuaternion.setFromRotationMatrix(aircraftBasis);
+      const futureProgress = Math.min(curveProgress + 0.018, 1);
+      const heroCurve =
+        heroFlight.mode === "HERO_TRANSITION" ? heroFlight.launchCurve : heroFlight.mode === "HERO_RETURN" ? heroFlight.returnCurve : null;
+      if (heroCurve) {
+        heroCurve.getTangentAt(futureProgress, launchFutureTangent).normalize();
+        const bankAmount = THREE.MathUtils.clamp(
+          launchFutureTangent.sub(launchTravelDirection).dot(aircraftRight) * 2.2,
+          -0.09,
+          0.09,
+        );
+        entry.bank = THREE.MathUtils.lerp(entry.bank, bankAmount, 0.08);
+      } else {
+        entry.bank = THREE.MathUtils.lerp(entry.bank, 0, 0.08);
+      }
+      aircraftBankQuaternion.setFromAxisAngle(worldForwardFallback, entry.bank);
+      aircraftFinalQuaternion.copy(aircraftTargetQuaternion).multiply(aircraftBankQuaternion);
+      entry.pose.quaternion.slerp(aircraftFinalQuaternion, rotationBlend);
+      entry.visual.quaternion.copy(AIRCRAFT_FORWARD_AXIS_CORRECTION);
+      aircraftTargetScale.setScalar(scale);
+      entry.anchor.scale.lerp(aircraftTargetScale, 0.12);
+
+      globeToCamera.copy(camera.position).sub(point).normalize();
+      const visibilityPresence = THREE.MathUtils.clamp(0.62 + Math.max(launchTravelDirection.dot(globeToCamera), -0.22) * 0.22, 0.42, 1);
+      const isHeroActor = entry === heroFlight.actor;
+      for (const material of entry.materials) {
+        material.opacity = opacity;
+        aircraftBodyColor.copy(aircraftFarBodyColor).lerp(aircraftNearBodyColor, visibilityPresence);
+        material.color.copy(aircraftBodyColor);
+        aircraftSpecularColor.copy(aircraftSpecularFar).lerp(aircraftSpecularNear, visibilityPresence);
+        material.specular.copy(aircraftSpecularColor);
+        material.shininess = THREE.MathUtils.lerp(20, 52, visibilityPresence);
+        material.emissive.copy(isHeroActor ? heroGlowWarm : entry.routeGlowColor);
+        material.emissiveIntensity = THREE.MathUtils.lerp(isHeroActor ? 0.48 : 0.3, isHeroActor ? 1.12 : 0.92, visibilityPresence);
+      }
+
+      const launchPulse = 0.78 + Math.pow(Math.max(Math.sin(elapsed * 1.08 + curveProgress * Math.PI * 2), 0), 3.4) * 1.2;
+      const glowOpacity = THREE.MathUtils.lerp(isHeroActor ? 0.2 : 0.16, isHeroActor ? 0.46 : 0.34, visibilityPresence) * launchPulse * opacity;
+      for (const material of entry.glowMaterials) {
+        const glowGain = typeof material.userData.glowGain === "number" ? material.userData.glowGain : 1;
+        if ("color" in material && material.color instanceof THREE.Color) {
+          material.color.copy(isHeroActor ? heroGlowWarm.clone().lerp(heroGlowHot, 1 - glowGain * 0.35) : entry.routeGlowColor);
+        }
+        if ("opacity" in material) {
+          material.opacity = glowOpacity * glowGain;
+        }
+      }
+
+      for (const [index, trailPoint] of entry.trailPoints.entries()) {
+        if (heroCurve) {
+          const trailProgress = Math.max(curveProgress - (index + 1) * (isHeroActor ? HERO_CONTRAIL_STEP : 0.05), 0);
+          heroCurve.getPointAt(trailProgress, aircraftTrailPoint);
+          heroCurve.getTangentAt(Math.max(trailProgress - 0.01, 0), aircraftTrailTangent).normalize();
+          if (isHeroActor) {
+            const spread = index / Math.max(entry.trailPoints.length - 1, 1);
+            const flutter = Math.sin(elapsed * 1.6 + index * 0.78) * 0.0028 * spread;
+            const wake = Math.cos(elapsed * 1.12 + index * 0.44) * 0.0016 * spread;
+            aircraftTrailPoint
+              .addScaledVector(aircraftRight, flutter)
+              .addScaledVector(aircraftUp, wake)
+              .addScaledVector(aircraftTrailTangent, -0.012 * spread);
+          }
+          trailPoint.position.copy(aircraftTrailPoint);
+        } else {
+          aircraftTrailPoint.copy(point).addScaledVector(launchTravelDirection, -(index + 1) * 0.06);
+          trailPoint.position.copy(aircraftTrailPoint);
+        }
+        const trailMaterial = (trailPoint as THREE.Mesh | THREE.Sprite).material as
+          | THREE.MeshBasicMaterial
+          | THREE.SpriteMaterial;
+        const trailMix = index / Math.max(entry.trailPoints.length - 1, 1);
+        if (trailPoint instanceof THREE.Sprite) {
+          trailMaterial.opacity = 0;
+        } else {
+          trailMaterial.opacity = opacity * THREE.MathUtils.lerp(0.09, 0.016, trailMix);
+        }
+      }
+    };
+
+    const hideAircraftEntry = (entry: AircraftEntry) => {
+      entry.anchor.scale.setScalar(0.001);
+      for (const material of entry.materials) {
+        material.opacity = 0;
+      }
+      for (const material of entry.glowMaterials) {
+        if ("opacity" in material) {
+          material.opacity = 0;
+        }
+      }
+      for (const trailPoint of entry.trailPoints) {
+        const trailMaterial = (trailPoint as THREE.Mesh | THREE.Sprite).material as
+          | THREE.MeshBasicMaterial
+          | THREE.SpriteMaterial;
+        trailMaterial.opacity = 0;
+      }
+    };
+
+    const resetHeroFlight = () => {
+      if (heroFlight.actor) {
+        hideAircraftEntry(heroFlight.actor);
+        heroFlight.actor.bank = 0;
+      }
+      heroFlight.launchCurve = null;
+      heroFlight.returnCurve = null;
+      heroFlight.launchStartTime = -1;
+      heroFlight.returnStartTime = -1;
+      heroFlight.transitionProgress = 0;
+      heroFlight.mode = "ROUTE_IDLE";
+      setHeroLaunchArcState(0, 0, 0);
+    };
+
+    const startHeroFlight = (elapsed: number) => {
+      if (!heroFlight.sourceEntry || !heroFlight.actor) {
+        return;
+      }
+
+      getHeroLaunchOriginPoint();
+      launchCurvePoint.copy(heroHiddenPoint);
+      launchSurfaceNormal.copy(launchCurvePoint).sub(globeRig.position).normalize();
+      heroFlight.routeProgress = heroFlight.sourceEntry.progress;
+      heroFlight.snapshotScale = getHeroJourneyScale();
+      heroFlight.snapshotOpacity = 1;
+      getHeroJourneyStartPoint();
+      getHeroJourneyDirection();
+      launchControlA
+        .copy(launchCurvePoint)
+        .addScaledVector(launchSurfaceNormal, isMobileLayout ? 0.26 : 0.34)
+        .addScaledVector(worldUp, isMobileLayout ? -0.02 : -0.04);
+      launchControlB
+        .copy(launchTargetPoint)
+        .addScaledVector(worldUp, isMobileLayout ? 0.24 : 0.3)
+        .addScaledVector(new THREE.Vector3(1, 0, 0), isMobileLayout ? 0.025 : 0.05);
+      heroFlight.launchCurve = new THREE.CubicBezierCurve3(
+        launchCurvePoint.clone(),
+        launchControlA.clone(),
+        launchControlB.clone(),
+        launchTargetPoint.clone(),
+      );
+      ensureHeroLaunchArc(heroFlight.launchCurve);
+      heroFlight.actor.anchor.position.copy(launchCurvePoint);
+      heroFlight.actor.anchor.scale.setScalar(0.001);
+      heroFlight.launchStartTime = elapsed;
+      heroFlight.returnCurve = null;
+      heroFlight.returnStartTime = -1;
+      heroFlight.transitionProgress = 0;
+      heroFlight.mode = "HERO_TRANSITION";
+    };
+
+    const startHeroReturn = (elapsed: number) => {
+      if (!heroFlight.actor) {
+        return;
+      }
+
+      heroFlight.actor.anchor.updateMatrixWorld(true);
+      heroFlight.actor.pose.updateMatrixWorld(true);
+      heroFlight.actor.anchor.getWorldPosition(launchCurvePoint);
+      heroFlight.actor.pose.getWorldQuaternion(aircraftWorldQuaternion);
+      launchTravelDirection.set(0, 0, 1).applyQuaternion(aircraftWorldQuaternion).normalize();
+      getHeroHiddenPoint(isMobileLayout ? 0.14 : 0.22, isMobileLayout ? 0.02 : 0.06);
+      routeReturnPoint.copy(heroHiddenPoint);
+      routeReturnNormal.copy(routeReturnPoint).sub(globeRig.position).normalize();
+      launchSurfaceNormal.copy(launchCurvePoint).sub(globeRig.position).normalize();
+      routeReturnRotation.setFromUnitVectors(launchSurfaceNormal, routeReturnNormal);
+
+      routeReturnRotationStep.identity().slerp(routeReturnRotation, 0.26);
+      routeReturnOrbitNormal.copy(launchSurfaceNormal).applyQuaternion(routeReturnRotationStep).normalize();
+      routeReturnOrbitPointA
+        .copy(routeReturnOrbitNormal)
+        .multiplyScalar(globeRadius * globeRig.scale.x + 0.18)
+        .add(globeRig.position)
+        .addScaledVector(worldUp, 0.08);
+
+      routeReturnRotationStep.identity().slerp(routeReturnRotation, 0.68);
+      routeReturnOrbitNormal.copy(launchSurfaceNormal).applyQuaternion(routeReturnRotationStep).normalize();
+      routeReturnOrbitPointB
+        .copy(routeReturnOrbitNormal)
+        .multiplyScalar(globeRadius * globeRig.scale.x + 0.18)
+        .add(globeRig.position)
+        .addScaledVector(worldUp, 0.03);
+
+      heroFlight.returnCurve = new THREE.CatmullRomCurve3(
+        [
+          launchCurvePoint.clone(),
+          routeReturnOrbitPointA.clone(),
+          routeReturnOrbitPointB.clone(),
+          routeReturnPoint.clone(),
+        ],
+        false,
+        "centripetal",
+        0.42,
+      );
+      heroFlight.returnStartTime = elapsed;
+      heroFlight.mode = "HERO_RETURN";
+    };
 
     const applyAircraftPose = (
       entry: AircraftEntry,
@@ -2134,15 +2628,18 @@ function LiveGlobeCanvas({
       aircraftRight.crossVectors(aircraftUp, aircraftForward).normalize();
       aircraftForward.crossVectors(aircraftRight, aircraftUp).normalize();
       aircraftBasis.makeBasis(aircraftRight, aircraftUp, aircraftForward);
-      entry.anchor.position.copy(aircraftPoint).addScaledVector(aircraftUp, AIRCRAFT_CLEARANCE);
-      entry.pose.quaternion.setFromRotationMatrix(aircraftBasis);
+      aircraftPoint.addScaledVector(aircraftUp, AIRCRAFT_CLEARANCE);
+      entry.anchor.position.copy(aircraftPoint);
+      aircraftTargetQuaternion.setFromRotationMatrix(aircraftBasis);
       const bankAmount = THREE.MathUtils.clamp(
-        aircraftFutureTangent.sub(aircraftTangent).dot(aircraftRight) * 2.8,
-        -0.11,
-        0.11,
+        aircraftFutureTangent.sub(aircraftTangent).dot(aircraftRight) * 2.3,
+        -0.085,
+        0.085,
       );
-      entry.bank = THREE.MathUtils.lerp(entry.bank, bankAmount, 0.16);
-      entry.pose.rotateZ(entry.bank);
+      entry.bank = THREE.MathUtils.lerp(entry.bank, bankAmount, 0.09);
+      aircraftBankQuaternion.setFromAxisAngle(worldForwardFallback, entry.bank);
+      aircraftFinalQuaternion.copy(aircraftTargetQuaternion).multiply(aircraftBankQuaternion);
+      entry.pose.quaternion.slerp(aircraftFinalQuaternion, 0.14);
       entry.visual.quaternion.copy(AIRCRAFT_FORWARD_AXIS_CORRECTION);
 
       entry.anchor.getWorldPosition(aircraftWorldPosition);
@@ -2160,7 +2657,9 @@ function LiveGlobeCanvas({
       const roleScale = entry.config.role === "hero" ? 1.06 : 1;
       const visibilityPresence = THREE.MathUtils.clamp(depthPresence + entry.config.visibilityBias, 0, 1);
       const depthScale = THREE.MathUtils.lerp(0.76, 1.32, visibilityPresence) * entry.config.scaleMultiplier * roleScale;
-      entry.anchor.scale.setScalar(depthScale * routeProgressScale * entry.revealScale);
+      const routeScale = depthScale * routeProgressScale * entry.revealScale;
+      aircraftTargetScale.setScalar(routeScale);
+      entry.anchor.scale.lerp(aircraftTargetScale, 0.14);
       const opacityMax = entry.config.role === "hero" ? 1 : 0.94;
       const opacity = THREE.MathUtils.lerp(0.56, opacityMax, visibilityPresence) * entry.revealOpacity;
       for (const material of entry.materials) {
@@ -2188,7 +2687,9 @@ function LiveGlobeCanvas({
         entry.routeEntry.curve.getPointAt(trailProgress, aircraftTrailPoint);
         aircraftTrailNormal.copy(aircraftTrailPoint).normalize();
         trailPoint.position.copy(aircraftTrailPoint).addScaledVector(aircraftTrailNormal, 0.003);
-        const trailMaterial = trailPoint.material as THREE.MeshBasicMaterial;
+        const trailMaterial = (trailPoint as THREE.Mesh | THREE.Sprite).material as
+          | THREE.MeshBasicMaterial
+          | THREE.SpriteMaterial;
         trailMaterial.opacity = opacity * THREE.MathUtils.lerp(0.08, 0.012, index / Math.max(entry.trailPoints.length - 1, 1));
       }
     };
@@ -2355,6 +2856,112 @@ function LiveGlobeCanvas({
             revealOpacity: 0,
           });
 
+          if (config.role === "hero") {
+            heroFlight.sourceEntry = aircraftEntries[aircraftEntries.length - 1];
+
+            const { visual: heroVisual, materials: heroMaterials } = buildAircraftModel(gltf.scene);
+            const heroAnchor = new THREE.Group();
+            heroAnchor.name = "hero-aircraft-anchor";
+            const heroPose = new THREE.Group();
+            heroPose.name = "hero-aircraft-pose";
+            heroPose.add(heroVisual);
+            heroAnchor.add(heroPose);
+            heroPlaneRig.add(heroAnchor);
+
+            const heroGlowMaterials: THREE.Material[] = [];
+            if (aircraftGlowCoreTexture && aircraftGlowStreakTexture) {
+              const flareGroup = new THREE.Group();
+              flareGroup.name = "hero-aircraft-flare";
+
+              const coreMaterial = new THREE.SpriteMaterial({
+                map: aircraftGlowCoreTexture,
+                color: heroGlowWarm.clone().lerp(heroGlowHot, 0.24),
+                transparent: true,
+                opacity: 0,
+                depthWrite: false,
+                depthTest: true,
+                blending: THREE.AdditiveBlending,
+              });
+              coreMaterial.userData.glowGain = 1.18;
+              const coreSprite = new THREE.Sprite(coreMaterial);
+              coreSprite.scale.set(0.19, 0.12, 1);
+              flareGroup.add(coreSprite);
+
+              const wingStreakMaterial = new THREE.SpriteMaterial({
+                map: aircraftGlowStreakTexture,
+                color: heroGlowWarm,
+                transparent: true,
+                opacity: 0,
+                depthWrite: false,
+                depthTest: true,
+                blending: THREE.AdditiveBlending,
+              });
+              wingStreakMaterial.userData.glowGain = 0.96;
+              const wingStreak = new THREE.Sprite(wingStreakMaterial);
+              wingStreak.scale.set(0.33, 0.07, 1);
+              flareGroup.add(wingStreak);
+
+              const crossStreakMaterial = new THREE.SpriteMaterial({
+                map: aircraftGlowStreakTexture,
+                color: heroGlowHot.clone().lerp(new THREE.Color(0xffffff), 0.08),
+                transparent: true,
+                opacity: 0,
+                depthWrite: false,
+                depthTest: true,
+                blending: THREE.AdditiveBlending,
+                rotation: Math.PI * 0.5,
+              });
+              crossStreakMaterial.userData.glowGain = 0.62;
+              const crossStreak = new THREE.Sprite(crossStreakMaterial);
+              crossStreak.scale.set(0.16, 0.05, 1);
+              flareGroup.add(crossStreak);
+
+              heroVisual.add(flareGroup);
+              heroGlowMaterials.push(coreMaterial, wingStreakMaterial, crossStreakMaterial);
+              routeMaterials.push(coreMaterial, wingStreakMaterial, crossStreakMaterial);
+            }
+
+            const heroTrailPoints: THREE.Object3D[] = [];
+            for (let index = 0; index < HERO_CONTRAIL_STEPS; index += 1) {
+              const trailMaterial = new THREE.SpriteMaterial({
+                map: aircraftContrailTexture ?? aircraftGlowCoreTexture ?? undefined,
+                color: contrailFarColor.clone(),
+                transparent: true,
+                opacity: 0,
+                depthWrite: false,
+                depthTest: true,
+                blending: THREE.NormalBlending,
+              });
+              const trailPointSprite = new THREE.Sprite(trailMaterial);
+              trailPointSprite.scale.set(
+                THREE.MathUtils.lerp(0.03, 0.095, index / Math.max(HERO_CONTRAIL_STEPS - 1, 1)),
+                THREE.MathUtils.lerp(0.012, 0.048, index / Math.max(HERO_CONTRAIL_STEPS - 1, 1)),
+                1,
+              );
+              trailPointSprite.renderOrder = 11;
+              heroTrailPoints.push(trailPointSprite);
+              routeMaterials.push(trailMaterial);
+              heroPlaneRig.add(trailPointSprite);
+            }
+
+            heroFlight.actor = {
+              anchor: heroAnchor,
+              pose: heroPose,
+              visual: heroVisual,
+              config,
+              routeEntry,
+              routeGlowColor,
+              progress: config.initialT,
+              bank: 0,
+              materials: heroMaterials,
+              glowMaterials: heroGlowMaterials,
+              trailPoints: heroTrailPoints,
+              revealScale: 1,
+              revealOpacity: 1,
+            };
+            hideAircraftEntry(heroFlight.actor);
+          }
+
           deployedTraffic.push({
             routeId: config.routeId,
             routeIndex: config.routeIndex,
@@ -2461,6 +3068,8 @@ function LiveGlobeCanvas({
     const animate = () => {
       const delta = clock.getDelta();
       const elapsed = clock.elapsedTime;
+      const scrollProgress = readScrollProgress();
+      const autoCompleteActive = autoCompleteActiveRef.current;
       const fps = 1 / Math.max(delta, 1 / 240);
       smoothedFps = THREE.MathUtils.lerp(smoothedFps, fps, 0.08);
       performanceSampleFrames += 1;
@@ -2491,9 +3100,143 @@ function LiveGlobeCanvas({
         for (const material of routeShaderMaterials) {
           material.uniforms.globeCenter.value.copy(globeRig.position);
         }
+        if (heroFlight.actor && heroFlight.sourceEntry) {
+          if (!autoCompleteActive && heroFlight.mode !== "ROUTE_IDLE" && heroFlight.mode !== "HERO_RETURN") {
+            startHeroReturn(elapsed);
+          } else if (autoCompleteActive && heroFlight.mode === "ROUTE_IDLE") {
+            startHeroFlight(elapsed);
+          }
+
+          if (heroFlight.mode === "HERO_TRANSITION" && heroFlight.launchCurve) {
+            const launchLinearProgress = THREE.MathUtils.clamp(
+              (elapsed - heroFlight.launchStartTime) / HERO_LAUNCH_DURATION_SECONDS,
+              0,
+              1,
+            );
+            const launchProgress = THREE.MathUtils.smootherstep(launchLinearProgress, 0, 1);
+            const acceleratedLaunchProgress = Math.pow(launchProgress, 1.38);
+            const spawnFollow = THREE.MathUtils.smoothstep(launchProgress, 0.02, 0.18);
+            const curveProgress = THREE.MathUtils.clamp((acceleratedLaunchProgress - 0.04) / 0.96, 0, 1);
+            getHeroLaunchOriginPoint();
+            heroFlight.launchCurve.getPointAt(curveProgress, launchCurvePoint);
+            heroFlight.launchCurve.getTangentAt(Math.min(curveProgress + 0.02, 1), launchCurveTangent).normalize();
+            launchCurvePoint.lerp(heroHiddenPoint, 1 - spawnFollow);
+            launchTravelDirection.copy(launchCurvePoint).sub(heroHiddenPoint).normalize();
+            if (launchTravelDirection.lengthSq() > 1e-5) {
+              launchCurveTangent.lerp(launchTravelDirection, 1 - spawnFollow).normalize();
+            }
+            launchCurveSafePoint.copy(launchCurvePoint).sub(globeRig.position);
+            const minLaunchRadius = globeRadius * globeRig.scale.x + heroLaunchSafeMargin;
+            if (launchCurveSafePoint.length() < minLaunchRadius) {
+              launchCurveSafePoint.normalize().multiplyScalar(minLaunchRadius).add(globeRig.position);
+              launchCurvePoint.copy(launchCurveSafePoint);
+            }
+            getCameraFacingUpForDirection(launchCurvePoint, launchCurveTangent);
+            blendUp
+              .copy(launchSurfaceNormal)
+              .lerp(cameraFacingUp, THREE.MathUtils.smoothstep(launchProgress, 0.4, 1))
+              .normalize();
+            const launchScale = getHeroScaleFromDistance(launchCurvePoint);
+            const launchOpacity = THREE.MathUtils.lerp(heroFlight.snapshotOpacity, 1, launchProgress);
+            const launchArcProgress = THREE.MathUtils.clamp(curveProgress - 0.018, 0, 1);
+            const launchArcFade = THREE.MathUtils.smoothstep(curveProgress, 0.1, 0.3);
+            ensureHeroLaunchArc(buildHeroLaunchDisplayCurve(heroFlight.launchCurve, Math.max(launchArcProgress, 0.02)));
+            setHeroLaunchArcState(
+              1,
+              0.34 * launchArcFade,
+              0.94 * launchArcFade,
+            );
+            orientAircraftForFreeFlight(
+              heroFlight.actor,
+              launchCurvePoint,
+              launchCurveTangent,
+              launchScale,
+              launchOpacity,
+              elapsed,
+              curveProgress,
+              blendUp,
+            );
+            heroFlight.transitionProgress = curveProgress;
+            if (launchProgress >= 0.999) {
+              heroFlight.actor.bank = 0;
+              heroFlight.transitionProgress = 1;
+              heroFlight.mode = "JOURNEY_READY";
+            }
+          } else if (heroFlight.mode === "JOURNEY_READY") {
+            if (heroFlight.launchCurve) {
+              getHeroLaunchOriginPoint();
+              ensureHeroLaunchArc(buildHeroLaunchDisplayCurve(heroFlight.launchCurve, 1));
+            }
+            setHeroLaunchArcState(1, 0.34, 0.94);
+            getHeroJourneyStartPoint();
+            getHeroJourneyDirection();
+            getCameraFacingUpForDirection(launchTargetPoint, launchTargetDirection);
+            orientAircraftForFreeFlight(
+              heroFlight.actor,
+              launchTargetPoint,
+              launchTargetDirection,
+              getHeroJourneyScale(),
+              1,
+              elapsed,
+              1,
+              cameraFacingUp,
+              0.22,
+            );
+          } else if (heroFlight.mode === "HERO_RETURN" && heroFlight.returnCurve) {
+            const returnLinearProgress = THREE.MathUtils.clamp(
+              (elapsed - heroFlight.returnStartTime) / HERO_RETURN_DURATION_SECONDS,
+              0,
+              1,
+            );
+            const returnProgress = THREE.MathUtils.smootherstep(returnLinearProgress, 0, 1);
+            const acceleratedReturnProgress = Math.pow(returnProgress, 1.32);
+            heroFlight.returnCurve.getPointAt(acceleratedReturnProgress, launchCurvePoint);
+            heroFlight.returnCurve.getTangentAt(Math.min(acceleratedReturnProgress + 0.02, 1), launchCurveTangent).normalize();
+            launchCurveSafePoint.copy(launchCurvePoint).sub(globeRig.position);
+            const minReturnRadius = globeRadius * globeRig.scale.x + 0.025;
+            if (launchCurveSafePoint.length() < minReturnRadius) {
+              launchCurveSafePoint.normalize().multiplyScalar(minReturnRadius).add(globeRig.position);
+              launchCurvePoint.copy(launchCurveSafePoint);
+            }
+            getCameraFacingUpForDirection(launchCurvePoint, launchCurveTangent);
+            blendUp.copy(launchSurfaceNormal).lerp(cameraFacingUp, 0.35).normalize();
+            const returnScaleFade = THREE.MathUtils.smoothstep(acceleratedReturnProgress, 0.72, 1);
+            const launchScale = THREE.MathUtils.lerp(
+              getHeroScaleFromDistance(launchCurvePoint),
+              getHeroJourneyScale() * 0.24,
+              returnScaleFade,
+            );
+            const returnArcFade = 1 - THREE.MathUtils.smootherstep(
+              THREE.MathUtils.clamp((elapsed - heroFlight.returnStartTime) / HERO_RETURN_ARC_FADE_SECONDS, 0, 1),
+              0,
+              1,
+            );
+            setHeroLaunchArcState(1, 0.34 * returnArcFade, 0.94 * returnArcFade);
+            orientAircraftForFreeFlight(
+              heroFlight.actor,
+              launchCurvePoint,
+              launchCurveTangent,
+              launchScale,
+              1 - returnScaleFade * 0.14,
+              elapsed,
+              acceleratedReturnProgress,
+              blendUp,
+              0.16,
+            );
+            heroFlight.transitionProgress = 1 - acceleratedReturnProgress;
+            if (acceleratedReturnProgress >= 0.999) {
+              resetHeroFlight();
+            }
+          } else {
+            setHeroLaunchArcState(0, 0, 0);
+          }
+        }
         for (const entry of aircraftEntries) {
           entry.progress = THREE.MathUtils.euclideanModulo(entry.progress + entry.config.speed * delta, 1);
           applyAircraftPose(entry, entry.progress, camera, elapsed);
+          if (entry === heroFlight.sourceEntry && heroFlight.mode !== "ROUTE_IDLE") {
+            hideAircraftEntry(entry);
+          }
         }
         if (cloudRig) {
           cloudRig.rotation.y = elapsed * 0.0028;
@@ -2510,6 +3253,9 @@ function LiveGlobeCanvas({
         globeRig.rotation.set(INITIAL_GLOBE_ROTATION.x, INITIAL_GLOBE_ROTATION.y, INITIAL_GLOBE_ROTATION.z);
         for (const entry of aircraftEntries) {
           applyAircraftPose(entry, entry.progress, camera, elapsed);
+          if (entry === heroFlight.sourceEntry && heroFlight.mode !== "ROUTE_IDLE") {
+            hideAircraftEntry(entry);
+          }
         }
         if (cloudRig) {
           cloudRig.rotation.set(0, 0, 0);
@@ -2563,7 +3309,7 @@ function LiveGlobeCanvas({
       }
       mount.removeChild(renderer.domElement);
     };
-  }, [aircraftEnabled, grade, materializeSignalRef, onReady, orbProgressRef, routesEnabled, textureSet]);
+  }, [aircraftEnabled, grade, materializeSignalRef, onReady, orbProgressRef, routesEnabled, scrollProgressRef, textureSet]);
 
   return <div ref={mountRef} className={styles.canvasMount} aria-hidden="true" />;
 }
