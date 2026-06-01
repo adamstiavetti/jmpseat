@@ -1,8 +1,14 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js";
+import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
+import { ShaderPass } from "three/examples/jsm/postprocessing/ShaderPass.js";
+import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass.js";
 
 import styles from "./page.module.css";
 
@@ -366,6 +372,14 @@ const INITIAL_GLOBE_ROTATION = {
   z: -0.025,
 };
 
+const GLOBE_INTERACTION = {
+  dragSensitivity: 0.0065,
+  inertiaDamping: 4.8,
+  returnDamping: 0.8,
+  minPitch: -0.92,
+  maxPitch: 0.92,
+} as const;
+
 const DEFAULT_TEXTURE_SET: TextureSetName = "cityhalo";
 const DEFAULT_GRADE: GradeName = "cityhalo";
 const DEFAULT_ROUTES_MODE: RoutesMode = "on";
@@ -667,6 +681,26 @@ function buildAircraftTrafficConfigs(routes: RouteArcConfig[]) {
 
 const AIRCRAFT_TRAFFIC = buildAircraftTrafficConfigs(ROUTE_ARCS);
 
+const WAITLIST_SCROLL_TRANSITION = {
+  fogDensity: 0.78,
+  bloomStrength: 0.34,
+  chromaticAberration: 0.0032,
+  cameraStartZ: 6.35,
+  cameraEndZ: 6.7,
+  gridOpacity: 0.42,
+  hazeIntensity: 0.74,
+  transitionStart: 0.0,
+  transitionEnd: 1.0,
+  pullbackEnd: 0.25,
+  distortionStart: 0.25,
+  distortionEnd: 0.65,
+  handoffStart: 0.65,
+  autoCompleteThreshold: 0.2,
+  autoCompleteDurationMs: 5200,
+  mobileTransitionDistance: 2.45,
+  desktopTransitionDistance: 1.35,
+} as const;
+
 export default function LiveGlobeProofPage() {
   const [isGlobeReady, setIsGlobeReady] = useState(false);
   const [areUiAssetsReady, setAreUiAssetsReady] = useState(false);
@@ -680,6 +714,7 @@ export default function LiveGlobeProofPage() {
   const orbProgressRef = useRef(0);
   const scrollProgressRef = useRef(0);
   const autoCompleteActiveRef = useRef(false);
+  const firstScrollIntentRef = useRef(false);
   const materializeSignalRef = useRef(0);
   const loaderStartRef = useRef<number | null>(null);
   const interactionReadyRef = useRef(false);
@@ -783,6 +818,7 @@ export default function LiveGlobeProofPage() {
 
     Promise.all([
       preloadImage("/cinematic/backgrounds/boarding-portal-entry-background.png"),
+      preloadImage("/cinematic/backgrounds/skybyrd-scroll-wave-background.jpg"),
       preloadImage("/cinematic/branding/optimized/skybyrd-logo-ui.png"),
       preloadImage("/cinematic/branding/optimized/skybyrd-logo-loader.png"),
       preloadImage("/cinematic/branding/skybyrd-wordmark-8k.png"),
@@ -825,12 +861,14 @@ export default function LiveGlobeProofPage() {
     let virtualScrollY = 0;
     let touchLastY: number | null = null;
     let lastScrollSource = 0;
+    let hasUserScrollIntent = false;
     let stableViewportWidth = window.innerWidth;
     let stableViewportHeight = Math.max(window.innerHeight, window.visualViewport?.height ?? 0, 1);
-    const AUTO_COMPLETE_THRESHOLD = 0.24;
-    const AUTO_COMPLETE_REWIND_PROGRESS = 0.2;
-    const AUTO_COMPLETE_DURATION_MS = 1300;
+    const AUTO_COMPLETE_THRESHOLD = WAITLIST_SCROLL_TRANSITION.autoCompleteThreshold;
+    const AUTO_COMPLETE_REWIND_PROGRESS = 0;
+    const AUTO_COMPLETE_DURATION_MS = WAITLIST_SCROLL_TRANSITION.autoCompleteDurationMs;
     const AUTO_COMPLETE_REWIND_DURATION_MS = 820;
+    const FIRST_SCROLL_KICKOFF_PROGRESS = 0.01;
     autoCompleteActiveRef.current = false;
     const getViewportHeight = () => stableViewportHeight;
     const refreshStableViewportSize = (force = false) => {
@@ -848,6 +886,18 @@ export default function LiveGlobeProofPage() {
     const applyProgressStyles = (rawProgress: number, viewportHeight: number) => {
       const clampedProgress = THREE.MathUtils.clamp(rawProgress, 0, 1);
       scrollProgressRef.current = clampedProgress;
+      const washPhase =
+        THREE.MathUtils.smoothstep(
+          clampedProgress,
+          WAITLIST_SCROLL_TRANSITION.distortionStart,
+          WAITLIST_SCROLL_TRANSITION.distortionEnd,
+        ) *
+        (1 - THREE.MathUtils.smoothstep(clampedProgress, 0.74, 0.94));
+      const handoffPhase = THREE.MathUtils.smoothstep(
+        clampedProgress,
+        WAITLIST_SCROLL_TRANSITION.handoffStart,
+        WAITLIST_SCROLL_TRANSITION.transitionEnd,
+      );
       const orbProgress = 1 - Math.pow(1 - clampedProgress, 3);
       const collapseProgress = THREE.MathUtils.smoothstep(clampedProgress, 0.02, 0.56);
       const widthCollapseProgress = THREE.MathUtils.smoothstep(clampedProgress, 0.02, 0.58);
@@ -864,12 +914,17 @@ export default function LiveGlobeProofPage() {
       const absorbYpx = -(absorptionMouthY / 100) * viewportHeight;
       const suckedWordYvh = -25 * suckedWordProgress - 25 * gapCloseProgress;
       const suckedWordYpx = (suckedWordYvh / 100) * viewportHeight;
-      const backgroundScale = THREE.MathUtils.lerp(1.018, isMobileViewport ? 0.955 : 0.94, perspectiveProgress);
-      const backgroundY = -viewportHeight * THREE.MathUtils.lerp(0, isMobileViewport ? 0.028 : 0.04, perspectiveProgress);
+      const backgroundScale = THREE.MathUtils.lerp(1.018, isMobileViewport ? 0.958 : 0.948, perspectiveProgress);
+      const backgroundY = -viewportHeight * THREE.MathUtils.lerp(0, isMobileViewport ? 0.022 : 0.032, perspectiveProgress);
       page.style.setProperty("--orb-progress", `${orbProgress}`);
       page.style.setProperty("--background-perspective-scale", `${backgroundScale}`);
       page.style.setProperty("--background-perspective-y", `${backgroundY}px`);
       page.style.setProperty("--background-extension-opacity", `${perspectiveProgress}`);
+      page.style.setProperty("--transition-wash-phase", `${washPhase}`);
+      page.style.setProperty("--transition-handoff-phase", `${handoffPhase}`);
+      page.style.setProperty("--wake-layer-opacity", `${Math.max(0, 1 - THREE.MathUtils.smoothstep(clampedProgress, 0.18, 0.7))}`);
+      page.style.setProperty("--vignette-layer-opacity", `${Math.max(0, 1 - THREE.MathUtils.smoothstep(clampedProgress, 0.58, 0.9))}`);
+      page.style.setProperty("--final-background-opacity", `${THREE.MathUtils.smoothstep(clampedProgress, 0.82, 0.98)}`);
       page.style.setProperty("--wordmark-y", `${wordmarkYpx}px`);
       page.style.setProperty("--wordmark-scale", `${1 - clampedProgress * 0.1}`);
       page.style.setProperty("--wordmark-collapse-x", `${Math.max(0.045, 1 - collapseProgress * 0.955)}`);
@@ -889,8 +944,31 @@ export default function LiveGlobeProofPage() {
 
     const getTransitionDistance = () => {
       const viewportHeight = getViewportHeight();
-      const distanceMultiplier = isMobileViewport ? 2.15 : 1.15;
+      const distanceMultiplier = isMobileViewport
+        ? WAITLIST_SCROLL_TRANSITION.mobileTransitionDistance
+        : WAITLIST_SCROLL_TRANSITION.desktopTransitionDistance;
       return viewportHeight * distanceMultiplier;
+    };
+
+    const markUserScrollIntent = () => {
+      if (prefersReducedMotion || hasUserScrollIntent) {
+        return;
+      }
+      hasUserScrollIntent = true;
+      firstScrollIntentRef.current = true;
+      targetProgress = Math.max(targetProgress, FIRST_SCROLL_KICKOFF_PROGRESS);
+    };
+
+    const resetScrollIntent = () => {
+      hasUserScrollIntent = false;
+      firstScrollIntentRef.current = false;
+      targetProgress = 0;
+    };
+
+    const resetToStart = () => {
+      resetScrollIntent();
+      smoothedProgress = 0;
+      applyProgressStyles(0, getViewportHeight());
     };
 
     const computeTargetProgress = () => {
@@ -899,6 +977,12 @@ export default function LiveGlobeProofPage() {
       const sourceProgress = prefersReducedMotion ? 0 : THREE.MathUtils.clamp(scrollSource / transitionDistance, 0, 1);
       const scrollingBackward = scrollSource < lastScrollSource - 1;
       lastScrollSource = scrollSource;
+      if (scrollSource <= 0.5 && !autoCompleteTriggered && !autoRewindTriggered) {
+        resetToStart();
+      }
+      if (scrollSource > 0.5) {
+        markUserScrollIntent();
+      }
 
       if (autoCompleteTriggered) {
         if (scrollingBackward) {
@@ -916,7 +1000,8 @@ export default function LiveGlobeProofPage() {
         return;
       }
 
-      targetProgress = sourceProgress;
+      const kickoffProgress = hasUserScrollIntent ? FIRST_SCROLL_KICKOFF_PROGRESS : 0;
+      targetProgress = Math.max(sourceProgress, kickoffProgress);
       if (!prefersReducedMotion && targetProgress >= AUTO_COMPLETE_THRESHOLD) {
         autoCompleteTriggered = true;
         autoCompleteActiveRef.current = true;
@@ -928,7 +1013,7 @@ export default function LiveGlobeProofPage() {
     const tick = (timestamp: number) => {
       if (autoCompleteTriggered) {
         const autoProgress = THREE.MathUtils.clamp((timestamp - autoCompleteStartMs) / AUTO_COMPLETE_DURATION_MS, 0, 1);
-        const easedAutoProgress = 1 - Math.pow(1 - autoProgress, 3);
+        const easedAutoProgress = autoProgress * autoProgress * (3 - 2 * autoProgress);
         targetProgress = THREE.MathUtils.lerp(autoCompleteStartProgress, 1, easedAutoProgress);
       } else if (autoRewindTriggered) {
         const rewindProgress = THREE.MathUtils.clamp((timestamp - autoRewindStartMs) / AUTO_COMPLETE_REWIND_DURATION_MS, 0, 1);
@@ -941,6 +1026,7 @@ export default function LiveGlobeProofPage() {
           } else {
             window.scrollTo(0, getTransitionDistance() * AUTO_COMPLETE_REWIND_PROGRESS);
           }
+          resetToStart();
         }
       }
       const dt = lastTickTime === 0 ? 1 / 60 : THREE.MathUtils.clamp((timestamp - lastTickTime) / 1000, 1 / 180, 1 / 20);
@@ -975,10 +1061,19 @@ export default function LiveGlobeProofPage() {
       frame = window.requestAnimationFrame(tick);
     };
 
+    const registerScrollIntent = (deltaY: number) => {
+      if (prefersReducedMotion || deltaY <= 0 || hasUserScrollIntent) {
+        return;
+      }
+      markUserScrollIntent();
+      requestScrollProgress();
+    };
+
     const applyVirtualScrollDelta = (deltaY: number) => {
       if (!isMobileViewport || !interactionReadyRef.current || prefersReducedMotion) {
         return;
       }
+      registerScrollIntent(deltaY);
       if (autoCompleteTriggered && deltaY < -0.5) {
         autoCompleteTriggered = false;
         autoCompleteActiveRef.current = false;
@@ -990,6 +1085,9 @@ export default function LiveGlobeProofPage() {
         return;
       }
       virtualScrollY = THREE.MathUtils.clamp(virtualScrollY + deltaY, 0, getTransitionDistance());
+      if (virtualScrollY <= 0.5 && deltaY < 0) {
+        resetToStart();
+      }
       requestScrollProgress();
     };
 
@@ -998,11 +1096,19 @@ export default function LiveGlobeProofPage() {
         touchLastY = null;
         return;
       }
+      if ((window as typeof window & { __deadheadGlobeDragging?: boolean }).__deadheadGlobeDragging) {
+        touchLastY = null;
+        return;
+      }
       touchLastY = event.touches[0]?.clientY ?? null;
     };
 
     const handleTouchMove = (event: TouchEvent) => {
       if (!isMobileViewport || event.touches.length !== 1) {
+        return;
+      }
+      if ((window as typeof window & { __deadheadGlobeDragging?: boolean }).__deadheadGlobeDragging) {
+        touchLastY = null;
         return;
       }
       event.preventDefault();
@@ -1016,6 +1122,7 @@ export default function LiveGlobeProofPage() {
     };
 
     const handleWheel = (event: WheelEvent) => {
+      registerScrollIntent(event.deltaY);
       if (!isMobileViewport) {
         return;
       }
@@ -1069,7 +1176,10 @@ export default function LiveGlobeProofPage() {
     <main ref={pageRef} className={pageClassName} aria-label="Deadhead live globe proof lab">
       <section className={styles.heroStage} aria-label="Skybyrd live globe hero">
         <div className={styles.heroContent}>
-          <div className={styles.backgroundPlate} />
+          <div className={styles.backgroundPlate}>
+            <WaitlistSceneTransition scrollProgressRef={scrollProgressRef} firstScrollIntentRef={firstScrollIntentRef} />
+            <div className={styles.finalBackgroundImage} aria-hidden="true" />
+          </div>
           <div className={styles.wakeLayer} />
           <div className={styles.cornerLogo} aria-hidden="true">
             <img
@@ -1232,6 +1342,524 @@ function useLiveGlobeOverrides() {
   };
 }
 
+function clamp01(value: number) {
+  return THREE.MathUtils.clamp(value, 0, 1);
+}
+
+function smoothstep(edge0: number, edge1: number, value: number) {
+  const x = clamp01((value - edge0) / Math.max(edge1 - edge0, 0.00001));
+  return x * x * (3 - 2 * x);
+}
+
+function bell(progress: number, center: number, width: number) {
+  const x = (progress - center) / Math.max(width, 0.00001);
+  return Math.exp(-x * x * 2.8);
+}
+
+function lerp(a: number, b: number, t: number) {
+  return a + (b - a) * t;
+}
+
+const FROST_DISPLACEMENT_SHADER = {
+  uniforms: {
+    tDiffuse: { value: null },
+    uProgress: { value: 0 },
+    uTime: { value: 0 },
+    uFrostStrength: { value: 0 },
+    uDisplacementStrength: { value: 0 },
+    uNoiseScale: { value: 7.5 },
+    uResolution: { value: new THREE.Vector2(1, 1) },
+  },
+  vertexShader: `
+    varying vec2 vUv;
+
+    void main() {
+      vUv = uv;
+      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+    }
+  `,
+  fragmentShader: `
+    precision highp float;
+
+    uniform sampler2D tDiffuse;
+    uniform float uProgress;
+    uniform float uTime;
+    uniform float uFrostStrength;
+    uniform float uDisplacementStrength;
+    uniform float uNoiseScale;
+    uniform vec2 uResolution;
+    varying vec2 vUv;
+
+    float hash(vec2 p) {
+      p = fract(p * vec2(123.34, 456.21));
+      p += dot(p, p + 45.32);
+      return fract(p.x * p.y);
+    }
+
+    float noise(vec2 p) {
+      vec2 i = floor(p);
+      vec2 f = fract(p);
+      vec2 u = f * f * (3.0 - 2.0 * f);
+      float a = hash(i);
+      float b = hash(i + vec2(1.0, 0.0));
+      float c = hash(i + vec2(0.0, 1.0));
+      float d = hash(i + vec2(1.0, 1.0));
+      return mix(mix(a, b, u.x), mix(c, d, u.x), u.y);
+    }
+
+    float fbm(vec2 p) {
+      float value = 0.0;
+      float amp = 0.5;
+      for (int i = 0; i < 5; i++) {
+        value += amp * noise(p);
+        p = p * 2.05 + vec2(13.7, 8.9);
+        amp *= 0.5;
+      }
+      return value;
+    }
+
+    void main() {
+      vec2 uv = vUv;
+      vec2 center = uv - 0.5;
+      center.x *= uResolution.x / max(uResolution.y, 1.0);
+      float radial = smoothstep(0.95, 0.05, length(center));
+      float broad = fbm(uv * uNoiseScale + vec2(uTime * 0.035, -uTime * 0.02));
+      float fine = fbm(uv * (uNoiseScale * 3.4) + vec2(-uTime * 0.12, uTime * 0.08));
+      vec2 flow = normalize(vec2(broad - 0.48, fine - 0.48) + vec2(0.001, -0.16));
+      vec2 smear = vec2(sin(uv.y * 18.0 + broad * 4.0), cos(uv.x * 14.0 - fine * 3.0)) * 0.35;
+      vec2 offset = (flow + smear) * uDisplacementStrength * radial;
+
+      vec3 color = texture2D(tDiffuse, clamp(uv + offset, 0.0, 1.0)).rgb;
+      vec3 blur = (
+        texture2D(tDiffuse, clamp(uv + offset * 1.8 + vec2(0.006, 0.0) * uFrostStrength, 0.0, 1.0)).rgb +
+        texture2D(tDiffuse, clamp(uv + offset * 1.2 - vec2(0.005, 0.0) * uFrostStrength, 0.0, 1.0)).rgb +
+        texture2D(tDiffuse, clamp(uv + offset * 1.4 + vec2(0.0, 0.006) * uFrostStrength, 0.0, 1.0)).rgb +
+        texture2D(tDiffuse, clamp(uv + offset * 0.8 - vec2(0.0, 0.005) * uFrostStrength, 0.0, 1.0)).rgb
+      ) * 0.25;
+
+      float frostVeil = smoothstep(0.38, 0.88, broad) * radial * uFrostStrength;
+      vec3 frostColor = vec3(0.48, 0.62, 0.72);
+      color = mix(color, blur, uFrostStrength * 0.38);
+      color = mix(color, max(color, frostColor), frostVeil * 0.12);
+      gl_FragColor = vec4(color, 1.0);
+    }
+  `,
+};
+
+const CHROMATIC_ABERRATION_SHADER = {
+  uniforms: {
+    tDiffuse: { value: null },
+    uStrength: { value: 0 },
+    uResolution: { value: new THREE.Vector2(1, 1) },
+  },
+  vertexShader: `
+    varying vec2 vUv;
+
+    void main() {
+      vUv = uv;
+      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+    }
+  `,
+  fragmentShader: `
+    precision highp float;
+
+    uniform sampler2D tDiffuse;
+    uniform float uStrength;
+    uniform vec2 uResolution;
+    varying vec2 vUv;
+
+    void main() {
+      vec2 uv = vUv;
+      vec2 dir = uv - 0.5;
+      dir.x *= uResolution.x / max(uResolution.y, 1.0);
+      float dist = length(dir);
+      vec2 offset = normalize(dir + vec2(0.0001)) * dist * uStrength;
+      vec3 color;
+      color.r = texture2D(tDiffuse, clamp(uv + offset, 0.0, 1.0)).r;
+      color.g = texture2D(tDiffuse, uv).g;
+      color.b = texture2D(tDiffuse, clamp(uv - offset * 0.82, 0.0, 1.0)).b;
+      gl_FragColor = vec4(color, 1.0);
+    }
+  `,
+};
+
+function WaitlistSceneTransition({
+  scrollProgressRef,
+  firstScrollIntentRef,
+}: {
+  scrollProgressRef: React.MutableRefObject<number>;
+  firstScrollIntentRef: React.MutableRefObject<boolean>;
+}) {
+  const mountRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const mount = mountRef.current;
+    if (!mount) {
+      return;
+    }
+
+    gsap.registerPlugin(ScrollTrigger);
+
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const isMobileViewport = () => window.matchMedia("(max-width: 760px)").matches;
+    const scene = new THREE.Scene();
+    scene.fog = new THREE.FogExp2(0x020712, 0.014);
+
+    const camera = new THREE.PerspectiveCamera(48, 1, 0.1, 80);
+    camera.position.set(0, 0.15, WAITLIST_SCROLL_TRANSITION.cameraStartZ);
+
+    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: false, powerPreference: "high-performance" });
+    renderer.setClearColor(0x020712, 0);
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.02;
+    mount.appendChild(renderer.domElement);
+
+    const composer = new EffectComposer(renderer);
+    const renderPass = new RenderPass(scene, camera);
+    composer.addPass(renderPass);
+
+    const bloomPass = new UnrealBloomPass(new THREE.Vector2(1, 1), 0.35, 0.35, 0.15);
+    composer.addPass(bloomPass);
+
+    const frostPass = new ShaderPass(FROST_DISPLACEMENT_SHADER);
+    composer.addPass(frostPass);
+
+    const chromaticPass = new ShaderPass(CHROMATIC_ABERRATION_SHADER);
+    composer.addPass(chromaticPass);
+
+    const scrollTriggerProgressRef = { current: 0 };
+    const scrollTrigger = ScrollTrigger.create({
+      trigger: document.querySelector("main") ?? mount,
+      start: "top top",
+      end: () => `+=${window.innerHeight * (isMobileViewport() ? 2.4 : 2.0)}`,
+      scrub: true,
+      onUpdate: (self) => {
+        scrollTriggerProgressRef.current = self.progress;
+      },
+    });
+
+    const textureLoader = new THREE.TextureLoader();
+    const loadedTextures: THREE.Texture[] = [];
+    const disposableObjects: THREE.Object3D[] = [];
+    const disposableMaterials: THREE.Material[] = [];
+    const disposableGeometries: THREE.BufferGeometry[] = [];
+
+    const loadTexture = (src: string) =>
+      new Promise<THREE.Texture>((resolve, reject) => {
+        textureLoader.load(src, resolve, undefined, reject);
+      });
+
+    const oldMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 1, depthWrite: false });
+    const newMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0, depthWrite: false });
+    disposableMaterials.push(oldMaterial, newMaterial);
+
+    const backgroundGeometry = new THREE.PlaneGeometry(1, 1, 1, 1);
+    disposableGeometries.push(backgroundGeometry);
+    const oldPlane = new THREE.Mesh(backgroundGeometry, oldMaterial);
+    const newPlane = new THREE.Mesh(backgroundGeometry, newMaterial);
+    oldPlane.position.set(0, 0, -4.5);
+    newPlane.position.set(0, -0.04, -4.55);
+    scene.add(oldPlane, newPlane);
+    disposableObjects.push(oldPlane, newPlane);
+
+    const starCount = isMobileViewport() ? 420 : 760;
+    const starPositions = new Float32Array(starCount * 3);
+    for (let i = 0; i < starCount; i += 1) {
+      const radius = THREE.MathUtils.randFloat(6, 24);
+      const theta = THREE.MathUtils.randFloat(0, Math.PI * 2);
+      starPositions[i * 3] = Math.cos(theta) * radius;
+      starPositions[i * 3 + 1] = THREE.MathUtils.randFloat(-2.4, 9.6);
+      starPositions[i * 3 + 2] = -THREE.MathUtils.randFloat(7, 34);
+    }
+    const starGeometry = new THREE.BufferGeometry();
+    starGeometry.setAttribute("position", new THREE.BufferAttribute(starPositions, 3));
+    const starMaterial = new THREE.PointsMaterial({
+      color: 0xdcefff,
+      size: isMobileViewport() ? 0.018 : 0.014,
+      transparent: true,
+      opacity: 0.48,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+    });
+    const starfield = new THREE.Points(starGeometry, starMaterial);
+    scene.add(starfield);
+    disposableObjects.push(starfield);
+    disposableGeometries.push(starGeometry);
+    disposableMaterials.push(starMaterial);
+
+    const networkGroup = new THREE.Group();
+    networkGroup.position.set(0, -2.08, -6.6);
+    networkGroup.rotation.x = -1.23;
+    scene.add(networkGroup);
+    disposableObjects.push(networkGroup);
+
+    const runwayGeometry = new THREE.PlaneGeometry(7.5, 16, 1, 1);
+    const runwayMaterial = new THREE.MeshBasicMaterial({
+      color: 0x08111f,
+      transparent: true,
+      opacity: 0.42,
+      depthWrite: false,
+      side: THREE.DoubleSide,
+    });
+    const runwayPlane = new THREE.Mesh(runwayGeometry, runwayMaterial);
+    runwayPlane.position.z = -0.6;
+    networkGroup.add(runwayPlane);
+    disposableGeometries.push(runwayGeometry);
+    disposableMaterials.push(runwayMaterial);
+
+    const nodeCount = isMobileViewport() ? 150 : 260;
+    const nodeGeometry = new THREE.BoxGeometry(0.028, 0.012, 0.028);
+    const cyanNodeMaterial = new THREE.MeshBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.68, blending: THREE.AdditiveBlending });
+    const amberNodeMaterial = new THREE.MeshBasicMaterial({ color: 0xf6b65b, transparent: true, opacity: 0.5, blending: THREE.AdditiveBlending });
+    const cyanNodes = new THREE.InstancedMesh(nodeGeometry, cyanNodeMaterial, nodeCount);
+    const amberNodes = new THREE.InstancedMesh(nodeGeometry, amberNodeMaterial, Math.floor(nodeCount * 0.42));
+    const dummy = new THREE.Object3D();
+    for (let i = 0; i < nodeCount; i += 1) {
+      const lane = i % 12;
+      const row = Math.floor(i / 12);
+      const x = (lane - 5.5) * 0.42 + (row % 2) * 0.08;
+      const z = -7.2 + row * 0.34;
+      dummy.position.set(x, 0.02 + (i % 3) * 0.006, z);
+      dummy.scale.setScalar(i % 11 === 0 ? 1.8 : 1);
+      dummy.updateMatrix();
+      cyanNodes.setMatrixAt(i, dummy.matrix);
+    }
+    for (let i = 0; i < amberNodes.count; i += 1) {
+      const lane = i % 8;
+      const row = Math.floor(i / 8);
+      const side = lane < 4 ? -1 : 1;
+      const x = side * (1.55 + (lane % 4) * 0.36);
+      const z = -6.9 + row * 0.5;
+      dummy.position.set(x, 0.024, z);
+      dummy.scale.setScalar(i % 9 === 0 ? 1.6 : 0.85);
+      dummy.updateMatrix();
+      amberNodes.setMatrixAt(i, dummy.matrix);
+    }
+    networkGroup.add(cyanNodes, amberNodes);
+    disposableGeometries.push(nodeGeometry);
+    disposableMaterials.push(cyanNodeMaterial, amberNodeMaterial);
+
+    const hazeMaterial = new THREE.ShaderMaterial({
+      transparent: true,
+      depthWrite: false,
+      depthTest: false,
+      blending: THREE.AdditiveBlending,
+      uniforms: {
+        uTime: { value: 0 },
+        uProgress: { value: 0 },
+        uOpacity: { value: 0.12 },
+      },
+      vertexShader: `
+        varying vec2 vUv;
+
+        void main() {
+          vUv = uv;
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        }
+      `,
+      fragmentShader: `
+        precision highp float;
+
+        uniform float uTime;
+        uniform float uProgress;
+        uniform float uOpacity;
+        varying vec2 vUv;
+
+        float hash(vec2 p) {
+          p = fract(p * vec2(91.7, 437.2));
+          p += dot(p, p + 21.13);
+          return fract(p.x * p.y);
+        }
+
+        float noise(vec2 p) {
+          vec2 i = floor(p);
+          vec2 f = fract(p);
+          vec2 u = f * f * (3.0 - 2.0 * f);
+          return mix(mix(hash(i), hash(i + vec2(1.0, 0.0)), u.x), mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), u.x), u.y);
+        }
+
+        void main() {
+          vec2 uv = vUv;
+          float column = exp(-pow((uv.x - 0.5) * 3.2, 2.0));
+          float vertical = smoothstep(0.0, 0.2, uv.y) * (1.0 - smoothstep(0.88, 1.0, uv.y));
+          float mist = noise(uv * vec2(4.0, 9.0) + vec2(uTime * 0.025, -uTime * 0.035));
+          vec3 color = mix(vec3(0.02, 0.09, 0.16), vec3(0.06, 0.34, 0.54), mist);
+          float alpha = column * vertical * uOpacity * (0.58 + 0.42 * mist);
+          gl_FragColor = vec4(color, alpha);
+        }
+      `,
+    });
+    const hazeGeometry = new THREE.PlaneGeometry(5.4, 8.6, 1, 1);
+    const hazePlane = new THREE.Mesh(hazeGeometry, hazeMaterial);
+    hazePlane.position.set(0, 0.4, -3.2);
+    scene.add(hazePlane);
+    disposableObjects.push(hazePlane);
+    disposableGeometries.push(hazeGeometry);
+    disposableMaterials.push(hazeMaterial);
+
+    let frame = 0;
+    let disposed = false;
+    let smoothedProgress = 0;
+    let lastTime = performance.now();
+    let texturesReady = false;
+
+    const sizeBackgroundPlanes = () => {
+      const rect = mount.getBoundingClientRect();
+      const width = Math.max(rect.width, 1);
+      const height = Math.max(rect.height, 1);
+      const pixelRatio = isMobileViewport() ? Math.min(window.devicePixelRatio || 1, 1.25) : Math.min(window.devicePixelRatio || 1, 1.75);
+      renderer.setPixelRatio(pixelRatio);
+      renderer.setSize(width, height, false);
+      composer.setPixelRatio(pixelRatio);
+      composer.setSize(width, height);
+      camera.aspect = width / height;
+      camera.updateProjectionMatrix();
+      frostPass.uniforms.uResolution.value.set(width, height);
+      chromaticPass.uniforms.uResolution.value.set(width, height);
+      bloomPass.setSize(width, height);
+
+      const distance = camera.position.z - oldPlane.position.z;
+      const visibleHeight = 2 * Math.tan(THREE.MathUtils.degToRad(camera.fov * 0.5)) * distance;
+      const visibleWidth = visibleHeight * camera.aspect;
+      oldPlane.scale.set(visibleWidth * 1.08, visibleHeight * 1.08, 1);
+      newPlane.scale.copy(oldPlane.scale);
+      hazePlane.scale.set(THREE.MathUtils.clamp(camera.aspect * 1.2, 0.9, 2.4), 1, 1);
+    };
+
+    sizeBackgroundPlanes();
+    window.addEventListener("resize", sizeBackgroundPlanes);
+    window.addEventListener("orientationchange", sizeBackgroundPlanes);
+
+    Promise.all([
+      loadTexture("/cinematic/backgrounds/boarding-portal-entry-background.png"),
+      loadTexture("/cinematic/backgrounds/skybyrd-scroll-wave-background.jpg"),
+    ])
+      .then(([oldTexture, newTexture]) => {
+        if (disposed) {
+          oldTexture.dispose();
+          newTexture.dispose();
+          return;
+        }
+        oldTexture.colorSpace = THREE.SRGBColorSpace;
+        newTexture.colorSpace = THREE.SRGBColorSpace;
+        oldTexture.minFilter = THREE.LinearFilter;
+        oldTexture.magFilter = THREE.LinearFilter;
+        newTexture.minFilter = THREE.LinearFilter;
+        newTexture.magFilter = THREE.LinearFilter;
+        oldTexture.wrapS = THREE.ClampToEdgeWrapping;
+        oldTexture.wrapT = THREE.ClampToEdgeWrapping;
+        newTexture.wrapS = THREE.ClampToEdgeWrapping;
+        newTexture.wrapT = THREE.ClampToEdgeWrapping;
+        oldMaterial.map = oldTexture;
+        newMaterial.map = newTexture;
+        oldMaterial.needsUpdate = true;
+        newMaterial.needsUpdate = true;
+        loadedTextures.push(oldTexture, newTexture);
+        texturesReady = true;
+      })
+      .catch(() => {
+        texturesReady = true;
+      });
+
+    const render = (now: number) => {
+      if (disposed) {
+        return;
+      }
+
+      const delta = THREE.MathUtils.clamp((now - lastTime) / 1000, 1 / 120, 1 / 20);
+      lastTime = now;
+      const sourceProgress = Math.max(scrollProgressRef.current, scrollTriggerProgressRef.current);
+      const targetProgress = prefersReducedMotion ? smoothstep(0.35, 0.88, sourceProgress) : sourceProgress;
+      const damping = prefersReducedMotion ? 8 : 13;
+      smoothedProgress = lerp(smoothedProgress, targetProgress, 1 - Math.exp(-damping * delta));
+      if (Math.abs(smoothedProgress - targetProgress) < 0.0005) {
+        smoothedProgress = targetProgress;
+      }
+
+      const activation = firstScrollIntentRef.current || smoothedProgress > 0.001 ? 1 : 0;
+      const p = clamp01(smoothedProgress) * activation;
+      const phase1 = smoothstep(0, 0.25, p);
+      const frostPeak = prefersReducedMotion ? 0 : bell(p, 0.52, 0.24);
+      const chromaPeak = prefersReducedMotion ? 0 : bell(p, 0.58, 0.2);
+      const hazeRise = smoothstep(0.25, 0.65, p);
+      const hazeFall = smoothstep(0.72, 1, p);
+      const hazeOpacity = prefersReducedMotion ? lerp(0.08, 0.16, smoothstep(0.4, 0.8, p)) : lerp(0.12, 0.55, hazeRise * (1 - hazeFall));
+      const oldSceneOpacity = prefersReducedMotion ? 1 - smoothstep(0.45, 0.9, p) : 1 - smoothstep(0.35, 0.85, p);
+      const newSceneOpacity = smoothstep(0.55, 1, p);
+      const gridOpacity = lerp(0.35, 0.65, smoothstep(0.18, 0.7, p)) * (1 - smoothstep(0.88, 1, p) * 0.18);
+
+      camera.position.z = prefersReducedMotion
+        ? WAITLIST_SCROLL_TRANSITION.cameraStartZ
+        : lerp(WAITLIST_SCROLL_TRANSITION.cameraStartZ, WAITLIST_SCROLL_TRANSITION.cameraEndZ, smoothstep(0, 1, p));
+      camera.position.y = prefersReducedMotion ? 0.15 : lerp(0.15, -0.08, smoothstep(0.2, 1, p));
+      camera.updateProjectionMatrix();
+
+      oldPlane.position.y = lerp(0, 0.08, phase1);
+      newPlane.position.y = lerp(-0.18, 0, smoothstep(0.62, 1, p));
+      oldMaterial.opacity = oldSceneOpacity;
+      newMaterial.opacity = newSceneOpacity;
+      starMaterial.opacity = lerp(0.45, 0.72, phase1) * (1 - newSceneOpacity * 0.12);
+      cyanNodeMaterial.opacity = WAITLIST_SCROLL_TRANSITION.gridOpacity * gridOpacity;
+      amberNodeMaterial.opacity = 0.62 * WAITLIST_SCROLL_TRANSITION.gridOpacity * gridOpacity;
+      runwayMaterial.opacity = 0.28 + gridOpacity * 0.22;
+      networkGroup.position.z = lerp(-6.6, -5.45, smoothstep(0.55, 1, p));
+      networkGroup.position.y = lerp(-2.08, -1.92, smoothstep(0.7, 1, p));
+      starfield.position.y = -p * 0.18;
+      starfield.position.z = p * 0.75;
+
+      hazeMaterial.uniforms.uTime.value = now / 1000;
+      hazeMaterial.uniforms.uProgress.value = p;
+      hazeMaterial.uniforms.uOpacity.value = hazeOpacity * WAITLIST_SCROLL_TRANSITION.hazeIntensity;
+      hazePlane.scale.setScalar(lerp(1, 1.22, hazeRise * (1 - hazeFall * 0.7)));
+
+      frostPass.uniforms.uTime.value = now / 1000;
+      frostPass.uniforms.uProgress.value = p;
+      frostPass.uniforms.uFrostStrength.value = frostPeak * 0.48;
+      frostPass.uniforms.uDisplacementStrength.value = frostPeak * 0.044;
+      frostPass.uniforms.uNoiseScale.value = lerp(8.2, 5.8, frostPeak);
+      chromaticPass.uniforms.uStrength.value = chromaPeak * WAITLIST_SCROLL_TRANSITION.chromaticAberration;
+      bloomPass.strength = prefersReducedMotion ? 0.28 : lerp(0.35, 0.85, bell(p, 0.56, 0.34));
+      bloomPass.radius = 0.35;
+      bloomPass.threshold = 0.15;
+      if (scene.fog instanceof THREE.FogExp2) {
+        scene.fog.density = prefersReducedMotion ? 0.008 : 0.012 + hazeOpacity * 0.028;
+      }
+
+      if (texturesReady) {
+        composer.render();
+      }
+      frame = window.requestAnimationFrame(render);
+    };
+
+    frame = window.requestAnimationFrame(render);
+
+    return () => {
+      disposed = true;
+      scrollTrigger.kill();
+      window.removeEventListener("resize", sizeBackgroundPlanes);
+      window.removeEventListener("orientationchange", sizeBackgroundPlanes);
+      if (frame) {
+        window.cancelAnimationFrame(frame);
+      }
+      loadedTextures.forEach((texture) => texture.dispose());
+      disposableObjects.forEach((object) => {
+        if (object.parent) {
+          object.parent.remove(object);
+        }
+      });
+      disposableGeometries.forEach((geometry) => geometry.dispose());
+      disposableMaterials.forEach((material) => material.dispose());
+      composer.dispose();
+      renderer.dispose();
+      renderer.forceContextLoss();
+      mount.removeChild(renderer.domElement);
+    };
+  }, [scrollProgressRef, firstScrollIntentRef]);
+
+  return <div ref={mountRef} className={styles.backgroundTransitionMount} aria-hidden="true" />;
+}
+
 function LiveGlobeCanvas({
   onReady,
   textureSet,
@@ -1290,6 +1918,18 @@ function LiveGlobeCanvas({
     let lastMaterializeSignal = materializeSignalRef.current;
     let materializeStartTime = -1;
     let materializeProgress = 0;
+    let globePointerId: number | null = null;
+    let globePointerLastX = 0;
+    let globePointerLastY = 0;
+    let globePointerLastTime = 0;
+    let globeTargetYaw = 0;
+    let globeTargetPitch = 0;
+    let globeYaw = 0;
+    let globePitch = 0;
+    let globeYawVelocity = 0;
+    let globePitchVelocity = 0;
+    const projectedGlobeCenter = new THREE.Vector3();
+    const projectedGlobeEdge = new THREE.Vector3();
     const heroFlight: HeroFlightController = {
       mode: "ROUTE_IDLE",
       sourceEntry: null,
@@ -1362,11 +2002,12 @@ function LiveGlobeCanvas({
       currentOrbProgress = progress;
       const finalScale = isMobileLayout ? 0.24 : 0.23;
       const finalY = isMobileLayout ? 0.78 : 1.12;
-      const cameraZ = isMobileLayout ? 6.35 : 6.15;
+      const cameraZ = isMobileLayout ? WAITLIST_SCROLL_TRANSITION.cameraStartZ : WAITLIST_SCROLL_TRANSITION.cameraStartZ - 0.2;
+      const cameraEndZ = isMobileLayout ? WAITLIST_SCROLL_TRANSITION.cameraEndZ : WAITLIST_SCROLL_TRANSITION.cameraEndZ - 0.19;
       const cameraPullback = THREE.MathUtils.smoothstep(progress, 0.05, 1);
       globeRig.position.set(0, baseGlobeY + THREE.MathUtils.lerp(0, finalY, progress), 0);
       globeRig.scale.setScalar(baseGlobeScale * THREE.MathUtils.lerp(1, finalScale, progress));
-      camera.position.z = cameraZ + THREE.MathUtils.lerp(0, isMobileLayout ? 0.28 : 0.36, cameraPullback);
+      camera.position.z = THREE.MathUtils.lerp(cameraZ, cameraEndZ, cameraPullback);
       camera.position.y = (isMobileLayout ? 0.02 : 0.04) + THREE.MathUtils.lerp(0, isMobileLayout ? 0.08 : 0.12, cameraPullback);
       camera.updateProjectionMatrix();
       for (const material of routeShaderMaterials) {
@@ -1388,6 +2029,7 @@ function LiveGlobeCanvas({
     isMobileLayout = initialBounds.width < 760;
     updatePixelRatio(initialBounds.width, true);
     mount.appendChild(renderer.domElement);
+    renderer.domElement.dataset.globeInteraction = "true";
 
     const heroPlaneRig = new THREE.Group();
     heroPlaneRig.name = "hero-plane-rig";
@@ -3051,7 +3693,7 @@ function LiveGlobeCanvas({
       camera.updateProjectionMatrix();
 
       isMobileLayout = rect.width < 760;
-      const cameraZ = isMobileLayout ? 6.35 : 6.15;
+      const cameraZ = isMobileLayout ? WAITLIST_SCROLL_TRANSITION.cameraStartZ : WAITLIST_SCROLL_TRANSITION.cameraStartZ - 0.2;
       const visibleHeight = 2 * cameraZ * Math.tan(THREE.MathUtils.degToRad(camera.fov * 0.5));
       const visibleWidth = visibleHeight * camera.aspect;
       const targetDiameter = isMobileLayout ? Math.min(visibleWidth * 0.84, visibleHeight * 0.5) : visibleHeight * 0.61;
@@ -3064,6 +3706,85 @@ function LiveGlobeCanvas({
       camera.position.set(0, isMobileLayout ? 0.02 : 0.04, cameraZ);
       applyGlobeOrbTransform();
     };
+
+    const isPointerOnGlobe = (clientX: number, clientY: number) => {
+      const rect = renderer.domElement.getBoundingClientRect();
+      if (rect.width <= 0 || rect.height <= 0) {
+        return false;
+      }
+      projectedGlobeCenter.copy(globeRig.position).project(camera);
+      projectedGlobeEdge
+        .copy(globeRig.position)
+        .add(new THREE.Vector3(globeRadius * globeRig.scale.x, 0, 0))
+        .project(camera);
+      const centerX = rect.left + (projectedGlobeCenter.x * 0.5 + 0.5) * rect.width;
+      const centerY = rect.top + (-projectedGlobeCenter.y * 0.5 + 0.5) * rect.height;
+      const edgeX = rect.left + (projectedGlobeEdge.x * 0.5 + 0.5) * rect.width;
+      const edgeY = rect.top + (-projectedGlobeEdge.y * 0.5 + 0.5) * rect.height;
+      const radius = Math.max(42, Math.hypot(edgeX - centerX, edgeY - centerY) * 1.18);
+      return Math.hypot(clientX - centerX, clientY - centerY) <= radius;
+    };
+
+    const releaseGlobePointer = (event?: PointerEvent) => {
+      if (event && globePointerId !== event.pointerId) {
+        return;
+      }
+      if (globePointerId !== null && renderer.domElement.hasPointerCapture(globePointerId)) {
+        renderer.domElement.releasePointerCapture(globePointerId);
+      }
+      globePointerId = null;
+      (window as typeof window & { __deadheadGlobeDragging?: boolean }).__deadheadGlobeDragging = false;
+      renderer.domElement.classList.remove(styles.canvasDragging);
+    };
+
+    const handlePointerDown = (event: PointerEvent) => {
+      if (!isPointerOnGlobe(event.clientX, event.clientY)) {
+        return;
+      }
+      event.preventDefault();
+      globePointerId = event.pointerId;
+      globePointerLastX = event.clientX;
+      globePointerLastY = event.clientY;
+      globePointerLastTime = performance.now();
+      globeYawVelocity = 0;
+      globePitchVelocity = 0;
+      renderer.domElement.setPointerCapture(event.pointerId);
+      renderer.domElement.classList.add(styles.canvasDragging);
+      (window as typeof window & { __deadheadGlobeDragging?: boolean }).__deadheadGlobeDragging = true;
+    };
+
+    const handlePointerMove = (event: PointerEvent) => {
+      if (globePointerId !== event.pointerId) {
+        return;
+      }
+      event.preventDefault();
+      const now = performance.now();
+      const deltaTime = Math.max((now - globePointerLastTime) / 1000, 1 / 120);
+      const deltaX = event.clientX - globePointerLastX;
+      const deltaY = event.clientY - globePointerLastY;
+      const sensitivity = GLOBE_INTERACTION.dragSensitivity * (isMobileLayout ? 1.12 : 1);
+      const yawDelta = deltaX * sensitivity;
+      const pitchDelta = deltaY * sensitivity;
+      globeTargetYaw += yawDelta;
+      globeTargetPitch = THREE.MathUtils.clamp(
+        globeTargetPitch + pitchDelta,
+        GLOBE_INTERACTION.minPitch - INITIAL_GLOBE_ROTATION.x,
+        GLOBE_INTERACTION.maxPitch - INITIAL_GLOBE_ROTATION.x,
+      );
+      globeYawVelocity = THREE.MathUtils.clamp(yawDelta / deltaTime, -4.8, 4.8);
+      globePitchVelocity = THREE.MathUtils.clamp(pitchDelta / deltaTime, -3.2, 3.2);
+      globePointerLastX = event.clientX;
+      globePointerLastY = event.clientY;
+      globePointerLastTime = now;
+    };
+
+    const handlePointerCancel = (event: PointerEvent) => releaseGlobePointer(event);
+
+    renderer.domElement.addEventListener("pointerdown", handlePointerDown);
+    renderer.domElement.addEventListener("pointermove", handlePointerMove);
+    renderer.domElement.addEventListener("pointerup", releaseGlobePointer);
+    renderer.domElement.addEventListener("pointercancel", handlePointerCancel);
+    renderer.domElement.addEventListener("lostpointercapture", handlePointerCancel);
 
     const animate = () => {
       const delta = clock.getDelta();
@@ -3092,10 +3813,33 @@ function LiveGlobeCanvas({
       }
       updateOrbAliveLook(elapsed);
       const cloudRig = globeRig.getObjectByName("cloud-rig");
+      if (globePointerId === null) {
+        globeTargetYaw += globeYawVelocity * delta;
+        globeTargetPitch = THREE.MathUtils.clamp(
+          globeTargetPitch + globePitchVelocity * delta,
+          GLOBE_INTERACTION.minPitch - INITIAL_GLOBE_ROTATION.x,
+          GLOBE_INTERACTION.maxPitch - INITIAL_GLOBE_ROTATION.x,
+        );
+        const inertiaDamping = Math.exp(-GLOBE_INTERACTION.inertiaDamping * delta);
+        globeYawVelocity *= inertiaDamping;
+        globePitchVelocity *= inertiaDamping;
+        if (Math.abs(globeYawVelocity) < 0.0008) {
+          globeYawVelocity = 0;
+        }
+        if (Math.abs(globePitchVelocity) < 0.0008) {
+          globePitchVelocity = 0;
+        }
+      }
+      const interactionDamping = globePointerId === null ? GLOBE_INTERACTION.returnDamping : 16;
+      const interactionAlpha = 1 - Math.exp(-interactionDamping * delta);
+      globeYaw = THREE.MathUtils.lerp(globeYaw, globeTargetYaw, interactionAlpha);
+      globePitch = THREE.MathUtils.lerp(globePitch, globeTargetPitch, interactionAlpha);
       if (!prefersReducedMotion) {
         const orbSpinBoost = Math.pow(currentOrbProgress, 1.35);
-        globeRig.rotation.y = INITIAL_GLOBE_ROTATION.y + elapsed * THREE.MathUtils.lerp(0.0195, 0.092, orbSpinBoost);
-        globeRig.rotation.x = INITIAL_GLOBE_ROTATION.x + Math.sin(elapsed * THREE.MathUtils.lerp(0.28, 1.1, orbSpinBoost)) * THREE.MathUtils.lerp(0.003, 0.013, orbSpinBoost);
+        const idleYaw = INITIAL_GLOBE_ROTATION.y + elapsed * THREE.MathUtils.lerp(0.0195, 0.092, orbSpinBoost);
+        const idlePitch = INITIAL_GLOBE_ROTATION.x + Math.sin(elapsed * THREE.MathUtils.lerp(0.28, 1.1, orbSpinBoost)) * THREE.MathUtils.lerp(0.003, 0.013, orbSpinBoost);
+        globeRig.rotation.y = idleYaw + globeYaw;
+        globeRig.rotation.x = THREE.MathUtils.clamp(idlePitch + globePitch, GLOBE_INTERACTION.minPitch, GLOBE_INTERACTION.maxPitch);
         globeRig.rotation.z = INITIAL_GLOBE_ROTATION.z;
         for (const material of routeShaderMaterials) {
           material.uniforms.globeCenter.value.copy(globeRig.position);
@@ -3250,7 +3994,11 @@ function LiveGlobeCanvas({
           }
         }
       } else {
-        globeRig.rotation.set(INITIAL_GLOBE_ROTATION.x, INITIAL_GLOBE_ROTATION.y, INITIAL_GLOBE_ROTATION.z);
+        globeRig.rotation.set(
+          THREE.MathUtils.clamp(INITIAL_GLOBE_ROTATION.x + globePitch, GLOBE_INTERACTION.minPitch, GLOBE_INTERACTION.maxPitch),
+          INITIAL_GLOBE_ROTATION.y + globeYaw,
+          INITIAL_GLOBE_ROTATION.z,
+        );
         for (const entry of aircraftEntries) {
           applyAircraftPose(entry, entry.progress, camera, elapsed);
           if (entry === heroFlight.sourceEntry && heroFlight.mode !== "ROUTE_IDLE") {
@@ -3276,6 +4024,12 @@ function LiveGlobeCanvas({
 
     return () => {
       disposed = true;
+      (window as typeof window & { __deadheadGlobeDragging?: boolean }).__deadheadGlobeDragging = false;
+      renderer.domElement.removeEventListener("pointerdown", handlePointerDown);
+      renderer.domElement.removeEventListener("pointermove", handlePointerMove);
+      renderer.domElement.removeEventListener("pointerup", releaseGlobePointer);
+      renderer.domElement.removeEventListener("pointercancel", handlePointerCancel);
+      renderer.domElement.removeEventListener("lostpointercapture", handlePointerCancel);
       window.removeEventListener("resize", resize);
       window.cancelAnimationFrame(frame);
       renderer.dispose();
@@ -3311,5 +4065,5 @@ function LiveGlobeCanvas({
     };
   }, [aircraftEnabled, grade, materializeSignalRef, onReady, orbProgressRef, routesEnabled, scrollProgressRef, textureSet]);
 
-  return <div ref={mountRef} className={styles.canvasMount} aria-hidden="true" />;
+  return <div ref={mountRef} className={styles.canvasMount} data-globe-interaction="true" aria-hidden="true" />;
 }
