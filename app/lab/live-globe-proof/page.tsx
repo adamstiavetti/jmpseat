@@ -858,6 +858,7 @@ export default function LiveGlobeProofPage() {
 
     Promise.all([
       preloadImage("/cinematic/backgrounds/boarding-portal-entry-background.png"),
+      preloadImage("/cinematic/backgrounds/boarding-portal-entry-background-transition.png"),
       preloadImage("/cinematic/backgrounds/skybyrd-scroll-wave-background.jpg"),
       preloadImage("/cinematic/branding/optimized/skybyrd-logo-ui.png"),
       preloadImage("/cinematic/branding/optimized/skybyrd-logo-loader.png"),
@@ -1849,7 +1850,7 @@ function WaitlistSceneTransition({
     window.addEventListener("orientationchange", sizeBackgroundPlanes);
 
     Promise.all([
-      loadTexture("/cinematic/backgrounds/boarding-portal-entry-background.png"),
+      loadTexture("/cinematic/backgrounds/boarding-portal-entry-background-transition.png"),
       loadTexture("/cinematic/backgrounds/skybyrd-scroll-wave-background.jpg"),
     ])
       .then(([oldTexture, newTexture]) => {
