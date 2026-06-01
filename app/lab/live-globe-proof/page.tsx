@@ -1106,6 +1106,35 @@ export default function LiveGlobeProofPage() {
       targetProgress = smoothedProgress;
     };
 
+    const nudgeAutoRewind = (deltaY: number) => {
+      if (!autoRewindTriggered || deltaY >= -0.5) {
+        return;
+      }
+      const rewindImpulse = THREE.MathUtils.clamp(Math.abs(deltaY) / 1800, 0.015, 0.12);
+      const rewoundProgress = THREE.MathUtils.clamp(smoothedProgress - rewindImpulse, 0, 1);
+      smoothedProgress = rewoundProgress;
+      targetProgress = rewoundProgress;
+      const nowMs = performance.now();
+      autoRewindStartProgress = rewoundProgress;
+      autoRewindStartMs = nowMs;
+      const rewindBoost = THREE.MathUtils.clamp(Math.abs(deltaY) / 420, 0.16, 0.52);
+      autoRewindDurationMs = Math.max(
+        180,
+        autoRewindStartProgress * AUTO_REWIND_MS_PER_PROGRESS * (1 - rewindBoost),
+      );
+      if (rewoundProgress <= 0.0035) {
+        autoRewindTriggered = false;
+        autoCompleteActiveRef.current = false;
+        autoRewindActiveRef.current = false;
+        if (isMobileViewport) {
+          virtualScrollY = 0;
+        } else {
+          window.scrollTo(0, 0);
+        }
+        resetToStart();
+      }
+    };
+
     const computeTargetProgress = () => {
       const transitionDistance = getTransitionDistance();
       const scrollSource = isMobileViewport ? virtualScrollY : window.scrollY;
@@ -1236,6 +1265,7 @@ export default function LiveGlobeProofPage() {
         return;
       }
       if (autoRewindTriggered) {
+        nudgeAutoRewind(deltaY);
         requestScrollProgress();
         return;
       }
@@ -1278,6 +1308,14 @@ export default function LiveGlobeProofPage() {
 
     const handleWheel = (event: WheelEvent) => {
       registerScrollIntent(event.deltaY);
+      if (autoRewindTriggered && event.deltaY < -0.5) {
+        nudgeAutoRewind(event.deltaY);
+        requestScrollProgress();
+        if (isMobileViewport) {
+          event.preventDefault();
+        }
+        return;
+      }
       if (!isMobileViewport) {
         return;
       }
