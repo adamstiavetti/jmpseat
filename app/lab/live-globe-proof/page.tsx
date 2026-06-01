@@ -697,6 +697,13 @@ const WAITLIST_SCROLL_TRANSITION = {
   handoffStart: 0.65,
   autoCompleteThreshold: 0.2,
   autoCompleteDurationMs: 5200,
+  autoHandoffEnabled: true,
+  autoHandoffMinMs: 320,
+  autoHandoffMaxMs: 760,
+  autoHandoffVelocitySmoothing: 0.18,
+  autoHandoffSpeedClampMin: 0.05,
+  autoHandoffSpeedClampMax: 1.25,
+  autoHandoffEndVelocityFactor: 0.06,
   autoRewindMsPerProgress: 2450,
   autoRewindMinDurationMs: 900,
   mobileTransitionDistance: 2.45,
@@ -895,6 +902,13 @@ export default function LiveGlobeProofPage() {
     let autoCompleteTriggered = false;
     let autoCompleteStartMs = 0;
     let autoCompleteStartProgress = 0;
+    let autoHandoffActive = false;
+    let autoHandoffStartMs = 0;
+    let autoHandoffDurationMs = 0;
+    let autoHandoffStartProgress = 0;
+    let autoHandoffStartVelocity = 0;
+    let autoHandoffTargetVelocity = 0;
+    let autoHandoffLastMs = 0;
     let autoRewindTriggered = false;
     let autoRewindStartMs = 0;
     let autoRewindStartProgress = 0;
@@ -908,9 +922,19 @@ export default function LiveGlobeProofPage() {
     let hasUserScrollIntent = false;
     let stableViewportWidth = window.innerWidth;
     let stableViewportHeight = Math.max(window.innerHeight, window.visualViewport?.height ?? 0, 1);
+    let lastUserVelocitySampleMs = performance.now();
+    let lastUserVelocitySampleProgress = 0;
+    let smoothedUserProgressVelocity = 0;
     const AUTO_COMPLETE_THRESHOLD = WAITLIST_SCROLL_TRANSITION.autoCompleteThreshold;
     const AUTO_COMPLETE_REWIND_PROGRESS = 0;
     const AUTO_COMPLETE_DURATION_MS = WAITLIST_SCROLL_TRANSITION.autoCompleteDurationMs;
+    const AUTO_HANDOFF_ENABLED = WAITLIST_SCROLL_TRANSITION.autoHandoffEnabled;
+    const AUTO_HANDOFF_MIN_MS = WAITLIST_SCROLL_TRANSITION.autoHandoffMinMs;
+    const AUTO_HANDOFF_MAX_MS = WAITLIST_SCROLL_TRANSITION.autoHandoffMaxMs;
+    const AUTO_HANDOFF_VELOCITY_SMOOTHING = WAITLIST_SCROLL_TRANSITION.autoHandoffVelocitySmoothing;
+    const AUTO_HANDOFF_SPEED_CLAMP_MIN = WAITLIST_SCROLL_TRANSITION.autoHandoffSpeedClampMin;
+    const AUTO_HANDOFF_SPEED_CLAMP_MAX = WAITLIST_SCROLL_TRANSITION.autoHandoffSpeedClampMax;
+    const AUTO_HANDOFF_END_VELOCITY_FACTOR = WAITLIST_SCROLL_TRANSITION.autoHandoffEndVelocityFactor;
     const AUTO_REWIND_MS_PER_PROGRESS = WAITLIST_SCROLL_TRANSITION.autoRewindMsPerProgress;
     const AUTO_REWIND_MIN_DURATION_MS = WAITLIST_SCROLL_TRANSITION.autoRewindMinDurationMs;
     const FIRST_SCROLL_KICKOFF_PROGRESS = 0.01;
@@ -1015,18 +1039,65 @@ export default function LiveGlobeProofPage() {
       firstScrollIntentRef.current = false;
       autoCompleteActiveRef.current = false;
       autoRewindActiveRef.current = false;
+      autoHandoffActive = false;
       targetProgress = 0;
     };
 
     const resetToStart = () => {
       resetScrollIntent();
       smoothedProgress = 0;
+      smoothedUserProgressVelocity = 0;
+      lastUserVelocitySampleProgress = 0;
+      lastUserVelocitySampleMs = performance.now();
       applyProgressStyles(0, getViewportHeight());
+    };
+
+    const sampleUserScrollVelocity = (sourceProgress: number, nowMs: number) => {
+      const dt = Math.max((nowMs - lastUserVelocitySampleMs) / 1000, 1 / 240);
+      const instantaneousVelocity = (sourceProgress - lastUserVelocitySampleProgress) / dt;
+      const clampedVelocity = THREE.MathUtils.clamp(instantaneousVelocity, -2.5, 2.5);
+      smoothedUserProgressVelocity = THREE.MathUtils.lerp(
+        smoothedUserProgressVelocity,
+        clampedVelocity,
+        AUTO_HANDOFF_VELOCITY_SMOOTHING,
+      );
+      lastUserVelocitySampleProgress = sourceProgress;
+      lastUserVelocitySampleMs = nowMs;
+    };
+
+    const startAutoComplete = (nowMs: number) => {
+      autoCompleteTriggered = true;
+      autoCompleteActiveRef.current = true;
+      autoCompleteStartMs = nowMs;
+      autoCompleteStartProgress = smoothedProgress;
+
+      const userForwardVelocity = THREE.MathUtils.clamp(smoothedUserProgressVelocity, 0, AUTO_HANDOFF_SPEED_CLAMP_MAX);
+      if (!prefersReducedMotion && AUTO_HANDOFF_ENABLED && userForwardVelocity > AUTO_HANDOFF_SPEED_CLAMP_MIN) {
+        const handoffBlend = THREE.MathUtils.clamp(
+          (userForwardVelocity - AUTO_HANDOFF_SPEED_CLAMP_MIN) /
+            Math.max(AUTO_HANDOFF_SPEED_CLAMP_MAX - AUTO_HANDOFF_SPEED_CLAMP_MIN, 1e-4),
+          0,
+          1,
+        );
+        autoHandoffActive = true;
+        autoHandoffStartMs = nowMs;
+        autoHandoffDurationMs = THREE.MathUtils.lerp(AUTO_HANDOFF_MIN_MS, AUTO_HANDOFF_MAX_MS, handoffBlend);
+        autoHandoffStartProgress = smoothedProgress;
+        autoHandoffStartVelocity = userForwardVelocity;
+        autoHandoffTargetVelocity = Math.min(
+          userForwardVelocity * AUTO_HANDOFF_END_VELOCITY_FACTOR,
+          0.04,
+        );
+        autoHandoffLastMs = 0;
+      } else {
+        autoHandoffActive = false;
+      }
     };
 
     const beginAutoRewind = () => {
       autoCompleteTriggered = false;
       autoCompleteActiveRef.current = false;
+      autoHandoffActive = false;
       autoRewindActiveRef.current = true;
       autoRewindTriggered = true;
       autoRewindStartMs = performance.now();
@@ -1038,7 +1109,11 @@ export default function LiveGlobeProofPage() {
     const computeTargetProgress = () => {
       const transitionDistance = getTransitionDistance();
       const scrollSource = isMobileViewport ? virtualScrollY : window.scrollY;
+      const nowMs = performance.now();
       const sourceProgress = prefersReducedMotion ? 0 : THREE.MathUtils.clamp(scrollSource / transitionDistance, 0, 1);
+      if (!autoCompleteTriggered && !autoRewindTriggered) {
+        sampleUserScrollVelocity(sourceProgress, nowMs);
+      }
       const scrollingBackward = scrollSource < lastScrollSource - 1;
       lastScrollSource = scrollSource;
       if (scrollSource <= 0.5 && !autoCompleteTriggered && !autoRewindTriggered) {
@@ -1062,18 +1137,38 @@ export default function LiveGlobeProofPage() {
       const kickoffProgress = hasUserScrollIntent ? FIRST_SCROLL_KICKOFF_PROGRESS : 0;
       targetProgress = Math.max(sourceProgress, kickoffProgress);
       if (!prefersReducedMotion && targetProgress >= AUTO_COMPLETE_THRESHOLD) {
-        autoCompleteTriggered = true;
-        autoCompleteActiveRef.current = true;
-        autoCompleteStartMs = performance.now();
-        autoCompleteStartProgress = smoothedProgress;
+        startAutoComplete(nowMs);
       }
     };
 
     const tick = (timestamp: number) => {
       if (autoCompleteTriggered) {
-        const autoProgress = THREE.MathUtils.clamp((timestamp - autoCompleteStartMs) / AUTO_COMPLETE_DURATION_MS, 0, 1);
-        const easedAutoProgress = autoProgress * autoProgress * (3 - 2 * autoProgress);
-        targetProgress = THREE.MathUtils.lerp(autoCompleteStartProgress, 1, easedAutoProgress);
+        if (autoHandoffActive) {
+          const handoffProgress = THREE.MathUtils.clamp(
+            (timestamp - autoHandoffStartMs) / Math.max(autoHandoffDurationMs, 1),
+            0,
+            1,
+          );
+          const handoffEase = handoffProgress * handoffProgress * (3 - 2 * handoffProgress);
+          const handoffVelocity = THREE.MathUtils.lerp(
+            autoHandoffStartVelocity,
+            autoHandoffTargetVelocity,
+            handoffEase,
+          );
+          const dt = autoHandoffLastMs === 0 ? 1 / 60 : THREE.MathUtils.clamp((timestamp - autoHandoffLastMs) / 1000, 1 / 180, 1 / 20);
+          autoHandoffLastMs = timestamp;
+          const handoffStep = Math.max(0, handoffVelocity * dt);
+          targetProgress = THREE.MathUtils.clamp(targetProgress + handoffStep, autoHandoffStartProgress, 1);
+          if (handoffProgress >= 0.999 || targetProgress >= 0.999) {
+            autoHandoffActive = false;
+            autoCompleteStartMs = timestamp;
+            autoCompleteStartProgress = targetProgress;
+          }
+        } else {
+          const autoProgress = THREE.MathUtils.clamp((timestamp - autoCompleteStartMs) / AUTO_COMPLETE_DURATION_MS, 0, 1);
+          const easedAutoProgress = autoProgress * autoProgress * (3 - 2 * autoProgress);
+          targetProgress = THREE.MathUtils.lerp(autoCompleteStartProgress, 1, easedAutoProgress);
+        }
       } else if (autoRewindTriggered) {
         const rewindDuration = Math.max(AUTO_REWIND_MIN_DURATION_MS, autoRewindDurationMs);
         const rewindProgress = THREE.MathUtils.clamp((timestamp - autoRewindStartMs) / rewindDuration, 0, 1);
