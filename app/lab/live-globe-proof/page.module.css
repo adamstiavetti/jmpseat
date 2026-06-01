@@ -29,6 +29,9 @@
   --scroll-cue-opacity: 1;
   --scene-materialize-opacity: 0;
   --scene-materialize-background-opacity: 0.42;
+  --background-perspective-scale: 1.018;
+  --background-perspective-y: 0px;
+  --background-extension-opacity: 0;
   position: relative;
   isolation: isolate;
   min-width: 320px;
@@ -98,11 +101,42 @@
 
 .backgroundPlate {
   z-index: 0;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse at 50% 24%, rgba(24, 80, 145, 0.16), transparent 38%),
+    radial-gradient(ellipse at 48% 76%, rgba(2, 9, 22, 0.9), rgba(1, 6, 13, 0.98) 66%, #01060d 100%);
+  opacity: var(--scene-materialize-background-opacity);
+}
+
+.backgroundPlate::before,
+.backgroundPlate::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+}
+
+.backgroundPlate::before {
+  inset: -14%;
+  background:
+    linear-gradient(180deg, rgba(0, 2, 8, 0.22), rgba(0, 2, 8, 0.46)),
+    url("/cinematic/backgrounds/boarding-portal-entry-background.png") center / cover no-repeat;
+  filter: blur(14px) saturate(0.86) brightness(0.76);
+  opacity: calc(0.72 + var(--background-extension-opacity) * 0.28);
+  transform:
+    translate3d(0, calc(var(--background-perspective-y) * -0.34), 0)
+    scale(1.13);
+}
+
+.backgroundPlate::after {
+  inset: 0;
   background:
     linear-gradient(180deg, rgba(0, 2, 8, 0.14), rgba(0, 2, 8, 0.28)),
     url("/cinematic/backgrounds/boarding-portal-entry-background.png") center / cover no-repeat;
-  transform: scale(1.018);
-  opacity: var(--scene-materialize-background-opacity);
+  transform:
+    translate3d(0, var(--background-perspective-y), 0)
+    scale(var(--background-perspective-scale));
+  transform-origin: 50% 36%;
+  will-change: transform;
 }
 
 .wakeLayer {

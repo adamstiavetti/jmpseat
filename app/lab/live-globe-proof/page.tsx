@@ -816,6 +816,7 @@ export default function LiveGlobeProofPage() {
       const widthCollapseProgress = THREE.MathUtils.smoothstep(clampedProgress, 0.02, 0.58);
       const absorptionExit = THREE.MathUtils.smoothstep(clampedProgress, 0.58, 0.74);
       const absorbProgress = THREE.MathUtils.smoothstep(clampedProgress, 0, 0.3) * (1 - absorptionExit);
+      const perspectiveProgress = 1 - Math.pow(1 - clampedProgress, 1.45);
       const suckedWordProgress = THREE.MathUtils.smoothstep(clampedProgress, 0.02, 0.82);
       const particleLeadProgress = 1 - Math.pow(1 - clampedProgress, 1.3);
       const fastPullProgress = 1 - Math.pow(1 - clampedProgress, 1.25);
@@ -826,7 +827,12 @@ export default function LiveGlobeProofPage() {
       const absorbYpx = -(absorptionMouthY / 100) * viewportHeight;
       const suckedWordYvh = -25 * suckedWordProgress - 25 * gapCloseProgress;
       const suckedWordYpx = (suckedWordYvh / 100) * viewportHeight;
+      const backgroundScale = THREE.MathUtils.lerp(1.018, isMobileViewport ? 0.955 : 0.94, perspectiveProgress);
+      const backgroundY = -viewportHeight * THREE.MathUtils.lerp(0, isMobileViewport ? 0.028 : 0.04, perspectiveProgress);
       page.style.setProperty("--orb-progress", `${orbProgress}`);
+      page.style.setProperty("--background-perspective-scale", `${backgroundScale}`);
+      page.style.setProperty("--background-perspective-y", `${backgroundY}px`);
+      page.style.setProperty("--background-extension-opacity", `${perspectiveProgress}`);
       page.style.setProperty("--wordmark-y", `${wordmarkYpx}px`);
       page.style.setProperty("--wordmark-scale", `${1 - clampedProgress * 0.1}`);
       page.style.setProperty("--wordmark-collapse-x", `${Math.max(0.045, 1 - collapseProgress * 0.955)}`);
@@ -1238,8 +1244,13 @@ function LiveGlobeCanvas({
       currentOrbProgress = progress;
       const finalScale = isMobileLayout ? 0.24 : 0.23;
       const finalY = isMobileLayout ? 0.78 : 1.12;
+      const cameraZ = isMobileLayout ? 6.35 : 6.15;
+      const cameraPullback = THREE.MathUtils.smoothstep(progress, 0.05, 1);
       globeRig.position.set(0, baseGlobeY + THREE.MathUtils.lerp(0, finalY, progress), 0);
       globeRig.scale.setScalar(baseGlobeScale * THREE.MathUtils.lerp(1, finalScale, progress));
+      camera.position.z = cameraZ + THREE.MathUtils.lerp(0, isMobileLayout ? 0.28 : 0.36, cameraPullback);
+      camera.position.y = (isMobileLayout ? 0.02 : 0.04) + THREE.MathUtils.lerp(0, isMobileLayout ? 0.08 : 0.12, cameraPullback);
+      camera.updateProjectionMatrix();
       for (const material of routeShaderMaterials) {
         material.uniforms.globeCenter.value.copy(globeRig.position);
       }
