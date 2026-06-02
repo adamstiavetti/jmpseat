@@ -20,7 +20,15 @@ import {
   setWebglPerfSceneState,
   subscribeWebglPerfDebugFlags,
 } from "@/src/lib/performance/webglPerfMonitor";
-import { getHeroReturnLinearProgress, shouldStartHeroReturn } from "@/src/lib/scroll/heroFlightControl";
+import {
+  getHeroLaunchSpawnFollow,
+  getHeroReturnLinearProgress,
+  shouldResumeHeroLaunchFromReturn,
+  shouldResumeInterruptedAutoComplete,
+  shouldKeepInterruptedTransitionTicking,
+  shouldScrubHeroReturnWithScroll,
+  shouldStartHeroReturn,
+} from "@/src/lib/scroll/heroFlightControl";
 import { applyReverseScrubStep, updateReverseActivationIntent } from "@/src/lib/scroll/autoRewindIntent";
 import {
   getEarlyCanvasOpacity,
@@ -134,6 +142,7 @@ type HeroFlightController = {
   launchStartTime: number;
   returnStartTime: number;
   transitionProgress: number;
+  resumedFromCurrentPose: boolean;
 };
 
 const TEXTURE_SETS: Record<TextureSetName, TextureSet> = {
@@ -761,7 +770,8 @@ const WAITLIST_SCROLL_TRANSITION = {
   earlyDistortionFallbackStrength: 0.22,
   mobileReverseActivationThreshold: 140,
   mobileReverseIntentDecayPerSecond: 220,
-  } as const;
+  interruptedAutoCompleteResumeMs: 220,
+} as const;
 
 const WAITLIST_PERFORMANCE = {
   mobileTransitionPixelRatio: 1.25,
@@ -803,6 +813,8 @@ export default function LiveGlobeProofPage() {
   const autoCompleteActiveRef = useRef(false);
   const autoRewindActiveRef = useRef(false);
   const manualReverseHoldActiveRef = useRef(false);
+  const manualScrollDirectionRef = useRef<-1 | 0 | 1>(0);
+  const lastManualScrollInputMsRef = useRef(0);
   const earlyForwardGestureCountRef = useRef(0);
   const firstScrollIntentRef = useRef(false);
   const materializeSignalRef = useRef(0);
@@ -1031,6 +1043,8 @@ export default function LiveGlobeProofPage() {
     let earlyForwardGestureCount = 0;
     let lastForwardGestureMs = 0;
     let manualReverseHoldActive = false;
+    let manualScrollDirection: -1 | 0 | 1 = 0;
+    let lastManualScrollInputMs = 0;
     const AUTO_COMPLETE_THRESHOLD = WAITLIST_SCROLL_TRANSITION.autoCompleteThreshold;
     const AUTO_COMPLETE_REWIND_PROGRESS = 0;
     const AUTO_COMPLETE_DURATION_MS = WAITLIST_SCROLL_TRANSITION.autoCompleteDurationMs;
@@ -1045,6 +1059,7 @@ export default function LiveGlobeProofPage() {
     const AUTO_REWIND_MIN_DURATION_MS = WAITLIST_SCROLL_TRANSITION.autoRewindMinDurationMs;
     const MOBILE_REVERSE_ACTIVATION_THRESHOLD = WAITLIST_SCROLL_TRANSITION.mobileReverseActivationThreshold;
     const MOBILE_REVERSE_INTENT_DECAY_PER_SECOND = WAITLIST_SCROLL_TRANSITION.mobileReverseIntentDecayPerSecond;
+    const INTERRUPTED_AUTO_COMPLETE_RESUME_MS = WAITLIST_SCROLL_TRANSITION.interruptedAutoCompleteResumeMs;
     const FIRST_SCROLL_KICKOFF_PROGRESS = 0.01;
     autoCompleteActiveRef.current = false;
     const getViewportHeight = () => stableViewportHeight;
@@ -1218,6 +1233,10 @@ export default function LiveGlobeProofPage() {
       earlyForwardGestureCount = 0;
       earlyForwardGestureCountRef.current = 0;
       lastForwardGestureMs = 0;
+      manualScrollDirection = 0;
+      manualScrollDirectionRef.current = 0;
+      lastManualScrollInputMs = 0;
+      lastManualScrollInputMsRef.current = 0;
       autoCompleteActiveRef.current = false;
       autoRewindActiveRef.current = false;
       manualReverseHoldActiveRef.current = false;
@@ -1344,6 +1363,8 @@ export default function LiveGlobeProofPage() {
       const transitionDistance = getTransitionDistance();
       const scrollSource = isMobileViewport ? virtualScrollY : window.scrollY;
       const nowMs = performance.now();
+      const userInputActive =
+        lastManualScrollInputMs > 0 && nowMs - lastManualScrollInputMs < INTERRUPTED_AUTO_COMPLETE_RESUME_MS;
       const sourceProgress = prefersReducedMotion ? 0 : THREE.MathUtils.clamp(scrollSource / transitionDistance, 0, 1);
       if (!autoCompleteTriggered && !autoRewindTriggered) {
         sampleUserScrollVelocity(sourceProgress, nowMs);
@@ -1351,6 +1372,12 @@ export default function LiveGlobeProofPage() {
       const scrollDelta = scrollSource - lastScrollSource;
       const scrollingBackward = scrollDelta < -1;
       const scrollingForward = scrollDelta > 1;
+      if (scrollingForward || scrollingBackward) {
+        manualScrollDirection = scrollingForward ? 1 : -1;
+        manualScrollDirectionRef.current = manualScrollDirection;
+        lastManualScrollInputMs = nowMs;
+        lastManualScrollInputMsRef.current = nowMs;
+      }
       lastScrollSource = scrollSource;
       if (scrollSource <= 0.5 && !autoCompleteTriggered && !autoRewindTriggered) {
         resetToStart();
@@ -1376,6 +1403,22 @@ export default function LiveGlobeProofPage() {
         if (scrollingForward || sourceProgress <= AUTO_COMPLETE_THRESHOLD - 0.01) {
           manualReverseHoldActive = false;
           manualReverseHoldActiveRef.current = false;
+        } else if (
+          shouldResumeInterruptedAutoComplete({
+            manualReverseHoldActive,
+            currentScrollProgress: sourceProgress,
+            nowMs,
+            lastManualScrollInputMs,
+            idleResumeMs: INTERRUPTED_AUTO_COMPLETE_RESUME_MS,
+            minResumeProgress: AUTO_COMPLETE_THRESHOLD,
+          })
+        ) {
+          manualReverseHoldActive = false;
+          manualReverseHoldActiveRef.current = false;
+          manualScrollDirection = 0;
+          manualScrollDirectionRef.current = 0;
+          startAutoComplete(nowMs);
+          return;
         } else {
           return;
         }
@@ -1386,6 +1429,9 @@ export default function LiveGlobeProofPage() {
     };
 
     const tick = (timestamp: number) => {
+      if (manualReverseHoldActive && !autoCompleteTriggered && !autoRewindTriggered) {
+        computeTargetProgress();
+      }
       if (autoCompleteTriggered) {
         if (autoHandoffActive) {
           const handoffProgress = THREE.MathUtils.clamp(
@@ -1440,7 +1486,15 @@ export default function LiveGlobeProofPage() {
       applyProgressStyles(smoothedProgress, getViewportHeight());
 
       const autoCompleting = autoCompleteTriggered && targetProgress < 0.9995;
-      if (Math.abs(targetProgress - smoothedProgress) > 0.0006 || autoCompleting || autoRewindTriggered) {
+      if (
+        shouldKeepInterruptedTransitionTicking({
+          manualReverseHoldActive,
+          targetProgress,
+          smoothedProgress,
+          autoCompleting,
+          autoRewindTriggered,
+        })
+      ) {
         frame = window.requestAnimationFrame(tick);
         return;
       }
@@ -1503,10 +1557,14 @@ export default function LiveGlobeProofPage() {
       if (normalizedDeltaY === 0) {
         return;
       }
+      const nowMs = performance.now();
+      manualScrollDirection = normalizedDeltaY > 0 ? 1 : -1;
+      manualScrollDirectionRef.current = manualScrollDirection;
+      lastManualScrollInputMs = nowMs;
+      lastManualScrollInputMsRef.current = nowMs;
       registerForwardGestureBurst(normalizedDeltaY);
       registerScrollIntent(deltaY);
       if (autoCompleteTriggered && normalizedDeltaY < -0.5) {
-        const nowMs = performance.now();
         virtualScrollY = THREE.MathUtils.clamp(smoothedProgress * getTransitionDistance(), 0, getTransitionDistance());
         autoCompleteTriggered = false;
         autoCompleteActiveRef.current = false;
@@ -1558,6 +1616,8 @@ export default function LiveGlobeProofPage() {
         manualReverseHoldActive = false;
         manualReverseHoldActiveRef.current = false;
         lastReverseActivationSampleMs = performance.now();
+        manualScrollDirection = normalizedDeltaY > 0 ? 1 : 0;
+        manualScrollDirectionRef.current = manualScrollDirection;
       }
       if (autoRewindTriggered) {
         nudgeAutoRewind(normalizedDeltaY);
@@ -1745,6 +1805,8 @@ export default function LiveGlobeProofPage() {
               autoCompleteActiveRef={autoCompleteActiveRef}
               autoRewindActiveRef={autoRewindActiveRef}
               manualReverseHoldActiveRef={manualReverseHoldActiveRef}
+              manualScrollDirectionRef={manualScrollDirectionRef}
+              lastManualScrollInputMsRef={lastManualScrollInputMsRef}
               materializeSignalRef={materializeSignalRef}
               perfEnabled={perfEnabled}
               forcedQuality={forcedQuality}
@@ -2694,6 +2756,8 @@ function LiveGlobeCanvas({
   autoCompleteActiveRef,
   autoRewindActiveRef,
   manualReverseHoldActiveRef,
+  manualScrollDirectionRef,
+  lastManualScrollInputMsRef,
   materializeSignalRef,
   perfEnabled,
   forcedQuality,
@@ -2713,6 +2777,8 @@ function LiveGlobeCanvas({
   autoCompleteActiveRef: React.MutableRefObject<boolean>;
   autoRewindActiveRef: React.MutableRefObject<boolean>;
   manualReverseHoldActiveRef: React.MutableRefObject<boolean>;
+  manualScrollDirectionRef: React.MutableRefObject<-1 | 0 | 1>;
+  lastManualScrollInputMsRef: React.MutableRefObject<number>;
   materializeSignalRef: React.MutableRefObject<number>;
   perfEnabled: boolean;
   forcedQuality: ForcedQuality;
@@ -2790,6 +2856,7 @@ function LiveGlobeCanvas({
       launchStartTime: -1,
       returnStartTime: -1,
       transitionProgress: 0,
+      resumedFromCurrentPose: false,
     };
 
     renderer.setClearColor(0x000000, 0);
@@ -4161,6 +4228,7 @@ function LiveGlobeCanvas({
       heroFlight.launchStartTime = -1;
       heroFlight.returnStartTime = -1;
       heroFlight.transitionProgress = 0;
+      heroFlight.resumedFromCurrentPose = false;
       heroFlight.mode = "ROUTE_IDLE";
       setHeroLaunchArcState(0, 0, 0);
     };
@@ -4199,6 +4267,47 @@ function LiveGlobeCanvas({
       heroFlight.returnCurve = null;
       heroFlight.returnStartTime = -1;
       heroFlight.transitionProgress = 0;
+      heroFlight.resumedFromCurrentPose = false;
+      heroFlight.mode = "HERO_TRANSITION";
+    };
+
+    const resumeHeroFlightFromCurrentPose = (elapsed: number) => {
+      if (!heroFlight.actor) {
+        return;
+      }
+
+      heroFlight.actor.anchor.updateMatrixWorld(true);
+      heroFlight.actor.pose.updateMatrixWorld(true);
+      heroFlight.actor.anchor.getWorldPosition(launchCurvePoint);
+      heroFlight.actor.pose.getWorldQuaternion(aircraftWorldQuaternion);
+      launchTravelDirection.set(0, 0, 1).applyQuaternion(aircraftWorldQuaternion).normalize();
+      if (launchTravelDirection.lengthSq() < 1e-5) {
+        launchTravelDirection.copy(worldForwardFallback);
+      }
+      heroFlight.snapshotScale = heroFlight.actor.anchor.scale.x;
+      heroFlight.snapshotOpacity = 1;
+      getHeroJourneyStartPoint();
+      getHeroJourneyDirection();
+      launchControlA
+        .copy(launchCurvePoint)
+        .addScaledVector(launchTravelDirection, isMobileLayout ? 0.2 : 0.28)
+        .addScaledVector(worldUp, isMobileLayout ? 0.05 : 0.08);
+      launchControlB
+        .copy(launchTargetPoint)
+        .addScaledVector(worldUp, isMobileLayout ? 0.18 : 0.24)
+        .addScaledVector(launchTargetDirection, isMobileLayout ? -0.12 : -0.18);
+      heroFlight.launchCurve = new THREE.CubicBezierCurve3(
+        launchCurvePoint.clone(),
+        launchControlA.clone(),
+        launchControlB.clone(),
+        launchTargetPoint.clone(),
+      );
+      ensureHeroLaunchArc(heroFlight.launchCurve);
+      heroFlight.launchStartTime = elapsed;
+      heroFlight.returnCurve = null;
+      heroFlight.returnStartTime = -1;
+      heroFlight.transitionProgress = 0;
+      heroFlight.resumedFromCurrentPose = true;
       heroFlight.mode = "HERO_TRANSITION";
     };
 
@@ -4256,6 +4365,7 @@ function LiveGlobeCanvas({
         0.42,
       );
       heroFlight.returnStartTime = elapsed;
+      heroFlight.resumedFromCurrentPose = false;
       heroFlight.mode = "HERO_RETURN";
     };
 
@@ -4955,6 +5065,11 @@ function LiveGlobeCanvas({
       const autoCompleteActive = autoCompleteActiveRef.current;
       const autoRewindActive = autoRewindActiveRef.current;
       const manualReverseHoldActive = manualReverseHoldActiveRef.current;
+      const manualScrollDirection = manualScrollDirectionRef.current;
+      const lastManualScrollInputMs = lastManualScrollInputMsRef.current;
+      const userInputActive =
+        lastManualScrollInputMs > 0 &&
+        performance.now() - lastManualScrollInputMs < WAITLIST_SCROLL_TRANSITION.interruptedAutoCompleteResumeMs;
       const fps = 1 / Math.max(delta, 1 / 240);
       smoothedFps = THREE.MathUtils.lerp(smoothedFps, fps, 0.08);
       performanceSampleFrames += 1;
@@ -5031,11 +5146,22 @@ function LiveGlobeCanvas({
           if (currentOrbProgress <= 0.025 && heroFlight.mode !== "ROUTE_IDLE") {
             resetHeroFlight();
           } else if (
-            shouldStartHeroReturn({
+            shouldResumeHeroLaunchFromReturn({
               autoCompleteActive,
+              manualReverseHoldActive,
+              heroMode: heroFlight.mode,
+              userInputActive,
+              manualScrollDirection,
+            })
+          ) {
+            resumeHeroFlightFromCurrentPose(elapsed);
+          } else if (
+            shouldStartHeroReturn({
               autoRewindActive,
               manualReverseHoldActive,
               heroMode: heroFlight.mode,
+              userInputActive,
+              manualScrollDirection,
             })
           ) {
             rewindHeroReturnStartScrollProgress = Math.max(currentScrollProgress, 0.04);
@@ -5052,15 +5178,20 @@ function LiveGlobeCanvas({
             );
             const launchProgress = THREE.MathUtils.smootherstep(launchLinearProgress, 0, 1);
             const acceleratedLaunchProgress = Math.pow(launchProgress, 1.38);
-            const spawnFollow = THREE.MathUtils.smoothstep(launchProgress, 0.02, 0.18);
+            const spawnFollow = getHeroLaunchSpawnFollow({
+              launchProgress,
+              resumedFromCurrentPose: heroFlight.resumedFromCurrentPose,
+            });
             const curveProgress = THREE.MathUtils.clamp((acceleratedLaunchProgress - 0.04) / 0.96, 0, 1);
             getHeroLaunchOriginPoint();
             heroFlight.launchCurve.getPointAt(curveProgress, launchCurvePoint);
             heroFlight.launchCurve.getTangentAt(Math.min(curveProgress + 0.02, 1), launchCurveTangent).normalize();
-            launchCurvePoint.lerp(heroHiddenPoint, 1 - spawnFollow);
-            launchTravelDirection.copy(launchCurvePoint).sub(heroHiddenPoint).normalize();
-            if (launchTravelDirection.lengthSq() > 1e-5) {
-              launchCurveTangent.lerp(launchTravelDirection, 1 - spawnFollow).normalize();
+            if (!heroFlight.resumedFromCurrentPose) {
+              launchCurvePoint.lerp(heroHiddenPoint, 1 - spawnFollow);
+              launchTravelDirection.copy(launchCurvePoint).sub(heroHiddenPoint).normalize();
+              if (launchTravelDirection.lengthSq() > 1e-5) {
+                launchCurveTangent.lerp(launchTravelDirection, 1 - spawnFollow).normalize();
+              }
             }
             launchCurveSafePoint.copy(launchCurvePoint).sub(globeRig.position);
             const minLaunchRadius = globeRadius * globeRig.scale.x + heroLaunchSafeMargin;
@@ -5097,6 +5228,7 @@ function LiveGlobeCanvas({
             if (launchProgress >= 0.999) {
               heroFlight.actor.bank = 0;
               heroFlight.transitionProgress = 1;
+              heroFlight.resumedFromCurrentPose = false;
               heroFlight.mode = "JOURNEY_READY";
             }
           } else if (heroFlight.mode === "JOURNEY_READY") {
@@ -5121,9 +5253,14 @@ function LiveGlobeCanvas({
             );
           } else if (heroFlight.mode === "HERO_RETURN" && heroFlight.returnCurve) {
             setHeroLaunchArcState(0, 0, 0);
-            const returnLinearProgress = getHeroReturnLinearProgress({
+            const useScrollScrubForReturn = shouldScrubHeroReturnWithScroll({
               autoRewindActive,
               manualReverseHoldActive,
+              userInputActive,
+              manualScrollDirection,
+            });
+            const returnLinearProgress = getHeroReturnLinearProgress({
+              useScrollScrub: useScrollScrubForReturn,
               currentScrollProgress,
               rewindStartScrollProgress: rewindHeroReturnStartScrollProgress,
               elapsed,
@@ -5131,7 +5268,7 @@ function LiveGlobeCanvas({
               durationSeconds: HERO_RETURN_DURATION_SECONDS,
             });
             const returnProgress = THREE.MathUtils.smootherstep(returnLinearProgress, 0, 1);
-            const acceleratedReturnProgress = autoRewindActive || manualReverseHoldActive
+            const acceleratedReturnProgress = useScrollScrubForReturn
               ? THREE.MathUtils.lerp(
                   returnProgress,
                   Math.pow(returnProgress, 1.16),
