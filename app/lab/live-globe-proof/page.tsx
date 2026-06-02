@@ -4174,13 +4174,6 @@ function LiveGlobeCanvas({
           recoveryPath.reentryTopPoint.y,
           recoveryPath.reentryTopPoint.z,
         );
-        launchTargetPoint.x = THREE.MathUtils.lerp(
-          launchTargetPoint.x,
-          isMobileLayout ? 0.02 : 0.04,
-          isMobileLayout ? 0.58 : 0.46,
-        );
-        launchTargetPoint.y += isMobileLayout ? 0.03 : 0.02;
-        launchTargetPoint.z += isMobileLayout ? 0.04 : 0.03;
         return launchTargetPoint;
       }
 
@@ -4976,15 +4969,7 @@ function LiveGlobeCanvas({
       aircraftTargetScale.setScalar(routeScale);
       entry.anchor.scale.lerp(aircraftTargetScale, 0.14);
       const opacityMax = entry.config.role === "hero" ? 1 : 0.94;
-      const heroPresenceBoost = entry.config.role === "hero" ? THREE.MathUtils.lerp(1.12, 1.36, visibilityPresence) : 1;
-      const opacity = THREE.MathUtils.clamp(
-        THREE.MathUtils.lerp(0.56, opacityMax, visibilityPresence) *
-          entry.revealOpacity *
-          assignmentVisibility *
-          heroPresenceBoost,
-        0,
-        1,
-      );
+      const opacity = THREE.MathUtils.lerp(0.56, opacityMax, visibilityPresence) * entry.revealOpacity * assignmentVisibility;
       for (const material of entry.materials) {
         material.opacity = opacity;
         aircraftBodyColor.copy(aircraftFarBodyColor).lerp(aircraftNearBodyColor, visibilityPresence);
@@ -4998,14 +4983,7 @@ function LiveGlobeCanvas({
       const sunPulseBase = Math.sin(elapsed * 0.92 + entry.config.routeIndex * 0.77);
       const sunPulsePeak = Math.pow(Math.max(sunPulseBase, 0), 3.2);
       const sunPulse = 0.76 + sunPulsePeak * 1.05;
-      const glowOpacity = THREE.MathUtils.clamp(
-        THREE.MathUtils.lerp(0.1, entry.config.role === "hero" ? 0.4 : 0.26, visibilityPresence) *
-          sunPulse *
-          entry.revealOpacity *
-          (entry.config.role === "hero" ? 1.18 : 1),
-        0,
-        1,
-      );
+      const glowOpacity = THREE.MathUtils.lerp(0.1, entry.config.role === "hero" ? 0.32 : 0.26, visibilityPresence) * sunPulse * entry.revealOpacity;
       for (const material of entry.glowMaterials) {
         const glowGain = typeof material.userData.glowGain === "number" ? material.userData.glowGain : 1;
         if ("color" in material && material.color instanceof THREE.Color) {
@@ -5023,13 +5001,7 @@ function LiveGlobeCanvas({
         const trailMaterial = (trailPoint as THREE.Mesh | THREE.Sprite).material as
           | THREE.MeshBasicMaterial
           | THREE.SpriteMaterial;
-        trailMaterial.opacity =
-          opacity *
-          THREE.MathUtils.lerp(
-            entry.config.role === "hero" ? 0.14 : 0.08,
-            entry.config.role === "hero" ? 0.024 : 0.012,
-            index / Math.max(entry.trailPoints.length - 1, 1),
-          );
+        trailMaterial.opacity = opacity * THREE.MathUtils.lerp(0.08, 0.012, index / Math.max(entry.trailPoints.length - 1, 1));
       }
     };
 
@@ -5728,8 +5700,8 @@ function LiveGlobeCanvas({
             !autoRewindActive &&
             !manualReverseHoldActive &&
             !userInputActive &&
-            currentScrollProgress >= (isMobileLayout ? 0.64 : 0.58) &&
-            currentOrbProgress >= (isMobileLayout ? 0.018 : 0.012);
+            currentScrollProgress >= (isMobileLayout ? 0.72 : 0.66) &&
+            currentOrbProgress >= (isMobileLayout ? 0.035 : 0.02);
           if (currentOrbProgress <= 0.025 && heroFlight.mode !== "ROUTE_IDLE") {
             resetHeroFlight();
           } else if (
@@ -5800,13 +5772,9 @@ function LiveGlobeCanvas({
               .lerp(cameraFacingUp, THREE.MathUtils.smoothstep(launchProgress, 0.4, 1))
               .normalize();
             const launchScale = getHeroScaleFromDistance(launchCurvePoint);
-            const launchOpacity = THREE.MathUtils.lerp(
-              heroFlight.snapshotOpacity,
-              1,
-              THREE.MathUtils.smoothstep(launchProgress, 0.04, 0.62),
-            );
+            const launchOpacity = THREE.MathUtils.lerp(heroFlight.snapshotOpacity, 1, launchProgress);
             const launchArcProgress = THREE.MathUtils.clamp(curveProgress - 0.018, 0, 1);
-            const launchArcFade = THREE.MathUtils.smoothstep(curveProgress, 0.03, 0.2);
+            const launchArcFade = THREE.MathUtils.smoothstep(curveProgress, 0.1, 0.3);
             if (heroFlight.glassRecoveryMode) {
               setHeroLaunchArcState(0, 0, 0);
             } else {
@@ -5819,8 +5787,8 @@ function LiveGlobeCanvas({
               );
               setHeroLaunchArcState(
                 1,
-                0.48 * launchArcFade,
-                1 * launchArcFade,
+                0.34 * launchArcFade,
+                0.94 * launchArcFade,
               );
             }
             orientAircraftForFreeFlight(
