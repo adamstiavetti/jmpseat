@@ -1204,6 +1204,7 @@ export default function LiveGlobeProofPage() {
         isMobileViewport ? 26 : 22,
         transitionShot.cameraTravelProgress,
       );
+      const wordmarkBlur = THREE.MathUtils.lerp(0, isMobileViewport ? 10 : 8, Math.max(transitionShot.brandDissolveProgress, transitionShot.occlusionProgress * 0.92));
       page.style.setProperty("--orb-progress", `${orbProgress}`);
       page.style.setProperty("--background-perspective-scale", `${backgroundScale}`);
       page.style.setProperty("--background-perspective-y", `${backgroundY}px`);
@@ -1217,9 +1218,10 @@ export default function LiveGlobeProofPage() {
       page.style.setProperty("--final-background-opacity", `${transitionShot.backgroundTakeoverProgress}`);
       page.style.setProperty("--wordmark-y", `${wordmarkYpx}px`);
       page.style.setProperty("--wordmark-width", `${wordmarkWidth}vw`);
+      page.style.setProperty("--wordmark-blur", `${wordmarkBlur}px`);
       page.style.setProperty("--wordmark-scale", `${THREE.MathUtils.lerp(1, 0.92, transitionShot.cameraTravelProgress)}`);
       page.style.setProperty("--wordmark-collapse-x", `${Math.max(0.045, 1 - collapseProgress * 0.955)}`);
-      page.style.setProperty("--wordmark-opacity", `${Math.max(0, 1 - absorptionExit * 1.08)}`);
+      page.style.setProperty("--wordmark-opacity", `${Math.max(0, 1 - absorptionExit * 1.2 - transitionShot.occlusionProgress * 0.12)}`);
       page.style.setProperty("--absorb-opacity", `${Math.max(0, absorbProgress * 0.92)}`);
       page.style.setProperty("--absorb-y", `${absorbYpx}px`);
       page.style.setProperty("--absorb-scale-x", `${Math.max(0.06, 1 - widthCollapseProgress * 0.94)}`);
@@ -2761,14 +2763,15 @@ function WaitlistSceneTransition({
       const chromaPeak = prefersReducedMotion ? 0 : bell(p, 0.58, 0.2);
       const hazeRise = transitionShot.occlusionProgress;
       const hazeFall = transitionShot.revealProgress;
+      const underlayReveal = prefersReducedMotion ? transitionShot.revealProgress : smoothstep(0.62, 0.92, p);
       const hazeOpacity = prefersReducedMotion
         ? lerp(0.08, 0.16, smoothstep(0.56, 0.86, p))
         : lerp(0.12, 0.68, hazeRise * (1 - hazeFall * 0.22)) + effectiveEarlyOnrampFactor * 0.06;
       const oldSceneOpacity = prefersReducedMotion
         ? 1 - smoothstep(0.56, 0.92, p)
-        : 1 - smoothstep(0.5, 0.9, p);
-      const newSceneOpacity = transitionShot.revealProgress;
-      const gridOpacity = lerp(0.3, 0.72, smoothstep(0.34, 0.88, p)) * (1 - smoothstep(0.94, 1, p) * 0.14);
+        : 1 - smoothstep(0.56, 0.96, p);
+      const newSceneOpacity = Math.min(1, underlayReveal * 0.68 + transitionShot.revealProgress * 0.44);
+      const gridOpacity = lerp(0.22, 0.62, smoothstep(0.46, 0.94, p)) * (1 - smoothstep(0.96, 1, p) * 0.12);
 
       camera.position.z = prefersReducedMotion
         ? WAITLIST_SCROLL_TRANSITION.cameraStartZ
@@ -2780,23 +2783,23 @@ function WaitlistSceneTransition({
       camera.rotation.x = prefersReducedMotion ? 0 : lerp(-0.018, mobile ? 0.052 : 0.036, transitionShot.cameraTravelProgress);
 
       oldPlane.position.y = lerp(0, 0.08, phase1);
-      newPlane.position.y = lerp(-0.24, 0, transitionShot.revealProgress);
+      newPlane.position.y = lerp(-0.3, 0, underlayReveal);
       oldMaterial.opacity = oldSceneOpacity;
       newMaterial.opacity = newSceneOpacity;
       starMaterial.opacity = lerp(0.45, 0.72, phase1) * (1 - newSceneOpacity * 0.12);
       cyanNodeMaterial.opacity = WAITLIST_SCROLL_TRANSITION.gridOpacity * gridOpacity;
       amberNodeMaterial.opacity = 0.62 * WAITLIST_SCROLL_TRANSITION.gridOpacity * gridOpacity;
-      runwayMaterial.opacity = 0.18 + gridOpacity * 0.28;
+      runwayMaterial.opacity = 0.08 + underlayReveal * 0.14 + gridOpacity * 0.18;
       starfield.visible = starsEnabled;
       networkGroup.visible = gridEnabled;
       hazePlane.visible = hazeEnabled;
       networkGroup.position.x = transitionShot.cameraDriftX * -0.42;
-      networkGroup.position.z = lerp(-6.8, -5.2, transitionShot.revealProgress);
-      networkGroup.position.y = lerp(-2.16, -1.88, smoothstep(0.76, 1, p));
+      networkGroup.position.z = lerp(-7.4, -5.35, underlayReveal);
+      networkGroup.position.y = lerp(-2.28, -1.94, smoothstep(0.7, 1, p));
       starfield.position.y = -transitionShot.cameraTravelProgress * 0.32;
       starfield.position.z = transitionShot.cameraTravelProgress * 1.08;
       oldPlane.position.x = transitionShot.cameraDriftX * -0.08;
-      newPlane.position.x = transitionShot.cameraDriftX * -0.2;
+      newPlane.position.x = transitionShot.cameraDriftX * -0.16;
 
       hazeMaterial.uniforms.uTime.value = now / 1000;
       hazeMaterial.uniforms.uProgress.value = p;
@@ -3210,7 +3213,7 @@ function LiveGlobeCanvas({
       for (const material of glassCardMaterials) {
         if ("opacity" in material && typeof material.opacity === "number") {
           const baseOpacity = typeof material.userData.baseOpacity === "number" ? material.userData.baseOpacity : 1;
-          material.opacity = baseOpacity * presence;
+          material.opacity = baseOpacity * Math.pow(presence, 1.65);
         }
       }
     };
