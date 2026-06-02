@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Two-Piece Cut Glass Card Viewer - #FFC56F</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    html, body { margin:0; height:100%; background:#07090d; overflow:hidden; font-family:system-ui, sans-serif; }
+    #label {
+      position:fixed; left:18px; top:14px; color:rgba(230,242,255,.82);
+      font-size:13px; letter-spacing:.04em; z-index:10;
+      background:rgba(6,12,22,.58); border:1px solid rgba(255,197,111,.46);
+      padding:10px 12px; border-radius:12px; backdrop-filter: blur(10px);
+    }
+    #hint {
+      position:fixed; left:18px; bottom:14px; color:rgba(230,242,255,.55);
+      font-size:12px; z-index:10;
+    }
+  </style>
+</head>
+<body>
+  <div id="label">Two-piece smoked glass card · border color #FFC56F · border broken at split</div>
+  <div id="hint">Drag to rotate · scroll to zoom</div>
+  <script type="module">
+    import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.164.1/build/three.module.js";
+    import { OrbitControls } from "https://cdn.jsdelivr.net/npm/three@0.164.1/examples/jsm/controls/OrbitControls.js";
+    import { GLTFLoader } from "https://cdn.jsdelivr.net/npm/three@0.164.1/examples/jsm/loaders/GLTFLoader.js";
+    import { RoomEnvironment } from "https://cdn.jsdelivr.net/npm/three@0.164.1/examples/jsm/environments/RoomEnvironment.js";
+
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x07090d);
+
+    const camera = new THREE.PerspectiveCamera(38, innerWidth / innerHeight, 0.01, 100);
+    camera.position.set(2.7, 1.15, 2.15);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+    renderer.setSize(innerWidth, innerHeight);
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.12;
+    document.body.appendChild(renderer.domElement);
+
+    const pmrem = new THREE.PMREMGenerator(renderer);
+    scene.environment = pmrem.fromScene(new RoomEnvironment(renderer), 0.04).texture;
+
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.target.set(0, 0, 0);
+
+    scene.add(new THREE.AmbientLight(0x6f91bd, 0.55));
+
+    const key = new THREE.DirectionalLight(0xffffff, 2.2);
+    key.position.set(2.5, 3, 3);
+    scene.add(key);
+
+    const amber = new THREE.PointLight(0xffc56f, 3.45, 5);
+    amber.position.set(0.0, 0.45, 0.8);
+    scene.add(amber);
+
+    const blue = new THREE.PointLight(0x4aa8ff, 1.15, 5);
+    blue.position.set(-2, 0.7, 1.2);
+    scene.add(blue);
+
+    const loader = new GLTFLoader();
+    loader.load("./two_piece_cut_glass_card_FFC56F.glb", (gltf) => {
+      const model = gltf.scene;
+      model.rotation.x = -0.06;
+      scene.add(model);
+    });
+
+    function resize() {
+      camera.aspect = innerWidth / innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(innerWidth, innerHeight);
+    }
+    addEventListener("resize", resize);
+
+    function animate() {
+      requestAnimationFrame(animate);
+      controls.update();
+      renderer.render(scene, camera);
+    }
+    animate();
+  </script>
+</body>
+</html>

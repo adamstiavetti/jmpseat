@@ -1,0 +1,66 @@
+name: Sentry Daily Scan
+
+on:
+  schedule:
+    - cron: "0 14 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sentry-daily-scan
+  cancel-in-progress: false
+
+env:
+  NODE_VERSION: "22"
+  SENTRY_MONITOR_SLUG: deadheadclub-daily-scan
+  SENTRY_MONITOR_SCHEDULE: "0 14 * * *"
+  SENTRY_MONITOR_TIMEZONE: UTC
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    env:
+      SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+      SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+      SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Validate Sentry secrets
+        run: |
+          missing=0
+
+          for key in SENTRY_AUTH_TOKEN SENTRY_ORG SENTRY_PROJECT; do
+            if [ -z "${!key}" ]; then
+              echo "::error::Missing required GitHub secret: $key"
+              missing=1
+            fi
+          done
+
+          if [ "$missing" -ne 0 ]; then
+            exit 1
+          fi
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run daily scan and report to Sentry
+        run: |
+          npx -y @sentry/cli monitors run "$SENTRY_MONITOR_SLUG" \
+            --environment production \
+            --schedule "$SENTRY_MONITOR_SCHEDULE" \
+            --timezone "$SENTRY_MONITOR_TIMEZONE" \
+            --check-in-margin 20 \
+            --max-runtime 30 \
+            --failure-issue-threshold 1 \
+            --recovery-threshold 1 \
+            -- bash -lc "npm run lint && npm run typecheck && npm run build"

@@ -35,6 +35,19 @@ import {
   getEarlyTransitionOnrampFactor,
   getEarlyTransitionOnrampStrength,
 } from "@/src/lib/scroll/transitionOnramp";
+import {
+  GLASS_CARD_HERO_ENTRY_END_PROGRESS,
+  GLASS_CARD_HERO_ENTRY_START_PROGRESS,
+  GLASS_CARD_RISE_START_PROGRESS,
+  getGlassCardEntryLocalPoint,
+  getGlassCardFinalTransform,
+  getGlassCardReconnectControlPoints,
+  getGlassCardRecoveryDropPath,
+  getGlassCardRecoveryPath,
+  getGlassCardRecoverySequence,
+  getGlassCardTransitionState,
+  shouldDelayGlassCardHeroFlight,
+} from "@/src/lib/scroll/glassCardTransition";
 import styles from "./page.module.css";
 
 type TextureSetName = "v2" | "v3" | "v4" | "cityrim" | "polar" | "atlantic" | "europe" | "cityhalo";
@@ -143,6 +156,8 @@ type HeroFlightController = {
   returnStartTime: number;
   transitionProgress: number;
   resumedFromCurrentPose: boolean;
+  glassRecoveryMode: boolean;
+  glassDropStartTime: number;
 };
 
 const TEXTURE_SETS: Record<TextureSetName, TextureSet> = {
@@ -417,6 +432,7 @@ const DEFAULT_GRADE: GradeName = "cityhalo";
 const DEFAULT_ROUTES_MODE: RoutesMode = "on";
 const DEFAULT_AIRCRAFT_MODE: AircraftMode = "on";
 const AIRCRAFT_MODEL_PATH = "/cinematic/models/deadhead-aircraft-v1.glb";
+const GLASS_CARD_MODEL_PATH = "/cinematic/models/two-piece-cut-glass-card-ffc56f.glb";
 const AIRCRAFT_CLEARANCE = 0;
 const AIRCRAFT_VISUAL_SIZE = 0.132;
 const AIRCRAFT_FORWARD_AXIS_CORRECTION = new THREE.Quaternion();
@@ -837,21 +853,20 @@ export default function LiveGlobeProofPage() {
     diagnosticsEnabled,
     perfQueryEnabled,
   } = useLiveGlobeOverrides();
+  const currentSearch = useSyncExternalStore(
+    subscribeToSearchParams,
+    getClientSearch,
+    getServerSearch,
+  );
   const perfDebugFlags = useSyncExternalStore(
     subscribeWebglPerfDebugFlags,
     getWebglPerfDebugFlagsSnapshot,
     getWebglPerfDebugFlagsSnapshot,
   );
-  const [perfStorageEnabled] = useState(() =>
-    typeof window !== "undefined" && window.localStorage.getItem("DH_PERF_HUD") === "1",
-  );
-  const [perfHudVisible] = useState(() => {
-    if (typeof window === "undefined") {
-      return false;
-    }
-    const params = new URLSearchParams(window.location.search);
-    return params.get("perfHud") === "1" || window.localStorage.getItem("DH_PERF_HUD_VISIBLE") === "1";
-  });
+  const [perfStorageEnabled, setPerfStorageEnabled] = useState(false);
+  const [perfHudStorageVisible, setPerfHudStorageVisible] = useState(false);
+  const currentSearchParams = new URLSearchParams(currentSearch);
+  const perfHudVisible = currentSearchParams.get("perfHud") === "1" || perfHudStorageVisible;
   const perfEnvEnabled = process.env.NODE_ENV !== "production" && process.env.NEXT_PUBLIC_DH_PERF_HUD === "1";
   const perfEnabled = perfQueryEnabled || perfStorageEnabled || perfEnvEnabled;
   const forcedQuality: ForcedQuality = perfDebugFlags.forceMobileQuality
@@ -877,6 +892,28 @@ export default function LiveGlobeProofPage() {
   useEffect(() => {
     interactionReadyRef.current = isInteractionReady;
   }, [isInteractionReady]);
+
+  useEffect(() => {
+    const readPerfStorageFlags = () => {
+      if (typeof window === "undefined") {
+        return;
+      }
+
+      setPerfStorageEnabled(window.localStorage.getItem("DH_PERF_HUD") === "1");
+      setPerfHudStorageVisible(window.localStorage.getItem("DH_PERF_HUD_VISIBLE") === "1");
+    };
+
+    readPerfStorageFlags();
+    window.addEventListener("storage", readPerfStorageFlags);
+    window.addEventListener("focus", readPerfStorageFlags);
+    document.addEventListener("visibilitychange", readPerfStorageFlags);
+
+    return () => {
+      window.removeEventListener("storage", readPerfStorageFlags);
+      window.removeEventListener("focus", readPerfStorageFlags);
+      document.removeEventListener("visibilitychange", readPerfStorageFlags);
+    };
+  }, []);
 
   useEffect(() => {
     initWebglPerfMonitor(perfEnabled);
@@ -974,6 +1011,11 @@ export default function LiveGlobeProofPage() {
         }
       });
 
+    const preloadFetch = (src: string) =>
+      fetch(src, { cache: "force-cache" })
+        .then(() => undefined)
+        .catch(() => undefined);
+
     const fontReady = "fonts" in document ? (document.fonts.ready as Promise<unknown>).catch(() => undefined) : Promise.resolve();
 
     Promise.all([
@@ -983,6 +1025,7 @@ export default function LiveGlobeProofPage() {
       preloadImage("/cinematic/branding/optimized/skybyrd-logo-ui.png"),
       preloadImage("/cinematic/branding/optimized/skybyrd-logo-loader.png"),
       preloadImage("/cinematic/branding/skybyrd-wordmark-8k.png"),
+      preloadFetch(GLASS_CARD_MODEL_PATH),
       fontReady,
     ]).then(() => {
       if (cancelled) {
@@ -2818,6 +2861,8 @@ function LiveGlobeCanvas({
     const aircraftEntries: AircraftEntry[] = [];
     const supportAircraftEntries: AircraftEntry[] = [];
     const aircraftGlowTextures: THREE.Texture[] = [];
+    const glassCardMaterials: THREE.Material[] = [];
+    const glassCardGeometries: THREE.BufferGeometry[] = [];
     let baseGlobeY = 0;
     let baseGlobeScale = 1;
     let isMobileLayout = false;
@@ -2857,6 +2902,8 @@ function LiveGlobeCanvas({
       returnStartTime: -1,
       transitionProgress: 0,
       resumedFromCurrentPose: false,
+      glassRecoveryMode: false,
+      glassDropStartTime: -1,
     };
 
     renderer.setClearColor(0x000000, 0);
@@ -2959,6 +3006,45 @@ function LiveGlobeCanvas({
         material.uniforms.globeCenter.value.copy(globeRig.position);
       }
     };
+    const updateGlassCardTransform = () => {
+      if (!glassCardLoaded || !glassCardRoot) {
+        glassCardRig.visible = false;
+        return;
+      }
+
+      const transitionState = getGlassCardTransitionState({
+        currentScrollProgress,
+        isMobileLayout,
+      });
+      const { presence } = transitionState;
+      glassCardRig.visible = presence > 0.001;
+      if (!glassCardRig.visible) {
+        return;
+      }
+
+      glassCardRig.position.set(
+        transitionState.x,
+        transitionState.y,
+        transitionState.z,
+      );
+      glassCardRig.scale.set(
+        transitionState.scale.x,
+        transitionState.scale.y,
+        transitionState.scale.z,
+      );
+      glassCardRig.rotation.set(
+        transitionState.rotation.x,
+        transitionState.rotation.y,
+        transitionState.rotation.z,
+      );
+
+      for (const material of glassCardMaterials) {
+        if ("opacity" in material && typeof material.opacity === "number") {
+          const baseOpacity = typeof material.userData.baseOpacity === "number" ? material.userData.baseOpacity : 1;
+          material.opacity = baseOpacity * presence;
+        }
+      }
+    };
     const pickVoxelBudget = (desktop: number, mobile: number, lowMobile: number) => {
       const width = mount.getBoundingClientRect().width;
       if (isMobileLayout && (width <= 520 || window.devicePixelRatio > 2.2)) {
@@ -2983,9 +3069,13 @@ function LiveGlobeCanvas({
     heroPlaneRig.name = "hero-plane-rig";
     const heroLaunchArcRig = new THREE.Group();
     heroLaunchArcRig.name = "hero-launch-arc-rig";
+    const glassCardRig = new THREE.Group();
+    glassCardRig.name = "glass-card-rig";
+    glassCardRig.visible = false;
     scene.add(globeRig);
     scene.add(heroPlaneRig);
     scene.add(heroLaunchArcRig);
+    scene.add(glassCardRig);
     scene.add(new THREE.AmbientLight(0x08182a, grade.ambientLight));
 
     const coolFill = new THREE.DirectionalLight(0x4aa4ff, grade.coolFill);
@@ -3009,9 +3099,8 @@ function LiveGlobeCanvas({
       }, 180);
     };
     loadingManager.onError = () => {
-      if (!disposed) {
-        onReady();
-      }
+      // A single asset error should not unlock the scroll choreography before
+      // the rest of the scene, especially the glass-card target, has settled.
     };
 
     const textureLoader = new THREE.TextureLoader(loadingManager);
@@ -3826,6 +3915,18 @@ function LiveGlobeCanvas({
     const routeReturnRotation = new THREE.Quaternion();
     const routeReturnRotationStep = new THREE.Quaternion();
     const heroHiddenPoint = new THREE.Vector3();
+    const glassCardTargetPoint = new THREE.Vector3();
+    const glassCardEntryLocalPoint = new THREE.Vector3();
+    const glassCardEntryWorldPoint = new THREE.Vector3();
+    const glassCardCurrentPoint = new THREE.Vector3();
+    const glassCardRecoveryTopPoint = new THREE.Vector3();
+    const glassCardBoundsSize = new THREE.Vector3();
+    const glassCardBoundsCenter = new THREE.Vector3();
+    const glassCardWorldQuaternion = new THREE.Quaternion();
+    const glassCardFinalPosition = new THREE.Vector3();
+    const glassCardFinalScaleVector = new THREE.Vector3();
+    const glassCardFinalMatrix = new THREE.Matrix4();
+    const glassCardFinalEuler = new THREE.Euler();
     const routeMidpointWorld = new THREE.Vector3();
     const routeMidpointProjected = new THREE.Vector3();
     const routeFacingNormal = new THREE.Vector3();
@@ -3833,6 +3934,8 @@ function LiveGlobeCanvas({
     let heroLaunchArcCoreMaterial: THREE.ShaderMaterial | null = null;
     let heroLaunchArcGlowMesh: THREE.Mesh | null = null;
     let heroLaunchArcCoreMesh: THREE.Mesh | null = null;
+    let glassCardRoot: THREE.Group | null = null;
+    let glassCardLoaded = false;
     const getHeroJourneyScale = () => (isMobileLayout ? 1.12 : 1.18);
     const heroScaleNearDistance = () => globeRadius * globeRig.scale.x + 0.02;
     const getHeroScaleFromDistance = (point: THREE.Vector3) => {
@@ -3859,8 +3962,49 @@ function LiveGlobeCanvas({
     const worldForwardFallback = new THREE.Vector3(0, 0, 1);
     const globeRadius = 1.42;
     const heroLaunchSafeMargin = 0.08;
+    const getGlassCardFinalMatrix = () => {
+      if (!glassCardRoot) {
+        return null;
+      }
+
+      const finalTransform = getGlassCardFinalTransform({ isMobileLayout });
+      glassCardFinalPosition.set(finalTransform.x, finalTransform.y, finalTransform.z);
+      glassCardFinalScaleVector.set(
+        finalTransform.scale.x,
+        finalTransform.scale.y,
+        finalTransform.scale.z,
+      );
+      glassCardFinalEuler.set(
+        finalTransform.rotation.x,
+        finalTransform.rotation.y,
+        finalTransform.rotation.z,
+      );
+      glassCardWorldQuaternion.setFromEuler(glassCardFinalEuler);
+      glassCardFinalMatrix.compose(glassCardFinalPosition, glassCardWorldQuaternion, glassCardFinalScaleVector);
+      return glassCardFinalMatrix.clone().multiply(glassCardRoot.matrix);
+    };
 
     const getHeroJourneyStartPoint = () => {
+      const glassCardFinalWorldMatrix = glassCardLoaded && glassCardRoot ? getGlassCardFinalMatrix() : null;
+      if (glassCardFinalWorldMatrix) {
+        glassCardEntryWorldPoint.copy(glassCardEntryLocalPoint).applyMatrix4(glassCardFinalWorldMatrix);
+        const recoveryPath = getGlassCardRecoveryPath({
+          entryPoint: {
+            x: glassCardEntryWorldPoint.x,
+            y: glassCardEntryWorldPoint.y,
+            z: glassCardEntryWorldPoint.z,
+          },
+          preEntryOffset: isMobileLayout ? 0.16 : 0.2,
+          recoveryLift: isMobileLayout ? 0.24 : 0.3,
+        });
+        launchTargetPoint.set(
+          recoveryPath.reentryTopPoint.x,
+          recoveryPath.reentryTopPoint.y,
+          recoveryPath.reentryTopPoint.z,
+        );
+        return launchTargetPoint;
+      }
+
       launchTargetPoint.set(
         isMobileLayout ? -0.28 : -0.54,
         isMobileLayout ? 0.38 : 0.44,
@@ -3870,9 +4014,21 @@ function LiveGlobeCanvas({
     };
 
     const getHeroJourneyDirection = () => {
+      if (glassCardLoaded && glassCardRoot && getGlassCardFinalMatrix()) {
+        launchTargetDirection.copy(worldDown);
+        return launchTargetDirection;
+      }
+
       launchTargetDirection.copy(worldDown);
       return launchTargetDirection;
     };
+
+    const getGlassCardHeroEntryBlend = () =>
+      THREE.MathUtils.smoothstep(
+        currentScrollProgress,
+        GLASS_CARD_HERO_ENTRY_START_PROGRESS,
+        GLASS_CARD_HERO_ENTRY_END_PROGRESS,
+      );
 
     const getHeroHiddenPoint = (lateralOffset: number, verticalOffset: number) => {
       globeToCamera.copy(camera.position).sub(globeRig.position).normalize();
@@ -3905,16 +4061,52 @@ function LiveGlobeCanvas({
       return heroHiddenPoint;
     };
 
-    const buildHeroLaunchDisplayCurve = (curve: THREE.Curve<THREE.Vector3>, progress: number) => {
+    const buildHeroLaunchDisplayCurve = (
+      curve: THREE.Curve<THREE.Vector3>,
+      progress: number,
+      includeOrigin = true,
+    ) => {
       const visibleStartProgress = 0.12;
       const samples = Math.max(3, Math.round(6 + progress * 28));
       const startProgress = Math.min(visibleStartProgress, progress);
-      const points: THREE.Vector3[] = [getHeroLaunchArcOriginPoint().clone()];
+      const points: THREE.Vector3[] = includeOrigin
+        ? [getHeroLaunchArcOriginPoint().clone()]
+        : [curve.getPointAt(startProgress)];
       for (let index = 1; index <= samples; index += 1) {
         const pointProgress = THREE.MathUtils.lerp(startProgress, progress, index / samples);
         points.push(curve.getPointAt(pointProgress));
       }
       return new THREE.CatmullRomCurve3(points, false, "centripetal", 0.48);
+    };
+
+    const createHeroGlassReconnectCurve = (topPoint: THREE.Vector3) => {
+      const originPoint = getHeroLaunchArcOriginPoint().clone();
+      const controls = getGlassCardReconnectControlPoints({
+        originPoint: { x: originPoint.x, y: originPoint.y, z: originPoint.z },
+        topPoint: { x: topPoint.x, y: topPoint.y, z: topPoint.z },
+        sweepLift: isMobileLayout ? 0.28 : 0.36,
+        verticalLeadIn: isMobileLayout ? 0.34 : 0.42,
+      });
+      launchControlA.set(controls.controlA.x, controls.controlA.y, controls.controlA.z);
+      launchControlB.set(controls.controlB.x, controls.controlB.y, controls.controlB.z);
+      return new THREE.CubicBezierCurve3(
+        originPoint,
+        launchControlA.clone(),
+        launchControlB.clone(),
+        topPoint.clone(),
+      );
+    };
+
+    const buildHeroGlassReconnectDisplayCurve = (topPoint: THREE.Vector3, progress: number) =>
+      buildHeroLaunchDisplayCurve(createHeroGlassReconnectCurve(topPoint), progress, true);
+
+    const buildHeroGlassReconnectAndDropCurve = (topPoint: THREE.Vector3, currentPoint: THREE.Vector3) => {
+      const path = new THREE.CurvePath<THREE.Vector3>();
+      path.add(createHeroGlassReconnectCurve(topPoint));
+      if (topPoint.distanceToSquared(currentPoint) > 1e-8) {
+        path.add(new THREE.LineCurve3(topPoint.clone(), currentPoint.clone()));
+      }
+      return path;
     };
 
     const ensureHeroLaunchArc = (curve: THREE.Curve<THREE.Vector3>) => {
@@ -4229,6 +4421,8 @@ function LiveGlobeCanvas({
       heroFlight.returnStartTime = -1;
       heroFlight.transitionProgress = 0;
       heroFlight.resumedFromCurrentPose = false;
+      heroFlight.glassRecoveryMode = false;
+      heroFlight.glassDropStartTime = -1;
       heroFlight.mode = "ROUTE_IDLE";
       setHeroLaunchArcState(0, 0, 0);
     };
@@ -4246,20 +4440,23 @@ function LiveGlobeCanvas({
       heroFlight.snapshotOpacity = 1;
       getHeroJourneyStartPoint();
       getHeroJourneyDirection();
-      launchControlA
-        .copy(launchCurvePoint)
-        .addScaledVector(launchSurfaceNormal, isMobileLayout ? 0.26 : 0.34)
-        .addScaledVector(worldUp, isMobileLayout ? -0.02 : -0.04);
-      launchControlB
-        .copy(launchTargetPoint)
-        .addScaledVector(worldUp, isMobileLayout ? 0.24 : 0.3)
-        .addScaledVector(new THREE.Vector3(1, 0, 0), isMobileLayout ? 0.025 : 0.05);
-      heroFlight.launchCurve = new THREE.CubicBezierCurve3(
-        launchCurvePoint.clone(),
-        launchControlA.clone(),
-        launchControlB.clone(),
-        launchTargetPoint.clone(),
-      );
+      heroFlight.launchCurve =
+        glassCardLoaded && glassCardRoot
+          ? createHeroGlassReconnectCurve(launchTargetPoint)
+          : new THREE.CubicBezierCurve3(
+              launchCurvePoint.clone(),
+              launchControlA
+                .copy(launchCurvePoint)
+                .addScaledVector(launchSurfaceNormal, isMobileLayout ? 0.26 : 0.34)
+                .addScaledVector(worldUp, isMobileLayout ? -0.02 : -0.04)
+                .clone(),
+              launchControlB
+                .copy(launchTargetPoint)
+                .addScaledVector(worldUp, isMobileLayout ? 0.24 : 0.3)
+                .addScaledVector(new THREE.Vector3(1, 0, 0), isMobileLayout ? 0.025 : 0.05)
+                .clone(),
+              launchTargetPoint.clone(),
+            );
       ensureHeroLaunchArc(heroFlight.launchCurve);
       heroFlight.actor.anchor.position.copy(launchCurvePoint);
       heroFlight.actor.anchor.scale.setScalar(0.001);
@@ -4268,6 +4465,8 @@ function LiveGlobeCanvas({
       heroFlight.returnStartTime = -1;
       heroFlight.transitionProgress = 0;
       heroFlight.resumedFromCurrentPose = false;
+      heroFlight.glassRecoveryMode = false;
+      heroFlight.glassDropStartTime = -1;
       heroFlight.mode = "HERO_TRANSITION";
     };
 
@@ -4288,20 +4487,49 @@ function LiveGlobeCanvas({
       heroFlight.snapshotOpacity = 1;
       getHeroJourneyStartPoint();
       getHeroJourneyDirection();
-      launchControlA
-        .copy(launchCurvePoint)
-        .addScaledVector(launchTravelDirection, isMobileLayout ? 0.2 : 0.28)
-        .addScaledVector(worldUp, isMobileLayout ? 0.05 : 0.08);
-      launchControlB
-        .copy(launchTargetPoint)
-        .addScaledVector(worldUp, isMobileLayout ? 0.18 : 0.24)
-        .addScaledVector(launchTargetDirection, isMobileLayout ? -0.12 : -0.18);
-      heroFlight.launchCurve = new THREE.CubicBezierCurve3(
-        launchCurvePoint.clone(),
-        launchControlA.clone(),
-        launchControlB.clone(),
-        launchTargetPoint.clone(),
-      );
+      if (glassCardLoaded && currentScrollProgress >= GLASS_CARD_RISE_START_PROGRESS) {
+        const recoveryPath = getGlassCardRecoveryPath({
+          entryPoint: {
+            x: glassCardEntryWorldPoint.x,
+            y: glassCardEntryWorldPoint.y,
+            z: glassCardEntryWorldPoint.z,
+          },
+          preEntryOffset: isMobileLayout ? 0.16 : 0.2,
+          recoveryLift: isMobileLayout ? 0.24 : 0.3,
+        });
+        heroFlight.launchCurve = new THREE.CatmullRomCurve3(
+          [
+            launchCurvePoint.clone(),
+            glassCardRecoveryTopPoint.set(
+              recoveryPath.reentryTopPoint.x,
+              recoveryPath.reentryTopPoint.y,
+              recoveryPath.reentryTopPoint.z,
+            ).clone(),
+          ],
+          false,
+          "centripetal",
+          0.42,
+        );
+        heroFlight.glassRecoveryMode = true;
+        heroFlight.glassDropStartTime = -1;
+      } else {
+        launchControlA
+          .copy(launchCurvePoint)
+          .addScaledVector(launchTravelDirection, isMobileLayout ? 0.2 : 0.28)
+          .addScaledVector(worldUp, isMobileLayout ? 0.05 : 0.08);
+        launchControlB
+          .copy(launchTargetPoint)
+          .addScaledVector(worldUp, isMobileLayout ? 0.18 : 0.24)
+          .addScaledVector(launchTargetDirection, isMobileLayout ? -0.12 : -0.18);
+        heroFlight.launchCurve = new THREE.CubicBezierCurve3(
+          launchCurvePoint.clone(),
+          launchControlA.clone(),
+          launchControlB.clone(),
+          launchTargetPoint.clone(),
+        );
+        heroFlight.glassRecoveryMode = false;
+        heroFlight.glassDropStartTime = -1;
+      }
       ensureHeroLaunchArc(heroFlight.launchCurve);
       heroFlight.launchStartTime = elapsed;
       heroFlight.returnCurve = null;
@@ -4366,7 +4594,156 @@ function LiveGlobeCanvas({
       );
       heroFlight.returnStartTime = elapsed;
       heroFlight.resumedFromCurrentPose = false;
+      heroFlight.glassRecoveryMode = false;
+      heroFlight.glassDropStartTime = -1;
       heroFlight.mode = "HERO_RETURN";
+    };
+
+    const addGlassCard = () => {
+      const glassLoader = new GLTFLoader(loadingManager);
+      glassLoader.load(GLASS_CARD_MODEL_PATH, (gltf) => {
+        if (disposed) {
+          return;
+        }
+
+        const normalizedRoot = gltf.scene;
+        normalizedRoot.name = "glass-card-root";
+        normalizedRoot.updateMatrixWorld(true);
+        const bounds = new THREE.Box3().setFromObject(normalizedRoot);
+        bounds.getCenter(glassCardBoundsCenter);
+        bounds.getSize(glassCardBoundsSize);
+        const width = Math.max(glassCardBoundsSize.x, 1e-4);
+        normalizedRoot.position.sub(glassCardBoundsCenter);
+        normalizedRoot.scale.setScalar(1 / width);
+        normalizedRoot.updateMatrixWorld(true);
+
+        const normalizedBounds = new THREE.Box3().setFromObject(normalizedRoot);
+        let leftPaneBounds: THREE.Box3 | null = null;
+        let rightPaneBounds: THREE.Box3 | null = null;
+        normalizedRoot.traverse((child) => {
+          if (!(child instanceof THREE.Mesh)) {
+            return;
+          }
+
+          child.castShadow = false;
+          child.receiveShadow = false;
+          child.renderOrder = 7;
+          if (!glassCardGeometries.includes(child.geometry)) {
+            glassCardGeometries.push(child.geometry);
+          }
+          const nextMaterials = (Array.isArray(child.material) ? child.material : [child.material]).map((material) => {
+            if (!glassCardMaterials.includes(material)) {
+              glassCardMaterials.push(material);
+            }
+
+            const isPaneMaterial =
+              material.name === "SmokedNavyGlass" ||
+              child.name.includes("SmokedGlassPane");
+            const isBorderMaterial =
+              material.name === "AmberGlow" ||
+              material.name === "AmberSoftGlow" ||
+              child.name.includes("border") ||
+              child.name.includes("Glow") ||
+              child.name.includes("CutEdge");
+
+            let preparedMaterial = material;
+            if (isPaneMaterial) {
+              const baseColor =
+                "color" in material && material.color instanceof THREE.Color
+                  ? material.color.clone()
+                  : new THREE.Color(0x12253d);
+              preparedMaterial = new THREE.MeshPhysicalMaterial({
+                color: baseColor.multiplyScalar(0.96),
+                transparent: true,
+                opacity: 0.9,
+                metalness: 0.04,
+                roughness: 0.16,
+                transmission: 0.78,
+                thickness: 0.34,
+                ior: 1.14,
+                reflectivity: 0.82,
+                clearcoat: 0.92,
+                clearcoatRoughness: 0.12,
+                attenuationColor: new THREE.Color(0x17324d),
+                attenuationDistance: 1.8,
+                envMapIntensity: 1.25,
+                side: THREE.DoubleSide,
+              });
+              preparedMaterial.depthWrite = false;
+            } else if (isBorderMaterial) {
+              const borderColor =
+                "color" in material && material.color instanceof THREE.Color
+                  ? material.color.clone()
+                  : new THREE.Color(0xffc56f);
+              const isSoftGlow = material.name === "AmberSoftGlow" || child.name.includes("SoftGlow");
+              preparedMaterial = new THREE.MeshStandardMaterial({
+                color: borderColor,
+                emissive: borderColor.clone().multiplyScalar(isSoftGlow ? 0.74 : 0.92),
+                emissiveIntensity: isSoftGlow ? 1.35 : 1.6,
+                transparent: true,
+                opacity: isSoftGlow ? 0.72 : 0.94,
+                roughness: isSoftGlow ? 0.42 : 0.28,
+                metalness: 0.08,
+                side: THREE.DoubleSide,
+              });
+              preparedMaterial.depthWrite = false;
+            }
+            if (!glassCardMaterials.includes(preparedMaterial)) {
+              glassCardMaterials.push(preparedMaterial);
+            }
+            if ("transparent" in preparedMaterial) {
+              preparedMaterial.transparent = true;
+            }
+            if ("opacity" in preparedMaterial && typeof preparedMaterial.opacity === "number") {
+              preparedMaterial.userData.baseOpacity = preparedMaterial.opacity;
+            }
+            return preparedMaterial;
+          });
+          child.material = Array.isArray(child.material) ? nextMaterials : nextMaterials[0];
+
+          const childBounds = new THREE.Box3().setFromObject(child);
+          if (childBounds.isEmpty() === false) {
+            if (child.name.includes("LeftSmokedGlassPane")) {
+              leftPaneBounds = childBounds.clone();
+            }
+            if (child.name.includes("RightSmokedGlassPane")) {
+              rightPaneBounds = childBounds.clone();
+            }
+          }
+        });
+        const toGlassCardBoundsData = (bounds: THREE.Box3 | null) =>
+          bounds
+            ? {
+                minX: bounds.min.x,
+                maxX: bounds.max.x,
+                minY: bounds.min.y,
+                maxY: bounds.max.y,
+                minZ: bounds.min.z,
+                maxZ: bounds.max.z,
+              }
+            : null;
+        const leftPaneBoundsData = toGlassCardBoundsData(leftPaneBounds);
+        const rightPaneBoundsData = toGlassCardBoundsData(rightPaneBounds);
+        const entryLocalPoint = getGlassCardEntryLocalPoint({
+          normalizedBounds: {
+            minX: normalizedBounds.min.x,
+            maxX: normalizedBounds.max.x,
+            minY: normalizedBounds.min.y,
+            maxY: normalizedBounds.max.y,
+            minZ: normalizedBounds.min.z,
+            maxZ: normalizedBounds.max.z,
+          },
+          leftPaneBounds: leftPaneBoundsData,
+          rightPaneBounds: rightPaneBoundsData,
+        });
+        glassCardEntryLocalPoint.set(entryLocalPoint.x, entryLocalPoint.y, entryLocalPoint.z);
+
+        glassCardRoot = new THREE.Group();
+        glassCardRoot.name = "glass-card-anchor";
+        glassCardRoot.add(normalizedRoot);
+        glassCardRig.add(glassCardRoot);
+        glassCardLoaded = true;
+      });
     };
 
     const applyAircraftPose = (
@@ -4836,6 +5213,7 @@ function LiveGlobeCanvas({
     };
 
     addGlobeSphere();
+    addGlassCard();
 
     const resize = () => {
       const rect = mount.getBoundingClientRect();
@@ -4857,6 +5235,7 @@ function LiveGlobeCanvas({
       baseGlobeY = isMobileLayout ? 0.66 : 0.04;
       camera.position.set(0, isMobileLayout ? 0.02 : 0.04, cameraZ);
       applyGlobeOrbTransform();
+      updateGlassCardTransform();
       if (diagnosticsEnabled && !diagnosticsLogged) {
         diagnosticsLogged = true;
         const routeSegments = isMobileLayout ? WAITLIST_PERFORMANCE.mobileRouteSegments : WAITLIST_PERFORMANCE.desktopRouteSegments;
@@ -4864,10 +5243,11 @@ function LiveGlobeCanvas({
           ? WAITLIST_PERFORMANCE.mobileRouteRadialSegments
           : WAITLIST_PERFORMANCE.desktopRouteRadialSegments;
         const sphereSegments = isMobileLayout ? WAITLIST_PERFORMANCE.mobileSphereSegments : WAITLIST_PERFORMANCE.desktopSphereSegments;
+        const pageCanvasCount = typeof document !== "undefined" ? document.querySelectorAll("canvas").length : 1;
         window.console.info("[live-globe-proof] renderer metrics", {
           canvas: { width: rect.width, height: rect.height, pixelRatio: activePixelRatio },
-          rendererCount: 2,
-          canvasCount: 2,
+          sceneRendererCount: 1,
+          pageCanvasCount,
           mobile: isMobileLayout,
           sphereSegments,
           routeArcs: routesEnabled ? ROUTE_ARCS.length : 0,
@@ -5086,6 +5466,7 @@ function LiveGlobeCanvas({
         }
       }
       applyGlobeOrbTransform();
+      updateGlassCardTransform();
       if (materializeSignalRef.current !== lastMaterializeSignal) {
         lastMaterializeSignal = materializeSignalRef.current;
         startMaterialize(elapsed);
@@ -5166,7 +5547,15 @@ function LiveGlobeCanvas({
           ) {
             rewindHeroReturnStartScrollProgress = Math.max(currentScrollProgress, 0.04);
             startHeroReturn(elapsed);
-          } else if (autoCompleteActive && !autoRewindActive && heroFlight.mode === "ROUTE_IDLE") {
+          } else if (
+            autoCompleteActive &&
+            !autoRewindActive &&
+            heroFlight.mode === "ROUTE_IDLE" &&
+            !shouldDelayGlassCardHeroFlight({
+              currentScrollProgress,
+              glassCardLoaded,
+            })
+          ) {
             startHeroFlight(elapsed);
           }
 
@@ -5208,12 +5597,22 @@ function LiveGlobeCanvas({
             const launchOpacity = THREE.MathUtils.lerp(heroFlight.snapshotOpacity, 1, launchProgress);
             const launchArcProgress = THREE.MathUtils.clamp(curveProgress - 0.018, 0, 1);
             const launchArcFade = THREE.MathUtils.smoothstep(curveProgress, 0.1, 0.3);
-            ensureHeroLaunchArc(buildHeroLaunchDisplayCurve(heroFlight.launchCurve, Math.max(launchArcProgress, 0.02)));
-            setHeroLaunchArcState(
-              1,
-              0.34 * launchArcFade,
-              0.94 * launchArcFade,
-            );
+            if (heroFlight.glassRecoveryMode) {
+              setHeroLaunchArcState(0, 0, 0);
+            } else {
+              ensureHeroLaunchArc(
+                buildHeroLaunchDisplayCurve(
+                  heroFlight.launchCurve,
+                  Math.max(launchArcProgress, 0.02),
+                  true,
+                ),
+              );
+              setHeroLaunchArcState(
+                1,
+                0.34 * launchArcFade,
+                0.94 * launchArcFade,
+              );
+            }
             orientAircraftForFreeFlight(
               heroFlight.actor,
               launchCurvePoint,
@@ -5229,23 +5628,118 @@ function LiveGlobeCanvas({
               heroFlight.actor.bank = 0;
               heroFlight.transitionProgress = 1;
               heroFlight.resumedFromCurrentPose = false;
+              if (glassCardLoaded) {
+                heroFlight.glassDropStartTime = elapsed;
+              }
               heroFlight.mode = "JOURNEY_READY";
             }
           } else if (heroFlight.mode === "JOURNEY_READY") {
-            if (heroFlight.launchCurve) {
-              getHeroLaunchOriginPoint();
-              ensureHeroLaunchArc(buildHeroLaunchDisplayCurve(heroFlight.launchCurve, 1));
-            }
-            setHeroLaunchArcState(1, 0.34, 0.94);
             getHeroJourneyStartPoint();
             getHeroJourneyDirection();
             getCameraFacingUpForDirection(launchTargetPoint, launchTargetDirection);
+            const glassEntrySequence =
+              glassCardLoaded && !heroFlight.glassRecoveryMode
+                ? getGlassCardRecoverySequence({
+                    elapsedSeconds: Math.max(0, elapsed - heroFlight.glassDropStartTime),
+                    reconnectDuration: 0,
+                    dropDuration: isMobileLayout ? 0.72 : 0.86,
+                  })
+                : null;
+            const glassEntryBlend = glassEntrySequence?.dropBlend ?? (glassCardLoaded ? getGlassCardHeroEntryBlend() : 0);
+            const glassEntryPath = glassCardLoaded
+              ? getGlassCardRecoveryDropPath({
+                  entryPoint: {
+                    x: glassCardEntryWorldPoint.x,
+                    y: glassCardEntryWorldPoint.y,
+                    z: glassCardEntryWorldPoint.z,
+                  },
+                  preEntryOffset: isMobileLayout ? 0.16 : 0.2,
+                  recoveryLift: isMobileLayout ? 0.24 : 0.3,
+                  dropBlend: glassEntryBlend,
+                })
+              : null;
+            const glassRecoverySequence =
+              glassCardLoaded && heroFlight.glassRecoveryMode
+                ? getGlassCardRecoverySequence({
+                    elapsedSeconds: Math.max(0, elapsed - heroFlight.glassDropStartTime),
+                    reconnectDuration: isMobileLayout ? 0.44 : 0.52,
+                    dropDuration: isMobileLayout ? 0.72 : 0.86,
+                  })
+                : null;
+            const glassRecoveryDropPath =
+              glassCardLoaded && heroFlight.glassRecoveryMode
+                ? getGlassCardRecoveryDropPath({
+                    entryPoint: {
+                      x: glassCardEntryWorldPoint.x,
+                      y: glassCardEntryWorldPoint.y,
+                      z: glassCardEntryWorldPoint.z,
+                    },
+                    preEntryOffset: isMobileLayout ? 0.16 : 0.2,
+                    recoveryLift: isMobileLayout ? 0.24 : 0.3,
+                    dropBlend: glassRecoverySequence?.dropBlend ?? 0,
+                  })
+                : null;
+            if (heroFlight.launchCurve) {
+              ensureHeroLaunchArc(
+                glassRecoverySequence && (glassRecoverySequence.reconnectBlend < 0.999 || glassRecoverySequence.dropBlend <= 0.001)
+                  ? buildHeroGlassReconnectDisplayCurve(
+                      glassCardRecoveryTopPoint.set(
+                        glassRecoveryDropPath?.reentryTopPoint.x ?? glassEntryPath?.reentryTopPoint.x ?? glassCardEntryWorldPoint.x,
+                        glassRecoveryDropPath?.reentryTopPoint.y ?? glassEntryPath?.reentryTopPoint.y ?? glassCardEntryWorldPoint.y,
+                        glassRecoveryDropPath?.reentryTopPoint.z ?? glassEntryPath?.reentryTopPoint.z ?? glassCardEntryWorldPoint.z,
+                      ),
+                      Math.max(glassRecoverySequence.reconnectBlend, 0.02),
+                    )
+                  : glassRecoveryDropPath
+                  ? buildHeroGlassReconnectAndDropCurve(
+                      glassCardRecoveryTopPoint.set(
+                        glassRecoveryDropPath.reentryTopPoint.x,
+                        glassRecoveryDropPath.reentryTopPoint.y,
+                        glassRecoveryDropPath.reentryTopPoint.z,
+                      ),
+                      glassCardCurrentPoint.set(
+                        glassRecoveryDropPath.currentPoint.x,
+                        glassRecoveryDropPath.currentPoint.y,
+                        glassRecoveryDropPath.currentPoint.z,
+                      ),
+                    )
+                  : glassEntryPath
+                  ? buildHeroGlassReconnectAndDropCurve(
+                      glassCardRecoveryTopPoint.set(
+                        glassEntryPath.reentryTopPoint.x,
+                        glassEntryPath.reentryTopPoint.y,
+                        glassEntryPath.reentryTopPoint.z,
+                      ),
+                      glassCardCurrentPoint.set(
+                        glassEntryPath.currentPoint.x,
+                        glassEntryPath.currentPoint.y,
+                        glassEntryPath.currentPoint.z,
+                      )
+                    )
+                  : buildHeroLaunchDisplayCurve(heroFlight.launchCurve, 1),
+              );
+            }
+            setHeroLaunchArcState(1, 0.34, 0.94);
+            const journeyPoint = glassCardLoaded
+              ? glassCardTargetPoint.set(
+                  glassRecoverySequence && glassRecoverySequence.dropBlend <= 0.001
+                    ? glassRecoveryDropPath?.reentryTopPoint.x ?? glassEntryPath?.reentryTopPoint.x ?? glassCardEntryWorldPoint.x
+                    : glassRecoveryDropPath?.currentPoint.x ?? glassEntryPath?.currentPoint.x ?? glassCardEntryWorldPoint.x,
+                  glassRecoverySequence && glassRecoverySequence.dropBlend <= 0.001
+                    ? glassRecoveryDropPath?.reentryTopPoint.y ?? glassEntryPath?.reentryTopPoint.y ?? glassCardEntryWorldPoint.y
+                    : glassRecoveryDropPath?.currentPoint.y ?? glassEntryPath?.currentPoint.y ?? glassCardEntryWorldPoint.y,
+                  glassRecoverySequence && glassRecoverySequence.dropBlend <= 0.001
+                    ? glassRecoveryDropPath?.reentryTopPoint.z ?? glassEntryPath?.reentryTopPoint.z ?? glassCardEntryWorldPoint.z
+                    : glassRecoveryDropPath?.currentPoint.z ?? glassEntryPath?.currentPoint.z ?? glassCardEntryWorldPoint.z,
+                )
+              : launchTargetPoint;
+            const journeyOpacity = 1;
             orientAircraftForFreeFlight(
               heroFlight.actor,
-              launchTargetPoint,
+              journeyPoint,
               launchTargetDirection,
               getHeroJourneyScale(),
-              1,
+              journeyOpacity,
               elapsed,
               1,
               cameraFacingUp,
@@ -5450,6 +5944,12 @@ function LiveGlobeCanvas({
       }
       for (const texture of aircraftGlowTextures) {
         texture.dispose();
+      }
+      for (const geometry of glassCardGeometries) {
+        geometry.dispose();
+      }
+      for (const material of glassCardMaterials) {
+        material.dispose();
       }
       renderer.forceContextLoss();
       mount.removeChild(renderer.domElement);

@@ -1,0 +1,25 @@
+# Material update: amber border color set to exact #FFC56F
+newmtl SmokedNavyGlass
+Ka 0.01 0.02 0.035
+Kd 0.02 0.055 0.095
+Ks 0.65 0.85 1.0
+Ns 280
+d 0.34
+illum 4
+
+newmtl AmberGlow
+Ka 1.0 0.7725490196078432 0.43529411764705883
+Kd 1.0 0.7725490196078432 0.43529411764705883
+Ks 1.0 0.76 0.45
+Ns 180
+d 1.0
+illum 2
+
+newmtl AmberSoftGlow
+Ka 1.0 0.7725490196078432 0.43529411764705883
+Kd 1.0 0.7725490196078432 0.43529411764705883
+Ks 1.0 0.72 0.4
+Ns 130
+d 0.68
+illum 2
+
