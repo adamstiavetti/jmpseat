@@ -48,7 +48,6 @@ import {
   getGlassCardTransitionState,
   shouldDelayGlassCardHeroFlight,
 } from "@/src/lib/scroll/glassCardTransition";
-import { LIVE_GLOBE_PAGE_HEIGHT_MULTIPLIERS } from "@/src/lib/scroll/liveGlobePageMetrics";
 import { getLiveGlobeTransitionShotState } from "@/src/lib/scroll/liveGlobeTransitionPlan";
 import styles from "./page.module.css";
 
@@ -1816,13 +1815,8 @@ export default function LiveGlobeProofPage() {
     .filter(Boolean)
     .join(" ");
 
-  const pageStyle = {
-    "--page-min-height-mobile-multiplier": `${LIVE_GLOBE_PAGE_HEIGHT_MULTIPLIERS.mobile}`,
-    "--page-min-height-desktop-multiplier": `${LIVE_GLOBE_PAGE_HEIGHT_MULTIPLIERS.desktop}`,
-  } as React.CSSProperties;
-
   return (
-    <main ref={pageRef} className={pageClassName} style={pageStyle} aria-label="Deadhead live globe proof lab">
+    <main ref={pageRef} className={pageClassName} aria-label="Deadhead live globe proof lab">
       <section className={styles.heroStage} aria-label="Skybyrd live globe hero">
         <div className={styles.heroContent}>
           <div className={styles.backgroundPlate}>

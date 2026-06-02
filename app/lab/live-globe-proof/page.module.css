@@ -40,21 +40,14 @@
   --final-background-opacity: 0;
   --transition-wash-phase: 0;
   --transition-handoff-phase: 0;
-  --page-min-height-multiplier: var(--page-min-height-mobile-multiplier, 3);
   position: relative;
   isolation: isolate;
   min-width: 320px;
-  min-height: calc(var(--page-min-height-multiplier) * 100vh);
-  min-height: calc(var(--page-min-height-multiplier) * 100svh);
-  min-height: calc(var(--page-min-height-multiplier) * 100dvh);
+  min-height: 300vh;
+  min-height: 300svh;
+  min-height: 300dvh;
   overflow-x: hidden;
   background: #01060d;
-}
-
-@media (min-width: 761px) {
-  .page {
-    --page-min-height-multiplier: var(--page-min-height-desktop-multiplier, 4.2);
-  }
 }
 
 .pageMaterializing {
