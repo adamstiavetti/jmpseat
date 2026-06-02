@@ -1231,7 +1231,7 @@ export default function LiveGlobeProofPage() {
       page.style.setProperty("--sucked-gap-close", `${gapCloseProgress}`);
       page.style.setProperty("--sucked-word-collapse-x", `${Math.max(0.028, 1 - widthCollapseProgress * 0.972)}`);
       page.style.setProperty("--sucked-word-opacity", `${Math.max(0, absorbProgress)}`);
-      page.style.setProperty("--scroll-cue-opacity", `${Math.max(0, 1 - THREE.MathUtils.smoothstep(clampedProgress, 0.08, 0.24))}`);
+      page.style.setProperty("--scroll-cue-opacity", "1");
       orbProgressRef.current = orbProgress;
       if (perfEnabled) {
         let scrollPhase: ScrollPhase = "idle";
@@ -5696,12 +5696,6 @@ function LiveGlobeCanvas({
         globeRig.rotation.x = THREE.MathUtils.clamp(idlePitch + globePitch, GLOBE_INTERACTION.minPitch, GLOBE_INTERACTION.maxPitch);
         globeRig.rotation.z = INITIAL_GLOBE_ROTATION.z;
         if (heroFlight.actor && heroFlight.sourceEntry) {
-          const earlyHeroHandoffReady =
-            !autoRewindActive &&
-            !manualReverseHoldActive &&
-            !userInputActive &&
-            currentScrollProgress >= (isMobileLayout ? 0.72 : 0.66) &&
-            currentOrbProgress >= (isMobileLayout ? 0.035 : 0.02);
           if (currentOrbProgress <= 0.025 && heroFlight.mode !== "ROUTE_IDLE") {
             resetHeroFlight();
           } else if (
@@ -5726,7 +5720,7 @@ function LiveGlobeCanvas({
             rewindHeroReturnStartScrollProgress = Math.max(currentScrollProgress, 0.04);
             startHeroReturn(elapsed);
           } else if (
-            (autoCompleteActive || earlyHeroHandoffReady) &&
+            autoCompleteActive &&
             !autoRewindActive &&
             heroFlight.mode === "ROUTE_IDLE" &&
             !shouldDelayGlassCardHeroFlight({
