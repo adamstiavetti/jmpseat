@@ -2763,7 +2763,7 @@ function WaitlistSceneTransition({
       const chromaPeak = prefersReducedMotion ? 0 : bell(p, 0.58, 0.2);
       const hazeRise = transitionShot.occlusionProgress;
       const hazeFall = transitionShot.revealProgress;
-      const underlayReveal = prefersReducedMotion ? transitionShot.revealProgress : smoothstep(0.6, 0.88, p);
+      const underlayReveal = prefersReducedMotion ? transitionShot.revealProgress : smoothstep(0.62, 0.92, p);
       const runwayAxisAlign = smoothstep(0.74, 0.98, p);
       const hazeOpacity = prefersReducedMotion
         ? lerp(0.08, 0.16, smoothstep(0.56, 0.86, p))
@@ -2771,7 +2771,7 @@ function WaitlistSceneTransition({
       const oldSceneOpacity = prefersReducedMotion
         ? 1 - smoothstep(0.56, 0.92, p)
         : 1 - smoothstep(0.56, 0.96, p);
-      const newSceneOpacity = Math.min(1, underlayReveal * 0.76 + transitionShot.revealProgress * 0.34);
+      const newSceneOpacity = Math.min(1, underlayReveal * 0.68 + transitionShot.revealProgress * 0.44);
       const gridOpacity = lerp(0.22, 0.62, smoothstep(0.46, 0.94, p)) * (1 - smoothstep(0.96, 1, p) * 0.12);
 
       camera.position.z = prefersReducedMotion
@@ -2782,33 +2782,33 @@ function WaitlistSceneTransition({
         : lerp(transitionShot.cameraDriftX * 0.65, 0, runwayAxisAlign);
       camera.position.y = prefersReducedMotion
         ? 0.15
-        : lerp(0.18, mobile ? -0.12 : -0.08, transitionShot.cameraLiftMix);
+        : lerp(0.18, mobile ? -0.18 : -0.12, transitionShot.cameraLiftMix);
       camera.rotation.x = prefersReducedMotion ? 0 : lerp(-0.018, mobile ? 0.052 : 0.036, transitionShot.cameraTravelProgress);
 
       oldPlane.position.y = lerp(0, 0.08, phase1);
-      newPlane.position.y = lerp(-0.26, 0.03, underlayReveal);
+      newPlane.position.y = lerp(-0.34, 0, underlayReveal);
       oldMaterial.opacity = oldSceneOpacity;
       newMaterial.opacity = newSceneOpacity;
       starMaterial.opacity = lerp(0.45, 0.72, phase1) * (1 - newSceneOpacity * 0.12);
       cyanNodeMaterial.opacity = WAITLIST_SCROLL_TRANSITION.gridOpacity * gridOpacity;
       amberNodeMaterial.opacity = 0.62 * WAITLIST_SCROLL_TRANSITION.gridOpacity * gridOpacity;
-      runwayMaterial.opacity = 0.07 + underlayReveal * 0.14 + gridOpacity * 0.18;
+      runwayMaterial.opacity = 0.06 + underlayReveal * 0.12 + gridOpacity * 0.16;
       starfield.visible = starsEnabled;
       networkGroup.visible = gridEnabled;
       hazePlane.visible = hazeEnabled;
       networkGroup.position.x = lerp(transitionShot.cameraDriftX * -0.42, 0, runwayAxisAlign);
-      networkGroup.position.z = lerp(-7.15, -5.05, underlayReveal);
-      networkGroup.position.y = lerp(-2.16, -1.82, smoothstep(0.68, 1, p));
+      networkGroup.position.z = lerp(-7.4, -5.35, underlayReveal);
+      networkGroup.position.y = lerp(-2.28, -1.94, smoothstep(0.7, 1, p));
       networkGroup.rotation.x = lerp(-1.28, -1.18, runwayAxisAlign);
       starfield.position.y = -transitionShot.cameraTravelProgress * 0.32;
       starfield.position.z = transitionShot.cameraTravelProgress * 1.08;
       oldPlane.position.x = transitionShot.cameraDriftX * -0.08;
       newPlane.position.x = lerp(transitionShot.cameraDriftX * -0.16, 0, runwayAxisAlign);
       runwayPlane.position.x = 0;
-      runwayPlane.position.y = lerp(0.02, -0.015, runwayAxisAlign);
+      runwayPlane.position.y = lerp(0, -0.04, runwayAxisAlign);
       runwayPlane.scale.set(
-        lerp(0.92, 1.04, underlayReveal),
-        lerp(0.88, 1.02, underlayReveal),
+        lerp(0.86, 1, underlayReveal),
+        lerp(0.82, 1, underlayReveal),
         1,
       );
 

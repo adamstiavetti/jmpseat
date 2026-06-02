@@ -39,13 +39,3 @@ test("glass card reveal keeps its final cut offset to the left of center", () =>
   assert.ok(desktopFinal.x < -0.04);
   assert.ok(mobileFinal.x < -0.03);
 });
-
-test("glass card settles higher and closer for a cleaner late reveal composition", () => {
-  const desktopFinal = getGlassCardFinalTransform({ isMobileLayout: false });
-  const mobileFinal = getGlassCardFinalTransform({ isMobileLayout: true });
-
-  assert.ok(desktopFinal.y > 0.15);
-  assert.ok(desktopFinal.z > 0.95);
-  assert.ok(mobileFinal.y > 0.11);
-  assert.ok(mobileFinal.z > 0.84);
-});

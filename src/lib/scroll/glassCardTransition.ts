@@ -140,8 +140,8 @@ const getGlassCardHiddenTransform = ({ isMobileLayout }: GlassCardLayoutArgs): G
 
 export const getGlassCardFinalTransform = ({ isMobileLayout }: GlassCardLayoutArgs): GlassCardTransform => ({
   x: isMobileLayout ? -0.045 : -0.06,
-  y: isMobileLayout ? 0.125 : 0.18,
-  z: isMobileLayout ? 0.87 : 0.98,
+  y: isMobileLayout ? 0.1 : 0.14,
+  z: isMobileLayout ? 0.8 : 0.92,
   scale: {
     x: isMobileLayout ? 1.22 : 1.34,
     y: isMobileLayout ? 1.22 : 1.34,
