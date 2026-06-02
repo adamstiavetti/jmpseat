@@ -20,6 +20,13 @@ import {
   setWebglPerfSceneState,
   subscribeWebglPerfDebugFlags,
 } from "@/src/lib/performance/webglPerfMonitor";
+import { getHeroReturnLinearProgress, shouldStartHeroReturn } from "@/src/lib/scroll/heroFlightControl";
+import { applyReverseScrubStep, updateReverseActivationIntent } from "@/src/lib/scroll/autoRewindIntent";
+import {
+  getEarlyCanvasOpacity,
+  getEarlyTransitionOnrampFactor,
+  getEarlyTransitionOnrampStrength,
+} from "@/src/lib/scroll/transitionOnramp";
 import styles from "./page.module.css";
 
 type TextureSetName = "v2" | "v3" | "v4" | "cityrim" | "polar" | "atlantic" | "europe" | "cityhalo";
@@ -91,6 +98,7 @@ type RouteCurveEntry = {
   routeIndex: number;
   routeConfig: RouteArcConfig;
   curve: THREE.CatmullRomCurve3;
+  midpoint: THREE.Vector3;
 };
 
 type AircraftEntry = {
@@ -107,6 +115,9 @@ type AircraftEntry = {
   trailPoints: THREE.Object3D[];
   revealScale: number;
   revealOpacity: number;
+  assignmentOpacity: number;
+  assignmentLockUntil: number;
+  pendingRouteEntry: RouteCurveEntry | null;
 };
 
 type HeroFlightMode = "ROUTE_IDLE" | "HERO_TRANSITION" | "JOURNEY_READY" | "HERO_RETURN";
@@ -410,6 +421,18 @@ const AIRCRAFT_ROUTE_COVERAGE_RATIO = 0.8;
 const HERO_LAUNCH_RESET_PROGRESS = 0.18;
 const HERO_LAUNCH_DURATION_SECONDS = 4.35;
 const HERO_RETURN_DURATION_SECONDS = 5;
+const ORB_SHELL_MODE_START = 0.68;
+const ORB_SHELL_MODE_FULL = 0.84;
+const MOBILE_SUPPORT_AIRCRAFT_COUNT = 6;
+const DESKTOP_SUPPORT_AIRCRAFT_COUNT = 9;
+const MOBILE_SUPPORT_TRAIL_STEPS = 0;
+const DESKTOP_SUPPORT_TRAIL_STEPS = 1;
+const SUPPORT_ROUTE_SCAN_INTERVAL_SECONDS = 0.08;
+const SUPPORT_ROUTE_ASSIGNMENT_LOCK_SECONDS = 0.18;
+const SUPPORT_ASSIGNMENT_FADE_OUT_PER_SECOND = 28;
+const SUPPORT_ASSIGNMENT_FADE_IN_PER_SECOND = 24;
+const SUPPORT_ROUTE_MIN_FRONT = -0.03;
+const SUPPORT_ROUTE_KEEP_FRONT = 0.04;
 
 const ROUTE_ARCS: RouteArcConfig[] = [
   {
@@ -692,6 +715,14 @@ function buildAircraftTrafficConfigs(routes: RouteArcConfig[]) {
 
 const AIRCRAFT_TRAFFIC = buildAircraftTrafficConfigs(ROUTE_ARCS);
 
+function getSupportAircraftPoolSize(isMobileLayout: boolean) {
+  return isMobileLayout ? MOBILE_SUPPORT_AIRCRAFT_COUNT : DESKTOP_SUPPORT_AIRCRAFT_COUNT;
+}
+
+function getSupportTrailSteps(isMobileLayout: boolean) {
+  return isMobileLayout ? MOBILE_SUPPORT_TRAIL_STEPS : DESKTOP_SUPPORT_TRAIL_STEPS;
+}
+
 const WAITLIST_SCROLL_TRANSITION = {
   fogDensity: 0.78,
   bloomStrength: 0.34,
@@ -719,7 +750,18 @@ const WAITLIST_SCROLL_TRANSITION = {
   autoRewindMinDurationMs: 900,
   mobileTransitionDistance: 2.45,
   desktopTransitionDistance: 1.35,
-} as const;
+  mobileScrollDeltaScale: 0.38,
+  mobileScrollDeltaMaxStep: 72,
+  earlyDistortionGestureCount: 2,
+  earlyDistortionProgressStart: 0.03,
+  earlyDistortionProgressEnd: 0.11,
+  earlyDistortionMaxStrength: 0.18,
+  earlyDistortionFallbackStart: 0.055,
+  earlyDistortionFallbackEnd: 0.14,
+  earlyDistortionFallbackStrength: 0.22,
+  mobileReverseActivationThreshold: 140,
+  mobileReverseIntentDecayPerSecond: 220,
+  } as const;
 
 const WAITLIST_PERFORMANCE = {
   mobileTransitionPixelRatio: 1.25,
@@ -760,6 +802,8 @@ export default function LiveGlobeProofPage() {
   const scrollProgressRef = useRef(0);
   const autoCompleteActiveRef = useRef(false);
   const autoRewindActiveRef = useRef(false);
+  const manualReverseHoldActiveRef = useRef(false);
+  const earlyForwardGestureCountRef = useRef(0);
   const firstScrollIntentRef = useRef(false);
   const materializeSignalRef = useRef(0);
   const loaderStartRef = useRef<number | null>(null);
@@ -789,6 +833,13 @@ export default function LiveGlobeProofPage() {
   const [perfStorageEnabled] = useState(() =>
     typeof window !== "undefined" && window.localStorage.getItem("DH_PERF_HUD") === "1",
   );
+  const [perfHudVisible] = useState(() => {
+    if (typeof window === "undefined") {
+      return false;
+    }
+    const params = new URLSearchParams(window.location.search);
+    return params.get("perfHud") === "1" || window.localStorage.getItem("DH_PERF_HUD_VISIBLE") === "1";
+  });
   const perfEnvEnabled = process.env.NODE_ENV !== "production" && process.env.NEXT_PUBLIC_DH_PERF_HUD === "1";
   const perfEnabled = perfQueryEnabled || perfStorageEnabled || perfEnvEnabled;
   const forcedQuality: ForcedQuality = perfDebugFlags.forceMobileQuality
@@ -819,7 +870,7 @@ export default function LiveGlobeProofPage() {
     initWebglPerfMonitor(perfEnabled);
     if (perfEnabled) {
       window.console.info(
-        "Deadhead Club Perf HUD enabled.\\nUse:\\nwindow.DH_PERF.summary()\\nwindow.DH_PERF.snapshot()\\nwindow.DH_PERF.setDebugFlag(\"postprocessing\", false)",
+        "Deadhead Club Perf monitor enabled.\\nHUD is hidden by default. Add ?perfHud=1 or set localStorage.DH_PERF_HUD_VISIBLE=\"1\" to show it.\\nUse:\\nwindow.DH_PERF.summary()\\nwindow.DH_PERF.snapshot()\\nwindow.DH_PERF.setDebugFlag(\"postprocessing\", false)",
       );
     }
   }, [perfEnabled]);
@@ -975,6 +1026,11 @@ export default function LiveGlobeProofPage() {
     let lastUserVelocitySampleMs = performance.now();
     let lastUserVelocitySampleProgress = 0;
     let smoothedUserProgressVelocity = 0;
+    let reverseActivationIntent = 0;
+    let lastReverseActivationSampleMs = performance.now();
+    let earlyForwardGestureCount = 0;
+    let lastForwardGestureMs = 0;
+    let manualReverseHoldActive = false;
     const AUTO_COMPLETE_THRESHOLD = WAITLIST_SCROLL_TRANSITION.autoCompleteThreshold;
     const AUTO_COMPLETE_REWIND_PROGRESS = 0;
     const AUTO_COMPLETE_DURATION_MS = WAITLIST_SCROLL_TRANSITION.autoCompleteDurationMs;
@@ -987,6 +1043,8 @@ export default function LiveGlobeProofPage() {
     const AUTO_HANDOFF_END_VELOCITY_FACTOR = WAITLIST_SCROLL_TRANSITION.autoHandoffEndVelocityFactor;
     const AUTO_REWIND_MS_PER_PROGRESS = WAITLIST_SCROLL_TRANSITION.autoRewindMsPerProgress;
     const AUTO_REWIND_MIN_DURATION_MS = WAITLIST_SCROLL_TRANSITION.autoRewindMinDurationMs;
+    const MOBILE_REVERSE_ACTIVATION_THRESHOLD = WAITLIST_SCROLL_TRANSITION.mobileReverseActivationThreshold;
+    const MOBILE_REVERSE_INTENT_DECAY_PER_SECOND = WAITLIST_SCROLL_TRANSITION.mobileReverseIntentDecayPerSecond;
     const FIRST_SCROLL_KICKOFF_PROGRESS = 0.01;
     autoCompleteActiveRef.current = false;
     const getViewportHeight = () => stableViewportHeight;
@@ -1005,13 +1063,42 @@ export default function LiveGlobeProofPage() {
     const applyProgressStyles = (rawProgress: number, viewportHeight: number) => {
       const clampedProgress = THREE.MathUtils.clamp(rawProgress, 0, 1);
       scrollProgressRef.current = clampedProgress;
-      const washPhase =
+      const earlyOnramp = getEarlyTransitionOnrampStrength({
+        gestureCount: earlyForwardGestureCountRef.current,
+        progress: clampedProgress,
+        minimumGestureCount: WAITLIST_SCROLL_TRANSITION.earlyDistortionGestureCount,
+        progressStart: WAITLIST_SCROLL_TRANSITION.earlyDistortionProgressStart,
+        progressEnd: WAITLIST_SCROLL_TRANSITION.earlyDistortionProgressEnd,
+        maxStrength: WAITLIST_SCROLL_TRANSITION.earlyDistortionMaxStrength,
+      });
+      const fallbackEarlyOnramp = getEarlyTransitionOnrampStrength({
+        gestureCount: firstScrollIntentRef.current ? 1 : 0,
+        progress: clampedProgress,
+        minimumGestureCount: 1,
+        progressStart: WAITLIST_SCROLL_TRANSITION.earlyDistortionFallbackStart,
+        progressEnd: WAITLIST_SCROLL_TRANSITION.earlyDistortionFallbackEnd,
+        maxStrength: WAITLIST_SCROLL_TRANSITION.earlyDistortionFallbackStrength,
+      });
+      const effectiveEarlyOnramp = Math.max(earlyOnramp, fallbackEarlyOnramp);
+      const effectiveEarlyOnrampFactor = Math.max(
+        getEarlyTransitionOnrampFactor({
+          strength: earlyOnramp,
+          maxStrength: WAITLIST_SCROLL_TRANSITION.earlyDistortionMaxStrength,
+        }),
+        getEarlyTransitionOnrampFactor({
+          strength: fallbackEarlyOnramp,
+          maxStrength: WAITLIST_SCROLL_TRANSITION.earlyDistortionFallbackStrength,
+        }),
+      );
+      const washPhase = Math.max(
         THREE.MathUtils.smoothstep(
           clampedProgress,
           WAITLIST_SCROLL_TRANSITION.distortionStart,
           WAITLIST_SCROLL_TRANSITION.distortionEnd,
         ) *
-        (1 - THREE.MathUtils.smoothstep(clampedProgress, 0.74, 0.94));
+          (1 - THREE.MathUtils.smoothstep(clampedProgress, 0.74, 0.94)),
+        effectiveEarlyOnrampFactor * 0.16,
+      );
       const handoffPhase = THREE.MathUtils.smoothstep(
         clampedProgress,
         WAITLIST_SCROLL_TRANSITION.handoffStart,
@@ -1025,6 +1112,11 @@ export default function LiveGlobeProofPage() {
       const perspectiveProgress = 1 - Math.pow(1 - clampedProgress, 1.45);
       const backgroundBlendProgress = THREE.MathUtils.smoothstep(clampedProgress, 0.08, 0.78);
       const webglBackgroundTakeover = THREE.MathUtils.smoothstep(clampedProgress, 0.18, 0.34);
+      const earlyCanvasOpacity = getEarlyCanvasOpacity({
+        mainOpacity: webglBackgroundTakeover,
+        earlyFactor: effectiveEarlyOnrampFactor,
+        maxOpacity: 0.3,
+      });
       const wakeFadeProgress = THREE.MathUtils.smoothstep(clampedProgress, 0.26, 0.82);
       const vignetteFadeProgress = THREE.MathUtils.smoothstep(clampedProgress, 0.62, 0.96);
       const suckedWordProgress = THREE.MathUtils.smoothstep(clampedProgress, 0.02, 0.82);
@@ -1043,8 +1135,8 @@ export default function LiveGlobeProofPage() {
       page.style.setProperty("--background-perspective-scale", `${backgroundScale}`);
       page.style.setProperty("--background-perspective-y", `${backgroundY}px`);
       page.style.setProperty("--background-extension-opacity", `${backgroundBlendProgress}`);
-      page.style.setProperty("--hero-background-opacity", `${Math.max(0, 1 - webglBackgroundTakeover)}`);
-      page.style.setProperty("--transition-canvas-opacity", `${webglBackgroundTakeover}`);
+      page.style.setProperty("--hero-background-opacity", `${Math.max(0, 1 - earlyCanvasOpacity)}`);
+      page.style.setProperty("--transition-canvas-opacity", `${earlyCanvasOpacity}`);
       page.style.setProperty("--transition-wash-phase", `${washPhase}`);
       page.style.setProperty("--transition-handoff-phase", `${handoffPhase}`);
       page.style.setProperty("--wake-layer-opacity", `${Math.max(0, 1 - wakeFadeProgress)}`);
@@ -1123,9 +1215,15 @@ export default function LiveGlobeProofPage() {
     const resetScrollIntent = () => {
       hasUserScrollIntent = false;
       firstScrollIntentRef.current = false;
+      earlyForwardGestureCount = 0;
+      earlyForwardGestureCountRef.current = 0;
+      lastForwardGestureMs = 0;
       autoCompleteActiveRef.current = false;
       autoRewindActiveRef.current = false;
+      manualReverseHoldActiveRef.current = false;
       autoHandoffActive = false;
+      manualReverseHoldActive = false;
+      reverseActivationIntent = 0;
       targetProgress = 0;
     };
 
@@ -1154,8 +1252,12 @@ export default function LiveGlobeProofPage() {
     const startAutoComplete = (nowMs: number) => {
       autoCompleteTriggered = true;
       autoCompleteActiveRef.current = true;
+      manualReverseHoldActiveRef.current = false;
       autoCompleteStartMs = nowMs;
       autoCompleteStartProgress = smoothedProgress;
+      reverseActivationIntent = 0;
+      lastReverseActivationSampleMs = nowMs;
+      manualReverseHoldActive = false;
 
       const userForwardVelocity = THREE.MathUtils.clamp(smoothedUserProgressVelocity, 0, AUTO_HANDOFF_SPEED_CLAMP_MAX);
       if (!prefersReducedMotion && AUTO_HANDOFF_ENABLED && userForwardVelocity > AUTO_HANDOFF_SPEED_CLAMP_MIN) {
@@ -1185,11 +1287,28 @@ export default function LiveGlobeProofPage() {
       autoCompleteActiveRef.current = false;
       autoHandoffActive = false;
       autoRewindActiveRef.current = true;
+      manualReverseHoldActiveRef.current = false;
       autoRewindTriggered = true;
+      reverseActivationIntent = 0;
+      manualReverseHoldActive = false;
       autoRewindStartMs = performance.now();
       autoRewindStartProgress = smoothedProgress;
       autoRewindDurationMs = Math.max(AUTO_REWIND_MIN_DURATION_MS, autoRewindStartProgress * AUTO_REWIND_MS_PER_PROGRESS);
       targetProgress = smoothedProgress;
+    };
+
+    const shouldStartMobileAutoRewind = (deltaY: number, nowMs: number) => {
+      const dtSeconds = THREE.MathUtils.clamp((nowMs - lastReverseActivationSampleMs) / 1000, 0, 0.25);
+      lastReverseActivationSampleMs = nowMs;
+      const result = updateReverseActivationIntent({
+        currentIntent: reverseActivationIntent,
+        deltaY,
+        dtSeconds,
+        threshold: MOBILE_REVERSE_ACTIVATION_THRESHOLD,
+        decayPerSecond: MOBILE_REVERSE_INTENT_DECAY_PER_SECOND,
+      });
+      reverseActivationIntent = result.nextIntent;
+      return result.shouldTrigger;
     };
 
     const nudgeAutoRewind = (deltaY: number) => {
@@ -1229,7 +1348,9 @@ export default function LiveGlobeProofPage() {
       if (!autoCompleteTriggered && !autoRewindTriggered) {
         sampleUserScrollVelocity(sourceProgress, nowMs);
       }
-      const scrollingBackward = scrollSource < lastScrollSource - 1;
+      const scrollDelta = scrollSource - lastScrollSource;
+      const scrollingBackward = scrollDelta < -1;
+      const scrollingForward = scrollDelta > 1;
       lastScrollSource = scrollSource;
       if (scrollSource <= 0.5 && !autoCompleteTriggered && !autoRewindTriggered) {
         resetToStart();
@@ -1251,6 +1372,14 @@ export default function LiveGlobeProofPage() {
 
       const kickoffProgress = hasUserScrollIntent ? FIRST_SCROLL_KICKOFF_PROGRESS : 0;
       targetProgress = Math.max(sourceProgress, kickoffProgress);
+      if (manualReverseHoldActive) {
+        if (scrollingForward || sourceProgress <= AUTO_COMPLETE_THRESHOLD - 0.01) {
+          manualReverseHoldActive = false;
+          manualReverseHoldActiveRef.current = false;
+        } else {
+          return;
+        }
+      }
       if (!prefersReducedMotion && targetProgress >= AUTO_COMPLETE_THRESHOLD) {
         startAutoComplete(nowMs);
       }
@@ -1340,23 +1469,103 @@ export default function LiveGlobeProofPage() {
       requestScrollProgress();
     };
 
+    const registerForwardGestureBurst = (deltaY: number) => {
+      if (prefersReducedMotion || deltaY <= 0.5) {
+        return;
+      }
+      if (smoothedProgress > 0.18 || autoCompleteTriggered || autoRewindTriggered) {
+        return;
+      }
+      const nowMs = performance.now();
+      if (nowMs - lastForwardGestureMs < 220) {
+        return;
+      }
+      lastForwardGestureMs = nowMs;
+      earlyForwardGestureCount = Math.min(earlyForwardGestureCount + 1, 6);
+      earlyForwardGestureCountRef.current = earlyForwardGestureCount;
+    };
+
+    const getNormalizedVirtualScrollDelta = (deltaY: number) => {
+      const scaledDelta = deltaY * WAITLIST_SCROLL_TRANSITION.mobileScrollDeltaScale;
+      const clampedDelta = THREE.MathUtils.clamp(
+        scaledDelta,
+        -WAITLIST_SCROLL_TRANSITION.mobileScrollDeltaMaxStep,
+        WAITLIST_SCROLL_TRANSITION.mobileScrollDeltaMaxStep,
+      );
+      return Math.abs(clampedDelta) < 0.5 ? 0 : clampedDelta;
+    };
+
     const applyVirtualScrollDelta = (deltaY: number) => {
       if (!isMobileViewport || !interactionReadyRef.current || prefersReducedMotion) {
         return;
       }
+      const normalizedDeltaY = getNormalizedVirtualScrollDelta(deltaY);
+      if (normalizedDeltaY === 0) {
+        return;
+      }
+      registerForwardGestureBurst(normalizedDeltaY);
       registerScrollIntent(deltaY);
-      if (autoCompleteTriggered && deltaY < -0.5) {
+      if (autoCompleteTriggered && normalizedDeltaY < -0.5) {
+        const nowMs = performance.now();
+        virtualScrollY = THREE.MathUtils.clamp(smoothedProgress * getTransitionDistance(), 0, getTransitionDistance());
+        autoCompleteTriggered = false;
+        autoCompleteActiveRef.current = false;
+        autoHandoffActive = false;
+        manualReverseHoldActive = true;
+        manualReverseHoldActiveRef.current = true;
+        const reverseStep = applyReverseScrubStep({
+          currentIntent: reverseActivationIntent,
+          deltaY: normalizedDeltaY,
+          dtSeconds: THREE.MathUtils.clamp((nowMs - lastReverseActivationSampleMs) / 1000, 0, 0.25),
+          threshold: MOBILE_REVERSE_ACTIVATION_THRESHOLD,
+          decayPerSecond: MOBILE_REVERSE_INTENT_DECAY_PER_SECOND,
+          virtualScrollY,
+          transitionDistance: getTransitionDistance(),
+        });
+        lastReverseActivationSampleMs = nowMs;
+        reverseActivationIntent = reverseStep.nextIntent;
+        virtualScrollY = reverseStep.nextVirtualScrollY;
+        if (!reverseStep.shouldTrigger) {
+          requestScrollProgress();
+          return;
+        }
         beginAutoRewind();
         requestScrollProgress();
         return;
       }
-      if (autoRewindTriggered) {
-        nudgeAutoRewind(deltaY);
+      if (manualReverseHoldActive && normalizedDeltaY < -0.5) {
+        const nowMs = performance.now();
+        const reverseStep = applyReverseScrubStep({
+          currentIntent: reverseActivationIntent,
+          deltaY: normalizedDeltaY,
+          dtSeconds: THREE.MathUtils.clamp((nowMs - lastReverseActivationSampleMs) / 1000, 0, 0.25),
+          threshold: MOBILE_REVERSE_ACTIVATION_THRESHOLD,
+          decayPerSecond: MOBILE_REVERSE_INTENT_DECAY_PER_SECOND,
+          virtualScrollY,
+          transitionDistance: getTransitionDistance(),
+        });
+        lastReverseActivationSampleMs = nowMs;
+        reverseActivationIntent = reverseStep.nextIntent;
+        virtualScrollY = reverseStep.nextVirtualScrollY;
+        if (reverseStep.shouldTrigger) {
+          beginAutoRewind();
+        }
         requestScrollProgress();
         return;
       }
-      virtualScrollY = THREE.MathUtils.clamp(virtualScrollY + deltaY, 0, getTransitionDistance());
-      if (virtualScrollY <= 0.5 && deltaY < 0) {
+      if (normalizedDeltaY >= -0.5) {
+        reverseActivationIntent = 0;
+        manualReverseHoldActive = false;
+        manualReverseHoldActiveRef.current = false;
+        lastReverseActivationSampleMs = performance.now();
+      }
+      if (autoRewindTriggered) {
+        nudgeAutoRewind(normalizedDeltaY);
+        requestScrollProgress();
+        return;
+      }
+      virtualScrollY = THREE.MathUtils.clamp(virtualScrollY + normalizedDeltaY, 0, getTransitionDistance());
+      if (virtualScrollY <= 0.5 && normalizedDeltaY < 0) {
         resetToStart();
       }
       requestScrollProgress();
@@ -1394,8 +1603,12 @@ export default function LiveGlobeProofPage() {
 
     const handleWheel = (event: WheelEvent) => {
       registerScrollIntent(event.deltaY);
-      if (autoRewindTriggered && event.deltaY < -0.5) {
-        nudgeAutoRewind(event.deltaY);
+      const normalizedDeltaY = isMobileViewport ? getNormalizedVirtualScrollDelta(event.deltaY) : event.deltaY;
+      if (!isMobileViewport) {
+        registerForwardGestureBurst(normalizedDeltaY);
+      }
+      if (autoRewindTriggered && normalizedDeltaY < -0.5) {
+        nudgeAutoRewind(normalizedDeltaY);
         requestScrollProgress();
         if (isMobileViewport) {
           event.preventDefault();
@@ -1488,6 +1701,7 @@ export default function LiveGlobeProofPage() {
           <div className={styles.backgroundPlate}>
             <WaitlistSceneTransition
               scrollProgressRef={scrollProgressRef}
+              earlyForwardGestureCountRef={earlyForwardGestureCountRef}
               firstScrollIntentRef={firstScrollIntentRef}
               postprocessingEnabled={effectivePostprocessingEnabled}
               starsEnabled={effectiveStarsEnabled}
@@ -1530,6 +1744,7 @@ export default function LiveGlobeProofPage() {
               orbProgressRef={orbProgressRef}
               autoCompleteActiveRef={autoCompleteActiveRef}
               autoRewindActiveRef={autoRewindActiveRef}
+              manualReverseHoldActiveRef={manualReverseHoldActiveRef}
               materializeSignalRef={materializeSignalRef}
               perfEnabled={perfEnabled}
               forcedQuality={forcedQuality}
@@ -1593,7 +1808,7 @@ export default function LiveGlobeProofPage() {
           <div className={styles.loadingLine} />
         </div>
         <h1 className={styles.srOnly}>Live CGTrader Earth globe proof</h1>
-        <PerfHud enabled={perfEnabled} />
+        <PerfHud enabled={perfEnabled && perfHudVisible} />
       </section>
     </main>
   );
@@ -1837,6 +2052,7 @@ const CHROMATIC_ABERRATION_SHADER = {
 
 function WaitlistSceneTransition({
   scrollProgressRef,
+  earlyForwardGestureCountRef,
   firstScrollIntentRef,
   postprocessingEnabled,
   starsEnabled,
@@ -1850,6 +2066,7 @@ function WaitlistSceneTransition({
   forcedQuality,
 }: {
   scrollProgressRef: React.MutableRefObject<number>;
+  earlyForwardGestureCountRef: React.MutableRefObject<number>;
   firstScrollIntentRef: React.MutableRefObject<boolean>;
   postprocessingEnabled: boolean;
   starsEnabled: boolean;
@@ -2283,11 +2500,44 @@ function WaitlistSceneTransition({
       const p = clamp01(smoothedProgress) * activation;
       const mobile = isMobileViewport();
       const phase1 = smoothstep(0, 0.25, p);
-      const frostPeak = prefersReducedMotion ? 0 : bell(p, 0.52, 0.24);
+      const earlyOnramp = prefersReducedMotion
+        ? 0
+        : getEarlyTransitionOnrampStrength({
+            gestureCount: earlyForwardGestureCountRef.current,
+            progress: p,
+            minimumGestureCount: WAITLIST_SCROLL_TRANSITION.earlyDistortionGestureCount,
+            progressStart: WAITLIST_SCROLL_TRANSITION.earlyDistortionProgressStart,
+            progressEnd: WAITLIST_SCROLL_TRANSITION.earlyDistortionProgressEnd,
+            maxStrength: WAITLIST_SCROLL_TRANSITION.earlyDistortionMaxStrength,
+          });
+      const fallbackEarlyOnramp = prefersReducedMotion
+        ? 0
+        : getEarlyTransitionOnrampStrength({
+            gestureCount: firstScrollIntentRef.current ? 1 : 0,
+            progress: p,
+            minimumGestureCount: 1,
+            progressStart: WAITLIST_SCROLL_TRANSITION.earlyDistortionFallbackStart,
+            progressEnd: WAITLIST_SCROLL_TRANSITION.earlyDistortionFallbackEnd,
+            maxStrength: WAITLIST_SCROLL_TRANSITION.earlyDistortionFallbackStrength,
+          });
+      const effectiveEarlyOnramp = Math.max(earlyOnramp, fallbackEarlyOnramp);
+      const effectiveEarlyOnrampFactor = Math.max(
+        getEarlyTransitionOnrampFactor({
+          strength: earlyOnramp,
+          maxStrength: WAITLIST_SCROLL_TRANSITION.earlyDistortionMaxStrength,
+        }),
+        getEarlyTransitionOnrampFactor({
+          strength: fallbackEarlyOnramp,
+          maxStrength: WAITLIST_SCROLL_TRANSITION.earlyDistortionFallbackStrength,
+        }),
+      );
+      const frostPeak = prefersReducedMotion ? 0 : Math.max(bell(p, 0.52, 0.24), effectiveEarlyOnramp);
       const chromaPeak = prefersReducedMotion ? 0 : bell(p, 0.58, 0.2);
       const hazeRise = smoothstep(0.25, 0.65, p);
       const hazeFall = smoothstep(0.72, 1, p);
-      const hazeOpacity = prefersReducedMotion ? lerp(0.08, 0.16, smoothstep(0.4, 0.8, p)) : lerp(0.12, 0.55, hazeRise * (1 - hazeFall));
+      const hazeOpacity = prefersReducedMotion
+        ? lerp(0.08, 0.16, smoothstep(0.4, 0.8, p))
+        : lerp(0.12, 0.55, hazeRise * (1 - hazeFall)) + effectiveEarlyOnrampFactor * 0.08;
       const oldSceneOpacity = prefersReducedMotion ? 1 - smoothstep(0.45, 0.9, p) : 1 - smoothstep(0.35, 0.85, p);
       const newSceneOpacity = smoothstep(0.55, 1, p);
       const gridOpacity = lerp(0.35, 0.65, smoothstep(0.18, 0.7, p)) * (1 - smoothstep(0.88, 1, p) * 0.18);
@@ -2320,14 +2570,22 @@ function WaitlistSceneTransition({
 
       frostPass.uniforms.uTime.value = now / 1000;
       frostPass.uniforms.uProgress.value = p;
-      frostPass.uniforms.uFrostStrength.value = frostPeak * 0.48;
-      frostPass.uniforms.uDisplacementStrength.value = frostPeak * (mobile ? 0.028 : 0.044);
+      const earlyFrostStrength = effectiveEarlyOnrampFactor * 0.12;
+      const effectiveFrostStrength = Math.max(frostPeak * 0.48, earlyFrostStrength);
+      frostPass.uniforms.uFrostStrength.value = effectiveFrostStrength;
+      frostPass.uniforms.uDisplacementStrength.value = Math.max(
+        frostPeak * (mobile ? 0.028 : 0.044),
+        effectiveEarlyOnrampFactor * (mobile ? 0.0065 : 0.0095),
+      );
       frostPass.uniforms.uNoiseScale.value = lerp(8.2, 5.8, frostPeak);
       chromaticPass.uniforms.uStrength.value = chromaPeak * (mobile ? 0.0024 : WAITLIST_SCROLL_TRANSITION.chromaticAberration);
       bloomPass.strength = prefersReducedMotion ? 0.28 : lerp(mobile ? 0.22 : 0.35, mobile ? 0.42 : 0.85, bell(p, 0.56, 0.34));
       bloomPass.radius = 0.35;
       bloomPass.threshold = 0.15;
-      frostPass.enabled = postprocessingEnabled && frostEnabled && frostPeak > 0.018;
+      frostPass.enabled =
+        postprocessingEnabled &&
+        frostEnabled &&
+        (frostPeak > 0.018 || effectiveEarlyOnrampFactor > 0.08);
       chromaticPass.enabled = postprocessingEnabled && chromaticEnabled && chromaPeak > 0.018;
       bloomPass.enabled = postprocessingEnabled && bloomEnabled && p > 0.001 && p < 0.995;
       if (scene.fog instanceof THREE.FogExp2) {
@@ -2435,6 +2693,7 @@ function LiveGlobeCanvas({
   orbProgressRef,
   autoCompleteActiveRef,
   autoRewindActiveRef,
+  manualReverseHoldActiveRef,
   materializeSignalRef,
   perfEnabled,
   forcedQuality,
@@ -2453,6 +2712,7 @@ function LiveGlobeCanvas({
   orbProgressRef: React.MutableRefObject<number>;
   autoCompleteActiveRef: React.MutableRefObject<boolean>;
   autoRewindActiveRef: React.MutableRefObject<boolean>;
+  manualReverseHoldActiveRef: React.MutableRefObject<boolean>;
   materializeSignalRef: React.MutableRefObject<number>;
   perfEnabled: boolean;
   forcedQuality: ForcedQuality;
@@ -2490,6 +2750,7 @@ function LiveGlobeCanvas({
     const constructionShellMaterials: THREE.ShaderMaterial[] = [];
     const aircraftMaterials: THREE.MeshPhongMaterial[] = [];
     const aircraftEntries: AircraftEntry[] = [];
+    const supportAircraftEntries: AircraftEntry[] = [];
     const aircraftGlowTextures: THREE.Texture[] = [];
     let baseGlobeY = 0;
     let baseGlobeScale = 1;
@@ -2503,6 +2764,8 @@ function LiveGlobeCanvas({
     let materializeStartTime = -1;
     let materializeProgress = 0;
     let constructionShellMesh: THREE.Object3D | null = null;
+    let globeRouteGroup: THREE.Group | null = null;
+    let globeRouteEntries: RouteCurveEntry[] = [];
     let globePointerId: number | null = null;
     let globePointerLastX = 0;
     let globePointerLastY = 0;
@@ -2542,6 +2805,7 @@ function LiveGlobeCanvas({
     let visibilityPaused = false;
     let diagnosticsLogged = false;
     let loopActiveState = false;
+    let supportRouteScanAccumulator = 0;
     const resolveMobileLayout = (width: number) => {
       if (forcedQuality === "mobile") {
         return true;
@@ -3141,6 +3405,9 @@ function LiveGlobeCanvas({
 
     const updateOrbAliveLook = (elapsed: number) => {
       const energy = Math.pow(currentOrbProgress, 1.18);
+      const shellMode = THREE.MathUtils.smoothstep(currentOrbProgress, ORB_SHELL_MODE_START, ORB_SHELL_MODE_FULL);
+      const supportTrafficVisibility = 1 - shellMode;
+      const shellRouteVisibility = THREE.MathUtils.lerp(1, 0.24, shellMode);
       const globeReveal = THREE.MathUtils.smootherstep(materializeProgress, 0, 1);
       const cityReveal = THREE.MathUtils.smootherstep(materializeProgress, 0.58, 1);
       const routeReveal = THREE.MathUtils.smootherstep(materializeProgress, 0.38, 1);
@@ -3161,15 +3428,23 @@ function LiveGlobeCanvas({
       orbAuraMaterial.uniforms.progress.value = energy * (2.65 + pulse * 1.75);
       orbAuraMaterial.uniforms.time.value = elapsed;
       const aircraftReveal = THREE.MathUtils.smootherstep(materializeProgress, 0.74, 1);
-      const aircraftRevealScale = THREE.MathUtils.lerp(0.001, 1, aircraftReveal);
+      const supportAircraftRevealScale = THREE.MathUtils.lerp(0.001, 1, aircraftReveal * supportTrafficVisibility);
       for (const entry of aircraftEntries) {
-        entry.revealOpacity = aircraftReveal;
-        entry.revealScale = aircraftRevealScale;
+        entry.revealOpacity = aircraftReveal * supportTrafficVisibility;
+        entry.revealScale = supportAircraftRevealScale;
+      }
+      if (heroFlight.actor) {
+        heroFlight.actor.revealOpacity = aircraftReveal;
+        heroFlight.actor.revealScale = THREE.MathUtils.lerp(0.001, 1, aircraftReveal);
       }
       const shellVisible = materializeProgress < 0.985;
       if (constructionShellMesh) {
         constructionShellMesh.visible = shellVisible;
       }
+      if (globeRouteGroup) {
+        globeRouteGroup.visible = routesEnabled && shellRouteVisibility > 0.035;
+      }
+      heroPlaneRig.visible = heroFlight.mode !== "ROUTE_IDLE" || supportTrafficVisibility > 0.035;
       if (shellVisible) {
         for (const material of constructionShellMaterials) {
           material.uniforms.materializeProgress.value = globeReveal;
@@ -3178,8 +3453,8 @@ function LiveGlobeCanvas({
       }
       for (const material of routeShaderMaterials) {
         const baseOpacity = typeof material.userData.baseOpacity === "number" ? material.userData.baseOpacity : material.uniforms.opacity.value;
-        material.uniforms.opacity.value = baseOpacity * (1 + energy * (3.2 + pulse * 1.58));
-        material.uniforms.aliveProgress.value = energy;
+        material.uniforms.opacity.value = baseOpacity * shellRouteVisibility * (1 + energy * (2.1 + pulse * 0.9));
+        material.uniforms.aliveProgress.value = energy * THREE.MathUtils.lerp(1, 0.42, shellMode);
         material.uniforms.materializeProgress.value = routeReveal;
         material.uniforms.time.value = elapsed;
       }
@@ -3484,6 +3759,9 @@ function LiveGlobeCanvas({
     const routeReturnRotation = new THREE.Quaternion();
     const routeReturnRotationStep = new THREE.Quaternion();
     const heroHiddenPoint = new THREE.Vector3();
+    const routeMidpointWorld = new THREE.Vector3();
+    const routeMidpointProjected = new THREE.Vector3();
+    const routeFacingNormal = new THREE.Vector3();
     let heroLaunchArcGlowMaterial: THREE.ShaderMaterial | null = null;
     let heroLaunchArcCoreMaterial: THREE.ShaderMaterial | null = null;
     let heroLaunchArcGlowMesh: THREE.Mesh | null = null;
@@ -3789,6 +4067,90 @@ function LiveGlobeCanvas({
       }
     };
 
+    const getRouteFrontScore = (routeEntry: RouteCurveEntry, camera: THREE.PerspectiveCamera) => {
+      routeMidpointWorld.copy(routeEntry.midpoint);
+      globeRig.localToWorld(routeMidpointWorld);
+      routeFacingNormal.copy(routeMidpointWorld).sub(globeRig.position).normalize();
+      globeToCamera.copy(camera.position).sub(globeRig.position).normalize();
+      const frontDot = routeFacingNormal.dot(globeToCamera);
+      if (frontDot <= SUPPORT_ROUTE_MIN_FRONT) {
+        return 0;
+      }
+      routeMidpointProjected.copy(routeMidpointWorld).project(camera);
+      const centerBias = THREE.MathUtils.clamp(
+        1 - Math.hypot(routeMidpointProjected.x * 0.86, routeMidpointProjected.y * 1.08) * 0.36,
+        0,
+        1,
+      );
+      return THREE.MathUtils.smoothstep(frontDot, SUPPORT_ROUTE_MIN_FRONT, 0.58) * (0.74 + centerBias * 0.26);
+    };
+
+    const updateSupportAircraftAssignments = (elapsed: number, delta: number, camera: THREE.PerspectiveCamera) => {
+      if (supportAircraftEntries.length === 0 || globeRouteEntries.length === 0) {
+        return;
+      }
+
+      for (const entry of supportAircraftEntries) {
+        if (entry.pendingRouteEntry) {
+          entry.assignmentOpacity = Math.max(0, entry.assignmentOpacity - delta * SUPPORT_ASSIGNMENT_FADE_OUT_PER_SECOND);
+          if (entry.assignmentOpacity <= 0.05) {
+            entry.routeEntry = entry.pendingRouteEntry;
+            entry.routeGlowColor.set(entry.pendingRouteEntry.routeConfig.glowColor);
+            entry.pendingRouteEntry = null;
+            entry.assignmentLockUntil = elapsed + SUPPORT_ROUTE_ASSIGNMENT_LOCK_SECONDS;
+            entry.progress = THREE.MathUtils.euclideanModulo(entry.progress + 0.19, 1);
+          }
+        } else {
+          entry.assignmentOpacity = Math.min(1, entry.assignmentOpacity + delta * SUPPORT_ASSIGNMENT_FADE_IN_PER_SECOND);
+        }
+      }
+
+      supportRouteScanAccumulator += delta;
+      if (supportRouteScanAccumulator < SUPPORT_ROUTE_SCAN_INTERVAL_SECONDS) {
+        return;
+      }
+      supportRouteScanAccumulator = 0;
+
+      const heroRouteIndex = heroFlight.sourceEntry?.routeEntry.routeIndex ?? -1;
+      const scoredRoutes = globeRouteEntries
+        .filter((routeEntry) => routeEntry.routeIndex !== heroRouteIndex)
+        .map((routeEntry) => ({ routeEntry, score: getRouteFrontScore(routeEntry, camera) }))
+        .filter((candidate) => candidate.score > SUPPORT_ROUTE_MIN_FRONT)
+        .sort((left, right) => right.score - left.score);
+
+      const reservedRoutes = new Set<number>();
+      for (const entry of supportAircraftEntries) {
+        if (entry.pendingRouteEntry) {
+          reservedRoutes.add(entry.pendingRouteEntry.routeIndex);
+          continue;
+        }
+        const currentScore = getRouteFrontScore(entry.routeEntry, camera);
+        if (currentScore >= SUPPORT_ROUTE_KEEP_FRONT) {
+          reservedRoutes.add(entry.routeEntry.routeIndex);
+        }
+      }
+
+      for (const entry of supportAircraftEntries) {
+        if (entry.pendingRouteEntry || elapsed < entry.assignmentLockUntil) {
+          continue;
+        }
+        const currentScore = getRouteFrontScore(entry.routeEntry, camera);
+        if (currentScore >= SUPPORT_ROUTE_KEEP_FRONT && reservedRoutes.has(entry.routeEntry.routeIndex)) {
+          continue;
+        }
+        const nextCandidate = scoredRoutes.find(
+          (candidate) =>
+            !reservedRoutes.has(candidate.routeEntry.routeIndex) &&
+            candidate.routeEntry.routeIndex !== entry.routeEntry.routeIndex,
+        );
+        if (!nextCandidate) {
+          continue;
+        }
+        entry.pendingRouteEntry = nextCandidate.routeEntry;
+        reservedRoutes.add(nextCandidate.routeEntry.routeIndex);
+      }
+    };
+
     const resetHeroFlight = () => {
       if (heroFlight.actor) {
         hideAircraftEntry(heroFlight.actor);
@@ -3940,13 +4302,15 @@ function LiveGlobeCanvas({
         routeCenterPresence,
       );
       const roleScale = entry.config.role === "hero" ? 1.06 : 1;
+      const assignmentVisibility = entry.config.role === "hero" ? 1 : entry.assignmentOpacity;
+      const assignmentScale = entry.config.role === "hero" ? 1 : THREE.MathUtils.lerp(0.001, 1, assignmentVisibility);
       const visibilityPresence = THREE.MathUtils.clamp(depthPresence + entry.config.visibilityBias, 0, 1);
       const depthScale = THREE.MathUtils.lerp(0.76, 1.32, visibilityPresence) * entry.config.scaleMultiplier * roleScale;
-      const routeScale = depthScale * routeProgressScale * entry.revealScale;
+      const routeScale = depthScale * routeProgressScale * entry.revealScale * assignmentScale;
       aircraftTargetScale.setScalar(routeScale);
       entry.anchor.scale.lerp(aircraftTargetScale, 0.14);
       const opacityMax = entry.config.role === "hero" ? 1 : 0.94;
-      const opacity = THREE.MathUtils.lerp(0.56, opacityMax, visibilityPresence) * entry.revealOpacity;
+      const opacity = THREE.MathUtils.lerp(0.56, opacityMax, visibilityPresence) * entry.revealOpacity * assignmentVisibility;
       for (const material of entry.materials) {
         material.opacity = opacity;
         aircraftBodyColor.copy(aircraftFarBodyColor).lerp(aircraftNearBodyColor, visibilityPresence);
@@ -3963,6 +4327,9 @@ function LiveGlobeCanvas({
       const glowOpacity = THREE.MathUtils.lerp(0.1, entry.config.role === "hero" ? 0.32 : 0.26, visibilityPresence) * sunPulse * entry.revealOpacity;
       for (const material of entry.glowMaterials) {
         const glowGain = typeof material.userData.glowGain === "number" ? material.userData.glowGain : 1;
+        if ("color" in material && material.color instanceof THREE.Color) {
+          material.color.copy(entry.routeGlowColor);
+        }
         if ("opacity" in material) {
           material.opacity = glowOpacity * glowGain;
         }
@@ -4035,8 +4402,13 @@ function LiveGlobeCanvas({
           speed: number;
           role: "hero" | "support";
         }> = [];
+        const heroConfig = AIRCRAFT_TRAFFIC.find((config) => config.role === "hero") ?? null;
+        const supportConfigs = AIRCRAFT_TRAFFIC
+          .filter((config) => config.role === "support")
+          .slice(0, getSupportAircraftPoolSize(isMobileLayout));
+        const trafficConfigs = heroConfig ? [heroConfig, ...supportConfigs] : supportConfigs;
 
-        for (const config of AIRCRAFT_TRAFFIC) {
+        for (const config of trafficConfigs) {
           const routeEntry = routeEntries.find((entry) => entry.routeIndex === config.routeIndex);
           if (!routeEntry) {
             continue;
@@ -4107,7 +4479,7 @@ function LiveGlobeCanvas({
           }
 
           const trailPoints: THREE.Mesh[] = [];
-          const trailSteps = config.role === "hero" ? AIRCRAFT_TRAIL_STEPS : 3;
+          const trailSteps = config.role === "hero" ? AIRCRAFT_TRAIL_STEPS : getSupportTrailSteps(isMobileLayout);
           for (let index = 0; index < trailSteps; index += 1) {
             const trailGeometry = new THREE.SphereGeometry(THREE.MathUtils.lerp(0.005, 0.002, index / Math.max(trailSteps - 1, 1)), 10, 10);
             const trailMaterial = new THREE.MeshBasicMaterial({
@@ -4139,7 +4511,13 @@ function LiveGlobeCanvas({
             trailPoints,
             revealScale: 0.001,
             revealOpacity: 0,
+            assignmentOpacity: 1,
+            assignmentLockUntil: 0,
+            pendingRouteEntry: null,
           });
+          if (config.role === "support") {
+            supportAircraftEntries.push(aircraftEntries[aircraftEntries.length - 1]);
+          }
 
           if (config.role === "hero") {
             heroFlight.sourceEntry = aircraftEntries[aircraftEntries.length - 1];
@@ -4243,6 +4621,9 @@ function LiveGlobeCanvas({
               trailPoints: heroTrailPoints,
               revealScale: 1,
               revealOpacity: 1,
+              assignmentOpacity: 1,
+              assignmentLockUntil: 0,
+              pendingRouteEntry: null,
             };
             hideAircraftEntry(heroFlight.actor);
           }
@@ -4276,7 +4657,7 @@ function LiveGlobeCanvas({
 
       for (const [routeIndex, route] of ROUTE_ARCS.entries()) {
         const curve = createRouteCurve(route);
-        routeEntries.push({ routeIndex, routeConfig: route, curve });
+        routeEntries.push({ routeIndex, routeConfig: route, curve, midpoint: curve.getPointAt(0.5) });
 
         const glowGeometry = new THREE.TubeGeometry(curve, routeSegments, route.glowRadius, routeRadialSegments, false);
         const glowMaterial = createRouteMaterial({
@@ -4304,6 +4685,7 @@ function LiveGlobeCanvas({
         group.add(glowMesh, coreMesh);
       }
 
+      globeRouteEntries = routeEntries;
       return { group, routeEntries };
     };
 
@@ -4335,6 +4717,7 @@ function LiveGlobeCanvas({
       globeRig.add(constructionShell, earth, cities, cityHalo, cloudRig, atmosphere, orbAura);
       const routeGroup = routesEnabled ? createRouteGroup() : null;
       if (routeGroup) {
+        globeRouteGroup = routeGroup.group;
         globeRig.add(routeGroup.group);
         if (aircraftEnabled) {
           attachAircraftToRoutes(routeGroup.group, routeGroup.routeEntries);
@@ -4571,6 +4954,7 @@ function LiveGlobeCanvas({
       const elapsed = clock.elapsedTime;
       const autoCompleteActive = autoCompleteActiveRef.current;
       const autoRewindActive = autoRewindActiveRef.current;
+      const manualReverseHoldActive = manualReverseHoldActiveRef.current;
       const fps = 1 / Math.max(delta, 1 / 240);
       smoothedFps = THREE.MathUtils.lerp(smoothedFps, fps, 0.08);
       performanceSampleFrames += 1;
@@ -4597,20 +4981,29 @@ function LiveGlobeCanvas({
       }
       updateOrbAliveLook(elapsed);
       const cloudRig = globeRig.getObjectByName("cloud-rig");
+      const shellMode = THREE.MathUtils.smoothstep(currentOrbProgress, ORB_SHELL_MODE_START, ORB_SHELL_MODE_FULL);
+      const shellModeActive = shellMode > 0.98;
       if (globePointerId === null) {
-        globeTargetYaw += globeYawVelocity * delta;
-        globeTargetPitch = THREE.MathUtils.clamp(
-          globeTargetPitch + globePitchVelocity * delta,
-          GLOBE_INTERACTION.minPitch - INITIAL_GLOBE_ROTATION.x,
-          GLOBE_INTERACTION.maxPitch - INITIAL_GLOBE_ROTATION.x,
-        );
-        const inertiaDamping = Math.exp(-GLOBE_INTERACTION.inertiaDamping * delta);
-        globeYawVelocity *= inertiaDamping;
-        globePitchVelocity *= inertiaDamping;
-        if (Math.abs(globeYawVelocity) < 0.0008) {
+        if (!shellModeActive) {
+          globeTargetYaw += globeYawVelocity * delta;
+          globeTargetPitch = THREE.MathUtils.clamp(
+            globeTargetPitch + globePitchVelocity * delta,
+            GLOBE_INTERACTION.minPitch - INITIAL_GLOBE_ROTATION.x,
+            GLOBE_INTERACTION.maxPitch - INITIAL_GLOBE_ROTATION.x,
+          );
+          const inertiaDamping = Math.exp(-GLOBE_INTERACTION.inertiaDamping * delta);
+          globeYawVelocity *= inertiaDamping;
+          globePitchVelocity *= inertiaDamping;
+          if (Math.abs(globeYawVelocity) < 0.0008) {
+            globeYawVelocity = 0;
+          }
+          if (Math.abs(globePitchVelocity) < 0.0008) {
+            globePitchVelocity = 0;
+          }
+        } else {
+          globeTargetYaw = THREE.MathUtils.lerp(globeTargetYaw, 0, 0.08);
+          globeTargetPitch = THREE.MathUtils.lerp(globeTargetPitch, 0, 0.08);
           globeYawVelocity = 0;
-        }
-        if (Math.abs(globePitchVelocity) < 0.0008) {
           globePitchVelocity = 0;
         }
       }
@@ -4620,12 +5013,16 @@ function LiveGlobeCanvas({
       globePitch = THREE.MathUtils.lerp(globePitch, globeTargetPitch, interactionAlpha);
       if (!prefersReducedMotion) {
         const orbSpinBoost = Math.pow(currentOrbProgress, 1.35);
+        const liveYawSpeed = THREE.MathUtils.lerp(0.0195, 0.092, orbSpinBoost);
+        const shellYawSpeed = isMobileLayout ? 0.013 : 0.015;
         const idleYaw =
-          INITIAL_GLOBE_ROTATION.y + (rotationEnabled ? elapsed * THREE.MathUtils.lerp(0.0195, 0.092, orbSpinBoost) : 0);
+          INITIAL_GLOBE_ROTATION.y + (rotationEnabled ? elapsed * THREE.MathUtils.lerp(liveYawSpeed, shellYawSpeed, shellMode) : 0);
+        const livePitchAmplitude = THREE.MathUtils.lerp(0.003, 0.013, orbSpinBoost);
+        const shellPitchAmplitude = 0.0012;
         const idlePitch =
           INITIAL_GLOBE_ROTATION.x +
           (rotationEnabled
-            ? Math.sin(elapsed * THREE.MathUtils.lerp(0.28, 1.1, orbSpinBoost)) * THREE.MathUtils.lerp(0.003, 0.013, orbSpinBoost)
+            ? Math.sin(elapsed * THREE.MathUtils.lerp(0.28, 1.1, orbSpinBoost)) * THREE.MathUtils.lerp(livePitchAmplitude, shellPitchAmplitude, shellMode)
             : 0);
         globeRig.rotation.y = idleYaw + globeYaw;
         globeRig.rotation.x = THREE.MathUtils.clamp(idlePitch + globePitch, GLOBE_INTERACTION.minPitch, GLOBE_INTERACTION.maxPitch);
@@ -4633,10 +5030,15 @@ function LiveGlobeCanvas({
         if (heroFlight.actor && heroFlight.sourceEntry) {
           if (currentOrbProgress <= 0.025 && heroFlight.mode !== "ROUTE_IDLE") {
             resetHeroFlight();
-          } else if (autoRewindActive && heroFlight.mode !== "ROUTE_IDLE" && heroFlight.mode !== "HERO_RETURN") {
+          } else if (
+            shouldStartHeroReturn({
+              autoCompleteActive,
+              autoRewindActive,
+              manualReverseHoldActive,
+              heroMode: heroFlight.mode,
+            })
+          ) {
             rewindHeroReturnStartScrollProgress = Math.max(currentScrollProgress, 0.04);
-            startHeroReturn(elapsed);
-          } else if (!autoCompleteActive && !autoRewindActive && heroFlight.mode !== "ROUTE_IDLE" && heroFlight.mode !== "HERO_RETURN") {
             startHeroReturn(elapsed);
           } else if (autoCompleteActive && !autoRewindActive && heroFlight.mode === "ROUTE_IDLE") {
             startHeroFlight(elapsed);
@@ -4719,19 +5121,17 @@ function LiveGlobeCanvas({
             );
           } else if (heroFlight.mode === "HERO_RETURN" && heroFlight.returnCurve) {
             setHeroLaunchArcState(0, 0, 0);
-            const returnLinearProgress = autoRewindActive
-              ? THREE.MathUtils.clamp(
-                  1 - currentScrollProgress / Math.max(rewindHeroReturnStartScrollProgress, 0.001),
-                  0,
-                  1,
-                )
-              : THREE.MathUtils.clamp(
-                  (elapsed - heroFlight.returnStartTime) / HERO_RETURN_DURATION_SECONDS,
-                  0,
-                  1,
-                );
+            const returnLinearProgress = getHeroReturnLinearProgress({
+              autoRewindActive,
+              manualReverseHoldActive,
+              currentScrollProgress,
+              rewindStartScrollProgress: rewindHeroReturnStartScrollProgress,
+              elapsed,
+              returnStartTime: heroFlight.returnStartTime,
+              durationSeconds: HERO_RETURN_DURATION_SECONDS,
+            });
             const returnProgress = THREE.MathUtils.smootherstep(returnLinearProgress, 0, 1);
-            const acceleratedReturnProgress = autoRewindActive
+            const acceleratedReturnProgress = autoRewindActive || manualReverseHoldActive
               ? THREE.MathUtils.lerp(
                   returnProgress,
                   Math.pow(returnProgress, 1.16),
@@ -4773,24 +5173,28 @@ function LiveGlobeCanvas({
             setHeroLaunchArcState(0, 0, 0);
           }
         }
-        for (const entry of aircraftEntries) {
-          if (rotationEnabled) {
-            entry.progress = THREE.MathUtils.euclideanModulo(entry.progress + entry.config.speed * delta, 1);
-          }
-          applyAircraftPose(entry, entry.progress, camera, elapsed);
-          if (entry === heroFlight.sourceEntry && heroFlight.mode !== "ROUTE_IDLE") {
-            hideAircraftEntry(entry);
+        if (!shellModeActive) {
+          updateSupportAircraftAssignments(elapsed, delta, camera);
+          for (const entry of aircraftEntries) {
+            if (rotationEnabled) {
+              entry.progress = THREE.MathUtils.euclideanModulo(entry.progress + entry.config.speed * delta, 1);
+            }
+            applyAircraftPose(entry, entry.progress, camera, elapsed);
+            if (entry === heroFlight.sourceEntry && heroFlight.mode !== "ROUTE_IDLE") {
+              hideAircraftEntry(entry);
+            }
           }
         }
         if (cloudRig && rotationEnabled) {
-          cloudRig.rotation.y = elapsed * 0.0028;
-          cloudRig.rotation.x = Math.sin(elapsed * 0.09) * 0.005;
-          cloudRig.rotation.z = Math.cos(elapsed * 0.07) * 0.002;
+          const cloudDriftMix = 1 - shellMode;
+          cloudRig.rotation.y = elapsed * THREE.MathUtils.lerp(0.0012, 0.0028, cloudDriftMix);
+          cloudRig.rotation.x = Math.sin(elapsed * 0.09) * THREE.MathUtils.lerp(0.0012, 0.005, cloudDriftMix);
+          cloudRig.rotation.z = Math.cos(elapsed * 0.07) * THREE.MathUtils.lerp(0.0006, 0.002, cloudDriftMix);
           const cloudBase = cloudRig.getObjectByName("cloud-base");
           if (cloudBase) {
-            cloudBase.rotation.y = -elapsed * 0.0011;
-            cloudBase.rotation.x = Math.sin(elapsed * 0.12) * 0.006;
-            cloudBase.rotation.z = Math.cos(elapsed * 0.08) * 0.003;
+            cloudBase.rotation.y = -elapsed * THREE.MathUtils.lerp(0.00045, 0.0011, cloudDriftMix);
+            cloudBase.rotation.x = Math.sin(elapsed * 0.12) * THREE.MathUtils.lerp(0.001, 0.006, cloudDriftMix);
+            cloudBase.rotation.z = Math.cos(elapsed * 0.08) * THREE.MathUtils.lerp(0.0005, 0.003, cloudDriftMix);
           }
         }
       } else {
@@ -4799,10 +5203,12 @@ function LiveGlobeCanvas({
           INITIAL_GLOBE_ROTATION.y + globeYaw,
           INITIAL_GLOBE_ROTATION.z,
         );
-        for (const entry of aircraftEntries) {
-          applyAircraftPose(entry, entry.progress, camera, elapsed);
-          if (entry === heroFlight.sourceEntry && heroFlight.mode !== "ROUTE_IDLE") {
-            hideAircraftEntry(entry);
+        if (!shellModeActive) {
+          for (const entry of aircraftEntries) {
+            applyAircraftPose(entry, entry.progress, camera, elapsed);
+            if (entry === heroFlight.sourceEntry && heroFlight.mode !== "ROUTE_IDLE") {
+              hideAircraftEntry(entry);
+            }
           }
         }
         if (cloudRig) {
