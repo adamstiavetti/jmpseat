@@ -123,7 +123,7 @@ const smoothstep = (value: number, edge0: number, edge1: number) => {
 };
 
 const getGlassCardHiddenTransform = ({ isMobileLayout }: GlassCardLayoutArgs): GlassCardTransform => ({
-  x: isMobileLayout ? -0.045 : -0.06,
+  x: 0,
   y: isMobileLayout ? -1.34 : -1.42,
   z: isMobileLayout ? 0.72 : 0.8,
   scale: {
@@ -139,7 +139,7 @@ const getGlassCardHiddenTransform = ({ isMobileLayout }: GlassCardLayoutArgs): G
 });
 
 export const getGlassCardFinalTransform = ({ isMobileLayout }: GlassCardLayoutArgs): GlassCardTransform => ({
-  x: isMobileLayout ? -0.045 : -0.06,
+  x: 0,
   y: isMobileLayout ? 0.1 : 0.14,
   z: isMobileLayout ? 0.8 : 0.92,
   scale: {

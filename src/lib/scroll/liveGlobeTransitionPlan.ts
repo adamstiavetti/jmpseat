@@ -9,7 +9,6 @@ export type LiveGlobeTransitionShotState = {
   cameraTravelProgress: number;
   cameraLiftMix: number;
   cameraDriftX: number;
-  terminalCenteringProgress: number;
   collapseProgress: number;
   globeScaleMix: number;
   globeLiftMix: number;
@@ -82,17 +81,15 @@ export const getLiveGlobeTransitionShotState = ({
     LIVE_GLOBE_TRANSITION_PHASES.backgroundTakeoverEnd,
     clampedProgress,
   );
-  const terminalCenteringProgress = smoothstep(0.82, 1, clampedProgress);
   const globeScaleMix = collapseProgress;
   const globeLiftMix = lerp(cameraTravelProgress * 0.16, 1, collapseProgress);
   const cameraLiftMix = cameraTravelProgress;
-  const cameraDriftX = lerp(0, layout === "mobile" ? -0.05 : -0.08, smoothstep(0.22, 0.76, clampedProgress));
+  const cameraDriftX = lerp(0, layout === "mobile" ? -0.08 : -0.14, smoothstep(0.22, 0.76, clampedProgress));
 
   return {
     cameraTravelProgress,
     cameraLiftMix,
     cameraDriftX,
-    terminalCenteringProgress,
     collapseProgress,
     globeScaleMix,
     globeLiftMix,

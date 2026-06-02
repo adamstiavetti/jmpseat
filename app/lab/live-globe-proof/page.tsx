@@ -3181,11 +3181,7 @@ function LiveGlobeCanvas({
       );
       globeRig.position.set(0, baseGlobeY + globeLift, 0);
       globeRig.scale.setScalar(baseGlobeScale * settledScale);
-      camera.position.x = THREE.MathUtils.lerp(
-        transitionShot.cameraDriftX,
-        0,
-        transitionShot.terminalCenteringProgress,
-      );
+      camera.position.x = transitionShot.cameraDriftX;
       camera.position.z = THREE.MathUtils.lerp(cameraZ, cameraEndZ, cameraTravel);
       camera.position.y = (isMobileLayout ? 0.01 : 0.03) + THREE.MathUtils.lerp(0, isMobileLayout ? 0.22 : 0.28, transitionShot.cameraLiftMix);
       camera.rotation.x = THREE.MathUtils.lerp(isMobileLayout ? -0.025 : -0.018, isMobileLayout ? -0.082 : -0.072, cameraTravel);
@@ -4174,7 +4170,6 @@ function LiveGlobeCanvas({
     const getHeroJourneyStartPoint = () => {
       const glassCardFinalWorldMatrix = glassCardLoaded && glassCardRoot ? getGlassCardFinalMatrix() : null;
       if (glassCardFinalWorldMatrix) {
-        const glassCardFinalTransform = getGlassCardFinalTransform({ isMobileLayout });
         glassCardEntryWorldPoint.copy(glassCardEntryLocalPoint).applyMatrix4(glassCardFinalWorldMatrix);
         const recoveryPath = getGlassCardRecoveryPath({
           entryPoint: {
@@ -4190,11 +4185,7 @@ function LiveGlobeCanvas({
           recoveryPath.reentryTopPoint.y,
           recoveryPath.reentryTopPoint.z,
         );
-        launchTargetPoint.x = THREE.MathUtils.lerp(
-          launchTargetPoint.x,
-          glassCardFinalTransform.x * 0.9,
-          0.72,
-        );
+        launchTargetPoint.x = THREE.MathUtils.lerp(launchTargetPoint.x, 0, 0.72);
         launchTargetPoint.y += isMobileLayout ? 0.03 : 0.02;
         launchTargetPoint.z += isMobileLayout ? 0.04 : 0.03;
         return launchTargetPoint;

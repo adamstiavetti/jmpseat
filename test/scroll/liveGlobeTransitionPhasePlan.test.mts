@@ -59,18 +59,3 @@ test("camera travel becomes the main transition driver before full reveal", () =
   assert.ok(traversalShot.cameraDriftX < 0);
   assert.ok(traversalShot.cameraLiftMix > earlyShot.cameraLiftMix);
 });
-
-test("terminal globe pose recenters the camera after the drift-heavy travel", () => {
-  const traversalShot = getLiveGlobeTransitionShotState({
-    progress: 0.74,
-    layout: "desktop",
-  });
-  const finalShot = getLiveGlobeTransitionShotState({
-    progress: 1,
-    layout: "desktop",
-  });
-
-  assert.ok(traversalShot.cameraDriftX < -0.035);
-  assert.ok(finalShot.cameraDriftX < -0.02);
-  assert.ok(finalShot.terminalCenteringProgress > 0.95);
-});
