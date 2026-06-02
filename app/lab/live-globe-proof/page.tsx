@@ -2764,6 +2764,7 @@ function WaitlistSceneTransition({
       const hazeRise = transitionShot.occlusionProgress;
       const hazeFall = transitionShot.revealProgress;
       const underlayReveal = prefersReducedMotion ? transitionShot.revealProgress : smoothstep(0.62, 0.92, p);
+      const runwayAxisAlign = smoothstep(0.74, 0.98, p);
       const hazeOpacity = prefersReducedMotion
         ? lerp(0.08, 0.16, smoothstep(0.56, 0.86, p))
         : lerp(0.12, 0.68, hazeRise * (1 - hazeFall * 0.22)) + effectiveEarlyOnrampFactor * 0.06;
@@ -2783,23 +2784,35 @@ function WaitlistSceneTransition({
       camera.rotation.x = prefersReducedMotion ? 0 : lerp(-0.018, mobile ? 0.052 : 0.036, transitionShot.cameraTravelProgress);
 
       oldPlane.position.y = lerp(0, 0.08, phase1);
-      newPlane.position.y = lerp(-0.3, 0, underlayReveal);
+      newPlane.position.y = lerp(-0.34, 0, underlayReveal);
       oldMaterial.opacity = oldSceneOpacity;
       newMaterial.opacity = newSceneOpacity;
       starMaterial.opacity = lerp(0.45, 0.72, phase1) * (1 - newSceneOpacity * 0.12);
       cyanNodeMaterial.opacity = WAITLIST_SCROLL_TRANSITION.gridOpacity * gridOpacity;
       amberNodeMaterial.opacity = 0.62 * WAITLIST_SCROLL_TRANSITION.gridOpacity * gridOpacity;
-      runwayMaterial.opacity = 0.08 + underlayReveal * 0.14 + gridOpacity * 0.18;
+      runwayMaterial.opacity = 0.06 + underlayReveal * 0.12 + gridOpacity * 0.16;
       starfield.visible = starsEnabled;
       networkGroup.visible = gridEnabled;
       hazePlane.visible = hazeEnabled;
-      networkGroup.position.x = transitionShot.cameraDriftX * -0.42;
+      networkGroup.position.x = lerp(
+        transitionShot.cameraDriftX * -0.42,
+        mobile ? 0.01 : 0.03,
+        runwayAxisAlign,
+      );
       networkGroup.position.z = lerp(-7.4, -5.35, underlayReveal);
       networkGroup.position.y = lerp(-2.28, -1.94, smoothstep(0.7, 1, p));
+      networkGroup.rotation.x = lerp(-1.28, -1.18, runwayAxisAlign);
       starfield.position.y = -transitionShot.cameraTravelProgress * 0.32;
       starfield.position.z = transitionShot.cameraTravelProgress * 1.08;
       oldPlane.position.x = transitionShot.cameraDriftX * -0.08;
-      newPlane.position.x = transitionShot.cameraDriftX * -0.16;
+      newPlane.position.x = lerp(transitionShot.cameraDriftX * -0.16, mobile ? 0.01 : 0.02, runwayAxisAlign);
+      runwayPlane.position.x = lerp(0, mobile ? 0.03 : 0.05, runwayAxisAlign);
+      runwayPlane.position.y = lerp(0, -0.04, runwayAxisAlign);
+      runwayPlane.scale.set(
+        lerp(0.86, 1, underlayReveal),
+        lerp(0.82, 1, underlayReveal),
+        1,
+      );
 
       hazeMaterial.uniforms.uTime.value = now / 1000;
       hazeMaterial.uniforms.uProgress.value = p;

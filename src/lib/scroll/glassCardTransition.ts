@@ -123,25 +123,25 @@ const smoothstep = (value: number, edge0: number, edge1: number) => {
 };
 
 const getGlassCardHiddenTransform = ({ isMobileLayout }: GlassCardLayoutArgs): GlassCardTransform => ({
-  x: isMobileLayout ? 0.03 : 0.06,
-  y: isMobileLayout ? -1.72 : -1.84,
-  z: isMobileLayout ? 0.92 : 1.04,
+  x: isMobileLayout ? 0.01 : 0.03,
+  y: isMobileLayout ? -1.34 : -1.42,
+  z: isMobileLayout ? 0.72 : 0.8,
   scale: {
-    x: isMobileLayout ? 0.82 : 0.94,
-    y: isMobileLayout ? 0.82 : 0.94,
-    z: isMobileLayout ? 0.92 : 1.04,
+    x: isMobileLayout ? 0.88 : 0.98,
+    y: isMobileLayout ? 0.88 : 0.98,
+    z: isMobileLayout ? 1 : 1.08,
   },
   rotation: {
-    x: Math.PI / 2 - 0.16,
-    y: isMobileLayout ? 0.52 : 0.44,
-    z: isMobileLayout ? -0.38 : -0.3,
+    x: Math.PI / 2 - 0.1,
+    y: isMobileLayout ? 0.18 : 0.14,
+    z: isMobileLayout ? -0.18 : -0.12,
   },
 });
 
 export const getGlassCardFinalTransform = ({ isMobileLayout }: GlassCardLayoutArgs): GlassCardTransform => ({
-  x: isMobileLayout ? 0.02 : 0.05,
-  y: isMobileLayout ? 0.08 : 0.12,
-  z: isMobileLayout ? 0.78 : 0.9,
+  x: isMobileLayout ? 0.01 : 0.03,
+  y: isMobileLayout ? 0.1 : 0.14,
+  z: isMobileLayout ? 0.8 : 0.92,
   scale: {
     x: isMobileLayout ? 1.22 : 1.34,
     y: isMobileLayout ? 1.22 : 1.34,

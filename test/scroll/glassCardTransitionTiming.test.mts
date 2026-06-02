@@ -24,7 +24,7 @@ test("glass card only becomes materially present near the late reveal window", (
   });
 
   assert.ok(midState.settleProgress < 0.12);
-  assert.ok(midState.y < -0.6);
+  assert.ok(midState.y < -0.5);
   assert.ok(lateState.presence > 0.9);
   assert.ok(lateState.settleProgress > 0.9);
 });
