@@ -10,6 +10,16 @@ import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
 import { ShaderPass } from "three/examples/jsm/postprocessing/ShaderPass.js";
 import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass.js";
 
+import { PerfHud } from "@/src/components/performance/PerfHud";
+import {
+  type QualityTier,
+  type ScrollPhase,
+  getWebglPerfDebugFlagsSnapshot,
+  initWebglPerfMonitor,
+  reportWebglFrame,
+  setWebglPerfSceneState,
+  subscribeWebglPerfDebugFlags,
+} from "@/src/lib/performance/webglPerfMonitor";
 import styles from "./page.module.css";
 
 type TextureSetName = "v2" | "v3" | "v4" | "cityrim" | "polar" | "atlantic" | "europe" | "cityhalo";
@@ -17,6 +27,7 @@ type GradeName = "regressed" | "recovered" | "cityrim" | "polar" | "atlantic" | 
 type RoutesMode = "on" | "off";
 type AircraftMode = "on" | "off";
 type ToggleMode = "on" | "off";
+type ForcedQuality = "mobile" | "desktop" | null;
 
 type TextureSet = {
   day: string;
@@ -768,13 +779,50 @@ export default function LiveGlobeProofPage() {
     atmosphereEnabled,
     cityLightsEnabled,
     diagnosticsEnabled,
+    perfQueryEnabled,
   } = useLiveGlobeOverrides();
+  const perfDebugFlags = useSyncExternalStore(
+    subscribeWebglPerfDebugFlags,
+    getWebglPerfDebugFlagsSnapshot,
+    getWebglPerfDebugFlagsSnapshot,
+  );
+  const [perfStorageEnabled] = useState(() =>
+    typeof window !== "undefined" && window.localStorage.getItem("DH_PERF_HUD") === "1",
+  );
+  const perfEnvEnabled = process.env.NODE_ENV !== "production" && process.env.NEXT_PUBLIC_DH_PERF_HUD === "1";
+  const perfEnabled = perfQueryEnabled || perfStorageEnabled || perfEnvEnabled;
+  const forcedQuality: ForcedQuality = perfDebugFlags.forceMobileQuality
+    ? "mobile"
+    : perfDebugFlags.forceDesktopQuality
+      ? "desktop"
+      : null;
+  const effectiveGlobeEnabled = globeEnabled && (!perfEnabled || perfDebugFlags.globeVisible);
+  const effectivePostprocessingEnabled = postprocessingEnabled && (!perfEnabled || perfDebugFlags.postprocessing);
+  const effectiveStarsEnabled = starsEnabled && (!perfEnabled || perfDebugFlags.starfield);
+  const effectiveHazeEnabled = hazeEnabled && (!perfEnabled || perfDebugFlags.haze);
+  const effectiveGridEnabled = gridEnabled && (!perfEnabled || perfDebugFlags.grid);
+  const effectiveBloomEnabled = !perfEnabled || perfDebugFlags.bloom;
+  const effectiveFrostEnabled = !perfEnabled || perfDebugFlags.frost;
+  const effectiveChromaticEnabled = !perfEnabled || perfDebugFlags.chromatic;
+  const effectiveRoutesEnabled = routesMode === "on" && (!perfEnabled || perfDebugFlags.globeRoutes);
+  const effectiveRotationEnabled = rotationEnabled && (!perfEnabled || perfDebugFlags.globeRotation);
+  const effectiveAtmosphereEnabled = atmosphereEnabled && (!perfEnabled || perfDebugFlags.globeAtmosphere);
+  const effectiveCityLightsEnabled = cityLightsEnabled && (!perfEnabled || perfDebugFlags.globeCities);
   const isPageReady = isGlobeReady && areUiAssetsReady;
   const isInteractionReady = isHeroVisible && isScrollUnlocked;
 
   useEffect(() => {
     interactionReadyRef.current = isInteractionReady;
   }, [isInteractionReady]);
+
+  useEffect(() => {
+    initWebglPerfMonitor(perfEnabled);
+    if (perfEnabled) {
+      window.console.info(
+        "Deadhead Club Perf HUD enabled.\\nUse:\\nwindow.DH_PERF.summary()\\nwindow.DH_PERF.snapshot()\\nwindow.DH_PERF.setDebugFlag(\"postprocessing\", false)",
+      );
+    }
+  }, [perfEnabled]);
 
   useEffect(() => {
     if (loaderStartRef.current === null) {
@@ -922,6 +970,8 @@ export default function LiveGlobeProofPage() {
     let hasUserScrollIntent = false;
     let stableViewportWidth = window.innerWidth;
     let stableViewportHeight = Math.max(window.innerHeight, window.visualViewport?.height ?? 0, 1);
+    let sceneOnscreen = true;
+    let pageVisible = !document.hidden;
     let lastUserVelocitySampleMs = performance.now();
     let lastUserVelocitySampleProgress = 0;
     let smoothedUserProgressVelocity = 0;
@@ -1015,6 +1065,42 @@ export default function LiveGlobeProofPage() {
       page.style.setProperty("--sucked-word-opacity", `${Math.max(0, absorbProgress)}`);
       page.style.setProperty("--scroll-cue-opacity", "1");
       orbProgressRef.current = orbProgress;
+      if (perfEnabled) {
+        let scrollPhase: ScrollPhase = "idle";
+        if (!sceneOnscreen || !pageVisible) {
+          scrollPhase = "offscreen";
+        } else if (clampedProgress < 0.24) {
+          scrollPhase = "hero";
+        } else if (clampedProgress < 0.7) {
+          scrollPhase = "transition";
+        } else if (clampedProgress < 0.995) {
+          scrollPhase = "chapter";
+        }
+        const debugFlags = getWebglPerfDebugFlagsSnapshot();
+        const mobileQuality = forcedQuality === "mobile" || (forcedQuality !== "desktop" && isMobileViewport);
+        const qualityTier: QualityTier = prefersReducedMotion ? "reduced-motion" : mobileQuality ? "mobile" : "desktop";
+        setWebglPerfSceneState({
+          scrollProgress: clampedProgress,
+          scrollPhase,
+          qualityTier,
+          postprocessingEnabled: effectivePostprocessingEnabled,
+          bloomEnabled: effectivePostprocessingEnabled && effectiveBloomEnabled,
+          frostEnabled: effectivePostprocessingEnabled && effectiveFrostEnabled,
+          chromaticEnabled: effectivePostprocessingEnabled && effectiveChromaticEnabled,
+          globeVisible: effectiveGlobeEnabled,
+          globeRotating: effectiveRotationEnabled && debugFlags.globeRotation,
+          globeAtmosphereEnabled: effectiveAtmosphereEnabled,
+          globeRoutesEnabled: effectiveRoutesEnabled,
+          globeCityLightsEnabled: effectiveCityLightsEnabled,
+          starfieldEnabled: effectiveStarsEnabled,
+          gridEnabled: effectiveGridEnabled,
+          hazeEnabled: effectiveHazeEnabled,
+          renderLoopActive: autoCompleteTriggered || autoRewindTriggered || clampedProgress > 0.001,
+          renderLoopPaused: false,
+          pageVisible,
+          sceneOnscreen,
+        });
+      }
     };
 
     const getTransitionDistance = () => {
@@ -1323,6 +1409,19 @@ export default function LiveGlobeProofPage() {
       applyVirtualScrollDelta(event.deltaY);
     };
 
+    const visibilityHandler = () => {
+      pageVisible = !document.hidden;
+    };
+    document.addEventListener("visibilitychange", visibilityHandler);
+    const intersectionObserver = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        sceneOnscreen = Boolean(entry?.isIntersecting);
+      },
+      { threshold: 0.05 },
+    );
+    intersectionObserver.observe(page);
+
     computeTargetProgress();
     smoothedProgress = targetProgress;
     applyProgressStyles(smoothedProgress, getViewportHeight());
@@ -1353,8 +1452,25 @@ export default function LiveGlobeProofPage() {
       window.removeEventListener("wheel", handleWheel);
       window.removeEventListener("resize", handleViewportResize);
       window.removeEventListener("orientationchange", handleOrientationChange);
+      document.removeEventListener("visibilitychange", visibilityHandler);
+      intersectionObserver.disconnect();
     };
-  }, []);
+  }, [
+    effectiveAtmosphereEnabled,
+    effectiveBloomEnabled,
+    effectiveChromaticEnabled,
+    effectiveCityLightsEnabled,
+    effectiveFrostEnabled,
+    effectiveGlobeEnabled,
+    effectiveGridEnabled,
+    effectiveHazeEnabled,
+    effectivePostprocessingEnabled,
+    effectiveRotationEnabled,
+    effectiveRoutesEnabled,
+    effectiveStarsEnabled,
+    forcedQuality,
+    perfEnabled,
+  ]);
 
   const pageClassName = [
     styles.page,
@@ -1373,11 +1489,16 @@ export default function LiveGlobeProofPage() {
             <WaitlistSceneTransition
               scrollProgressRef={scrollProgressRef}
               firstScrollIntentRef={firstScrollIntentRef}
-              postprocessingEnabled={postprocessingEnabled}
-              starsEnabled={starsEnabled}
-              hazeEnabled={hazeEnabled}
-              gridEnabled={gridEnabled}
+              postprocessingEnabled={effectivePostprocessingEnabled}
+              starsEnabled={effectiveStarsEnabled}
+              hazeEnabled={effectiveHazeEnabled}
+              gridEnabled={effectiveGridEnabled}
               diagnosticsEnabled={diagnosticsEnabled}
+              bloomEnabled={effectiveBloomEnabled}
+              frostEnabled={effectiveFrostEnabled}
+              chromaticEnabled={effectiveChromaticEnabled}
+              perfEnabled={perfEnabled}
+              forcedQuality={forcedQuality}
             />
             <div className={styles.finalBackgroundImage} aria-hidden="true" />
           </div>
@@ -1398,18 +1519,20 @@ export default function LiveGlobeProofPage() {
               onReady={handleGlobeReady}
               textureSet={TEXTURE_SETS[textureSetName]}
               grade={GRADE_CONFIGS[gradeName]}
-              globeEnabled={globeEnabled}
-              routesEnabled={routesMode === "on"}
+              globeEnabled={effectiveGlobeEnabled}
+              routesEnabled={effectiveRoutesEnabled}
               aircraftEnabled={aircraftMode === "on"}
-              rotationEnabled={rotationEnabled}
-              atmosphereEnabled={atmosphereEnabled}
-              cityLightsEnabled={cityLightsEnabled}
+              rotationEnabled={effectiveRotationEnabled}
+              atmosphereEnabled={effectiveAtmosphereEnabled}
+              cityLightsEnabled={effectiveCityLightsEnabled}
               diagnosticsEnabled={diagnosticsEnabled}
               scrollProgressRef={scrollProgressRef}
               orbProgressRef={orbProgressRef}
               autoCompleteActiveRef={autoCompleteActiveRef}
               autoRewindActiveRef={autoRewindActiveRef}
               materializeSignalRef={materializeSignalRef}
+              perfEnabled={perfEnabled}
+              forcedQuality={forcedQuality}
             />
           </div>
           <div className={styles.wordmark} aria-hidden="true">
@@ -1470,6 +1593,7 @@ export default function LiveGlobeProofPage() {
           <div className={styles.loadingLine} />
         </div>
         <h1 className={styles.srOnly}>Live CGTrader Earth globe proof</h1>
+        <PerfHud enabled={perfEnabled} />
       </section>
     </main>
   );
@@ -1566,6 +1690,7 @@ function useLiveGlobeOverrides() {
     atmosphereEnabled: getToggleMode(params.get("atmosphere")) === "on",
     cityLightsEnabled: getToggleMode(params.get("cities")) === "on",
     diagnosticsEnabled: getToggleMode(params.get("diagnostics"), "off") === "on",
+    perfQueryEnabled: getToggleMode(params.get("perf"), "off") === "on",
   };
 }
 
@@ -1718,6 +1843,11 @@ function WaitlistSceneTransition({
   hazeEnabled,
   gridEnabled,
   diagnosticsEnabled,
+  bloomEnabled,
+  frostEnabled,
+  chromaticEnabled,
+  perfEnabled,
+  forcedQuality,
 }: {
   scrollProgressRef: React.MutableRefObject<number>;
   firstScrollIntentRef: React.MutableRefObject<boolean>;
@@ -1726,6 +1856,11 @@ function WaitlistSceneTransition({
   hazeEnabled: boolean;
   gridEnabled: boolean;
   diagnosticsEnabled: boolean;
+  bloomEnabled: boolean;
+  frostEnabled: boolean;
+  chromaticEnabled: boolean;
+  perfEnabled: boolean;
+  forcedQuality: ForcedQuality;
 }) {
   const mountRef = useRef<HTMLDivElement | null>(null);
 
@@ -1738,7 +1873,15 @@ function WaitlistSceneTransition({
     gsap.registerPlugin(ScrollTrigger);
 
     const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const isMobileViewport = () => window.matchMedia("(max-width: 760px)").matches;
+    const isMobileViewport = () => {
+      if (forcedQuality === "mobile") {
+        return true;
+      }
+      if (forcedQuality === "desktop") {
+        return false;
+      }
+      return window.matchMedia("(max-width: 760px)").matches;
+    };
     const scene = new THREE.Scene();
     scene.fog = new THREE.FogExp2(0x020712, 0.014);
 
@@ -1764,7 +1907,7 @@ function WaitlistSceneTransition({
 
     const chromaticPass = new ShaderPass(CHROMATIC_ABERRATION_SHADER);
     composer.addPass(chromaticPass);
-    bloomPass.enabled = postprocessingEnabled;
+    bloomPass.enabled = postprocessingEnabled && bloomEnabled;
     frostPass.enabled = false;
     chromaticPass.enabled = false;
 
@@ -1947,6 +2090,9 @@ function WaitlistSceneTransition({
     let lastTime = performance.now();
     let texturesReady = false;
     let renderedOnce = false;
+    let sceneOnscreen = true;
+    let pageVisible = !document.hidden;
+    let lastManualRenderNonce = 0;
 
     const sizeBackgroundPlanes = () => {
       const rect = mount.getBoundingClientRect();
@@ -1999,6 +2145,13 @@ function WaitlistSceneTransition({
     sizeBackgroundPlanes();
     window.addEventListener("resize", sizeBackgroundPlanes);
     window.addEventListener("orientationchange", sizeBackgroundPlanes);
+    const intersectionObserver = new IntersectionObserver(
+      (entries) => {
+        sceneOnscreen = Boolean(entries[0]?.isIntersecting);
+      },
+      { threshold: 0.05 },
+    );
+    intersectionObserver.observe(mount);
 
     Promise.all([
       loadTexture("/cinematic/backgrounds/boarding-portal-entry-background-transition.png"),
@@ -2036,7 +2189,81 @@ function WaitlistSceneTransition({
         return;
       }
 
+      const debugFlags = perfEnabled ? getWebglPerfDebugFlagsSnapshot() : null;
+      pageVisible = !document.hidden;
       if (document.hidden) {
+        lastTime = now;
+        if (perfEnabled) {
+          reportWebglFrame({
+            source: "transition",
+            now,
+            frameMs: 0,
+            renderLoopActive: false,
+            renderLoopPaused: true,
+            pageVisible: false,
+            sceneOnscreen,
+            scrollProgress: clamp01(smoothedProgress),
+            scrollPhase: "offscreen",
+            qualityTier: prefersReducedMotion ? "reduced-motion" : isMobileViewport() ? "mobile" : "desktop",
+            postprocessingScale: isMobileViewport() ? WAITLIST_PERFORMANCE.mobileTransitionPostScale : WAITLIST_PERFORMANCE.desktopTransitionPostScale,
+            activePostprocessingPasses: [],
+            postprocessingEnabled,
+            bloomEnabled: postprocessingEnabled && bloomEnabled,
+            frostEnabled: false,
+            chromaticEnabled: false,
+            globeVisible: Boolean(debugFlags?.globeVisible ?? true),
+            globeRotating: Boolean(debugFlags?.globeRotation ?? true),
+            globeAtmosphereEnabled: Boolean(debugFlags?.globeAtmosphere ?? true),
+            globeRoutesEnabled: Boolean(debugFlags?.globeRoutes ?? true),
+            globeCityLightsEnabled: Boolean(debugFlags?.globeCities ?? true),
+            starfieldEnabled: Boolean(debugFlags?.starfield ?? true),
+            gridEnabled: Boolean(debugFlags?.grid ?? true),
+            hazeEnabled: Boolean(debugFlags?.haze ?? true),
+            renderer,
+            canvas: renderer.domElement,
+          });
+        }
+        frame = window.requestAnimationFrame(render);
+        return;
+      }
+
+      const pauseRequested = Boolean(perfEnabled && debugFlags?.pauseRenderLoop);
+      const manualRenderNonce = Number(debugFlags?.manualRenderNonce ?? 0);
+      const manualRenderRequested = pauseRequested && manualRenderNonce !== lastManualRenderNonce;
+      if (manualRenderRequested) {
+        lastManualRenderNonce = manualRenderNonce;
+      }
+      if (pauseRequested && !manualRenderRequested) {
+        if (perfEnabled) {
+          reportWebglFrame({
+            source: "transition",
+            now,
+            frameMs: 0,
+            renderLoopActive: false,
+            renderLoopPaused: true,
+            pageVisible,
+            sceneOnscreen,
+            scrollProgress: clamp01(smoothedProgress),
+            scrollPhase: sceneOnscreen ? "idle" : "offscreen",
+            qualityTier: prefersReducedMotion ? "reduced-motion" : isMobileViewport() ? "mobile" : "desktop",
+            postprocessingScale: isMobileViewport() ? WAITLIST_PERFORMANCE.mobileTransitionPostScale : WAITLIST_PERFORMANCE.desktopTransitionPostScale,
+            activePostprocessingPasses: [],
+            postprocessingEnabled,
+            bloomEnabled: postprocessingEnabled && bloomEnabled,
+            frostEnabled: false,
+            chromaticEnabled: false,
+            globeVisible: Boolean(debugFlags?.globeVisible ?? true),
+            globeRotating: Boolean(debugFlags?.globeRotation ?? true),
+            globeAtmosphereEnabled: Boolean(debugFlags?.globeAtmosphere ?? true),
+            globeRoutesEnabled: Boolean(debugFlags?.globeRoutes ?? true),
+            globeCityLightsEnabled: Boolean(debugFlags?.globeCities ?? true),
+            starfieldEnabled: Boolean(debugFlags?.starfield ?? true),
+            gridEnabled: Boolean(debugFlags?.grid ?? true),
+            hazeEnabled: Boolean(debugFlags?.haze ?? true),
+            renderer,
+            canvas: renderer.domElement,
+          });
+        }
         lastTime = now;
         frame = window.requestAnimationFrame(render);
         return;
@@ -2100,17 +2327,53 @@ function WaitlistSceneTransition({
       bloomPass.strength = prefersReducedMotion ? 0.28 : lerp(mobile ? 0.22 : 0.35, mobile ? 0.42 : 0.85, bell(p, 0.56, 0.34));
       bloomPass.radius = 0.35;
       bloomPass.threshold = 0.15;
-      frostPass.enabled = postprocessingEnabled && frostPeak > 0.018;
-      chromaticPass.enabled = postprocessingEnabled && chromaPeak > 0.018;
-      bloomPass.enabled = postprocessingEnabled && p > 0.001 && p < 0.995;
+      frostPass.enabled = postprocessingEnabled && frostEnabled && frostPeak > 0.018;
+      chromaticPass.enabled = postprocessingEnabled && chromaticEnabled && chromaPeak > 0.018;
+      bloomPass.enabled = postprocessingEnabled && bloomEnabled && p > 0.001 && p < 0.995;
       if (scene.fog instanceof THREE.FogExp2) {
         scene.fog.density = prefersReducedMotion ? 0.008 : 0.012 + hazeOpacity * 0.028;
       }
 
       const transitionChanging = Math.abs(smoothedProgress - targetProgress) > 0.0007 || (p > 0.001 && p < 0.999);
+      const activePasses = [
+        bloomPass.enabled ? "bloom" : "",
+        frostPass.enabled ? "frost" : "",
+        chromaticPass.enabled ? "chromatic" : "",
+      ].filter(Boolean);
       if (texturesReady && (!renderedOnce || transitionChanging)) {
         composer.render();
         renderedOnce = true;
+      }
+      if (perfEnabled) {
+        const scrollPhase: ScrollPhase = !sceneOnscreen ? "offscreen" : p < 0.24 ? "hero" : p < 0.7 ? "transition" : p < 0.995 ? "chapter" : "idle";
+        reportWebglFrame({
+          source: "transition",
+          now,
+          frameMs: delta * 1000,
+          renderLoopActive: transitionChanging,
+          renderLoopPaused: pauseRequested && !manualRenderRequested,
+          pageVisible,
+          sceneOnscreen,
+          scrollProgress: p,
+          scrollPhase,
+          qualityTier: prefersReducedMotion ? "reduced-motion" : mobile ? "mobile" : "desktop",
+          postprocessingScale: mobile ? WAITLIST_PERFORMANCE.mobileTransitionPostScale : WAITLIST_PERFORMANCE.desktopTransitionPostScale,
+          activePostprocessingPasses: activePasses,
+          postprocessingEnabled,
+          bloomEnabled: bloomPass.enabled,
+          frostEnabled: frostPass.enabled,
+          chromaticEnabled: chromaticPass.enabled,
+          globeVisible: Boolean(debugFlags?.globeVisible ?? true),
+          globeRotating: Boolean(debugFlags?.globeRotation ?? true),
+          globeAtmosphereEnabled: Boolean(debugFlags?.globeAtmosphere ?? true),
+          globeRoutesEnabled: Boolean(debugFlags?.globeRoutes ?? true),
+          globeCityLightsEnabled: Boolean(debugFlags?.globeCities ?? true),
+          starfieldEnabled: starsEnabled,
+          gridEnabled: gridEnabled,
+          hazeEnabled: hazeEnabled,
+          renderer,
+          canvas: renderer.domElement,
+        });
       }
       frame = window.requestAnimationFrame(render);
     };
@@ -2122,6 +2385,7 @@ function WaitlistSceneTransition({
       scrollTrigger.kill();
       window.removeEventListener("resize", sizeBackgroundPlanes);
       window.removeEventListener("orientationchange", sizeBackgroundPlanes);
+      intersectionObserver.disconnect();
       if (frame) {
         window.cancelAnimationFrame(frame);
       }
@@ -2139,9 +2403,14 @@ function WaitlistSceneTransition({
       mount.removeChild(renderer.domElement);
     };
   }, [
+    bloomEnabled,
+    chromaticEnabled,
     scrollProgressRef,
     firstScrollIntentRef,
+    forcedQuality,
+    frostEnabled,
     postprocessingEnabled,
+    perfEnabled,
     starsEnabled,
     hazeEnabled,
     gridEnabled,
@@ -2167,6 +2436,8 @@ function LiveGlobeCanvas({
   autoCompleteActiveRef,
   autoRewindActiveRef,
   materializeSignalRef,
+  perfEnabled,
+  forcedQuality,
 }: {
   onReady: () => void;
   textureSet: TextureSet;
@@ -2183,6 +2454,8 @@ function LiveGlobeCanvas({
   autoCompleteActiveRef: React.MutableRefObject<boolean>;
   autoRewindActiveRef: React.MutableRefObject<boolean>;
   materializeSignalRef: React.MutableRefObject<number>;
+  perfEnabled: boolean;
+  forcedQuality: ForcedQuality;
 }) {
   const mountRef = useRef<HTMLDivElement | null>(null);
 
@@ -2221,6 +2494,8 @@ function LiveGlobeCanvas({
     let baseGlobeY = 0;
     let baseGlobeScale = 1;
     let isMobileLayout = false;
+    let sceneOnscreen = true;
+    let lastManualRenderNonce = 0;
     let currentScrollProgress = 0;
     let currentOrbProgress = 0;
     let rewindHeroReturnStartScrollProgress = 1;
@@ -2266,8 +2541,19 @@ function LiveGlobeCanvas({
     let lastRenderTime = 0;
     let visibilityPaused = false;
     let diagnosticsLogged = false;
+    let loopActiveState = false;
+    const resolveMobileLayout = (width: number) => {
+      if (forcedQuality === "mobile") {
+        return true;
+      }
+      if (forcedQuality === "desktop") {
+        return false;
+      }
+      return width < 760;
+    };
     const getTargetFrameInterval = () => {
       if (!isMobileLayout) {
+        loopActiveState = true;
         return 1000 / WAITLIST_PERFORMANCE.desktopFrameRate;
       }
 
@@ -2284,11 +2570,12 @@ function LiveGlobeCanvas({
         aircraftTransitionActive ||
         autoCompleteActiveRef.current ||
         autoRewindActiveRef.current;
+      loopActiveState = active;
       return 1000 / (active ? WAITLIST_PERFORMANCE.mobileActiveFrameRate : WAITLIST_PERFORMANCE.mobileIdleFrameRate);
     };
     const getPixelRatioBounds = (width: number) => {
       const devicePixelRatio = window.devicePixelRatio || 1;
-      const isMobile = width < 760;
+      const isMobile = resolveMobileLayout(width);
       const lowMobile = isMobile && (width <= 520 || devicePixelRatio > 2.6);
       const max = isMobile
         ? Math.min(devicePixelRatio, lowMobile ? WAITLIST_PERFORMANCE.lowMobileGlobeMaxPixelRatio : WAITLIST_PERFORMANCE.mobileGlobeMaxPixelRatio)
@@ -2356,7 +2643,7 @@ function LiveGlobeCanvas({
       }
     };
     const initialBounds = mount.getBoundingClientRect();
-    isMobileLayout = initialBounds.width < 760;
+    isMobileLayout = resolveMobileLayout(initialBounds.width);
     updatePixelRatio(initialBounds.width, true);
     mount.appendChild(renderer.domElement);
     renderer.domElement.dataset.globeInteraction = "true";
@@ -4064,7 +4351,7 @@ function LiveGlobeCanvas({
       camera.aspect = rect.width / rect.height;
       camera.updateProjectionMatrix();
 
-      isMobileLayout = rect.width < 760;
+      isMobileLayout = resolveMobileLayout(rect.width);
       const cameraZ = isMobileLayout ? WAITLIST_SCROLL_TRANSITION.cameraStartZ : WAITLIST_SCROLL_TRANSITION.cameraStartZ - 0.2;
       const visibleHeight = 2 * cameraZ * Math.tan(THREE.MathUtils.degToRad(camera.fov * 0.5));
       const visibleWidth = visibleHeight * camera.aspect;
@@ -4192,9 +4479,46 @@ function LiveGlobeCanvas({
     renderer.domElement.addEventListener("lostpointercapture", handlePointerCancel);
 
     const animate = (now = performance.now()) => {
+      const debugFlags = perfEnabled ? getWebglPerfDebugFlagsSnapshot() : null;
+      const pauseRequested = Boolean(perfEnabled && debugFlags?.pauseRenderLoop);
+      const manualRenderNonce = Number(debugFlags?.manualRenderNonce ?? 0);
+      const manualRenderRequested = pauseRequested && manualRenderNonce !== lastManualRenderNonce;
+      if (manualRenderRequested) {
+        lastManualRenderNonce = manualRenderNonce;
+      }
       if (document.hidden) {
         clock.getDelta();
         visibilityPaused = true;
+        if (perfEnabled) {
+          reportWebglFrame({
+            source: "globe",
+            now,
+            frameMs: 0,
+            renderLoopActive: false,
+            renderLoopPaused: true,
+            pageVisible: false,
+            sceneOnscreen,
+            scrollProgress: currentScrollProgress,
+            scrollPhase: "offscreen",
+            qualityTier: prefersReducedMotion ? "reduced-motion" : isMobileLayout ? "mobile" : "desktop",
+            postprocessingScale: isMobileLayout ? WAITLIST_PERFORMANCE.mobileTransitionPostScale : WAITLIST_PERFORMANCE.desktopTransitionPostScale,
+            activePostprocessingPasses: [],
+            postprocessingEnabled: false,
+            bloomEnabled: false,
+            frostEnabled: false,
+            chromaticEnabled: false,
+            globeVisible: globeEnabled,
+            globeRotating: rotationEnabled,
+            globeAtmosphereEnabled: atmosphereEnabled,
+            globeRoutesEnabled: routesEnabled,
+            globeCityLightsEnabled: cityLightsEnabled,
+            starfieldEnabled: Boolean(debugFlags?.starfield ?? true),
+            gridEnabled: Boolean(debugFlags?.grid ?? true),
+            hazeEnabled: Boolean(debugFlags?.haze ?? true),
+            renderer,
+            canvas: renderer.domElement,
+          });
+        }
         frame = window.requestAnimationFrame(animate);
         return;
       }
@@ -4202,6 +4526,40 @@ function LiveGlobeCanvas({
         visibilityPaused = false;
         lastRenderTime = now;
         clock.getDelta();
+      }
+      if (pauseRequested && !manualRenderRequested) {
+        if (perfEnabled) {
+          reportWebglFrame({
+            source: "globe",
+            now,
+            frameMs: 0,
+            renderLoopActive: false,
+            renderLoopPaused: true,
+            pageVisible: true,
+            sceneOnscreen,
+            scrollProgress: currentScrollProgress,
+            scrollPhase: sceneOnscreen ? (currentScrollProgress < 0.24 ? "hero" : currentScrollProgress < 0.7 ? "transition" : currentScrollProgress < 0.995 ? "chapter" : "idle") : "offscreen",
+            qualityTier: prefersReducedMotion ? "reduced-motion" : isMobileLayout ? "mobile" : "desktop",
+            postprocessingScale: isMobileLayout ? WAITLIST_PERFORMANCE.mobileTransitionPostScale : WAITLIST_PERFORMANCE.desktopTransitionPostScale,
+            activePostprocessingPasses: [],
+            postprocessingEnabled: false,
+            bloomEnabled: false,
+            frostEnabled: false,
+            chromaticEnabled: false,
+            globeVisible: globeEnabled,
+            globeRotating: rotationEnabled,
+            globeAtmosphereEnabled: atmosphereEnabled,
+            globeRoutesEnabled: routesEnabled,
+            globeCityLightsEnabled: cityLightsEnabled,
+            starfieldEnabled: Boolean(debugFlags?.starfield ?? true),
+            gridEnabled: Boolean(debugFlags?.grid ?? true),
+            hazeEnabled: Boolean(debugFlags?.haze ?? true),
+            renderer,
+            canvas: renderer.domElement,
+          });
+        }
+        frame = window.requestAnimationFrame(animate);
+        return;
       }
       const targetFrameInterval = getTargetFrameInterval();
       if (lastRenderTime > 0 && now - lastRenderTime < targetFrameInterval) {
@@ -4457,11 +4815,57 @@ function LiveGlobeCanvas({
       }
 
       renderer.render(scene, camera);
+      if (perfEnabled) {
+        const scrollPhase: ScrollPhase = !sceneOnscreen
+          ? "offscreen"
+          : currentScrollProgress < 0.24
+            ? "hero"
+            : currentScrollProgress < 0.7
+              ? "transition"
+              : currentScrollProgress < 0.995
+                ? "chapter"
+                : "idle";
+        reportWebglFrame({
+          source: "globe",
+          now,
+          frameMs: delta * 1000,
+          renderLoopActive: loopActiveState,
+          renderLoopPaused: pauseRequested && !manualRenderRequested,
+          pageVisible: !document.hidden,
+          sceneOnscreen,
+          scrollProgress: currentScrollProgress,
+          scrollPhase,
+          qualityTier: prefersReducedMotion ? "reduced-motion" : isMobileLayout ? "mobile" : "desktop",
+          postprocessingScale: isMobileLayout ? WAITLIST_PERFORMANCE.mobileTransitionPostScale : WAITLIST_PERFORMANCE.desktopTransitionPostScale,
+          activePostprocessingPasses: [],
+          postprocessingEnabled: false,
+          bloomEnabled: false,
+          frostEnabled: false,
+          chromaticEnabled: false,
+          globeVisible: globeEnabled,
+          globeRotating: rotationEnabled,
+          globeAtmosphereEnabled: atmosphereEnabled,
+          globeRoutesEnabled: routesEnabled,
+          globeCityLightsEnabled: cityLightsEnabled,
+          starfieldEnabled: Boolean(debugFlags?.starfield ?? true),
+          gridEnabled: Boolean(debugFlags?.grid ?? true),
+          hazeEnabled: Boolean(debugFlags?.haze ?? true),
+          renderer,
+          canvas: renderer.domElement,
+        });
+      }
       frame = window.requestAnimationFrame(animate);
     };
 
     resize();
     window.addEventListener("resize", resize);
+    const intersectionObserver = new IntersectionObserver(
+      (entries) => {
+        sceneOnscreen = Boolean(entries[0]?.isIntersecting);
+      },
+      { threshold: 0.05 },
+    );
+    intersectionObserver.observe(mount);
     animate();
 
     return () => {
@@ -4473,6 +4877,7 @@ function LiveGlobeCanvas({
       renderer.domElement.removeEventListener("pointercancel", handlePointerCancel);
       renderer.domElement.removeEventListener("lostpointercapture", handlePointerCancel);
       window.removeEventListener("resize", resize);
+      intersectionObserver.disconnect();
       window.cancelAnimationFrame(frame);
       renderer.dispose();
       dayMap.dispose();
@@ -4510,6 +4915,7 @@ function LiveGlobeCanvas({
     aircraftEnabled,
     atmosphereEnabled,
     autoCompleteActiveRef,
+    autoRewindActiveRef,
     cityLightsEnabled,
     diagnosticsEnabled,
     globeEnabled,
@@ -4518,8 +4924,11 @@ function LiveGlobeCanvas({
     onReady,
     orbProgressRef,
     rotationEnabled,
+    scrollProgressRef,
     routesEnabled,
     textureSet,
+    perfEnabled,
+    forcedQuality,
   ]);
 
   return <div ref={mountRef} className={styles.canvasMount} data-globe-interaction="true" aria-hidden="true" />;

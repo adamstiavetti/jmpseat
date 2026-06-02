@@ -4,10 +4,12 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:perf": "next dev -p 4012",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "perf:notes": "echo 'Open http://localhost:4012/lab/live-globe-proof?perf=1 or set localStorage.DH_PERF_HUD=\"1\". Console API: window.DH_PERF.summary(), snapshot(), setDebugFlag(\"postprocessing\", false), startRecording(), stopRecording(), exportRecording()'"
   },
   "dependencies": {
     "gsap": "^3.15.0",
