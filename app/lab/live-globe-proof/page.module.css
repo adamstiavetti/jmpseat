@@ -15,7 +15,7 @@
   --wordmark-y: 0px;
   --wordmark-scale: 1;
   --wordmark-collapse-x: 1;
-  --wordmark-width: 58vw;
+  --wordmark-width: 46vw;
   --wordmark-opacity: 1;
   --absorb-opacity: 0;
   --absorb-y: 0px;
@@ -241,12 +241,12 @@
   place-items: center;
   justify-content: center;
   pointer-events: none;
-  inset: clamp(52.4%, 56.2%, 58.8%) 0 auto 0;
+  inset: clamp(58.4%, 61.8%, 64.2%) 0 auto 0;
   opacity: var(--wordmark-opacity);
   transform:
     translate3d(0, var(--wordmark-y), 0)
     scale(var(--wordmark-scale));
-  transform-origin: 50% 40%;
+  transform-origin: 50% 32%;
   will-change: transform, opacity, width;
 }
 
@@ -263,8 +263,8 @@
   transform-origin: 50% 50%;
   will-change: transform, width, opacity;
   filter:
-    drop-shadow(0 0 9px rgba(118, 196, 255, 0.2))
-    drop-shadow(0 0 16px rgba(60, 128, 219, 0.18));
+    drop-shadow(0 0 7px rgba(118, 196, 255, 0.16))
+    drop-shadow(0 0 12px rgba(60, 128, 219, 0.12));
 }
 
 .wordmarkAbsorption {
@@ -610,7 +610,7 @@
   }
 
   .wordmark {
-    inset: clamp(53.4%, 57.2%, 59%) 0 auto 0;
+    inset: clamp(59.4%, 62.2%, 64.8%) 0 auto 0;
   }
 }
 
@@ -629,7 +629,7 @@
   }
 
   .wordmark {
-    inset: clamp(60.8%, 64.6%, 66.9%) 0 auto 0;
+    inset: clamp(66.4%, 69.2%, 72%) 0 auto 0;
   }
 
   .wordmarkImage {

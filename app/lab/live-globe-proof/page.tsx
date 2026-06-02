@@ -48,6 +48,7 @@ import {
   getGlassCardTransitionState,
   shouldDelayGlassCardHeroFlight,
 } from "@/src/lib/scroll/glassCardTransition";
+import { getLiveGlobeTransitionShotState } from "@/src/lib/scroll/liveGlobeTransitionPlan";
 import styles from "./page.module.css";
 
 type TextureSetName = "v2" | "v3" | "v4" | "cityrim" | "polar" | "atlantic" | "europe" | "cityhalo";
@@ -761,21 +762,21 @@ const WAITLIST_SCROLL_TRANSITION = {
   pullbackEnd: 0.25,
   distortionStart: 0.25,
   distortionEnd: 0.65,
-  handoffStart: 0.65,
-  autoCompleteThreshold: 0.2,
-  autoCompleteDurationMs: 5200,
+  handoffStart: 0.78,
+  autoCompleteThreshold: 0.82,
+  autoCompleteDurationMs: 4200,
   autoHandoffEnabled: true,
   autoHandoffMinMs: 320,
-  autoHandoffMaxMs: 760,
+  autoHandoffMaxMs: 920,
   autoHandoffVelocitySmoothing: 0.18,
   autoHandoffSpeedClampMin: 0.05,
   autoHandoffSpeedClampMax: 1.25,
   autoHandoffEndVelocityFactor: 0.06,
   autoRewindMsPerProgress: 2450,
   autoRewindMinDurationMs: 900,
-  mobileTransitionDistance: 2.45,
-  desktopTransitionDistance: 1.35,
-  mobileScrollDeltaScale: 0.38,
+  mobileTransitionDistance: 3.8,
+  desktopTransitionDistance: 3.1,
+  mobileScrollDeltaScale: 0.32,
   mobileScrollDeltaMaxStep: 72,
   earlyDistortionGestureCount: 2,
   earlyDistortionProgressStart: 0.03,
@@ -1120,6 +1121,10 @@ export default function LiveGlobeProofPage() {
 
     const applyProgressStyles = (rawProgress: number, viewportHeight: number) => {
       const clampedProgress = THREE.MathUtils.clamp(rawProgress, 0, 1);
+      const transitionShot = getLiveGlobeTransitionShotState({
+        progress: clampedProgress,
+        layout: isMobileViewport ? "mobile" : "desktop",
+      });
       scrollProgressRef.current = clampedProgress;
       const earlyOnramp = getEarlyTransitionOnrampStrength({
         gestureCount: earlyForwardGestureCountRef.current,
@@ -1162,33 +1167,43 @@ export default function LiveGlobeProofPage() {
         WAITLIST_SCROLL_TRANSITION.handoffStart,
         WAITLIST_SCROLL_TRANSITION.transitionEnd,
       );
-      const orbProgress = 1 - Math.pow(1 - clampedProgress, 3);
-      const collapseProgress = THREE.MathUtils.smoothstep(clampedProgress, 0.02, 0.56);
-      const widthCollapseProgress = THREE.MathUtils.smoothstep(clampedProgress, 0.02, 0.58);
-      const absorptionExit = THREE.MathUtils.smoothstep(clampedProgress, 0.58, 0.74);
-      const absorbProgress = THREE.MathUtils.smoothstep(clampedProgress, 0, 0.3) * (1 - absorptionExit);
-      const perspectiveProgress = 1 - Math.pow(1 - clampedProgress, 1.45);
-      const backgroundBlendProgress = THREE.MathUtils.smoothstep(clampedProgress, 0.08, 0.78);
-      const webglBackgroundTakeover = THREE.MathUtils.smoothstep(clampedProgress, 0.18, 0.34);
+      const orbProgress = transitionShot.collapseProgress;
+      const collapseProgress = transitionShot.collapseProgress;
+      const widthCollapseProgress = THREE.MathUtils.smoothstep(clampedProgress, 0.6, 0.9);
+      const absorptionExit = transitionShot.brandDissolveProgress;
+      const absorbLead = THREE.MathUtils.smoothstep(clampedProgress, 0.42, 0.78);
+      const absorbProgress = absorbLead * (1 - transitionShot.revealProgress * 0.82);
+      const perspectiveProgress = transitionShot.cameraTravelProgress;
+      const backgroundBlendProgress = THREE.MathUtils.smoothstep(clampedProgress, 0.24, 0.88);
+      const webglBackgroundTakeover = transitionShot.backgroundTakeoverProgress;
       const earlyCanvasOpacity = getEarlyCanvasOpacity({
         mainOpacity: webglBackgroundTakeover,
         earlyFactor: effectiveEarlyOnrampFactor,
-        maxOpacity: 0.3,
+        maxOpacity: 0.18,
       });
-      const wakeFadeProgress = THREE.MathUtils.smoothstep(clampedProgress, 0.26, 0.82);
-      const vignetteFadeProgress = THREE.MathUtils.smoothstep(clampedProgress, 0.62, 0.96);
-      const suckedWordProgress = THREE.MathUtils.smoothstep(clampedProgress, 0.02, 0.82);
-      const particleLeadProgress = 1 - Math.pow(1 - clampedProgress, 1.3);
-      const fastPullProgress = 1 - Math.pow(1 - clampedProgress, 1.25);
-      const gapCloseProgress = THREE.MathUtils.smoothstep(clampedProgress, 0, 0.58);
-      const wordmarkMouthY = Math.min(52, 34 * fastPullProgress + 26 * gapCloseProgress);
-      const absorptionMouthY = Math.min(24, 15 * particleLeadProgress + 15 * gapCloseProgress);
+      const wakeFadeProgress = THREE.MathUtils.smoothstep(clampedProgress, 0.46, 0.9);
+      const vignetteFadeProgress = THREE.MathUtils.smoothstep(clampedProgress, 0.72, 0.98);
+      const suckedWordProgress = THREE.MathUtils.smoothstep(clampedProgress, 0.42, 0.9);
+      const particleLeadProgress = THREE.MathUtils.lerp(
+        transitionShot.cameraTravelProgress,
+        1,
+        transitionShot.collapseProgress,
+      );
+      const fastPullProgress = transitionShot.cameraTravelProgress;
+      const gapCloseProgress = THREE.MathUtils.smoothstep(clampedProgress, 0.38, 0.82);
+      const wordmarkMouthY = Math.min(38, 14 * fastPullProgress + 18 * gapCloseProgress);
+      const absorptionMouthY = Math.min(18, 10 * particleLeadProgress + 12 * gapCloseProgress);
       const wordmarkYpx = -(wordmarkMouthY / 100) * viewportHeight;
       const absorbYpx = -(absorptionMouthY / 100) * viewportHeight;
-      const suckedWordYvh = -25 * suckedWordProgress - 25 * gapCloseProgress;
+      const suckedWordYvh = -10 * transitionShot.cameraTravelProgress - 18 * suckedWordProgress;
       const suckedWordYpx = (suckedWordYvh / 100) * viewportHeight;
-      const backgroundScale = THREE.MathUtils.lerp(1.018, isMobileViewport ? 0.958 : 0.948, perspectiveProgress);
-      const backgroundY = -viewportHeight * THREE.MathUtils.lerp(0, isMobileViewport ? 0.022 : 0.032, perspectiveProgress);
+      const backgroundScale = THREE.MathUtils.lerp(1.018, isMobileViewport ? 0.978 : 0.966, perspectiveProgress);
+      const backgroundY = -viewportHeight * THREE.MathUtils.lerp(0, isMobileViewport ? 0.04 : 0.055, perspectiveProgress);
+      const wordmarkWidth = THREE.MathUtils.lerp(
+        isMobileViewport ? 52 : 46,
+        isMobileViewport ? 26 : 22,
+        transitionShot.cameraTravelProgress,
+      );
       page.style.setProperty("--orb-progress", `${orbProgress}`);
       page.style.setProperty("--background-perspective-scale", `${backgroundScale}`);
       page.style.setProperty("--background-perspective-y", `${backgroundY}px`);
@@ -1199,11 +1214,12 @@ export default function LiveGlobeProofPage() {
       page.style.setProperty("--transition-handoff-phase", `${handoffPhase}`);
       page.style.setProperty("--wake-layer-opacity", `${Math.max(0, 1 - wakeFadeProgress)}`);
       page.style.setProperty("--vignette-layer-opacity", `${Math.max(0, 1 - vignetteFadeProgress)}`);
-      page.style.setProperty("--final-background-opacity", `${THREE.MathUtils.smoothstep(clampedProgress, 0.82, 0.98)}`);
+      page.style.setProperty("--final-background-opacity", `${transitionShot.backgroundTakeoverProgress}`);
       page.style.setProperty("--wordmark-y", `${wordmarkYpx}px`);
-      page.style.setProperty("--wordmark-scale", `${1 - clampedProgress * 0.1}`);
+      page.style.setProperty("--wordmark-width", `${wordmarkWidth}vw`);
+      page.style.setProperty("--wordmark-scale", `${THREE.MathUtils.lerp(1, 0.92, transitionShot.cameraTravelProgress)}`);
       page.style.setProperty("--wordmark-collapse-x", `${Math.max(0.045, 1 - collapseProgress * 0.955)}`);
-      page.style.setProperty("--wordmark-opacity", `${Math.max(0, 1 - absorptionExit)}`);
+      page.style.setProperty("--wordmark-opacity", `${Math.max(0, 1 - absorptionExit * 1.08)}`);
       page.style.setProperty("--absorb-opacity", `${Math.max(0, absorbProgress * 0.92)}`);
       page.style.setProperty("--absorb-y", `${absorbYpx}px`);
       page.style.setProperty("--absorb-scale-x", `${Math.max(0.06, 1 - widthCollapseProgress * 0.94)}`);
@@ -2406,6 +2422,107 @@ function WaitlistSceneTransition({
     disposableGeometries.push(hazeGeometry);
     disposableMaterials.push(hazeMaterial);
 
+    const foregroundOccluderGeometry = new THREE.PlaneGeometry(2.8, 5.8, 1, 1);
+    disposableGeometries.push(foregroundOccluderGeometry);
+    const createForegroundOccluder = ({
+      x,
+      y,
+      z,
+      rotationZ,
+      seed,
+      opacity,
+    }: {
+      x: number;
+      y: number;
+      z: number;
+      rotationZ: number;
+      seed: number;
+      opacity: number;
+    }) => {
+      const material = new THREE.ShaderMaterial({
+        transparent: true,
+        depthWrite: false,
+        depthTest: false,
+        blending: THREE.NormalBlending,
+        uniforms: {
+          uTime: { value: 0 },
+          uOpacity: { value: 0 },
+          uSeed: { value: seed },
+          uWarmth: { value: opacity },
+        },
+        vertexShader: `
+          varying vec2 vUv;
+
+          void main() {
+            vUv = uv;
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+          }
+        `,
+        fragmentShader: `
+          precision highp float;
+
+          uniform float uTime;
+          uniform float uOpacity;
+          uniform float uSeed;
+          uniform float uWarmth;
+          varying vec2 vUv;
+
+          float hash(vec2 p) {
+            p = fract(p * vec2(123.34, 345.45));
+            p += dot(p, p + 34.23);
+            return fract(p.x * p.y);
+          }
+
+          float noise(vec2 p) {
+            vec2 i = floor(p);
+            vec2 f = fract(p);
+            vec2 u = f * f * (3.0 - 2.0 * f);
+            return mix(
+              mix(hash(i), hash(i + vec2(1.0, 0.0)), u.x),
+              mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), u.x),
+              u.y
+            );
+          }
+
+          void main() {
+            vec2 uv = vUv;
+            vec2 p = uv - 0.5;
+            p.x += sin((uv.y + uSeed) * 7.0 + uTime * 0.18) * 0.08;
+            float core = exp(-pow(p.x * 2.2, 2.0));
+            float feather = smoothstep(0.0, 0.22, uv.y) * (1.0 - smoothstep(0.68, 1.0, uv.y));
+            float turbulence = noise(uv * vec2(4.0, 11.0) + vec2(uSeed * 3.0, -uTime * 0.05));
+            float streak = smoothstep(0.24, 0.88, core + turbulence * 0.24);
+            float alpha = streak * feather * uOpacity * (0.62 + turbulence * 0.32);
+            vec3 cool = vec3(0.72, 0.86, 0.94);
+            vec3 warm = vec3(0.94, 0.9, 0.76);
+            vec3 color = mix(cool, warm, uWarmth * 0.7);
+            gl_FragColor = vec4(color, alpha);
+          }
+        `,
+      });
+      const mesh = new THREE.Mesh(foregroundOccluderGeometry, material);
+      mesh.position.set(x, y, z);
+      mesh.rotation.z = rotationZ;
+      scene.add(mesh);
+      disposableObjects.push(mesh);
+      disposableMaterials.push(material);
+      return {
+        baseX: x,
+        baseY: y,
+        baseZ: z,
+        mesh,
+        material,
+        opacity,
+        rotationZ,
+      };
+    };
+
+    const foregroundOccluders = [
+      createForegroundOccluder({ x: -1.22, y: 0.34, z: -1.6, rotationZ: 0.18, seed: 0.13, opacity: 0.28 }),
+      createForegroundOccluder({ x: 0.96, y: 0.18, z: -1.42, rotationZ: -0.12, seed: 0.37, opacity: 0.22 }),
+      createForegroundOccluder({ x: 0.06, y: -0.26, z: -1.22, rotationZ: 0.04, seed: 0.61, opacity: 0.18 }),
+    ];
+
     let frame = 0;
     let disposed = false;
     let smoothedProgress = 0;
@@ -2604,7 +2721,11 @@ function WaitlistSceneTransition({
       const activation = firstScrollIntentRef.current || smoothedProgress > 0.001 ? 1 : 0;
       const p = clamp01(smoothedProgress) * activation;
       const mobile = isMobileViewport();
-      const phase1 = smoothstep(0, 0.25, p);
+      const transitionShot = getLiveGlobeTransitionShotState({
+        progress: p,
+        layout: mobile ? "mobile" : "desktop",
+      });
+      const phase1 = smoothstep(0, 0.32, p);
       const earlyOnramp = prefersReducedMotion
         ? 0
         : getEarlyTransitionOnrampStrength({
@@ -2638,53 +2759,85 @@ function WaitlistSceneTransition({
       );
       const frostPeak = prefersReducedMotion ? 0 : Math.max(bell(p, 0.52, 0.24), effectiveEarlyOnramp);
       const chromaPeak = prefersReducedMotion ? 0 : bell(p, 0.58, 0.2);
-      const hazeRise = smoothstep(0.25, 0.65, p);
-      const hazeFall = smoothstep(0.72, 1, p);
+      const hazeRise = transitionShot.occlusionProgress;
+      const hazeFall = transitionShot.revealProgress;
       const hazeOpacity = prefersReducedMotion
-        ? lerp(0.08, 0.16, smoothstep(0.4, 0.8, p))
-        : lerp(0.12, 0.55, hazeRise * (1 - hazeFall)) + effectiveEarlyOnrampFactor * 0.08;
-      const oldSceneOpacity = prefersReducedMotion ? 1 - smoothstep(0.45, 0.9, p) : 1 - smoothstep(0.35, 0.85, p);
-      const newSceneOpacity = smoothstep(0.55, 1, p);
-      const gridOpacity = lerp(0.35, 0.65, smoothstep(0.18, 0.7, p)) * (1 - smoothstep(0.88, 1, p) * 0.18);
+        ? lerp(0.08, 0.16, smoothstep(0.56, 0.86, p))
+        : lerp(0.12, 0.68, hazeRise * (1 - hazeFall * 0.22)) + effectiveEarlyOnrampFactor * 0.06;
+      const oldSceneOpacity = prefersReducedMotion
+        ? 1 - smoothstep(0.56, 0.92, p)
+        : 1 - smoothstep(0.5, 0.9, p);
+      const newSceneOpacity = transitionShot.revealProgress;
+      const gridOpacity = lerp(0.3, 0.72, smoothstep(0.34, 0.88, p)) * (1 - smoothstep(0.94, 1, p) * 0.14);
 
       camera.position.z = prefersReducedMotion
         ? WAITLIST_SCROLL_TRANSITION.cameraStartZ
-        : lerp(WAITLIST_SCROLL_TRANSITION.cameraStartZ, WAITLIST_SCROLL_TRANSITION.cameraEndZ, smoothstep(0, 1, p));
-      camera.position.y = prefersReducedMotion ? 0.15 : lerp(0.15, -0.08, smoothstep(0.2, 1, p));
+        : lerp(WAITLIST_SCROLL_TRANSITION.cameraStartZ, mobile ? WAITLIST_SCROLL_TRANSITION.cameraEndZ + 0.95 : WAITLIST_SCROLL_TRANSITION.cameraEndZ + 0.7, transitionShot.cameraTravelProgress);
+      camera.position.x = prefersReducedMotion ? 0 : transitionShot.cameraDriftX * 0.65;
+      camera.position.y = prefersReducedMotion
+        ? 0.15
+        : lerp(0.18, mobile ? -0.18 : -0.12, transitionShot.cameraLiftMix);
+      camera.rotation.x = prefersReducedMotion ? 0 : lerp(-0.018, mobile ? 0.052 : 0.036, transitionShot.cameraTravelProgress);
 
       oldPlane.position.y = lerp(0, 0.08, phase1);
-      newPlane.position.y = lerp(-0.18, 0, smoothstep(0.62, 1, p));
+      newPlane.position.y = lerp(-0.24, 0, transitionShot.revealProgress);
       oldMaterial.opacity = oldSceneOpacity;
       newMaterial.opacity = newSceneOpacity;
       starMaterial.opacity = lerp(0.45, 0.72, phase1) * (1 - newSceneOpacity * 0.12);
       cyanNodeMaterial.opacity = WAITLIST_SCROLL_TRANSITION.gridOpacity * gridOpacity;
       amberNodeMaterial.opacity = 0.62 * WAITLIST_SCROLL_TRANSITION.gridOpacity * gridOpacity;
-      runwayMaterial.opacity = 0.28 + gridOpacity * 0.22;
+      runwayMaterial.opacity = 0.18 + gridOpacity * 0.28;
       starfield.visible = starsEnabled;
       networkGroup.visible = gridEnabled;
       hazePlane.visible = hazeEnabled;
-      networkGroup.position.z = lerp(-6.6, -5.45, smoothstep(0.55, 1, p));
-      networkGroup.position.y = lerp(-2.08, -1.92, smoothstep(0.7, 1, p));
-      starfield.position.y = -p * 0.18;
-      starfield.position.z = p * 0.75;
+      networkGroup.position.x = transitionShot.cameraDriftX * -0.42;
+      networkGroup.position.z = lerp(-6.8, -5.2, transitionShot.revealProgress);
+      networkGroup.position.y = lerp(-2.16, -1.88, smoothstep(0.76, 1, p));
+      starfield.position.y = -transitionShot.cameraTravelProgress * 0.32;
+      starfield.position.z = transitionShot.cameraTravelProgress * 1.08;
+      oldPlane.position.x = transitionShot.cameraDriftX * -0.08;
+      newPlane.position.x = transitionShot.cameraDriftX * -0.2;
 
       hazeMaterial.uniforms.uTime.value = now / 1000;
       hazeMaterial.uniforms.uProgress.value = p;
       hazeMaterial.uniforms.uOpacity.value = hazeOpacity * WAITLIST_SCROLL_TRANSITION.hazeIntensity;
-      hazePlane.scale.setScalar(lerp(1, 1.22, hazeRise * (1 - hazeFall * 0.7)));
+      hazePlane.scale.setScalar(lerp(1, 1.36, hazeRise * (1 - hazeFall * 0.42)));
+      hazePlane.position.z = lerp(-1.2, -0.3, transitionShot.occlusionProgress);
+      hazePlane.position.x = transitionShot.cameraDriftX * -0.24;
+
+      const occluderPassProgress = transitionShot.occlusionProgress * (1 - transitionShot.revealProgress * 0.42);
+      foregroundOccluders.forEach((occluder, index) => {
+        occluder.material.uniforms.uTime.value = now / 1000;
+        occluder.material.uniforms.uOpacity.value = occluder.opacity * occluderPassProgress;
+        occluder.mesh.position.x =
+          occluder.baseX +
+          transitionShot.cameraDriftX * (index === 1 ? -4.4 : -3.2) +
+          occluderPassProgress * (index === 1 ? -0.7 : 0.56);
+        occluder.mesh.position.y =
+          occluder.baseY +
+          Math.sin(now * 0.00032 + index * 1.8) * 0.05 +
+          occluderPassProgress * (index === 2 ? 0.12 : -0.08);
+        occluder.mesh.position.z = occluder.baseZ + occluderPassProgress * (index === 2 ? 0.28 : 0.16);
+        occluder.mesh.rotation.z = occluder.rotationZ + occluderPassProgress * (index === 1 ? -0.2 : 0.16);
+      });
 
       frostPass.uniforms.uTime.value = now / 1000;
       frostPass.uniforms.uProgress.value = p;
       const earlyFrostStrength = effectiveEarlyOnrampFactor * 0.12;
-      const effectiveFrostStrength = Math.max(frostPeak * 0.48, earlyFrostStrength);
+      const effectiveFrostStrength = Math.max(frostPeak * 0.34, transitionShot.occlusionProgress * 0.38, earlyFrostStrength);
       frostPass.uniforms.uFrostStrength.value = effectiveFrostStrength;
       frostPass.uniforms.uDisplacementStrength.value = Math.max(
-        frostPeak * (mobile ? 0.028 : 0.044),
+        frostPeak * (mobile ? 0.024 : 0.038) + transitionShot.occlusionProgress * (mobile ? 0.012 : 0.018),
         effectiveEarlyOnrampFactor * (mobile ? 0.0065 : 0.0095),
       );
-      frostPass.uniforms.uNoiseScale.value = lerp(8.2, 5.8, frostPeak);
-      chromaticPass.uniforms.uStrength.value = chromaPeak * (mobile ? 0.0024 : WAITLIST_SCROLL_TRANSITION.chromaticAberration);
-      bloomPass.strength = prefersReducedMotion ? 0.28 : lerp(mobile ? 0.22 : 0.35, mobile ? 0.42 : 0.85, bell(p, 0.56, 0.34));
+      frostPass.uniforms.uNoiseScale.value = lerp(8.2, 5.8, Math.max(frostPeak, transitionShot.occlusionProgress));
+      chromaticPass.uniforms.uStrength.value = Math.max(
+        chromaPeak * (mobile ? 0.0022 : WAITLIST_SCROLL_TRANSITION.chromaticAberration),
+        transitionShot.occlusionProgress * (mobile ? 0.0012 : 0.0018),
+      );
+      bloomPass.strength = prefersReducedMotion
+        ? 0.28
+        : lerp(mobile ? 0.18 : 0.28, mobile ? 0.5 : 0.76, Math.max(bell(p, 0.72, 0.18), transitionShot.occlusionProgress));
       bloomPass.radius = 0.35;
       bloomPass.threshold = 0.15;
       frostPass.enabled =
@@ -2993,15 +3146,31 @@ function LiveGlobeCanvas({
       currentScrollProgress = prefersReducedMotion ? 0 : THREE.MathUtils.clamp(scrollProgressRef.current, 0, 1);
       const progress = readOrbProgress();
       currentOrbProgress = progress;
+      const transitionShot = getLiveGlobeTransitionShotState({
+        progress: currentScrollProgress,
+        layout: isMobileLayout ? "mobile" : "desktop",
+      });
       const finalScale = isMobileLayout ? 0.24 : 0.23;
       const finalY = isMobileLayout ? 0.78 : 1.12;
       const cameraZ = isMobileLayout ? WAITLIST_SCROLL_TRANSITION.cameraStartZ : WAITLIST_SCROLL_TRANSITION.cameraStartZ - 0.2;
-      const cameraEndZ = isMobileLayout ? WAITLIST_SCROLL_TRANSITION.cameraEndZ : WAITLIST_SCROLL_TRANSITION.cameraEndZ - 0.19;
-      const cameraPullback = THREE.MathUtils.smoothstep(progress, 0.05, 1);
-      globeRig.position.set(0, baseGlobeY + THREE.MathUtils.lerp(0, finalY, progress), 0);
-      globeRig.scale.setScalar(baseGlobeScale * THREE.MathUtils.lerp(1, finalScale, progress));
-      camera.position.z = THREE.MathUtils.lerp(cameraZ, cameraEndZ, cameraPullback);
-      camera.position.y = (isMobileLayout ? 0.02 : 0.04) + THREE.MathUtils.lerp(0, isMobileLayout ? 0.08 : 0.12, cameraPullback);
+      const cameraEndZ = isMobileLayout
+        ? WAITLIST_SCROLL_TRANSITION.cameraEndZ + 0.85
+        : WAITLIST_SCROLL_TRANSITION.cameraEndZ + 0.55;
+      const cameraTravel = transitionShot.cameraTravelProgress;
+      const collapseProgress = transitionShot.collapseProgress;
+      const preCollapseScale = THREE.MathUtils.lerp(1, isMobileLayout ? 0.88 : 0.84, cameraTravel);
+      const settledScale = THREE.MathUtils.lerp(preCollapseScale, finalScale, collapseProgress);
+      const globeLift = THREE.MathUtils.lerp(
+        THREE.MathUtils.lerp(0, isMobileLayout ? 0.18 : 0.24, cameraTravel),
+        finalY,
+        transitionShot.globeLiftMix,
+      );
+      globeRig.position.set(0, baseGlobeY + globeLift, 0);
+      globeRig.scale.setScalar(baseGlobeScale * settledScale);
+      camera.position.x = transitionShot.cameraDriftX;
+      camera.position.z = THREE.MathUtils.lerp(cameraZ, cameraEndZ, cameraTravel);
+      camera.position.y = (isMobileLayout ? 0.01 : 0.03) + THREE.MathUtils.lerp(0, isMobileLayout ? 0.22 : 0.28, transitionShot.cameraLiftMix);
+      camera.rotation.x = THREE.MathUtils.lerp(isMobileLayout ? -0.025 : -0.018, isMobileLayout ? -0.082 : -0.072, cameraTravel);
       for (const material of routeShaderMaterials) {
         material.uniforms.globeCenter.value.copy(globeRig.position);
       }
