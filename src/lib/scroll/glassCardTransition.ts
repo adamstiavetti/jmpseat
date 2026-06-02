@@ -1,8 +1,8 @@
-export const GLASS_CARD_RISE_START_PROGRESS = 0.82;
-export const GLASS_CARD_RISE_END_PROGRESS = 0.97;
-export const GLASS_CARD_SETTLE_START_PROGRESS = 0.88;
-export const GLASS_CARD_SETTLE_END_PROGRESS = 1;
-export const GLASS_CARD_HERO_ENTRY_START_PROGRESS = 0.9;
+export const GLASS_CARD_RISE_START_PROGRESS = 0.74;
+export const GLASS_CARD_RISE_END_PROGRESS = 0.92;
+export const GLASS_CARD_SETTLE_START_PROGRESS = 0.8;
+export const GLASS_CARD_SETTLE_END_PROGRESS = 0.96;
+export const GLASS_CARD_HERO_ENTRY_START_PROGRESS = 0.84;
 export const GLASS_CARD_HERO_ENTRY_END_PROGRESS = 0.98;
 
 type GlassCardLayoutArgs = {
@@ -334,7 +334,7 @@ export const getGlassCardTransitionState = ({
     GLASS_CARD_SETTLE_START_PROGRESS,
     GLASS_CARD_SETTLE_END_PROGRESS,
   );
-  const presence = smoothstep(riseProgress, 0.08, 0.34);
+  const presence = smoothstep(riseProgress, 0.02, 0.18);
 
   return {
     visible: presence > 0.001,
