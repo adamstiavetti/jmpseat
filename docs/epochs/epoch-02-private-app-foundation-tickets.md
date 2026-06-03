@@ -605,6 +605,10 @@ Define the minimum accessibility expectations for the private shell and navigati
 **Title**  
 Enforce No-Real-Functionality Guardrails
 
+**Status Note**
+
+- Satisfied by the merged private shell implementation, the focused private-shell guardrail assertions, and the documented audit in `docs/epochs/epoch-02-no-real-functionality-guardrails.md`.
+
 **Goal**  
 Prevent accidental scope drift from shell planning into real MVP feature implementation.
 

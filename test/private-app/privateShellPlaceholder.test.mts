@@ -64,6 +64,7 @@ test("private child routes are defined as locked placeholders only", () => {
   assert.equal(layovers?.navLabel, "Layover Boards");
   assert.match(layovers?.title ?? "", /not available yet/i);
   assert.match(layovers?.detail ?? "", /login and verification come later/i);
+  assert.match(layovers?.message.disclaimer ?? "", /not a real security boundary/i);
 });
 
 test("unknown private child routes are not treated as placeholders", () => {
@@ -76,6 +77,11 @@ test("private placeholder route config stays isolated under /app", () => {
     Object.values(PRIVATE_SHELL_CHILD_ROUTE_RECORD).every((route) => route.path.startsWith("/app")),
   );
   assert.ok(PRIVATE_SHELL_NAV_ITEMS.every((item) => !/waitlist|join the private beta/i.test(item.label)));
+  assert.ok(
+    PRIVATE_SHELL_NAV_ITEMS.every(
+      (item) => !/post|comment|save|search|pay|deal|login/i.test(item.label),
+    ),
+  );
 });
 
 test("public and private route source files stay separated", () => {
@@ -91,4 +97,8 @@ test("public and private route source files stay separated", () => {
   assert.match(privateRootSource, /PrivateShellPlaceholder/);
   assert.doesNotMatch(privateRootSource, /Join the Private Beta Waitlist/);
   assert.doesNotMatch(privateChildSource, /Join the Private Beta Waitlist/);
+  assert.doesNotMatch(privateRootSource, /fetch\(|axios|supabase|prisma|api\//);
+  assert.doesNotMatch(privateChildSource, /fetch\(|axios|supabase|prisma|api\//);
+  assert.doesNotMatch(privateRootSource, /\bPost\b|\bComment\b|\bSave\b|\bSearch\b/);
+  assert.doesNotMatch(privateChildSource, /\bPost\b|\bComment\b|\bSave\b|\bSearch\b/);
 });
