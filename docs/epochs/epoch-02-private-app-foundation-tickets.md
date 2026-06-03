@@ -660,6 +660,10 @@ Prevent accidental scope drift from shell planning into real MVP feature impleme
 **Title**  
 Run Epoch 02 Validation And Exit Review
 
+**Status Note**
+
+- Satisfied by the completed Epoch 02 validation pass, route proof, and exit review documented in `docs/epochs/epoch-02-exit-review.md`.
+
 **Goal**  
 Create the final validation checklist and handoff review required to close Epoch 02 cleanly.
 
