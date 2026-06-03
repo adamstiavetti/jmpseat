@@ -57,6 +57,7 @@ V1 explicitly excludes airline portal login, schedule scraping, public nearby cr
 
 - [Deadhead Club Blueprint](docs/DEADHEAD_CLUB_BLUEPRINT.md)
 - [MVP Scope](docs/MVP_SCOPE.md)
+- [First Release MVP](docs/FIRST_RELEASE_MVP.md)
 - [Feature Roadmap](docs/FEATURE_ROADMAP.md)
 - [Trust and Safety](docs/TRUST_AND_SAFETY.md)
 - [Monetization](docs/MONETIZATION.md)
