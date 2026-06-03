@@ -476,6 +476,10 @@ Create a navigation skeleton that previews the private app information architect
 - Review nav order against first-release MVP priorities.
 - Confirm no nav label implies excluded features.
 
+**Status Note**
+
+- Satisfied by the merged `E02-T03` and `E02-T04` private shell work, which implemented a shared disabled navigation skeleton for `/app` and the placeholder child routes with planning-aligned labels, utility-first ordering, and explicit non-functional/current-placeholder states.
+
 **Risk Notes**
 
 - Risk: navigation exposes too much future scope too early.  
