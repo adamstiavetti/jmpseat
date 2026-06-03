@@ -490,6 +490,10 @@ Create a navigation skeleton that previews the private app information architect
 **Title**  
 Preserve Public Waitlist / Private App Boundary
 
+**Status Note**
+
+- Satisfied by the merged private shell work plus the E02-T07 public root-route restoration and boundary verification pass, which restores `/`, keeps `/app` isolated, and preserves the no-new-features rule for Epoch 02.
+
 **Goal**  
 Ensure Epoch 02 respects the separation between the existing public waitlist surface and the future private product shell.
 

@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 
 import {
   PRIVATE_SHELL_CHILD_ROUTE_RECORD,
@@ -67,4 +68,27 @@ test("private child routes are defined as locked placeholders only", () => {
 
 test("unknown private child routes are not treated as placeholders", () => {
   assert.equal(getPrivateShellChildRoute("unknown"), null);
+});
+
+test("private placeholder route config stays isolated under /app", () => {
+  assert.ok(PRIVATE_SHELL_NAV_ITEMS.every((item) => item.path.startsWith("/app")));
+  assert.ok(
+    Object.values(PRIVATE_SHELL_CHILD_ROUTE_RECORD).every((route) => route.path.startsWith("/app")),
+  );
+  assert.ok(PRIVATE_SHELL_NAV_ITEMS.every((item) => !/waitlist|join the private beta/i.test(item.label)));
+});
+
+test("public and private route source files stay separated", () => {
+  const publicRouteSource = readFileSync(new URL("../../app/page.tsx", import.meta.url), "utf8");
+  const privateRootSource = readFileSync(new URL("../../app/app/page.tsx", import.meta.url), "utf8");
+  const privateChildSource = readFileSync(
+    new URL("../../app/app/[section]/page.tsx", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(publicRouteSource, /Join the Private Beta Waitlist/);
+  assert.doesNotMatch(publicRouteSource, /PrivateShellPlaceholder/);
+  assert.match(privateRootSource, /PrivateShellPlaceholder/);
+  assert.doesNotMatch(privateRootSource, /Join the Private Beta Waitlist/);
+  assert.doesNotMatch(privateChildSource, /Join the Private Beta Waitlist/);
 });
