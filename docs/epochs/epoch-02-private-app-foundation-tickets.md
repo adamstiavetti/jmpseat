@@ -187,6 +187,7 @@ Create an explicit route map for the private app shell and clarify the boundary 
 **Likely Files Or Areas Affected**
 
 - `docs/epochs/epoch-02-private-app-foundation-tickets.md`
+- `docs/epochs/epoch-02-route-map.md`
 - future implementation planning docs or route maps
 
 **Validation Steps**
