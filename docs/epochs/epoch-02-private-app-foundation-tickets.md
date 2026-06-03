@@ -548,6 +548,10 @@ Ensure Epoch 02 respects the separation between the existing public waitlist sur
 **Title**  
 Establish Accessibility Baseline For Private Shell
 
+**Status Note**
+
+- Satisfied by the merged private shell implementation and the documented shell-level accessibility audit in `docs/epochs/epoch-02-accessibility-baseline.md`.
+
 **Goal**  
 Define the minimum accessibility expectations for the private shell and navigation before real features are added.
 
