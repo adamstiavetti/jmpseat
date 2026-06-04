@@ -418,6 +418,9 @@ Create the minimum account/profile model needed for private-beta identity and la
 **Title**  
 Implement Invite And Beta Access Model
 
+**Status**  
+Implemented for the bounded beta-access slice. See [Epoch 03 Beta Access Model Implementation](epoch-03-beta-access-model-implementation.md).
+
 **Goal**  
 Implement the invite-only beta-access state that sits between auth and aviation verification.
 
@@ -692,7 +695,7 @@ Close Epoch 03 with validation evidence and a clean handoff to the verification 
 - [ ] Public handle is distinct from private identity.
 - [ ] Invite and beta-access state exist.
 - [ ] Invited users can enter the private app.
-- [ ] Non-invited users are blocked.
+- [x] Non-invited users are blocked.
 - [ ] Auth remains separate from aviation verification.
 - [ ] Authorization helpers and access-control tests exist.
 - [ ] Community features remain blocked.

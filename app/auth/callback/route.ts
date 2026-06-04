@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 import { AUTH_ROUTES, sanitizeNextPath } from "../../../src/lib/auth/routes";
-import { resolveCurrentUserAppPath } from "../../../src/lib/profile/server";
+import { resolveCurrentUserAppPath } from "../../../src/lib/betaAccess/server";
 import { getSupabaseBrowserEnv } from "../../../src/lib/supabase/config";
 import { createClient } from "../../../src/lib/supabase/server";
 
