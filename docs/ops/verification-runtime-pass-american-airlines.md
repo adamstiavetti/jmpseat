@@ -207,7 +207,9 @@ This post-transactional runtime proof confirms:
 
 This American Airlines runtime proof covers the work-email verification path only.
 
-It does not cover the later redacted-proof upload/storage path.
+It does not cover the later redacted-proof upload/storage path, which is now documented separately in:
+
+- [Redacted Proof Upload Runtime Pass](redacted-proof-upload-runtime-pass.md)
 
 That proof-upload runtime path should be validated separately after:
 
@@ -275,6 +277,10 @@ Fix posture:
 - routing context is not a claim
 - routing context does not grant protected access
 - no proof viewing, signed URLs, downloads, AI, or employer-system lookup were added by the fix
+
+The final green redacted-proof upload/runtime proof is now documented separately in:
+
+- [Redacted Proof Upload Runtime Pass](redacted-proof-upload-runtime-pass.md)
 
 ## Proof Reviewer RLS Read Gap After Routing-Context Persistence
 

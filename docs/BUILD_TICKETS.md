@@ -35,6 +35,7 @@ Supplemental epoch-specific ticket packs:
 - [Proof Routing Context RPC Persistence Fix](epochs/proof-routing-context-rpc-persistence-fix.md)
 - [Proof Request Reviewer RLS Routing Fix](epochs/proof-request-reviewer-rls-routing-fix.md)
 - [Verification Runtime Pass: American Airlines Test](ops/verification-runtime-pass-american-airlines.md)
+- [Redacted Proof Upload Runtime Pass](ops/redacted-proof-upload-runtime-pass.md)
 - [Supabase Runtime Setup](ops/supabase-runtime-setup.md)
 - [Supabase CLI Migration Workflow](ops/supabase-cli-migration-workflow.md)
 - [Verification Method Decision](VERIFICATION_METHOD_DECISION.md)
