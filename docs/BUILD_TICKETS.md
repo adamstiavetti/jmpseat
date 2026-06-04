@@ -11,6 +11,7 @@ Supplemental epoch-specific ticket packs:
 
 - [Epoch 02: Private App Foundation Ticket Pack](epochs/epoch-02-private-app-foundation-tickets.md)
 - [Epoch 03: Auth, Profiles, and Beta Access Ticket Pack](epochs/epoch-03-auth-account-beta-access-tickets.md)
+- [Epoch 03: Auth Access Architecture Decision](epochs/epoch-03-auth-access-architecture-decision.md)
 
 Documentation hygiene reminder:
 

@@ -152,6 +152,9 @@ Epoch 03 is complete when:
 **Title**  
 Confirm Auth And Access Architecture Decision
 
+**Status**  
+Complete for planning. See [Epoch 03 Auth Access Architecture Decision](epoch-03-auth-access-architecture-decision.md).
+
 **Goal**  
 Lock the real auth/backend approach for Epoch 03 before implementation starts.
 
@@ -192,7 +195,7 @@ Lock the real auth/backend approach for Epoch 03 before implementation starts.
 **Likely Files Or Areas Affected**
 
 - `docs/epochs/epoch-03-auth-account-beta-access-tickets.md`
-- ADR or implementation-decision doc if approved later
+- `docs/epochs/epoch-03-auth-access-architecture-decision.md`
 
 **Validation Steps**
 
