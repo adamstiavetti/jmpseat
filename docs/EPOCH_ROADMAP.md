@@ -49,8 +49,8 @@ Future Codex tasks must declare which epoch they belong to. Work that does not m
 | 00 | Discovery & Problem/Solution Validation | Active / partially complete | Validate problem, audience, wedge, trust concerns, and first beta community. | `DISCOVERY_RESEARCH_PLAN.md`, `DISCOVERY_RESEARCH_REPORT_001.md`, `PROBLEM_SOLUTION_VALIDATION_MATRIX.md`, `M0_VALIDATION_OPERATING_PACKET.md`, `PRODUCT_DELIVERY_OPERATING_MODEL.md` | FA expert interview completed, 3-5 trusted aviation contacts review live site, feedback captured, matrix updated, no major safety contradiction found. | FA expert interview, user feedback, trusted contact outreach, and first-community evidence are pending. | Start trusted-contact outreach and record feedback. |
 | 01 | Public Splash + Waitlist | Complete / live | Make concept publicly viewable and capture waitlist interest. | `APP_FOUNDATION_NOTES.md`, `LANDING_PAGE_WAITLIST_PLAN.md`, `DEPLOYMENT_AND_WAITLIST_READINESS.md`, `DEPLOYMENT_RECORD_001.md` | Production loads, CTA opens Tally, fallback removed, Tally test response submitted, mobile page reviewed. | Test response and mobile UX review are not yet recorded. | Submit/verify a Tally test response and review mobile. |
 | 02 | Private App Foundation | Pending | Create locked private app shell behind splash page. | `PRIVATE_APP_AUTH_DB_ARCHITECTURE.md`, `NAMING_AND_INFORMATION_ARCHITECTURE.md`, `MILESTONE_EXECUTION_PLAN.md`, `TECHNICAL_ARCHITECTURE.md` | Private shell exists, route structure defined, no unauthorized access, no real community functionality. | Explicit approval required; M0 validation signal preferred first. | Decide after Epoch 00 feedback whether M1B is justified. |
-| 03 | Auth, Profiles, and Beta Access | Pending | Establish login, profile, invite-only beta access, and access gates. | `PRIVATE_APP_AUTH_DB_ARCHITECTURE.md`, `DATA_MODEL.md`, `TECHNICAL_ARCHITECTURE.md`, `BETA_READINESS_CHECKLIST.md`, `SCALABILITY_AND_ARCHITECTURE_REQUIREMENTS.md`, `MOBILE_APP_STRATEGY.md` | Auth implemented, beta access state exists, invited users can enter, non-invited users are blocked, auth remains separate from aviation verification. | Backend/Auth ADR and explicit implementation approval required. | Prepare Supabase/Auth ADR only if Epoch 02 is approved. |
-| 04 | Verification System | Pending | Implement aviation verification state and review workflow. | `PRIVATE_APP_AUTH_DB_ARCHITECTURE.md`, `LEGAL_POLICY_REQUIREMENTS.md`, `TRUST_AND_SAFETY.md`, `DATA_MODEL.md`, `SCALABILITY_AND_ARCHITECTURE_REQUIREMENTS.md`, `MOBILE_APP_STRATEGY.md` | Verification state machine exists, non-upload manual review supported first, upload flow blocked until controls exist, AI cannot approve verification. | Verification consent, artifact retention, and upload acceptability decisions remain open. | Resolve non-upload manual verification flow before upload design. |
+| 03 | Auth, Profiles, and Beta Access | Complete | Establish login, profile, invite-only beta access, and access gates. | `epochs/epoch-03-auth-account-beta-access-tickets.md`, `epochs/epoch-03-validation-and-handoff-review.md`, `PRIVATE_APP_AUTH_DB_ARCHITECTURE.md`, `SCALABILITY_AND_ARCHITECTURE_REQUIREMENTS.md`, `MOBILE_APP_STRATEGY.md` | Auth implemented, beta access state exists, invited users can enter, non-invited users are blocked, auth remains separate from aviation verification. | Supabase operator setup and private-beta operations remain ongoing, but the approved implementation scope is complete. | Use the merged Epoch 03 handoff and runtime setup docs as the operator baseline. |
+| 04 | Worker Verification Foundation | Pending | Implement worker-verification foundation, claims, evidence handling rules, and human review baseline. | `VERIFICATION_METHOD_DECISION.md`, `epochs/epoch-04-worker-verification-foundation-tickets.md`, `PRIVATE_APP_AUTH_DB_ARCHITECTURE.md`, `TRUST_AND_SAFETY.md`, `SCALABILITY_AND_ARCHITECTURE_REQUIREMENTS.md`, `MOBILE_APP_STRATEGY.md` | Verification claim model exists, approved verification methods are implemented for the chosen slice, proof handling is private and retention-bounded, human review exists, claims-based authorization direction is explicit, and no employer-system lookup or AI final approval exists. | Verification consent, retention windows, approved-domain inventory, storage policy, and reviewer workflow still need bounded ticket-by-ticket implementation. | Start `E04-T01` and lock the verification claim/lifecycle decision before any upload or review implementation begins. |
 | 05 | Community Structure | Pending | Implement Base Boards, Layover Boards, and verified/role rooms structurally. | `MVP_SCOPE.md`, `BUILD_TICKETS.md`, `FEATURE_ROADMAP.md`, `DISCOVERY_RESEARCH_REPORT_001.md`, `SCALABILITY_AND_ARCHITECTURE_REQUIREMENTS.md`, `MOBILE_APP_STRATEGY.md` | Board/room structures exist, content can be seeded/read-only first, no real anonymous posting until moderation/admin gates are complete. | Requires auth/access and verification state before real member access. | Wait until Epochs 03-04 are underway. |
 | 06 | Moderation, Reporting, and Admin | Pending | Implement safety foundation before real anonymous posting. | `TRUST_AND_SAFETY.md`, `LEGAL_POLICY_REQUIREMENTS.md`, `BETA_READINESS_CHECKLIST.md`, `PRIVATE_APP_AUTH_DB_ARCHITECTURE.md`, `SCALABILITY_AND_ARCHITECTURE_REQUIREMENTS.md`, `MOBILE_APP_STRATEGY.md` | Report flow, moderation queue, admin actions, emergency escalation, and audit/security events exist. | Must precede real anonymous posting and beta UGC. | Design admin/moderation slice before enabling posting. |
 | 11 | Native Mobile Client | Future | Add a native phone app after the core web loop, access model, and moderation foundations are validated. | `MOBILE_APP_STRATEGY.md`, `TECHNICAL_ARCHITECTURE.md`, `PRIVATE_APP_AUTH_DB_ARCHITECTURE.md` | Mobile implementation begins only after core backend, auth, authorization, verification, and community rules are stable enough to reuse. | Web MVP and private-beta product loop are not validated yet. | Keep current implementation web-first while avoiding web-only architecture lock-in. |
@@ -187,7 +187,7 @@ Blockers:
 
 ### Epoch 03 - Auth, Profiles, and Beta Access
 
-Status: pending.
+Status: complete.
 
 Purpose:
 
@@ -212,15 +212,16 @@ Exit criteria:
 - Auth, profile, beta-access, authorization, pagination, indexing, and private-data handling choices remain scale-ready for tens of thousands of registered users without unnecessary overengineering.
 - Auth, account-state, authorization, and data-access choices avoid web-only assumptions that would block a future native mobile client.
 
-### Epoch 04 - Verification System
+### Epoch 04 - Worker Verification Foundation
 
 Status: pending.
 
 Purpose:
 
-- Implement aviation verification state and review workflow.
-- Support initial approved methods: airline work-email verification where available and redacted badge/proof upload with human review.
-- Produce approved worker claims that later room and private-area authorization can use.
+- implement worker-verification foundation and review workflow
+- support initial approved methods: airline work-email verification where available and redacted badge/proof upload with human review
+- produce approved worker claims that later room and private-area authorization can use
+- preserve privacy, auditability, and retention/deletion controls while avoiding legally risky verification behavior
 
 Primary docs:
 
@@ -230,6 +231,7 @@ Primary docs:
 - `DATA_MODEL.md`
 - `SCALABILITY_AND_ARCHITECTURE_REQUIREMENTS.md`
 - `VERIFICATION_METHOD_DECISION.md`
+- `epochs/epoch-04-worker-verification-foundation-tickets.md`
 
 Exit criteria:
 
@@ -247,6 +249,18 @@ Planned workflow slice:
 - human review
 - approved claims for airline-worker, airline, role, and base where relevant
 - retention and deletion controls for raw proof
+
+Explicit prohibitions:
+
+- no employer-system lookup unless explicit written authorization exists
+- no AI final approval
+- no scraping private airline systems or private groups
+- no employee database lookup
+
+Important follow-up preserved for later ops/brand work:
+
+- customize Supabase auth email templates for jmpseat branding
+- configure custom SMTP/domain sender so confirmation and reset emails do not look third-party
 
 ### Epoch 05 - Community Structure
 
