@@ -322,6 +322,25 @@ test("review migration adds reviewer scopes, RLS, and no-self-review reviewer po
   );
 });
 
+test("reviewer routing migration extends RLS helper to match requested_airline for proof requests only", () => {
+  const sql = readFileSync(
+    new URL("../../supabase/migrations/20260604223611_include_requested_airline_in_reviewer_routing.sql", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(sql, /create or replace function public\.can_review_verification_request/i);
+  assert.match(sql, /metadata ->> 'airline'/i);
+  assert.match(sql, /metadata ->> 'requested_airline'/i);
+  assert.match(
+    sql,
+    /public\.has_matching_verification_reviewer_scope\(\s*actor_id,\s*coalesce\(\s*metadata ->> 'airline',\s*metadata ->> 'requested_airline'\s*\)/i,
+  );
+  assert.match(sql, /actor_id <> request_owner_id/i);
+  assert.match(sql, /scope_type = 'global'/i);
+  assert.doesNotMatch(sql, /issue.*claim|insert into public\.verification_claims|approved_by = auth\.uid\(\)/i);
+  assert.doesNotMatch(sql, /signed url|public url|download|preview|storage_path|employer system lookup/i);
+});
+
 test("transactional review migration adds a bounded authenticated RPC for atomic review decisions", () => {
   const sql = readFileSync(
     new URL("../../supabase/migrations/20260604195441_create_apply_verification_review_decision.sql", import.meta.url),

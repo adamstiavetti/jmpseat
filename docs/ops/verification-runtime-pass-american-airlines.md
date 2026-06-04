@@ -275,3 +275,43 @@ Fix posture:
 - routing context is not a claim
 - routing context does not grant protected access
 - no proof viewing, signed URLs, downloads, AI, or employer-system lookup were added by the fix
+
+## Proof Reviewer RLS Read Gap After Routing-Context Persistence
+
+The next runtime rerun after the RPC persistence fix proved that proof-routing context was finally being stored correctly, but it also exposed one more reviewer-routing blocker.
+
+Observed runtime result:
+
+- proof upload succeeded
+- the new proof evidence metadata row included:
+  - `requested_airline = American Airlines`
+  - `routing_context_source = self_declared`
+- no claim was issued from upload alone
+- security events remained sanitized
+- but the airline-scoped reviewer still saw no reviewable proof request
+
+Why the request was still invisible:
+
+- the app-side queue matcher already supported proof routing by `requested_airline`
+- but reviewer-session reads were still gated by `public.can_review_verification_request(...)`
+- that helper still matched only:
+  - `metadata ->> 'airline'`
+  - `metadata ->> 'role'`
+  - `metadata ->> 'base'`
+- it did not yet consider:
+  - `metadata ->> 'requested_airline'`
+
+That meant reviewer sessions could not read the proof request rows through RLS, so the queue stayed empty before app-side filtering could help.
+
+Follow-up fix:
+
+- [Proof Request Reviewer RLS Routing Fix](../epochs/proof-request-reviewer-rls-routing-fix.md)
+
+Fix posture:
+
+- reviewer-read routing is extended to allow airline-scope matching by:
+  - approved `airline` metadata
+  - or bounded proof-routing `requested_airline`
+- `requested_airline` remains routing context only
+- it is still not treated as verified proof
+- it still does not issue claims or grant protected access
