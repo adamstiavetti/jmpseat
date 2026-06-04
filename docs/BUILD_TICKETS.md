@@ -22,6 +22,7 @@ Supplemental epoch-specific ticket packs:
 - [Epoch 04: Verification Claim Lifecycle Decision](epochs/epoch-04-verification-claim-lifecycle-decision.md)
 - [Epoch 04: Verification Data Model Implementation](epochs/epoch-04-verification-data-model-implementation.md)
 - [Epoch 04: Work Email Verification Foundation Implementation](epochs/epoch-04-work-email-verification-foundation-implementation.md)
+- [Epoch 04: Redacted Proof Storage Retention Design](epochs/epoch-04-redacted-proof-storage-retention-design.md)
 - [Supabase Runtime Setup](ops/supabase-runtime-setup.md)
 - [Supabase CLI Migration Workflow](ops/supabase-cli-migration-workflow.md)
 - [Verification Method Decision](VERIFICATION_METHOD_DECISION.md)

@@ -344,6 +344,9 @@ Define the approved-domain model and work-email verification flow boundary.
 **Title**  
 Define Redacted Proof Storage And Retention Design
 
+**Status**
+Complete for design. See [Epoch 04 Redacted Proof Storage Retention Design](epoch-04-redacted-proof-storage-retention-design.md).
+
 **Objective**  
 Define storage, retention, deletion, and reviewer-access rules before any upload implementation begins.
 
