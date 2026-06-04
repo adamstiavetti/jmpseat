@@ -414,6 +414,9 @@ Define storage, retention, deletion, and reviewer-access rules before any upload
 **Title**  
 Implement Verification Submission Surface Foundation
 
+**Status**
+Complete for implementation. See [Epoch 04 Verification Submission Surface Implementation](epoch-04-verification-submission-surface-implementation.md).
+
 **Objective**  
 Build the first bounded `/app/verification` submission and status surface.
 

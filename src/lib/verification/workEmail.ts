@@ -1,7 +1,5 @@
-import {
-  VERIFICATION_EVIDENCE_TYPES,
-  VERIFICATION_METHODS,
-} from "./verification";
+const WORK_EMAIL_VERIFICATION_METHOD = "work_email" as const;
+const WORK_EMAIL_EVIDENCE_TYPE = "work_email" as const;
 
 export const APPROVED_EMAIL_DOMAIN_STATUSES = [
   "active",
@@ -171,7 +169,7 @@ export function buildWorkEmailEvidenceMetadata({
       Boolean(normalizedWorkEmail) &&
       normalizedLoginEmail !== normalizedWorkEmail,
     supported_domain: Boolean(matchedDomain),
-    verification_method: VERIFICATION_METHODS[0],
+    verification_method: WORK_EMAIL_VERIFICATION_METHOD,
   };
 }
 
@@ -206,12 +204,12 @@ export function buildWorkEmailVerificationDraft({
       user_id: userId,
       status: "submitted" as const,
       requested_claim_types: requestedClaimTypes,
-      method: VERIFICATION_METHODS[0],
+      method: WORK_EMAIL_VERIFICATION_METHOD,
       submitted_at: nowIso,
     },
     evidence: {
       user_id: userId,
-      evidence_type: VERIFICATION_EVIDENCE_TYPES[0],
+      evidence_type: WORK_EMAIL_EVIDENCE_TYPE,
       status: "submitted" as const,
       uploaded_at: nowIso,
       redaction_acknowledged: false,
