@@ -247,6 +247,7 @@ test("review migration adds reviewer scopes, RLS, and no-self-review reviewer po
   assert.match(sql, /create or replace function public\.can_review_verification_request/i);
   assert.match(sql, /public\.can_review_verification_request\(auth\.uid\(\), user_id, id\)/i);
   assert.match(sql, /metadata ->> 'airline'/i);
+  assert.doesNotMatch(sql, /with check \(\s+and reviewer_id = auth\.uid\(\)/i);
   assert.doesNotMatch(sql, /public read|for select using \(true\)|for all/i);
   assert.doesNotMatch(
     sql,

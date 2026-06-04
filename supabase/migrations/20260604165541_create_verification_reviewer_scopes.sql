@@ -206,7 +206,7 @@ on public.verification_review_actions
 for insert
 to authenticated
 with check (
-  and reviewer_id = auth.uid()
+  reviewer_id = auth.uid()
   and action in ('approve', 'reject', 'request_resubmission')
   and exists (
     select 1
