@@ -297,7 +297,8 @@ test("proof access implementation stays server-only and uses service-role signed
     "utf8",
   );
 
-  assert.match(source, /"use server"|import "server-only"/i);
+  assert.match(source, /import "server-only"/i);
+  assert.match(storageAdminSource, /import "server-only"/i);
   assert.match(source, /createSignedUrl/i);
   assert.match(storageAdminSource, /SUPABASE_SERVICE_ROLE_KEY/);
   assert.doesNotMatch(storageAdminSource, /NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY/);

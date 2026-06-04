@@ -1,9 +1,8 @@
+import "server-only";
+
 import { createClient } from "@supabase/supabase-js";
 
 import { getSupabaseBrowserEnv } from "./config";
-
-const STORAGE_ADMIN_SERVER_ONLY = "server-only";
-void STORAGE_ADMIN_SERVER_ONLY;
 
 export const STORAGE_ADMIN_UNAVAILABLE_MESSAGE =
   "Controlled proof viewing is not available in this environment yet.";

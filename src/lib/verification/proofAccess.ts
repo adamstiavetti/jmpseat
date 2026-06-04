@@ -1,3 +1,5 @@
+import "server-only";
+
 import { redirect } from "next/navigation";
 
 import { AUTH_ROUTES } from "../auth/routes";
@@ -9,9 +11,6 @@ import {
   resolveProofViewAccess,
   type ProofViewReasonCode,
 } from "./proofAccessCore";
-
-const PROOF_ACCESS_SERVER_ONLY = "server-only";
-void PROOF_ACCESS_SERVER_ONLY;
 
 const VERIFICATION_REVIEW_ROUTE = "/app/admin/verification";
 const PROOF_EVIDENCE_TYPE = "redacted_badge_or_proof";
