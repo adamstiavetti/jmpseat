@@ -219,6 +219,8 @@ Status: pending.
 Purpose:
 
 - Implement aviation verification state and review workflow.
+- Support initial approved methods: airline work-email verification where available and redacted badge/proof upload with human review.
+- Produce approved worker claims that later room and private-area authorization can use.
 
 Primary docs:
 
@@ -227,6 +229,7 @@ Primary docs:
 - `TRUST_AND_SAFETY.md`
 - `DATA_MODEL.md`
 - `SCALABILITY_AND_ARCHITECTURE_REQUIREMENTS.md`
+- `VERIFICATION_METHOD_DECISION.md`
 
 Exit criteria:
 
@@ -234,6 +237,16 @@ Exit criteria:
 - Non-upload manual review supported first.
 - Upload flow remains blocked until controls exist.
 - AI cannot approve verification.
+- Approved email-domain verification, redacted badge/proof review, claim issuance, and raw-proof retention/deletion rules are defined and implemented for the chosen verification slice.
+
+Planned workflow slice:
+
+- email-domain verification for approved airline/employer domains
+- redacted badge/proof upload
+- private storage and controlled reviewer access
+- human review
+- approved claims for airline-worker, airline, role, and base where relevant
+- retention and deletion controls for raw proof
 
 ### Epoch 05 - Community Structure
 

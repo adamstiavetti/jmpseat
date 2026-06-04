@@ -157,6 +157,8 @@ Private app community features should not be self-serve public access in early b
 
 Verification should be modeled as a state machine, separate from auth and beta access.
 
+The initial verification-method direction is defined in [Verification Method Decision](VERIFICATION_METHOD_DECISION.md).
+
 Recommended states:
 
 - `unverified`
@@ -179,6 +181,8 @@ Verification rules:
 - Verification status can expire or require recheck when employment context changes or abuse risk is detected.
 
 Verification artifacts, if ever accepted, must not be processed by AI and must not be stored in public paths.
+
+Later private-room and access rules should rely on approved verification claims rather than trusting self-selected profile fields alone. Verification remains separate from auth identity and from beta-access approval.
 
 ## 9. Anonymous Identity Model
 

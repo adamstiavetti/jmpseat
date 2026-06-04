@@ -13,6 +13,7 @@ Supplemental epoch-specific ticket packs:
 - [Epoch 03: Auth, Profiles, and Beta Access Ticket Pack](epochs/epoch-03-auth-account-beta-access-tickets.md)
 - [Epoch 03: Auth Access Architecture Decision](epochs/epoch-03-auth-access-architecture-decision.md)
 - [Epoch 03: Auth Route Account State Map](epochs/epoch-03-auth-route-account-state-map.md)
+- [Verification Method Decision](VERIFICATION_METHOD_DECISION.md)
 
 Documentation hygiene reminder:
 

@@ -49,6 +49,8 @@ V1 should focus on Tiers 0 through 3 and cautiously test Tier 4. Tier 5 should w
 
 ## Verification Risk Notes
 
+The controlling method-direction doc for initial verification is [Verification Method Decision](VERIFICATION_METHOD_DECISION.md).
+
 Work email verification is useful but not risk-free. Employer mail logs may reveal that a verification email was requested, even if public activity remains anonymous. The product should disclose that risk plainly and offer manual verification as an alternative.
 
 Manual document or badge verification should minimize collection:
@@ -65,6 +67,8 @@ Manual document or badge verification should minimize collection:
 - Never send verification documents to AI systems.
 
 Peer vouching should not launch as the only verification method because it can create cliques, pressure, and abuse. Use it as a supplemental trust signal.
+
+Verification reviewers must not access employer systems, crew scheduling tools, internal directories, or other confidential employer resources unless jmpseat has explicit written authorization from that employer.
 
 ## Banned Content Categories
 
