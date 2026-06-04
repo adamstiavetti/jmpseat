@@ -1,0 +1,33 @@
+{
+  "generated_at": "2026-05-31T00:51:00.607Z",
+  "inputs": {
+    "albedo": "public/cinematic/textures/jmpseat-earth-cityrim-candidate-albedo.webp",
+    "emission": "public/cinematic/textures/jmpseat-earth-cityrim-candidate-emission.webp",
+    "clouds": "public/cinematic/textures/jmpseat-earth-cityrim-candidate-clouds.webp",
+    "iceMask": "public/cinematic/textures/jmpseat-earth-ice-suppression-v4.webp",
+    "prior_metadata": "public/cinematic/textures/jmpseat-earth-cityrim-candidate-metadata.json"
+  },
+  "outputs": {
+    "albedo": "public/cinematic/textures/jmpseat-earth-polar-candidate-albedo.webp",
+    "emission": "public/cinematic/textures/jmpseat-earth-polar-candidate-emission.webp",
+    "clouds": "public/cinematic/textures/jmpseat-earth-polar-candidate-clouds.webp",
+    "metadata": "public/cinematic/textures/jmpseat-earth-polar-candidate-metadata.json"
+  },
+  "candidate_goal": "Single safe polar/ice and top-rim correction for /lab/live-globe-proof.",
+  "transforms": [
+    "Started from the accepted cityrim albedo so city lights, ocean balance, and general land values remain aligned with the current working state.",
+    "Reduced Greenland/Arctic harshness by selectively cooling and lowering the brightest north-polar ice response using the existing ice mask and top-latitude targeting.",
+    "Preserved emission and clouds unchanged so warm city lights and current cloud detail do not regress.",
+    "This candidate is intended to pair with a small runtime top/rim glow grade change rather than a broad material rewrite."
+  ],
+  "notes": [
+    "No camera, placement, orientation, rotation, routes, aircraft, scanner, ticket, ENTER CTA, chapter cards, homepage, or waitlist changes are encoded here.",
+    "The change is intentionally limited to one versioned candidate for accept/reject review."
+  ],
+  "inherited_from_cityrim": {
+    "albedo": "public/cinematic/textures/jmpseat-earth-cityrim-candidate-albedo.webp",
+    "emission": "public/cinematic/textures/jmpseat-earth-cityrim-candidate-emission.webp",
+    "clouds": "public/cinematic/textures/jmpseat-earth-cityrim-candidate-clouds.webp",
+    "metadata": "public/cinematic/textures/jmpseat-earth-cityrim-candidate-metadata.json"
+  }
+}

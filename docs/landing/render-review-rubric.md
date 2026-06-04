@@ -1,17 +1,17 @@
-# Deadhead Hero Render Review Rubric
+# jmpseat Hero Render Review Rubric
 
-This rubric gates every Deadhead cinematic waitlist hero render iteration against the supplied mobile and desktop references.
+This rubric gates every jmpseat cinematic waitlist hero render iteration against the supplied mobile and desktop references.
 
 Reference files:
 
-- `docs/landing/references/deadheadwaitlistglobemobile.jpeg`
-- `docs/landing/references/deadheadwaitlistglobedesktop.jpeg`
+- `docs/landing/references/jmpseatwaitlistglobemobile.jpeg`
+- `docs/landing/references/jmpseatwaitlistglobedesktop.jpeg`
 
 Current render files:
 
-- `public/cinematic/previews/deadhead-hero-mobile-preview.png`
-- `public/cinematic/previews/deadhead-hero-desktop-preview.png`
-- `public/cinematic/previews/deadhead-hero-contact-sheet.png`
+- `public/cinematic/previews/jmpseat-hero-mobile-preview.png`
+- `public/cinematic/previews/jmpseat-hero-desktop-preview.png`
+- `public/cinematic/previews/jmpseat-hero-contact-sheet.png`
 
 ## Scoring Scale
 

@@ -1,4 +1,4 @@
-# Deadhead Earth V2 Texture Lookdev
+# jmpseat Earth V2 Texture Lookdev
 
 Date: 2026-05-30
 
@@ -74,13 +74,13 @@ Existing web-safe source derivatives used for this pass:
 
 ### Current runtime wiring after this pass
 
-- Day/albedo: `public/cinematic/textures/deadhead-earth-albedo-v2.webp`
-- Night/emission: `public/cinematic/textures/deadhead-earth-emission-v2.webp`
-- Night halo support: `public/cinematic/textures/deadhead-earth-emission-halo-v2.webp`
-- Clouds: `public/cinematic/textures/deadhead-earth-clouds-v2.webp`
-- Ocean response helper: `public/cinematic/textures/deadhead-earth-ocean-mask-v2.webp`
-- Desert suppression helper: `public/cinematic/textures/deadhead-earth-desert-suppression-v2.webp`
-- Ice suppression helper: `public/cinematic/textures/deadhead-earth-ice-suppression-v2.webp`
+- Day/albedo: `public/cinematic/textures/jmpseat-earth-albedo-v2.webp`
+- Night/emission: `public/cinematic/textures/jmpseat-earth-emission-v2.webp`
+- Night halo support: `public/cinematic/textures/jmpseat-earth-emission-halo-v2.webp`
+- Clouds: `public/cinematic/textures/jmpseat-earth-clouds-v2.webp`
+- Ocean response helper: `public/cinematic/textures/jmpseat-earth-ocean-mask-v2.webp`
+- Desert suppression helper: `public/cinematic/textures/jmpseat-earth-desert-suppression-v2.webp`
+- Ice suppression helper: `public/cinematic/textures/jmpseat-earth-ice-suppression-v2.webp`
 
 Normal/bump data is still identified and documented, but it is not sampled by the current live shader.
 
@@ -88,24 +88,24 @@ Normal/bump data is still identified and documented, but it is not sampled by th
 
 ### Required outputs
 
-- `public/cinematic/textures/deadhead-earth-albedo-v2.webp`
-- `public/cinematic/textures/deadhead-earth-emission-v2.webp`
-- `public/cinematic/textures/deadhead-earth-clouds-v2.webp`
-- `public/cinematic/textures/deadhead-earth-lookdev-metadata.json`
+- `public/cinematic/textures/jmpseat-earth-albedo-v2.webp`
+- `public/cinematic/textures/jmpseat-earth-emission-v2.webp`
+- `public/cinematic/textures/jmpseat-earth-clouds-v2.webp`
+- `public/cinematic/textures/jmpseat-earth-lookdev-metadata.json`
 
 ### Supporting outputs used in runtime
 
-- `public/cinematic/textures/deadhead-earth-emission-halo-v2.webp`
-- `public/cinematic/textures/deadhead-earth-ocean-mask-v2.webp`
-- `public/cinematic/textures/deadhead-earth-desert-suppression-v2.webp`
-- `public/cinematic/textures/deadhead-earth-ice-suppression-v2.webp`
+- `public/cinematic/textures/jmpseat-earth-emission-halo-v2.webp`
+- `public/cinematic/textures/jmpseat-earth-ocean-mask-v2.webp`
+- `public/cinematic/textures/jmpseat-earth-desert-suppression-v2.webp`
+- `public/cinematic/textures/jmpseat-earth-ice-suppression-v2.webp`
 
 ### Flat previews
 
-- `public/cinematic/previews/deadhead-earth-albedo-v2-preview.png`
-- `public/cinematic/previews/deadhead-earth-emission-v2-preview.png`
-- `public/cinematic/previews/deadhead-earth-clouds-v2-preview.png`
-- `public/cinematic/previews/deadhead-earth-emission-halo-v2-preview.png`
+- `public/cinematic/previews/jmpseat-earth-albedo-v2-preview.png`
+- `public/cinematic/previews/jmpseat-earth-emission-v2-preview.png`
+- `public/cinematic/previews/jmpseat-earth-clouds-v2-preview.png`
+- `public/cinematic/previews/jmpseat-earth-emission-halo-v2-preview.png`
 
 ## Exact Visual Changes
 
@@ -142,19 +142,19 @@ Normal/bump data is still identified and documented, but it is not sampled by th
 
 Source-derived required maps:
 
-- `deadhead-earth-albedo-v2.webp`
-- `deadhead-earth-emission-v2.webp`
-- `deadhead-earth-clouds-v2.webp`
+- `jmpseat-earth-albedo-v2.webp`
+- `jmpseat-earth-emission-v2.webp`
+- `jmpseat-earth-clouds-v2.webp`
 
 Supporting derived maps:
 
-- `deadhead-earth-emission-halo-v2.webp`
+- `jmpseat-earth-emission-halo-v2.webp`
   - blurred from the same source night geography
-- `deadhead-earth-ocean-mask-v2.webp`
+- `jmpseat-earth-ocean-mask-v2.webp`
   - derived from the source specular map plus day-map color separation
-- `deadhead-earth-desert-suppression-v2.webp`
+- `jmpseat-earth-desert-suppression-v2.webp`
   - derived from source hue, luma, and dryness cues
-- `deadhead-earth-ice-suppression-v2.webp`
+- `jmpseat-earth-ice-suppression-v2.webp`
   - derived from source brightness, saturation, and latitude cues
 
 No required map was replaced with invented fantasy content.
@@ -193,7 +193,7 @@ No required map was replaced with invented fantasy content.
 
 ## Remaining Exact-Match Gaps
 
-- Greenland and other bright polar regions still catch more top light than the supplied Deadhead reference wants
+- Greenland and other bright polar regions still catch more top light than the supplied jmpseat reference wants
 - The dark-side surface still reads as a graded Earth map, not a fully art-authored premium aviation globe
 - The route orientation is intentionally preserved, so Europe is not as dominant in the current proof frame as it is in the strongest reference art
 - Cloud richness is improved, but still below the reference’s integrated render quality

@@ -1,4 +1,4 @@
-# Deadhead Cinematic Earth Texture Sources
+# jmpseat Cinematic Earth Texture Sources
 
 Updated: 2026-05-30T05:41:37.241634+00:00
 

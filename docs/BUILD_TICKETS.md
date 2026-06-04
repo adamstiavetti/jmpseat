@@ -1,6 +1,7 @@
 # Build Tickets
 
-Working name note: "Deadhead Club" is a working product name pending legal and trademark clearance. This document does not claim legal or trademark clearance.
+Brand note: jmpseat is the canonical product and app name. This document does not claim legal or trademark clearance for the name.
+Rename note: Deadhead Club is retired and should not be used in current docs, UI, code, or planning. Older Git history may still contain legacy references.
 
 This is a prioritized implementation plan for a future build phase. No app code is included in this documentation-only repository initialization.
 

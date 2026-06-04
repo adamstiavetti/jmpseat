@@ -56,15 +56,15 @@
 - Tool used:
   - ImageMagick `7.1.2-24`, installed via Homebrew during this task.
 - Source staging path:
-  - `/tmp/deadheadclub-earth-src/`
+  - `/tmp/jmpseat-earth-src/`
 - Commands used:
 
 ```bash
-magick /tmp/deadheadclub-earth-src/earth-day-source.jpg \
+magick /tmp/jmpseat-earth-src/earth-day-source.jpg \
   -resize 4096x2048 -strip -interlace Plane -quality 90 \
   public/textures/earth/earth-day.jpg
 
-magick /tmp/deadheadclub-earth-src/earth-night-source.jpg \
+magick /tmp/jmpseat-earth-src/earth-night-source.jpg \
   -resize 3600x1800 -strip -interlace Plane -quality 92 \
   public/textures/earth/earth-night.jpg
 ```

@@ -1,16 +1,16 @@
 # Naming and Information Architecture
 
-Working name note: "Deadhead Club" is a working product name pending legal and trademark clearance. This document does not prove legal, trademark, or brand-name safety.
+Brand note: jmpseat is the canonical product and app name. This document does not claim legal or trademark clearance for the name.
 
 Product principle: Utility first. Community second. Social feed last.
 
 Identity principle: Verified privately. Anonymous publicly. Accountable internally.
 
-Deadhead Club is not affiliated with or endorsed by any airline, airport, union, or employer unless explicitly obtained and documented.
+jmpseat is not affiliated with or endorsed by any airline, airport, union, or employer unless explicitly obtained and documented.
 
 ## 1. Purpose
 
-This document defines the naming and information architecture foundation for the logged-in Deadhead Club app before the private app shell is built.
+This document defines the naming and information architecture foundation for the logged-in jmpseat app before the private app shell is built.
 
 The public brand can be cinematic, bold, and aviation-native. The logged-in product must be clearer: trusted, role-aware, gated, useful, and navigable on mobile. Names should help airline workers know where to go and what is safe to do.
 
@@ -18,7 +18,7 @@ This is not a legal clearance document. It does not implement app code, routes, 
 
 ## 2. Naming Strategy
 
-Good Deadhead Club names should:
+Good jmpseat names should:
 
 - Sound aviation-native without becoming corny.
 - Be understandable to flight attendants and broader airline workers.
@@ -34,7 +34,7 @@ Naming should prefer clear product nouns over overly clever metaphors. Aviation 
 
 ## 3. Audience Segmentation
 
-Deadhead Club should serve the broader airline ecosystem, but not every label works equally for every role.
+jmpseat should serve the broader airline ecosystem, but not every label works equally for every role.
 
 | Audience | Terminology needs | IA implication |
 | --- | --- | --- |

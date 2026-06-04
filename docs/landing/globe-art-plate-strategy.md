@@ -11,7 +11,7 @@ The scripted Blender globe proofs plateaued around the low 20s out of 30. They i
 - cyan/glass display orb
 - raw texture look without premium aviation art direction
 
-The supplied Deadhead globe reference needs a stronger art-directed plate: deep navy Earth, rich surface texture, warm embedded cities, thin rim atmosphere, and cinematic depth.
+The supplied jmpseat globe reference needs a stronger art-directed plate: deep navy Earth, rich surface texture, warm embedded cities, thin rim atmosphere, and cinematic depth.
 
 ## Plate Role
 
@@ -67,7 +67,7 @@ The overlay route and aircraft layers should remain separate so they can animate
 
 The plate route should not be promoted beyond lab status unless:
 
-- the globe resembles the supplied Deadhead globe reference more than the failed Blender proofs
+- the globe resembles the supplied jmpseat globe reference more than the failed Blender proofs
 - oceans read deep navy/blue, not black or cyan
 - city lights are warm and geography-shaped
 - atmosphere is a thin rim, not a front-face coating

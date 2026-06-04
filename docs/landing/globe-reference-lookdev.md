@@ -26,7 +26,7 @@ Status: active globe-only reference target.
 
 ## Current Lookdev Goal
 
-Generate larger controlled variants that target the supplied Deadhead globe reference directly:
+Generate larger controlled variants that target the supplied jmpseat globe reference directly:
 
 - Reference Fill Match: mid-face navy/blue richness.
 - Surface Detail Match: richer surface/cloud/terrain breakup.

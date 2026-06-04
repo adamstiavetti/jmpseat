@@ -1,6 +1,6 @@
 # Private Beta Operating Plan
 
-Working name note: "Deadhead Club" is a working product name pending legal and trademark clearance. This plan does not claim legal or trademark clearance.
+Brand note: jmpseat is the canonical product and app name. This document does not claim legal or trademark clearance for the name.
 
 Product principle: Utility first. Community second. Social feed last.
 
@@ -69,12 +69,12 @@ Moderation load:
 Qualitative feedback:
 
 - At least 10 structured feedback responses.
-- At least 6 users can name a specific way Deadhead Club was useful.
+- At least 6 users can name a specific way jmpseat was useful.
 - Fewer than 3 users say they primarily want excluded risky features such as public crew tracking, flight-load requests, dating/swiping, or schedule import.
 
 ## 3. First Beta Community Strategy
 
-Deadhead Club should start with one focused community instead of launching everywhere. A narrow beta creates enough density for useful answers, gives admins a manageable moderation surface, and makes product learning clearer.
+jmpseat should start with one focused community instead of launching everywhere. A narrow beta creates enough density for useful answers, gives admins a manageable moderation surface, and makes product learning clearer.
 
 Options:
 
@@ -308,7 +308,7 @@ Trust and safety pinned posts:
 
 Welcome/onboarding posts:
 
-- "Start here: what Deadhead Club is."
+- "Start here: what jmpseat is."
 - "How verification and anonymity work."
 - "How to report safety or privacy issues."
 
@@ -436,7 +436,7 @@ Minimum legal/policy docs needed before real users:
 - Community guidelines.
 - Verification consent language.
 - AI disclaimer.
-- Name/trademark clearance path for the Deadhead Club working name.
+- Name/trademark clearance path for the jmpseat working name.
 
 Required owner/review:
 
@@ -556,4 +556,4 @@ Alternative documentation-only task:
 - Exact verification-document retention period after legal/privacy review.
 - Whether private beta uses only non-upload Tier 3 manual review or upload controls are ready enough for manual badge/document uploads.
 - Policy owner for terms, privacy policy, community guidelines, verification consent, and AI disclaimer.
-- Legal/trademark clearance path for the Deadhead Club working name.
+- Legal/trademark clearance path for the jmpseat working name.

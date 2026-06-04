@@ -7,18 +7,18 @@
     "specular": "public/cinematic/textures/cgtrader-earth-specular-4k.jpg"
   },
   "outputs": {
-    "albedo": "public/cinematic/textures/deadhead-earth-albedo-v2.webp",
-    "emission": "public/cinematic/textures/deadhead-earth-emission-v2.webp",
-    "emissionHalo": "public/cinematic/textures/deadhead-earth-emission-halo-v2.webp",
-    "clouds": "public/cinematic/textures/deadhead-earth-clouds-v2.webp",
-    "oceanMask": "public/cinematic/textures/deadhead-earth-ocean-mask-v2.webp",
-    "desertMask": "public/cinematic/textures/deadhead-earth-desert-suppression-v2.webp",
-    "iceMask": "public/cinematic/textures/deadhead-earth-ice-suppression-v2.webp",
-    "metadata": "public/cinematic/textures/deadhead-earth-lookdev-metadata.json",
-    "albedoPreview": "public/cinematic/previews/deadhead-earth-albedo-v2-preview.png",
-    "emissionPreview": "public/cinematic/previews/deadhead-earth-emission-v2-preview.png",
-    "emissionHaloPreview": "public/cinematic/previews/deadhead-earth-emission-halo-v2-preview.png",
-    "cloudsPreview": "public/cinematic/previews/deadhead-earth-clouds-v2-preview.png"
+    "albedo": "public/cinematic/textures/jmpseat-earth-albedo-v2.webp",
+    "emission": "public/cinematic/textures/jmpseat-earth-emission-v2.webp",
+    "emissionHalo": "public/cinematic/textures/jmpseat-earth-emission-halo-v2.webp",
+    "clouds": "public/cinematic/textures/jmpseat-earth-clouds-v2.webp",
+    "oceanMask": "public/cinematic/textures/jmpseat-earth-ocean-mask-v2.webp",
+    "desertMask": "public/cinematic/textures/jmpseat-earth-desert-suppression-v2.webp",
+    "iceMask": "public/cinematic/textures/jmpseat-earth-ice-suppression-v2.webp",
+    "metadata": "public/cinematic/textures/jmpseat-earth-lookdev-metadata.json",
+    "albedoPreview": "public/cinematic/previews/jmpseat-earth-albedo-v2-preview.png",
+    "emissionPreview": "public/cinematic/previews/jmpseat-earth-emission-v2-preview.png",
+    "emissionHaloPreview": "public/cinematic/previews/jmpseat-earth-emission-halo-v2-preview.png",
+    "cloudsPreview": "public/cinematic/previews/jmpseat-earth-clouds-v2-preview.png"
   },
   "texture_audit": {
     "runtime_geometry": "SphereGeometry in app/lab/live-globe-proof/page.tsx",
@@ -82,9 +82,9 @@
     }
   },
   "procedural_supporting_maps": [
-    "deadhead-earth-ocean-mask-v2.webp",
-    "deadhead-earth-desert-suppression-v2.webp",
-    "deadhead-earth-ice-suppression-v2.webp"
+    "jmpseat-earth-ocean-mask-v2.webp",
+    "jmpseat-earth-desert-suppression-v2.webp",
+    "jmpseat-earth-ice-suppression-v2.webp"
   ],
   "notes": [
     "Raw CGTrader assets remain private under the ignored Globe/ source directory.",

@@ -2,7 +2,7 @@
 
 ## 1. Purpose
 
-This document defines a future V2 visual direction for turning the Deadhead Club public landing page into a premium full-page Three.js/WebGL aviation experience across desktop and mobile.
+This document defines a future V2 visual direction for turning the jmpseat public landing page into a premium full-page Three.js/WebGL aviation experience across desktop and mobile.
 
 The current Three.js prototype branch is technically safe but visually underpowered for the founder's target. It behaves like a subtle hero enhancement, not a full-page aviation-native journey. V2 should make the page feel more fantastic and immersive while preserving the product's conversion goal, accessibility, performance, and safety boundaries.
 
@@ -12,8 +12,8 @@ Controlling principles:
 
 - Utility first. Community second. Social feed last.
 - Verified privately. Anonymous publicly. Accountable internally.
-- Deadhead Club is a working name pending legal/trademark clearance.
-- Deadhead Club must not imply official airline, airport, union, or employer affiliation.
+- jmpseat is a working name pending legal/trademark clearance.
+- jmpseat must not imply official airline, airport, union, or employer affiliation.
 - The waitlist conversion remains the top goal.
 - All essential text, CTA buttons, disclaimers, and product explanations remain normal accessible HTML.
 - Three.js/WebGL remains visual and storytelling support, not the source of essential content.
@@ -23,7 +23,7 @@ Controlling principles:
 
 ## 2. Current State
 
-- Production site: https://deadheadclub.vercel.app
+- Production site: https://jmpseat.vercel.app
 - Waitlist form: https://tally.so/r/jav6aa
 - Current production page includes the public splash/waitlist page and `/app` private beta placeholder.
 - Current production page does not include the unmerged Three.js prototype unless separately deployed as a preview.

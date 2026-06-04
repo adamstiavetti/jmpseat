@@ -2,8 +2,8 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Deadhead Club",
-  description: "Deadhead Club application shell.",
+  title: "jmpseat",
+  description: "jmpseat application shell.",
 };
 
 export const viewport: Viewport = {

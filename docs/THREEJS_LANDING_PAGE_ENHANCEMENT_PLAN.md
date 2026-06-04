@@ -1,25 +1,25 @@
 # Three.js Landing Page Enhancement Plan
 
-Working name note: "Deadhead Club" is a working product name pending legal and trademark clearance. This plan does not claim legal or trademark clearance.
+Brand note: jmpseat is the canonical product and app name. This document does not claim legal or trademark clearance for the name.
 
 Product principle: Utility first. Community second. Social feed last.
 
 Identity principle: Verified privately. Anonymous publicly. Accountable internally.
 
-Deadhead Club is not affiliated with or endorsed by any airline, airport, union, or employer.
+jmpseat is not affiliated with or endorsed by any airline, airport, union, or employer.
 
 This is a documentation-only plan. It does not implement Three.js, add dependencies, create assets, modify the landing page, change deployment config, or add product features.
 
 ## 1. Purpose
 
-This plan defines how Deadhead Club could add a premium aviation-native 3D hero layer to the existing public splash/waitlist page. The goal is to strengthen the airport-at-night atmosphere, make the founder-pitch surface feel more memorable, and support waitlist conversion.
+This plan defines how jmpseat could add a premium aviation-native 3D hero layer to the existing public splash/waitlist page. The goal is to strengthen the airport-at-night atmosphere, make the founder-pitch surface feel more memorable, and support waitlist conversion.
 
-3D should support trust, aviation context, and conversion. It should not become a gimmick, hide the product promise, slow the page down, or make Deadhead Club feel like a travel-booking site, dating app, flight tracker, or cartoon aviation demo.
+3D should support trust, aviation context, and conversion. It should not become a gimmick, hide the product promise, slow the page down, or make jmpseat feel like a travel-booking site, dating app, flight tracker, or cartoon aviation demo.
 
 ## 2. Current State
 
 - Public splash page is live.
-- Production URL: https://deadheadclub.vercel.app.
+- Production URL: https://jmpseat.vercel.app.
 - Waitlist URL: https://tally.so/r/jav6aa.
 - Current landing page is CSS/HTML only.
 - Current routes are `/` and `/app`.
@@ -48,7 +48,7 @@ Research accessed: May 28, 2026.
 
 ## 4. Visual Target
 
-The enhancement should extend the already-approved Deadhead Club visual direction:
+The enhancement should extend the already-approved jmpseat visual direction:
 
 - Airside Night palette.
 - Airport-at-night feel.

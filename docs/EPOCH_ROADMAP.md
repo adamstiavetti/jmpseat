@@ -1,16 +1,17 @@
 # Epoch Roadmap
 
-Working name note: "Deadhead Club" is a working product name pending legal and trademark clearance. This roadmap does not claim legal or trademark clearance.
+Brand note: jmpseat is the canonical product and app name. This document does not claim legal or trademark clearance for the name.
+Rename note: Deadhead Club is retired and should not be used in current docs, UI, code, or planning. Older Git history may still contain legacy references.
 
 Product principle: Utility first. Community second. Social feed last.
 
 Identity principle: Verified privately. Anonymous publicly. Accountable internally.
 
-Deadhead Club is not affiliated with or endorsed by any airline, airport, union, or employer unless explicitly obtained and documented.
+jmpseat is not affiliated with or endorsed by any airline, airport, union, or employer unless explicitly obtained and documented.
 
 ## 1. Purpose
 
-This roadmap organizes the existing Deadhead Club planning library into execution epochs. It is the sequencing spine for future founder, product, engineering, design, policy, and Codex work.
+This roadmap organizes the existing jmpseat planning library into execution epochs. It is the sequencing spine for future founder, product, engineering, design, policy, and Codex work.
 
 Detailed docs remain the source of truth for their domains. This roadmap summarizes controlling decisions, exit criteria, blockers, and next actions without duplicating every detail.
 
@@ -18,7 +19,7 @@ Future Codex tasks must declare which epoch they belong to. Work that does not m
 
 ## 2. Current Project State
 
-- Live production site exists: https://deadheadclub.vercel.app.
+- Live production site exists: https://jmpseat.vercel.app.
 - Tally waitlist exists: https://tally.so/r/jav6aa.
 - Public splash page exists at `/`.
 - `/app` private beta placeholder exists.
@@ -113,7 +114,7 @@ Primary docs:
 
 Current truth:
 
-- Live production URL: https://deadheadclub.vercel.app.
+- Live production URL: https://jmpseat.vercel.app.
 - Tally URL: https://tally.so/r/jav6aa.
 - CTA is wired through `NEXT_PUBLIC_WAITLIST_FORM_URL`.
 - `/app` remains placeholder only.

@@ -29,23 +29,23 @@ Preserved intentionally:
 ## Brief Material Audit
 
 - Albedo/base:
-  - prior accepted default: `public/cinematic/textures/deadhead-earth-europe-candidate-albedo.webp`
-  - accepted city-halo default: `public/cinematic/textures/deadhead-earth-cityhalo-candidate-albedo.webp`
+  - prior accepted default: `public/cinematic/textures/jmpseat-earth-europe-candidate-albedo.webp`
+  - accepted city-halo default: `public/cinematic/textures/jmpseat-earth-cityhalo-candidate-albedo.webp`
 - Emission/city lights:
-  - prior accepted default: `public/cinematic/textures/deadhead-earth-europe-candidate-emission.webp`
-  - accepted city-halo default: `public/cinematic/textures/deadhead-earth-cityhalo-candidate-emission.webp`
+  - prior accepted default: `public/cinematic/textures/jmpseat-earth-europe-candidate-emission.webp`
+  - accepted city-halo default: `public/cinematic/textures/jmpseat-earth-cityhalo-candidate-emission.webp`
 - Clouds:
   - preserved from the accepted Europe state
-  - `public/cinematic/textures/deadhead-earth-cityhalo-candidate-clouds.webp`
+  - `public/cinematic/textures/jmpseat-earth-cityhalo-candidate-clouds.webp`
 - Atmosphere/rim controls:
   - procedural shader and runtime grade controls in `app/lab/live-globe-proof/page.tsx`
 
 ## Candidate Outputs
 
-- `public/cinematic/textures/deadhead-earth-cityhalo-candidate-albedo.webp`
-- `public/cinematic/textures/deadhead-earth-cityhalo-candidate-emission.webp`
-- `public/cinematic/textures/deadhead-earth-cityhalo-candidate-clouds.webp`
-- `public/cinematic/textures/deadhead-earth-cityhalo-candidate-metadata.json`
+- `public/cinematic/textures/jmpseat-earth-cityhalo-candidate-albedo.webp`
+- `public/cinematic/textures/jmpseat-earth-cityhalo-candidate-emission.webp`
+- `public/cinematic/textures/jmpseat-earth-cityhalo-candidate-clouds.webp`
+- `public/cinematic/textures/jmpseat-earth-cityhalo-candidate-metadata.json`
 - `public/cinematic/previews/live-globe-proof-cityhalo-desktop.png`
 - `public/cinematic/previews/live-globe-proof-cityhalo-mobile.png`
 - `public/cinematic/previews/live-globe-proof-cityhalo-comparison.png`

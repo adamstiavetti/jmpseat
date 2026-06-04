@@ -1,10 +1,10 @@
 # Competitive Positioning
 
-Working name note: "Deadhead Club" is a working product name pending legal and trademark clearance. This document does not claim legal or trademark clearance.
+Brand note: jmpseat is the canonical product and app name. This document does not claim legal or trademark clearance for the name.
 
 ## Positioning Statement
 
-Deadhead Club is a verified aviation-worker utility community for base intel, layover planning, anonymous crew talk, career movement, and crew-friendly perks.
+jmpseat is a verified aviation-worker utility community for base intel, layover planning, anonymous crew talk, career movement, and crew-friendly perks.
 
 It should not compete head-on with schedule apps or non-rev load tools in V1. Its wedge is verified aviation identity plus anonymous, accountable, aviation-specific utility.
 
@@ -22,7 +22,7 @@ Observed pattern:
 - Subscription model.
 - App-store reviews surface concern around airline login or scheduling-software access policies.
 
-Deadhead Club response:
+jmpseat response:
 
 - Do not try to beat Flight Crew View at schedule/roster utility in V1.
 - Avoid airline portal login and schedule scraping.
@@ -36,7 +36,7 @@ Observed pattern:
 - Airline employee eligibility verification.
 - Travel tips and deals.
 
-Deadhead Club response:
+jmpseat response:
 
 - Do not try to beat StaffTraveler at non-rev load requests in V1.
 - Do not build flight-load request infrastructure.
@@ -53,7 +53,7 @@ Observed pattern:
 - Hotel room and pickup utilities.
 - Privacy settings around sharing.
 
-Deadhead Club response:
+jmpseat response:
 
 - Do not clone CrewLounge's roster/calendar-first model in V1.
 - Treat roster/calendar integrations as Phase 4 only after trust is established.
@@ -69,7 +69,7 @@ Observed pattern:
 - AI layover planner.
 - Business/partner dashboard positioning.
 
-Deadhead Club response:
+jmpseat response:
 
 - Do not rely on CrewVIP-style deals alone as the primary wedge.
 - Keep NonRev Deals useful but secondary to verified community utility.
@@ -86,7 +86,7 @@ Observed pattern across YoFly Crew, CrewRoom, Creweaze, Air Crew Meet, Rendezvou
 - Some social/dating-like mechanics.
 - Some live alerts or location-oriented features.
 
-Deadhead Club response:
+jmpseat response:
 
 - Validate demand for layover utility, crash pad discussion, and crew-only spaces.
 - Avoid public nearby crew tracking in V1.
@@ -104,7 +104,7 @@ Observed pattern:
 - Fragmented knowledge retrieval.
 - Limited verification consistency.
 
-Deadhead Club response:
+jmpseat response:
 
 - Create structured Base Boards and Layover Boards.
 - Enforce verification and room rules.
@@ -120,7 +120,7 @@ Observed pattern:
 - Non-worker participation and inconsistent verification.
 - Community-specific moderation varies.
 
-Deadhead Club response:
+jmpseat response:
 
 - Use verified aviation affiliation to improve signal.
 - Keep public identity flexible.
@@ -136,7 +136,7 @@ Observed pattern:
 - Explicit policies against confidential company information.
 - Privacy caveat that employer email logs may reveal verification-code requests.
 
-Deadhead Club response:
+jmpseat response:
 
 - Borrow the verified-anonymous pattern.
 - Add aviation-specific room types, trust tiers, and safety rules.
@@ -145,7 +145,7 @@ Deadhead Club response:
 
 ## The Wedge
 
-Deadhead Club should differentiate through:
+jmpseat should differentiate through:
 
 - Verified aviation identity.
 - Anonymous public discussion.
@@ -158,7 +158,7 @@ Deadhead Club should differentiate through:
 - Crew-friendly marketplace context.
 - Inclusion of flight, ground, ops, dispatch, scheduling, regional, new-hire, and commuter roles.
 
-## What Deadhead Club Should Not Copy
+## What jmpseat Should Not Copy
 
 - Schedule/roster-first positioning.
 - Airline portal login or credential collection in V1.

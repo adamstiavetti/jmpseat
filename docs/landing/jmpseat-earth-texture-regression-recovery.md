@@ -1,4 +1,4 @@
-# Deadhead Earth Texture Regression Recovery
+# jmpseat Earth Texture Regression Recovery
 
 Date: 2026-05-30
 
@@ -27,18 +27,18 @@ Untouched intentionally:
 
 ## Candidate Texture Sets Found
 
-### Complete Deadhead route-ready sets
+### Complete jmpseat route-ready sets
 
 `v2`
 
-- Albedo: `public/cinematic/textures/deadhead-earth-albedo-v2.webp`
-- Emission: `public/cinematic/textures/deadhead-earth-emission-v2.webp`
-- Emission halo: `public/cinematic/textures/deadhead-earth-emission-halo-v2.webp`
-- Clouds: `public/cinematic/textures/deadhead-earth-clouds-v2.webp`
+- Albedo: `public/cinematic/textures/jmpseat-earth-albedo-v2.webp`
+- Emission: `public/cinematic/textures/jmpseat-earth-emission-v2.webp`
+- Emission halo: `public/cinematic/textures/jmpseat-earth-emission-halo-v2.webp`
+- Clouds: `public/cinematic/textures/jmpseat-earth-clouds-v2.webp`
 - Helper masks:
-  - `public/cinematic/textures/deadhead-earth-ocean-mask-v2.webp`
-  - `public/cinematic/textures/deadhead-earth-desert-suppression-v2.webp`
-  - `public/cinematic/textures/deadhead-earth-ice-suppression-v2.webp`
+  - `public/cinematic/textures/jmpseat-earth-ocean-mask-v2.webp`
+  - `public/cinematic/textures/jmpseat-earth-desert-suppression-v2.webp`
+  - `public/cinematic/textures/jmpseat-earth-ice-suppression-v2.webp`
 - Complete for current route: yes
 - Prior screenshot evidence:
   - `public/cinematic/previews/live-globe-proof-v2-desktop.png`
@@ -46,14 +46,14 @@ Untouched intentionally:
 
 `v3`
 
-- Albedo: `public/cinematic/textures/deadhead-earth-albedo-v3.webp`
-- Emission: `public/cinematic/textures/deadhead-earth-emission-v3.webp`
-- Emission halo: `public/cinematic/textures/deadhead-earth-emission-halo-v3.webp`
-- Clouds: `public/cinematic/textures/deadhead-earth-clouds-v3.webp`
+- Albedo: `public/cinematic/textures/jmpseat-earth-albedo-v3.webp`
+- Emission: `public/cinematic/textures/jmpseat-earth-emission-v3.webp`
+- Emission halo: `public/cinematic/textures/jmpseat-earth-emission-halo-v3.webp`
+- Clouds: `public/cinematic/textures/jmpseat-earth-clouds-v3.webp`
 - Helper masks:
-  - `public/cinematic/textures/deadhead-earth-ocean-mask-v3.webp`
-  - `public/cinematic/textures/deadhead-earth-desert-suppression-v3.webp`
-  - `public/cinematic/textures/deadhead-earth-ice-suppression-v3.webp`
+  - `public/cinematic/textures/jmpseat-earth-ocean-mask-v3.webp`
+  - `public/cinematic/textures/jmpseat-earth-desert-suppression-v3.webp`
+  - `public/cinematic/textures/jmpseat-earth-ice-suppression-v3.webp`
 - Complete for current route: yes
 - Prior screenshot evidence:
   - `public/cinematic/previews/_tmp-live-globe-proof-v3-desktop.png`
@@ -61,14 +61,14 @@ Untouched intentionally:
 
 `v4`
 
-- Albedo: `public/cinematic/textures/deadhead-earth-albedo-v4.webp`
-- Emission: `public/cinematic/textures/deadhead-earth-emission-v4.webp`
-- Emission halo: `public/cinematic/textures/deadhead-earth-emission-halo-v4.webp`
-- Clouds: `public/cinematic/textures/deadhead-earth-clouds-v4.webp`
+- Albedo: `public/cinematic/textures/jmpseat-earth-albedo-v4.webp`
+- Emission: `public/cinematic/textures/jmpseat-earth-emission-v4.webp`
+- Emission halo: `public/cinematic/textures/jmpseat-earth-emission-halo-v4.webp`
+- Clouds: `public/cinematic/textures/jmpseat-earth-clouds-v4.webp`
 - Helper masks:
-  - `public/cinematic/textures/deadhead-earth-ocean-mask-v4.webp`
-  - `public/cinematic/textures/deadhead-earth-desert-suppression-v4.webp`
-  - `public/cinematic/textures/deadhead-earth-ice-suppression-v4.webp`
+  - `public/cinematic/textures/jmpseat-earth-ocean-mask-v4.webp`
+  - `public/cinematic/textures/jmpseat-earth-desert-suppression-v4.webp`
+  - `public/cinematic/textures/jmpseat-earth-ice-suppression-v4.webp`
 - Complete for current route: yes
 - Prior screenshot evidence:
   - `public/cinematic/previews/_tmp-live-globe-proof-v4-desktop.png`
@@ -86,7 +86,7 @@ Complete for current route as a direct set: no.
 
 Why incomplete:
 
-- no matching Deadhead emission halo
+- no matching jmpseat emission halo
 - no dedicated ocean mask
 - no dedicated desert suppression mask
 - no dedicated ice suppression mask
@@ -123,7 +123,7 @@ Comparison outputs:
 
 `v2` regressed
 
-- darkest of the route-ready Deadhead sets in the matched capture
+- darkest of the route-ready jmpseat sets in the matched capture
 - oceans acceptable, but surface detail felt most crushed
 - weakest apparent city-light read in this fixed camera/orientation
 - closest to the user-reported regression

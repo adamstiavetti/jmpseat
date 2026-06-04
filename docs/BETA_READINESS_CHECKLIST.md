@@ -1,6 +1,6 @@
 # Beta Readiness Checklist
 
-Working name note: "Deadhead Club" is a working product name pending legal and trademark clearance. This checklist does not claim legal or trademark clearance.
+Brand note: jmpseat is the canonical product and app name. This document does not claim legal or trademark clearance for the name.
 
 Product principle: Utility first. Community second. Social feed last.
 
@@ -111,7 +111,7 @@ Required before public launch:
 
 ## 4. Aviation Safety Gate
 
-Deadhead Club must treat aviation privacy and security-sensitive information as product constraints, not afterthoughts.
+jmpseat must treat aviation privacy and security-sensitive information as product constraints, not afterthoughts.
 
 Required for private beta:
 
@@ -390,7 +390,7 @@ These decisions must be answered before real users are invited.
 - [ ] What is the target first base/community?
 - [ ] What is the initial ambassador strategy?
 - [ ] Who are the first 50 beta users?
-- [ ] What is the legal/trademark clearance path for the Deadhead Club working name?
+- [ ] What is the legal/trademark clearance path for the jmpseat working name?
 - [ ] Who drafts privacy policy and terms of service?
 - [ ] Are crash pad listings excluded from V1 and held for Phase 2, or included only as discussion without listings/payments?
 - [ ] Who owns emergency escalation during private beta?

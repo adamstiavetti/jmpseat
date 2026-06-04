@@ -1,6 +1,6 @@
 # Legal Policy Requirements
 
-Working name note: "Deadhead Club" is a working product name pending legal and trademark clearance. This document does not claim legal or trademark clearance.
+Brand note: jmpseat is the canonical product and app name. This document does not claim legal or trademark clearance for the name.
 
 Product principle: Utility first. Community second. Social feed last.
 
@@ -10,22 +10,22 @@ This is a documentation-only requirements checklist for founder, engineering, se
 
 ## 1. Purpose and Non-Legal-Advice Disclaimer
 
-Deadhead Club needs policy decisions before collecting real user data, accepting aviation-worker verification, enabling anonymous discussion, publishing AI outputs, or showing sponsored deals. This document converts current product plans and public research into reviewable requirements.
+jmpseat needs policy decisions before collecting real user data, accepting aviation-worker verification, enabling anonymous discussion, publishing AI outputs, or showing sponsored deals. This document converts current product plans and public research into reviewable requirements.
 
 Production Terms of Service, Privacy Policy, Community Guidelines, verification consent language, advertising disclosures, incident response procedures, and trademark decisions require qualified legal review or an explicitly assigned policy owner before launch.
 
-| Checklist item | Recommended approach for Deadhead Club | Research/source basis | Confidence level | Required before private beta | Required before public launch | Owner/reviewer | Notes or open questions |
+| Checklist item | Recommended approach for jmpseat | Research/source basis | Confidence level | Required before private beta | Required before public launch | Owner/reviewer | Notes or open questions |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | Internal policy requirements checklist | Use this doc as an internal planning checklist only, not as user-facing legal terms. | FTC business guidance separates practical security/privacy practices from company-specific legal drafting; USPTO guidance does not substitute for legal clearance. | High | Yes | Yes | Founder, attorney, policy owner | Keep all user-facing legal documents separately reviewed. |
 | Non-legal-advice disclaimer | State that production legal documents require qualified legal review. | USPTO and FTC materials provide public guidance but do not clear a mark or draft platform policies. | High | Yes | Yes | Attorney | Do not present this document as counsel-reviewed unless that review occurs. |
-| Working-name caveat | Treat "Deadhead Club" as a working name until trademark/brand clearance is documented. | USPTO likelihood-of-confusion guidance and trademark basics. | High | Yes | Yes | Founder, attorney | No public launch under the name until clearance decision is documented. |
+| Working-name caveat | Treat "jmpseat" as a working name until trademark/brand clearance is documented. | USPTO likelihood-of-confusion guidance and trademark basics. | High | Yes | Yes | Founder, attorney | No public launch under the name until clearance decision is documented. |
 | No official affiliation claim | Public copy and policies must say the product is not affiliated with, endorsed by, or officially connected to any airline unless that becomes true. | FTC advertising guidance on clear, non-misleading claims; product safety positioning. | High | Yes | Yes | Founder, attorney | Avoid airline logos or marks without permission. |
 
 ## 2. Required Policy Artifacts
 
 These are not final documents. They are artifacts that need owners, review, and version control before real users rely on the product.
 
-| Checklist item | Purpose | Why Deadhead Club needs it | Recommended minimum contents | Research/source basis | Confidence level | Required before private beta | Required before public launch | Owner/reviewer | Notes or open questions |
+| Checklist item | Purpose | Why jmpseat needs it | Recommended minimum contents | Research/source basis | Confidence level | Required before private beta | Required before public launch | Owner/reviewer | Notes or open questions |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | Terms of Service | Define account rules, permitted use, disclaimers, user content rights, enforcement, and dispute basics. | The product hosts anonymous worker discussion, AI outputs, user content, verification, and vendor/deal information. | Eligibility, account responsibility, prohibited conduct, no airline affiliation, user content license, moderation rights, beta limitations if applicable, AI limitations, vendor/deal disclaimers, termination, dispute/legal owner sections. | FTC clear-claims guidance; Blind community/product precedent; platform risk profile. | High | No, use beta terms minimum | Yes | Attorney | Do not draft as production terms without counsel. |
 | Privacy Policy | Explain collection, use, sharing, retention, deletion/export, security, and user rights. | Verification, private identity, public handles, reports, AI logs, and admin actions create sensitive data flows. | Data categories, purposes, retention, access controls, verification artifact handling, AI processing, cookies/analytics, deletion/export request process, contact channel, state privacy rights where applicable. | FTC Start with Security; FTC Protecting Personal Information; NIST Privacy Framework; CCPA official resources. | High | Use privacy notice minimum | Yes | Attorney, security reviewer | State-law applicability requires review. |
@@ -43,7 +43,7 @@ These are not final documents. They are artifacts that need owners, review, and 
 
 Private beta should not start with real users until a lightweight but explicit policy set exists. It can be shorter than public-launch legal terms, but it must be clear enough for consent, safety, and moderation.
 
-| Checklist item | Recommended approach for Deadhead Club | Research/source basis | Confidence level | Required before private beta | Required before public launch | Owner/reviewer | Notes or open questions |
+| Checklist item | Recommended approach for jmpseat | Research/source basis | Confidence level | Required before private beta | Required before public launch | Owner/reviewer | Notes or open questions |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | Beta participation terms | Create invite-only beta terms before first real user invite. | FTC disclosure guidance; private beta operating plan. | High | Yes | No | Attorney, founder | Can later be replaced by full Terms of Service. |
 | Privacy notice | Publish or provide a beta privacy notice before waitlist-to-beta conversion. | FTC privacy/security guidance; NIST Privacy Framework; CCPA resources for user-right awareness. | High | Yes | Yes | Attorney | Must cover verification artifacts and anonymous/internal identity split. |
@@ -58,7 +58,7 @@ Private beta should not start with real users until a lightweight but explicit p
 
 Public launch requires more complete policy coverage because the audience, content volume, data rights requests, moderation scale, and monetization exposure increase.
 
-| Checklist item | Recommended approach for Deadhead Club | Research/source basis | Confidence level | Required before private beta | Required before public launch | Owner/reviewer | Notes or open questions |
+| Checklist item | Recommended approach for jmpseat | Research/source basis | Confidence level | Required before private beta | Required before public launch | Owner/reviewer | Notes or open questions |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | Full Terms of Service | Counsel-reviewed terms must replace beta-only terms. | FTC disclosure principles; user-generated-content platform risk. | High | No | Yes | Attorney | Include eligibility and excluded V1 feature boundaries. |
 | Full Privacy Policy | Publish reviewed privacy policy before broad access. | FTC; NIST Privacy Framework; state privacy resources. | High | Lightweight notice | Yes | Attorney, security reviewer | Applicability of state privacy laws needs counsel review. |
@@ -71,7 +71,7 @@ Public launch requires more complete policy coverage because the audience, conte
 
 ## 5. Trademark / Name Clearance Requirements
 
-"Deadhead Club" remains a working name only. No document in this repository states or implies that the mark is available, registerable, or legally cleared.
+"jmpseat" remains a working name only. No document in this repository states or implies that the mark is available, registerable, or legally cleared.
 
 Questions for counsel:
 
@@ -79,24 +79,24 @@ Questions for counsel:
 - Are there confusingly similar marks in software, online social networking, aviation, travel, recruiting, marketplace, apparel, or merch?
 - Are there domain, app-store, or social handle conflicts?
 - Are there common-law users not visible in USPTO search results?
-- Is "Deadhead" descriptive in an aviation context?
-- Does the Grateful Dead / "Deadhead" fan meaning create brand or legal risk?
+- Is "jmpseat" descriptive in an aviation context?
+- Does the Grateful Dead / "jmpseat" fan meaning create brand or legal risk?
 - Should public copy use a different beta codename until clearance is complete?
 
 Recommendation: no public launch under the name until a clearance decision is documented by counsel or the designated legal owner.
 
-| Checklist item | Recommended approach for Deadhead Club | Research/source basis | Confidence level | Required before private beta | Required before public launch | Owner/reviewer | Notes or open questions |
+| Checklist item | Recommended approach for jmpseat | Research/source basis | Confidence level | Required before private beta | Required before public launch | Owner/reviewer | Notes or open questions |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | USPTO search | Run counsel-reviewed USPTO search across relevant marks and classes. | USPTO trademark search and likelihood-of-confusion guidance. | High | No | Yes | Attorney | Founder can do preliminary search, but not rely on it as clearance. |
 | Common-law and marketplace search | Search web, app stores, domains, social handles, aviation/travel marketplaces, and apparel/merch. | USPTO basics note rights can depend on use and confusion, not just exact registration. | Medium | No | Yes | Attorney, founder | Document methodology and date. |
-| Aviation descriptiveness review | Ask counsel whether "deadhead" is descriptive or weak for aviation-worker services. | USPTO basics and likelihood-of-confusion principles. | Medium | No | Yes | Attorney | A descriptive term may affect protectability. |
+| Aviation descriptiveness review | Ask counsel whether "jmpseat" is descriptive or weak for aviation-worker services. | USPTO basics and likelihood-of-confusion principles. | Medium | No | Yes | Attorney | A descriptive term may affect protectability. |
 | Public naming decision | Treat the name as provisional until clearance memo is complete. | USPTO guidance. | High | Working-name note required | Yes | Founder, attorney | Beta can use caveat; public launch should not. |
 
 ## 6. Privacy Requirements
 
-Deadhead Club must avoid collecting sensitive data it does not need. V1 should not collect airline portal credentials, schedules, live location, passenger private information, exact crew hotel data, or unnecessary government ID data.
+jmpseat must avoid collecting sensitive data it does not need. V1 should not collect airline portal credentials, schedules, live location, passenger private information, exact crew hotel data, or unnecessary government ID data.
 
-| Checklist item | Recommended approach for Deadhead Club | Research/source basis | Confidence level | Required before private beta | Required before public launch | Owner/reviewer | Notes or open questions |
+| Checklist item | Recommended approach for jmpseat | Research/source basis | Confidence level | Required before private beta | Required before public launch | Owner/reviewer | Notes or open questions |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | Data minimization | Collect only data needed for account, verification, profile, posting, moderation, AI feature operation, and safety. | FTC Protecting Personal Information; NIST Privacy Framework. | High | Yes | Yes | Founder, engineer, attorney | Do not collect sensitive waitlist documents. |
 | Purpose limitation | State why each sensitive data type is collected and avoid secondary use without review. | NIST Privacy Framework; FTC privacy guidance. | High | Yes | Yes | Attorney, policy owner | Especially important for verification artifacts and AI logs. |
@@ -110,7 +110,7 @@ Deadhead Club must avoid collecting sensitive data it does not need. V1 should n
 
 V1 verification should rely on practical, privacy-aware methods: basic email, aviation work email where comfortable, and controlled manual review. During private beta, Tier 3 manual review can use non-upload methods such as live call review, founder/admin-known verification, work email plus manual context, or non-stored visual confirmation if upload controls are not ready. Manual badge/document uploads should be accepted only when safe upload handling exists. Tier 5 employment/payroll/API verification remains later-stage.
 
-| Checklist item | Recommended approach for Deadhead Club | Research/source basis | Confidence level | Required before private beta | Required before public launch | Owner/reviewer | Notes or open questions |
+| Checklist item | Recommended approach for jmpseat | Research/source basis | Confidence level | Required before private beta | Required before public launch | Owner/reviewer | Notes or open questions |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | What is collected | Tell users the exact method-specific data: email domain, redacted badge/document evidence, reviewer decision metadata, or peer-vouch metadata. | StaffTraveler verification support; Blind FAQ; vendor verification docs. | High | Yes | Yes | Attorney, policy owner | Do not ask for employee numbers unless counsel approves. |
 | Why collected | Explain that verification keeps Crew Rooms, Base Boards, and Layover Boards aviation-worker focused. | Product positioning; verification vendor consent patterns. | High | Yes | Yes | Founder | Avoid implying airline endorsement. |
@@ -125,7 +125,7 @@ V1 verification should rely on practical, privacy-aware methods: basic email, av
 
 Community rules should be short enough for users to understand and specific enough for admins to enforce. Anonymous posting should be permitted only where room rules allow it and remains accountable internally.
 
-| Checklist item | Recommended approach for Deadhead Club | Research/source basis | Confidence level | Required before private beta | Required before public launch | Owner/reviewer | Notes or open questions |
+| Checklist item | Recommended approach for jmpseat | Research/source basis | Confidence level | Required before private beta | Required before public launch | Owner/reviewer | Notes or open questions |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | Doxxing, harassment, threats | Ban and enforce against identity exposure, targeted abuse, threats, hate, sexualized targeting, and retaliation. | Blind community guidelines; Trust and Safety doc. | High | Yes | Yes | Policy owner | Include emergency escalation for credible threats. |
 | Passenger private information | Ban passenger names, photos, itineraries, medical details, incidents, seat/trip identifiers, and contact details. | FTC privacy guidance; AP reporting on passenger data scrutiny. | High | Yes | Yes | Policy owner, attorney | Remove quickly if posted. |
@@ -135,9 +135,9 @@ Community rules should be short enough for users to understand and specific enou
 
 ## 9. Aviation-Sensitive Content Requirements
 
-Deadhead Club should educate users that base and layover utility is welcome, but security-sensitive or privacy-sensitive operational detail is not.
+jmpseat should educate users that base and layover utility is welcome, but security-sensitive or privacy-sensitive operational detail is not.
 
-| Checklist item | Recommended approach for Deadhead Club | Research/source basis | Confidence level | Required before private beta | Required before public launch | Owner/reviewer | Notes or open questions |
+| Checklist item | Recommended approach for jmpseat | Research/source basis | Confidence level | Required before private beta | Required before public launch | Owner/reviewer | Notes or open questions |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | Airport security procedures | Remove content that explains restricted procedures, screening bypasses, access controls, badge/security processes, or SSI-like information. | TSA SSI page; 49 CFR Part 1520. | High | Yes | Yes | Policy owner, security reviewer | When uncertain, hide pending review. |
 | Crew hotel/location exposure | Ban exact public crew hotel exposure tied to airline, route, date, crew, or trip; allow generalized neighborhood safety and layover tips. | Crew hotel safety research; privacy-by-design; V1 exclusions. | High | Yes | Yes | Policy owner | Include examples in Layover Board guidelines. |
@@ -150,7 +150,7 @@ Deadhead Club should educate users that base and layover utility is welcome, but
 
 Moderation is a launch requirement, not a later community feature. The first version may be manually operated, but it needs clear authority, logs, and appeal paths.
 
-| Checklist item | Recommended approach for Deadhead Club | Research/source basis | Confidence level | Required before private beta | Required before public launch | Owner/reviewer | Notes or open questions |
+| Checklist item | Recommended approach for jmpseat | Research/source basis | Confidence level | Required before private beta | Required before public launch | Owner/reviewer | Notes or open questions |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | Report workflow | Users must be able to report posts, comments, profiles, deals, and users with categories and notes. | Trust and Safety plan; OWASP logging for event capture. | High | Yes | Yes | Engineer, policy owner | Manual beta process acceptable if documented. |
 | Admin review queue | Admins need a queue or controlled tracker with content, reporter, author, history, and action options. | Existing beta readiness docs; OWASP logging. | High | Yes | Yes | Engineer, policy owner | Admin-only access required. |
@@ -163,7 +163,7 @@ Moderation is a launch requirement, not a later community feature. The first ver
 
 AI should turn community knowledge into useful outputs. It is not the brand gimmick and cannot be the final authority for verification, bans, or safety-sensitive decisions.
 
-| Checklist item | Recommended approach for Deadhead Club | Research/source basis | Confidence level | Required before private beta | Required before public launch | Owner/reviewer | Notes or open questions |
+| Checklist item | Recommended approach for jmpseat | Research/source basis | Confidence level | Required before private beta | Required before public launch | Owner/reviewer | Notes or open questions |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | AI use disclosure | Tell users when Jumpseat Brief or other features use AI and what they should not rely on it for. | NIST AI RMF; OpenAI docs. | High | Yes if AI enabled | Yes | Policy owner, attorney | Required even in limited beta mode. |
 | Server-side only | Keep AI calls and API keys server-side; no client-exposed model keys. | OpenAI API key safety docs; Next.js data security guidance. | High | Yes | Yes | Engineer, security reviewer | Use least-privilege tool access. |
@@ -175,9 +175,9 @@ AI should turn community knowledge into useful outputs. It is not the brand gimm
 
 ## 12. User Content and Licensing Requirements
 
-User content rules must preserve user ownership while giving Deadhead Club enough rights to operate, moderate, search, save, display, and summarize permitted content.
+User content rules must preserve user ownership while giving jmpseat enough rights to operate, moderate, search, save, display, and summarize permitted content.
 
-| Checklist item | Recommended approach for Deadhead Club | Research/source basis | Confidence level | Required before private beta | Required before public launch | Owner/reviewer | Notes or open questions |
+| Checklist item | Recommended approach for jmpseat | Research/source basis | Confidence level | Required before private beta | Required before public launch | Owner/reviewer | Notes or open questions |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | Ownership | State that users own their submitted content subject to platform rights and policy enforcement. | Standard user-generated-content platform practice; FTC clarity principles. | Medium | Yes | Yes | Attorney | Counsel should draft exact language. |
 | Platform license | Obtain limited license to host, display, search, moderate, process, and, where disclosed, summarize content for product features. | UGC platform practice; AI disclosure needs. | Medium | Yes | Yes | Attorney | AI summarization should be explicit if enabled. |
@@ -190,19 +190,19 @@ User content rules must preserve user ownership while giving Deadhead Club enoug
 
 NonRev Deals should be useful, controlled, and clearly labeled. Display ads are not the primary early revenue model, and V1 should not include full marketplace payments or unmoderated vendor self-service.
 
-| Checklist item | Recommended approach for Deadhead Club | Research/source basis | Confidence level | Required before private beta | Required before public launch | Owner/reviewer | Notes or open questions |
+| Checklist item | Recommended approach for jmpseat | Research/source basis | Confidence level | Required before private beta | Required before public launch | Owner/reviewer | Notes or open questions |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | Sponsored labels | Clearly label sponsored placements, affiliate links, featured listings, and paid relationships near the claim or CTA. | FTC endorsement, native advertising, and dot-com disclosure guidance. | High | If monetized deals live | Yes before monetized deals | Attorney, founder | Labels must be hard to miss. |
 | Offer accuracy | Require vendor review and removal rights for outdated, misleading, or unsafe offers. | FTC advertising guidance. | High | If deals live | Yes | Founder, policy owner | Admin-reviewed deals only in V1. |
 | Vendor approval | Approve vendors before listing; no unmoderated vendor posting. | Product monetization plan; FTC spam/misleading-ad risk. | High | If deals live | Yes | Founder | Track sponsorship status and verification status. |
-| Affiliate disclosure | Disclose affiliate revenue where links may compensate Deadhead Club. | FTC endorsement/dot-com disclosure guidance. | High | If affiliates live | Yes | Attorney, founder | Do not bury disclosure only in terms. |
+| Affiliate disclosure | Disclose affiliate revenue where links may compensate jmpseat. | FTC endorsement/dot-com disclosure guidance. | High | If affiliates live | Yes | Attorney, founder | Do not bury disclosure only in terms. |
 | Marketplace deferral | Defer full marketplace payments and disputes until later. | Monetization plan; risk around scams and payments. | High | Yes | Yes | Founder | Stripe/payment policies can be reviewed later. |
 
 ## 14. Beta Participation Requirements
 
 Private beta terms should make clear that the product is controlled, unfinished, invite-only, and safety-tested.
 
-| Checklist item | Recommended approach for Deadhead Club | Research/source basis | Confidence level | Required before private beta | Required before public launch | Owner/reviewer | Notes or open questions |
+| Checklist item | Recommended approach for jmpseat | Research/source basis | Confidence level | Required before private beta | Required before public launch | Owner/reviewer | Notes or open questions |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | Beta status | Tell users features may change, break, or be removed. | FTC clear-disclosure principles; beta operating plan. | High | Yes | No | Attorney, founder | Do not overpromise feature availability. |
 | Invite-only access | State that access can be limited, revoked, or paused. | Private beta plan. | High | Yes | No | Founder, attorney | Supports safety and community density. |
@@ -215,7 +215,7 @@ Private beta terms should make clear that the product is controlled, unfinished,
 
 Incident response must cover both conventional security/privacy incidents and aviation/community safety incidents.
 
-| Checklist item | Recommended approach for Deadhead Club | Research/source basis | Confidence level | Required before private beta | Required before public launch | Owner/reviewer | Notes or open questions |
+| Checklist item | Recommended approach for jmpseat | Research/source basis | Confidence level | Required before private beta | Required before public launch | Owner/reviewer | Notes or open questions |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | Incident contacts | Assign owner and backup for privacy/security, content safety, verification artifact, and aviation/security-sensitive incidents. | NIST CSF; FTC security guidance. | High | Yes | Yes | Founder, security reviewer | Private beta can use founder plus backup reviewer. |
 | Security/privacy incidents | Define intake, triage, containment, evidence preservation, user notification decision path, and postmortem. | FTC Start with Security; NIST CSF; OWASP logging. | High | Yes | Yes | Security reviewer, attorney | Notification obligations require legal review. |
@@ -254,7 +254,7 @@ Incident response must cover both conventional security/privacy incidents and av
 
 | Decision | Recommendation | Reason | Owner/reviewer |
 | --- | --- | --- | --- |
-| Use "Deadhead Club" publicly | Require counsel before public launch | USPTO/confusion/common-law risks remain unresolved. | Attorney |
+| Use "jmpseat" publicly | Require counsel before public launch | USPTO/confusion/common-law risks remain unresolved. | Attorney |
 | Invite private beta users | Accept only after beta policy minimum exists | Product validation needs real users, but safety and consent gates must be ready. | Founder, attorney |
 | Public waitlist | Accept with minimal fields and no sensitive uploads | Useful no-code validation with manageable privacy risk. | Founder, attorney |
 | Manual badge/document uploads | Defer unless private upload controls and retention/deletion process are ready | Verification artifacts are sensitive and mishandling is high risk. | Security reviewer, attorney |

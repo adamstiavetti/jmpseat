@@ -1,10 +1,10 @@
 # Monetization
 
-Working name note: "Deadhead Club" is a working product name pending legal and trademark clearance. This document does not claim legal or trademark clearance.
+Brand note: jmpseat is the canonical product and app name. This document does not claim legal or trademark clearance for the name.
 
 ## Monetization Principle
 
-Revenue should reinforce utility and trust. Deadhead Club should not optimize early revenue in ways that make members feel watched, sold to, or pushed into generic feed engagement.
+Revenue should reinforce utility and trust. jmpseat should not optimize early revenue in ways that make members feel watched, sold to, or pushed into generic feed engagement.
 
 ## Research-Backed Context
 
@@ -15,7 +15,7 @@ Competitor patterns suggest multiple monetization paths:
 - StaffTraveler uses non-rev load request utility and travel deals.
 - Newer layover/social apps point toward premium social, crash pad, marketplace, and crew discovery features.
 
-Deadhead Club should not rely on one of those wedges alone. Its strongest revenue options should build on verified trust, utility, and crew-friendly context.
+jmpseat should not rely on one of those wedges alone. Its strongest revenue options should build on verified trust, utility, and crew-friendly context.
 
 ## Free Tier
 

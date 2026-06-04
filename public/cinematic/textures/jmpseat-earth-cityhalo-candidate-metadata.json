@@ -1,16 +1,16 @@
 {
   "generated_at": "2026-05-31T02:01:12.681Z",
   "inputs": {
-    "albedo": "public/cinematic/textures/deadhead-earth-europe-candidate-albedo.webp",
-    "emission": "public/cinematic/textures/deadhead-earth-europe-candidate-emission.webp",
-    "clouds": "public/cinematic/textures/deadhead-earth-europe-candidate-clouds.webp",
-    "prior_metadata": "public/cinematic/textures/deadhead-earth-europe-candidate-metadata.json"
+    "albedo": "public/cinematic/textures/jmpseat-earth-europe-candidate-albedo.webp",
+    "emission": "public/cinematic/textures/jmpseat-earth-europe-candidate-emission.webp",
+    "clouds": "public/cinematic/textures/jmpseat-earth-europe-candidate-clouds.webp",
+    "prior_metadata": "public/cinematic/textures/jmpseat-earth-europe-candidate-metadata.json"
   },
   "outputs": {
-    "albedo": "public/cinematic/textures/deadhead-earth-cityhalo-candidate-albedo.webp",
-    "emission": "public/cinematic/textures/deadhead-earth-cityhalo-candidate-emission.webp",
-    "clouds": "public/cinematic/textures/deadhead-earth-cityhalo-candidate-clouds.webp",
-    "metadata": "public/cinematic/textures/deadhead-earth-cityhalo-candidate-metadata.json"
+    "albedo": "public/cinematic/textures/jmpseat-earth-cityhalo-candidate-albedo.webp",
+    "emission": "public/cinematic/textures/jmpseat-earth-cityhalo-candidate-emission.webp",
+    "clouds": "public/cinematic/textures/jmpseat-earth-cityhalo-candidate-clouds.webp",
+    "metadata": "public/cinematic/textures/jmpseat-earth-cityhalo-candidate-metadata.json"
   },
   "candidate_goal": "Single safe city-halo cohesion correction for /lab/live-globe-proof.",
   "transforms": [
@@ -24,9 +24,9 @@
     "No routes, aircraft, scanner, ticket, ENTER CTA, chapter cards, placement, framing, orientation, rotation, homepage, or waitlist changes are encoded here."
   ],
   "inherited_from_europe": {
-    "albedo": "public/cinematic/textures/deadhead-earth-europe-candidate-albedo.webp",
-    "emission": "public/cinematic/textures/deadhead-earth-europe-candidate-emission.webp",
-    "clouds": "public/cinematic/textures/deadhead-earth-europe-candidate-clouds.webp",
-    "metadata": "public/cinematic/textures/deadhead-earth-europe-candidate-metadata.json"
+    "albedo": "public/cinematic/textures/jmpseat-earth-europe-candidate-albedo.webp",
+    "emission": "public/cinematic/textures/jmpseat-earth-europe-candidate-emission.webp",
+    "clouds": "public/cinematic/textures/jmpseat-earth-europe-candidate-clouds.webp",
+    "metadata": "public/cinematic/textures/jmpseat-earth-europe-candidate-metadata.json"
   }
 }

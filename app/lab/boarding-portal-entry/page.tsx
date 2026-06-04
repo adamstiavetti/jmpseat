@@ -2,7 +2,7 @@ import styles from "./page.module.css";
 
 export default function BoardingPortalEntryPage() {
   return (
-    <main className={styles.page} aria-label="Deadhead boarding portal entry atmosphere lab">
+    <main className={styles.page} aria-label="jmpseat boarding portal entry atmosphere lab">
       <CinematicAtmosphere />
     </main>
   );

@@ -1,6 +1,6 @@
 # No-Code Waitlist Execution
 
-Working name note: "Deadhead Club" is a working product name pending legal and trademark clearance. This checklist does not claim legal or trademark clearance.
+Brand note: jmpseat is the canonical product and app name. This document does not claim legal or trademark clearance for the name.
 
 Product principle: Utility first. Community second. Social feed last.
 
@@ -50,7 +50,7 @@ Use Tally-only if speed matters more than polish or if the first test is limited
 
 ## 4. Landing Page Setup Checklist
 
-- [ ] Create the page title: `Deadhead Club - Private Beta Waitlist`.
+- [ ] Create the page title: `jmpseat - Private Beta Waitlist`.
 - [ ] Add the hero headline and subheadline from the copy bank.
 - [ ] Add one primary CTA button: `Join the private beta waitlist`.
 - [ ] Add a problem section focused on scattered base intel, hard-to-search group chats, unsafe public forums, and fragmented layover knowledge.
@@ -121,7 +121,7 @@ Safe to analyze:
 
 Hero headline:
 
-> Deadhead Club is the off-duty network for airline people.
+> jmpseat is the off-duty network for airline people.
 
 Hero subheadline:
 
@@ -133,15 +133,15 @@ CTA:
 
 Waitlist intro:
 
-> Deadhead Club is recruiting a small private beta group to validate whether verified airline people want a safer, more useful place for base intel, layover boards, anonymous but accountable crew discussion, career tools, and crew-friendly perks.
+> jmpseat is recruiting a small private beta group to validate whether verified airline people want a safer, more useful place for base intel, layover boards, anonymous but accountable crew discussion, career tools, and crew-friendly perks.
 
 Privacy note:
 
-> Deadhead Club is designed around a simple identity model: verified privately, anonymous publicly, accountable internally. If invited to beta, you may be asked to prove aviation affiliation through a separate private process. Do not upload badges, IDs, schedules, or company documents here.
+> jmpseat is designed around a simple identity model: verified privately, anonymous publicly, accountable internally. If invited to beta, you may be asked to prove aviation affiliation through a separate private process. Do not upload badges, IDs, schedules, or company documents here.
 
 No-official-affiliation disclaimer:
 
-> Deadhead Club is a working name pending legal/trademark clearance. Deadhead Club is not affiliated with, endorsed by, or officially connected to any airline unless explicitly stated.
+> jmpseat is a working name pending legal/trademark clearance. jmpseat is not affiliated with, endorsed by, or officially connected to any airline unless explicitly stated.
 
 Ambassador callout:
 

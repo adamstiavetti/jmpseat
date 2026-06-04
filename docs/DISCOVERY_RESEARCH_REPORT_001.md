@@ -1,6 +1,6 @@
 # Discovery Research Report 001
 
-Working name note: "Deadhead Club" is a working product name pending legal and trademark clearance. This report does not claim legal or trademark clearance.
+Brand note: jmpseat is the canonical product and app name. This document does not claim legal or trademark clearance for the name.
 
 Product principle: Utility first. Community second. Social feed last.
 
@@ -36,7 +36,7 @@ Desk-research finding:
 
 Product implication:
 
-- Deadhead Club should not compete on schedule import, legality, roster workflows, or airline portal integrations in V1.
+- jmpseat should not compete on schedule import, legality, roster workflows, or airline portal integrations in V1.
 - Preserve no airline portal login and no schedule scraping.
 
 Source basis:
@@ -55,7 +55,7 @@ Desk-research finding:
 
 Product implication:
 
-- Deadhead Club should not attempt flight-load requests in V1.
+- jmpseat should not attempt flight-load requests in V1.
 - StaffTraveler supports tiered verification and delete-after-review handling as a product pattern.
 
 Source basis:
@@ -72,7 +72,7 @@ Desk-research finding:
 Product implication:
 
 - Do not lead with roster/calendar integrations.
-- Privacy controls and trip utility are useful signals, but they are not Deadhead Club's V1 competition lane.
+- Privacy controls and trip utility are useful signals, but they are not jmpseat's V1 competition lane.
 
 Source basis:
 
@@ -88,7 +88,7 @@ Desk-research finding:
 Product implication:
 
 - AI layover planning and deals are validated as useful surfaces, but not enough to differentiate alone.
-- Deadhead Club should be more privacy-first, community-intelligence-first, and less dependent on location or nearby-crew mechanics.
+- jmpseat should be more privacy-first, community-intelligence-first, and less dependent on location or nearby-crew mechanics.
 
 Source basis:
 
@@ -104,7 +104,7 @@ Desk-research finding:
 Product implication:
 
 - This is a close conceptual competitor.
-- Deadhead Club must differentiate through broader airline workforce inclusion, stronger trust/safety, and structured base intelligence.
+- jmpseat must differentiate through broader airline workforce inclusion, stronger trust/safety, and structured base intelligence.
 
 Source basis:
 
@@ -120,7 +120,7 @@ Desk-research finding:
 Product implication:
 
 - Validates the layover recommendation/community niche.
-- Does not displace Deadhead Club's broader wedge around base intel, verified anonymous discussion, and wider airline-worker inclusion.
+- Does not displace jmpseat's broader wedge around base intel, verified anonymous discussion, and wider airline-worker inclusion.
 
 Source basis:
 
@@ -150,7 +150,7 @@ Desk-research finding:
 Product implication:
 
 - Avoid dating/swipe/match-first identity.
-- Deadhead Club should remain utility and community knowledge first.
+- jmpseat should remain utility and community knowledge first.
 
 Source basis:
 
@@ -158,7 +158,7 @@ Source basis:
 
 ## 3. Competitor Map
 
-| Competitor lane | Existing products | Deadhead Club implication |
+| Competitor lane | Existing products | jmpseat implication |
 | --- | --- | --- |
 | Schedule, roster, legality utility | Flight Crew View, CrewLounge CONNECT | Do not compete in V1. |
 | Non-rev loads | StaffTraveler | Do not compete in V1. |
@@ -255,7 +255,7 @@ Most defensible moat:
 
 Strategic interpretation:
 
-- Deadhead Club should not pitch itself as a crew social app.
+- jmpseat should not pitch itself as a crew social app.
 - It should pitch itself as an off-duty aviation-worker utility network built around verified knowledge, practical boards, and safe candid discussion.
 
 ## 8. Product Recommendations
@@ -319,7 +319,7 @@ These are desk-research-only updates. No assumption is user-validated or beta-va
 | Ambassadors can seed activity. | Untested | Low | No direct evidence yet. |
 | Jumpseat Brief is useful but not main wedge. | Desk-researched | Medium-high | AI layover planning exists, but differentiation depends on community intel. |
 | Deals are monetization layer, not core wedge. | Desk-researched | High | CrewVIP/StaffTraveler support deals; deals alone are not the wedge. |
-| Users do not primarily demand excluded V1 features. | Untested | Low | Competitor demand for excluded features exists; Deadhead Club must validate its narrower wedge. |
+| Users do not primarily demand excluded V1 features. | Untested | Low | Competitor demand for excluded features exists; jmpseat must validate its narrower wedge. |
 | Privacy/safety concerns are addressable. | Desk-researched | Medium | Strong policy path exists, but user comfort remains untested. |
 | Career tools matter later. | Desk-researched | Medium | Plausible; better Phase 2 unless interviews show urgency. |
 
@@ -345,7 +345,7 @@ The FA expert interview with the founder's wife remains pending. Preserve these 
 16. Would they upload a badge if it was deleted after review?
 17. What verification method would feel safest?
 18. What would make people refuse to sign up?
-19. Does "Deadhead Club" sound natural to airline people?
+19. Does "jmpseat" sound natural to airline people?
 20. Does "The off-duty network for airline people" feel accurate?
 21. Which sounds most useful: Base Boards, Layover Boards, Crew Rooms, Jumpseat Brief, The Galley, Ready Room, Crew Rest?
 22. What would make you send this to another FA?

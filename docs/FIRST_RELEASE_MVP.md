@@ -1,6 +1,6 @@
 # First Release MVP
 
-Working name note: "Deadhead Club" is a working product name pending legal and trademark clearance. This document does not claim legal or trademark clearance.
+Brand note: jmpseat is the canonical product and app name. This document does not claim legal or trademark clearance for the name.
 
 Product principle: Utility first. Community second. Social feed last.
 
@@ -8,7 +8,7 @@ Identity principle: Verified privately. Anonymous publicly. Accountable internal
 
 ## 1. Purpose
 
-This document defines the practical first release MVP for Deadhead Club based on the current blueprint, MVP scope, research, interviews, operating model, build sequencing, trust and safety rules, and beta-readiness constraints.
+This document defines the practical first release MVP for jmpseat based on the current blueprint, MVP scope, research, interviews, operating model, build sequencing, trust and safety rules, and beta-readiness constraints.
 
 It exists to resolve a recurring ambiguity in the planning set:
 
@@ -268,7 +268,7 @@ When there is tension between the broad V1 list and the smallest practical safe 
 
 ## 14. Final Definition
 
-The first release MVP for Deadhead Club is:
+The first release MVP for jmpseat is:
 
 A tightly controlled, invite-only, verified airline-worker beta for one base-centered multi-role community, built to validate whether Base Boards, Layover Boards, and gated utility discussion can create repeat-use, trusted aviation-worker knowledge exchange inside a safe, moderated environment.
 

@@ -162,76 +162,76 @@ type HeroFlightController = {
 
 const TEXTURE_SETS: Record<TextureSetName, TextureSet> = {
   v2: {
-    day: "/cinematic/textures/deadhead-earth-albedo-v2.webp",
-    night: "/cinematic/textures/deadhead-earth-emission-v2.webp",
-    nightHalo: "/cinematic/textures/deadhead-earth-emission-halo-v2.webp",
-    clouds: "/cinematic/textures/deadhead-earth-clouds-v2.webp",
-    oceanMask: "/cinematic/textures/deadhead-earth-ocean-mask-v2.webp",
-    desertMask: "/cinematic/textures/deadhead-earth-desert-suppression-v2.webp",
-    iceMask: "/cinematic/textures/deadhead-earth-ice-suppression-v2.webp",
+    day: "/cinematic/textures/jmpseat-earth-albedo-v2.webp",
+    night: "/cinematic/textures/jmpseat-earth-emission-v2.webp",
+    nightHalo: "/cinematic/textures/jmpseat-earth-emission-halo-v2.webp",
+    clouds: "/cinematic/textures/jmpseat-earth-clouds-v2.webp",
+    oceanMask: "/cinematic/textures/jmpseat-earth-ocean-mask-v2.webp",
+    desertMask: "/cinematic/textures/jmpseat-earth-desert-suppression-v2.webp",
+    iceMask: "/cinematic/textures/jmpseat-earth-ice-suppression-v2.webp",
   },
   v3: {
-    day: "/cinematic/textures/deadhead-earth-albedo-v3.webp",
-    night: "/cinematic/textures/deadhead-earth-emission-v3.webp",
-    nightHalo: "/cinematic/textures/deadhead-earth-emission-halo-v3.webp",
-    clouds: "/cinematic/textures/deadhead-earth-clouds-v3.webp",
-    oceanMask: "/cinematic/textures/deadhead-earth-ocean-mask-v3.webp",
-    desertMask: "/cinematic/textures/deadhead-earth-desert-suppression-v3.webp",
-    iceMask: "/cinematic/textures/deadhead-earth-ice-suppression-v3.webp",
+    day: "/cinematic/textures/jmpseat-earth-albedo-v3.webp",
+    night: "/cinematic/textures/jmpseat-earth-emission-v3.webp",
+    nightHalo: "/cinematic/textures/jmpseat-earth-emission-halo-v3.webp",
+    clouds: "/cinematic/textures/jmpseat-earth-clouds-v3.webp",
+    oceanMask: "/cinematic/textures/jmpseat-earth-ocean-mask-v3.webp",
+    desertMask: "/cinematic/textures/jmpseat-earth-desert-suppression-v3.webp",
+    iceMask: "/cinematic/textures/jmpseat-earth-ice-suppression-v3.webp",
   },
   v4: {
-    day: "/cinematic/textures/deadhead-earth-albedo-v4.webp",
-    night: "/cinematic/textures/deadhead-earth-emission-v4.webp",
-    nightHalo: "/cinematic/textures/deadhead-earth-emission-halo-v4.webp",
-    clouds: "/cinematic/textures/deadhead-earth-clouds-v4.webp",
-    oceanMask: "/cinematic/textures/deadhead-earth-ocean-mask-v4.webp",
-    desertMask: "/cinematic/textures/deadhead-earth-desert-suppression-v4.webp",
-    iceMask: "/cinematic/textures/deadhead-earth-ice-suppression-v4.webp",
+    day: "/cinematic/textures/jmpseat-earth-albedo-v4.webp",
+    night: "/cinematic/textures/jmpseat-earth-emission-v4.webp",
+    nightHalo: "/cinematic/textures/jmpseat-earth-emission-halo-v4.webp",
+    clouds: "/cinematic/textures/jmpseat-earth-clouds-v4.webp",
+    oceanMask: "/cinematic/textures/jmpseat-earth-ocean-mask-v4.webp",
+    desertMask: "/cinematic/textures/jmpseat-earth-desert-suppression-v4.webp",
+    iceMask: "/cinematic/textures/jmpseat-earth-ice-suppression-v4.webp",
   },
   cityrim: {
-    day: "/cinematic/textures/deadhead-earth-cityrim-candidate-albedo.webp",
-    night: "/cinematic/textures/deadhead-earth-cityrim-candidate-emission.webp",
-    nightHalo: "/cinematic/textures/deadhead-earth-emission-halo-v4.webp",
-    clouds: "/cinematic/textures/deadhead-earth-cityrim-candidate-clouds.webp",
-    oceanMask: "/cinematic/textures/deadhead-earth-ocean-mask-v4.webp",
-    desertMask: "/cinematic/textures/deadhead-earth-desert-suppression-v4.webp",
-    iceMask: "/cinematic/textures/deadhead-earth-ice-suppression-v4.webp",
+    day: "/cinematic/textures/jmpseat-earth-cityrim-candidate-albedo.webp",
+    night: "/cinematic/textures/jmpseat-earth-cityrim-candidate-emission.webp",
+    nightHalo: "/cinematic/textures/jmpseat-earth-emission-halo-v4.webp",
+    clouds: "/cinematic/textures/jmpseat-earth-cityrim-candidate-clouds.webp",
+    oceanMask: "/cinematic/textures/jmpseat-earth-ocean-mask-v4.webp",
+    desertMask: "/cinematic/textures/jmpseat-earth-desert-suppression-v4.webp",
+    iceMask: "/cinematic/textures/jmpseat-earth-ice-suppression-v4.webp",
   },
   polar: {
-    day: "/cinematic/textures/deadhead-earth-polar-candidate-albedo.webp",
-    night: "/cinematic/textures/deadhead-earth-polar-candidate-emission.webp",
-    nightHalo: "/cinematic/textures/deadhead-earth-emission-halo-v4.webp",
-    clouds: "/cinematic/textures/deadhead-earth-polar-candidate-clouds.webp",
-    oceanMask: "/cinematic/textures/deadhead-earth-ocean-mask-v4.webp",
-    desertMask: "/cinematic/textures/deadhead-earth-desert-suppression-v4.webp",
-    iceMask: "/cinematic/textures/deadhead-earth-ice-suppression-v4.webp",
+    day: "/cinematic/textures/jmpseat-earth-polar-candidate-albedo.webp",
+    night: "/cinematic/textures/jmpseat-earth-polar-candidate-emission.webp",
+    nightHalo: "/cinematic/textures/jmpseat-earth-emission-halo-v4.webp",
+    clouds: "/cinematic/textures/jmpseat-earth-polar-candidate-clouds.webp",
+    oceanMask: "/cinematic/textures/jmpseat-earth-ocean-mask-v4.webp",
+    desertMask: "/cinematic/textures/jmpseat-earth-desert-suppression-v4.webp",
+    iceMask: "/cinematic/textures/jmpseat-earth-ice-suppression-v4.webp",
   },
   atlantic: {
-    day: "/cinematic/textures/deadhead-earth-atlantic-candidate-albedo.webp",
-    night: "/cinematic/textures/deadhead-earth-atlantic-candidate-emission.webp",
-    nightHalo: "/cinematic/textures/deadhead-earth-emission-halo-v4.webp",
-    clouds: "/cinematic/textures/deadhead-earth-atlantic-candidate-clouds.webp",
-    oceanMask: "/cinematic/textures/deadhead-earth-ocean-mask-v4.webp",
-    desertMask: "/cinematic/textures/deadhead-earth-desert-suppression-v4.webp",
-    iceMask: "/cinematic/textures/deadhead-earth-ice-suppression-v4.webp",
+    day: "/cinematic/textures/jmpseat-earth-atlantic-candidate-albedo.webp",
+    night: "/cinematic/textures/jmpseat-earth-atlantic-candidate-emission.webp",
+    nightHalo: "/cinematic/textures/jmpseat-earth-emission-halo-v4.webp",
+    clouds: "/cinematic/textures/jmpseat-earth-atlantic-candidate-clouds.webp",
+    oceanMask: "/cinematic/textures/jmpseat-earth-ocean-mask-v4.webp",
+    desertMask: "/cinematic/textures/jmpseat-earth-desert-suppression-v4.webp",
+    iceMask: "/cinematic/textures/jmpseat-earth-ice-suppression-v4.webp",
   },
   europe: {
-    day: "/cinematic/textures/deadhead-earth-europe-candidate-albedo.webp",
-    night: "/cinematic/textures/deadhead-earth-europe-candidate-emission.webp",
-    nightHalo: "/cinematic/textures/deadhead-earth-emission-halo-v4.webp",
-    clouds: "/cinematic/textures/deadhead-earth-europe-candidate-clouds.webp",
-    oceanMask: "/cinematic/textures/deadhead-earth-ocean-mask-v4.webp",
-    desertMask: "/cinematic/textures/deadhead-earth-desert-suppression-v4.webp",
-    iceMask: "/cinematic/textures/deadhead-earth-ice-suppression-v4.webp",
+    day: "/cinematic/textures/jmpseat-earth-europe-candidate-albedo.webp",
+    night: "/cinematic/textures/jmpseat-earth-europe-candidate-emission.webp",
+    nightHalo: "/cinematic/textures/jmpseat-earth-emission-halo-v4.webp",
+    clouds: "/cinematic/textures/jmpseat-earth-europe-candidate-clouds.webp",
+    oceanMask: "/cinematic/textures/jmpseat-earth-ocean-mask-v4.webp",
+    desertMask: "/cinematic/textures/jmpseat-earth-desert-suppression-v4.webp",
+    iceMask: "/cinematic/textures/jmpseat-earth-ice-suppression-v4.webp",
   },
   cityhalo: {
-    day: "/cinematic/textures/deadhead-earth-cityhalo-candidate-albedo.webp",
-    night: "/cinematic/textures/deadhead-earth-cityhalo-candidate-emission.webp",
-    nightHalo: "/cinematic/textures/deadhead-earth-emission-halo-v4.webp",
-    clouds: "/cinematic/textures/deadhead-earth-cityhalo-candidate-clouds.webp",
-    oceanMask: "/cinematic/textures/deadhead-earth-ocean-mask-v4.webp",
-    desertMask: "/cinematic/textures/deadhead-earth-desert-suppression-v4.webp",
-    iceMask: "/cinematic/textures/deadhead-earth-ice-suppression-v4.webp",
+    day: "/cinematic/textures/jmpseat-earth-cityhalo-candidate-albedo.webp",
+    night: "/cinematic/textures/jmpseat-earth-cityhalo-candidate-emission.webp",
+    nightHalo: "/cinematic/textures/jmpseat-earth-emission-halo-v4.webp",
+    clouds: "/cinematic/textures/jmpseat-earth-cityhalo-candidate-clouds.webp",
+    oceanMask: "/cinematic/textures/jmpseat-earth-ocean-mask-v4.webp",
+    desertMask: "/cinematic/textures/jmpseat-earth-desert-suppression-v4.webp",
+    iceMask: "/cinematic/textures/jmpseat-earth-ice-suppression-v4.webp",
   },
 };
 
@@ -431,7 +431,7 @@ const DEFAULT_TEXTURE_SET: TextureSetName = "cityhalo";
 const DEFAULT_GRADE: GradeName = "cityhalo";
 const DEFAULT_ROUTES_MODE: RoutesMode = "on";
 const DEFAULT_AIRCRAFT_MODE: AircraftMode = "on";
-const AIRCRAFT_MODEL_PATH = "/cinematic/models/deadhead-aircraft-v1.glb";
+const AIRCRAFT_MODEL_PATH = "/cinematic/models/jmpseat-aircraft-v1.glb";
 const GLASS_CARD_MODEL_PATH = "/cinematic/models/two-piece-cut-glass-card-ffc56f.glb";
 const AIRCRAFT_CLEARANCE = 0;
 const AIRCRAFT_VISUAL_SIZE = 0.132;
@@ -919,7 +919,7 @@ export default function LiveGlobeProofPage() {
     initWebglPerfMonitor(perfEnabled);
     if (perfEnabled) {
       window.console.info(
-        "Deadhead Club Perf monitor enabled.\\nHUD is hidden by default. Add ?perfHud=1 or set localStorage.DH_PERF_HUD_VISIBLE=\"1\" to show it.\\nUse:\\nwindow.DH_PERF.summary()\\nwindow.DH_PERF.snapshot()\\nwindow.DH_PERF.setDebugFlag(\"postprocessing\", false)",
+        "jmpseat Perf monitor enabled.\\nHUD is hidden by default. Add ?perfHud=1 or set localStorage.DH_PERF_HUD_VISIBLE=\"1\" to show it.\\nUse:\\nwindow.DH_PERF.summary()\\nwindow.DH_PERF.snapshot()\\nwindow.DH_PERF.setDebugFlag(\"postprocessing\", false)",
       );
     }
   }, [perfEnabled]);
@@ -1679,7 +1679,7 @@ export default function LiveGlobeProofPage() {
         touchLastY = null;
         return;
       }
-      if ((window as typeof window & { __deadheadGlobeDragging?: boolean }).__deadheadGlobeDragging) {
+      if ((window as typeof window & { __jmpseatGlobeDragging?: boolean }).__jmpseatGlobeDragging) {
         touchLastY = null;
         return;
       }
@@ -1690,7 +1690,7 @@ export default function LiveGlobeProofPage() {
       if (!isMobileViewport || event.touches.length !== 1) {
         return;
       }
-      if ((window as typeof window & { __deadheadGlobeDragging?: boolean }).__deadheadGlobeDragging) {
+      if ((window as typeof window & { __jmpseatGlobeDragging?: boolean }).__jmpseatGlobeDragging) {
         touchLastY = null;
         return;
       }
@@ -1798,7 +1798,7 @@ export default function LiveGlobeProofPage() {
     .join(" ");
 
   return (
-    <main ref={pageRef} className={pageClassName} aria-label="Deadhead live globe proof lab">
+    <main ref={pageRef} className={pageClassName} aria-label="jmpseat live globe proof lab">
       <section className={styles.heroStage} aria-label="Skybyrd live globe hero">
         <div className={styles.heroContent}>
           <div className={styles.backgroundPlate}>
@@ -5298,7 +5298,7 @@ function LiveGlobeCanvas({
         renderer.domElement.releasePointerCapture(globePointerId);
       }
       globePointerId = null;
-      (window as typeof window & { __deadheadGlobeDragging?: boolean }).__deadheadGlobeDragging = false;
+      (window as typeof window & { __jmpseatGlobeDragging?: boolean }).__jmpseatGlobeDragging = false;
       renderer.domElement.classList.remove(styles.canvasDragging);
     };
 
@@ -5315,7 +5315,7 @@ function LiveGlobeCanvas({
       globePitchVelocity = 0;
       renderer.domElement.setPointerCapture(event.pointerId);
       renderer.domElement.classList.add(styles.canvasDragging);
-      (window as typeof window & { __deadheadGlobeDragging?: boolean }).__deadheadGlobeDragging = true;
+      (window as typeof window & { __jmpseatGlobeDragging?: boolean }).__jmpseatGlobeDragging = true;
     };
 
     const handlePointerMove = (event: PointerEvent) => {
@@ -5907,7 +5907,7 @@ function LiveGlobeCanvas({
 
     return () => {
       disposed = true;
-      (window as typeof window & { __deadheadGlobeDragging?: boolean }).__deadheadGlobeDragging = false;
+      (window as typeof window & { __jmpseatGlobeDragging?: boolean }).__jmpseatGlobeDragging = false;
       renderer.domElement.removeEventListener("pointerdown", handlePointerDown);
       renderer.domElement.removeEventListener("pointermove", handlePointerMove);
       renderer.domElement.removeEventListener("pointerup", releaseGlobePointer);

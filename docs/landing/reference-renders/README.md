@@ -1,9 +1,9 @@
-# Deadhead Waitlist Render References
+# jmpseat Waitlist Render References
 
 User-provided target references for the cinematic waitlist hero:
 
-- Mobile: `deadhead-waitlist-globe-mobile-reference.png`
-- Desktop: `deadhead-waitlist-globe-desktop-reference.png`
+- Mobile: `jmpseat-waitlist-globe-mobile-reference.png`
+- Desktop: `jmpseat-waitlist-globe-desktop-reference.png`
 
 The Blender/Cinematic render should visually converge on these references while still passing the render rubric in `../render-review-rubric.md`.
 

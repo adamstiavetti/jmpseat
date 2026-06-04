@@ -1,4 +1,4 @@
-# Latest Deadhead Hero Render Review
+# Latest jmpseat Hero Render Review
 
 Generated: 2026-05-30T13:27:54.954950+00:00
 
@@ -8,11 +8,11 @@ This render is pipeline proof only. It is not visually acceptable, not complete,
 
 ## Reference Assets
 
-- Mobile reference: `docs/landing/references/deadheadwaitlistglobemobile.jpeg`
-- Desktop reference: `docs/landing/references/deadheadwaitlistglobedesktop.jpeg`
-- Mobile render: `public/cinematic/previews/deadhead-hero-mobile-preview.png`
-- Desktop render: `public/cinematic/previews/deadhead-hero-desktop-preview.png`
-- Contact sheet: `public/cinematic/previews/deadhead-hero-contact-sheet.png`
+- Mobile reference: `docs/landing/references/jmpseatwaitlistglobemobile.jpeg`
+- Desktop reference: `docs/landing/references/jmpseatwaitlistglobedesktop.jpeg`
+- Mobile render: `public/cinematic/previews/jmpseat-hero-mobile-preview.png`
+- Desktop render: `public/cinematic/previews/jmpseat-hero-desktop-preview.png`
+- Contact sheet: `public/cinematic/previews/jmpseat-hero-contact-sheet.png`
 - Debug day-only globe: `public/cinematic/previews/debug-earth-day-only.png`
 - Debug city-light-only globe: `public/cinematic/previews/debug-earth-night-city-lights-only.png`
 - Debug final globe material: `public/cinematic/previews/debug-earth-final-material.png`

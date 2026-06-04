@@ -92,11 +92,11 @@ test("public and private route source files stay separated", () => {
     "utf8",
   );
 
-  assert.match(publicRouteSource, /Join the Private Beta Waitlist/);
+  assert.match(publicRouteSource, /Join the private beta waitlist\./);
   assert.doesNotMatch(publicRouteSource, /PrivateShellPlaceholder/);
   assert.match(privateRootSource, /PrivateShellPlaceholder/);
-  assert.doesNotMatch(privateRootSource, /Join the Private Beta Waitlist/);
-  assert.doesNotMatch(privateChildSource, /Join the Private Beta Waitlist/);
+  assert.doesNotMatch(privateRootSource, /Join the private beta waitlist\./);
+  assert.doesNotMatch(privateChildSource, /Join the private beta waitlist\./);
   assert.doesNotMatch(privateRootSource, /fetch\(|axios|supabase|prisma|api\//);
   assert.doesNotMatch(privateChildSource, /fetch\(|axios|supabase|prisma|api\//);
   assert.doesNotMatch(privateRootSource, /\bPost\b|\bComment\b|\bSave\b|\bSearch\b/);

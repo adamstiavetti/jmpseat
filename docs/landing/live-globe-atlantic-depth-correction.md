@@ -29,23 +29,23 @@ Preserved intentionally:
 ## Brief Material Audit
 
 - Albedo/base:
-  - prior accepted default: `public/cinematic/textures/deadhead-earth-polar-candidate-albedo.webp`
-  - accepted Atlantic default: `public/cinematic/textures/deadhead-earth-atlantic-candidate-albedo.webp`
+  - prior accepted default: `public/cinematic/textures/jmpseat-earth-polar-candidate-albedo.webp`
+  - accepted Atlantic default: `public/cinematic/textures/jmpseat-earth-atlantic-candidate-albedo.webp`
 - Emission/city lights:
   - preserved from accepted polar state
-  - `public/cinematic/textures/deadhead-earth-atlantic-candidate-emission.webp`
+  - `public/cinematic/textures/jmpseat-earth-atlantic-candidate-emission.webp`
 - Clouds:
   - preserved from accepted polar state
-  - `public/cinematic/textures/deadhead-earth-atlantic-candidate-clouds.webp`
+  - `public/cinematic/textures/jmpseat-earth-atlantic-candidate-clouds.webp`
 - Atmosphere/rim controls:
   - procedural shader and runtime grade controls in `app/lab/live-globe-proof/page.tsx`
 
 ## Candidate Outputs
 
-- `public/cinematic/textures/deadhead-earth-atlantic-candidate-albedo.webp`
-- `public/cinematic/textures/deadhead-earth-atlantic-candidate-emission.webp`
-- `public/cinematic/textures/deadhead-earth-atlantic-candidate-clouds.webp`
-- `public/cinematic/textures/deadhead-earth-atlantic-candidate-metadata.json`
+- `public/cinematic/textures/jmpseat-earth-atlantic-candidate-albedo.webp`
+- `public/cinematic/textures/jmpseat-earth-atlantic-candidate-emission.webp`
+- `public/cinematic/textures/jmpseat-earth-atlantic-candidate-clouds.webp`
+- `public/cinematic/textures/jmpseat-earth-atlantic-candidate-metadata.json`
 - `public/cinematic/previews/live-globe-proof-atlantic-desktop.png`
 - `public/cinematic/previews/live-globe-proof-atlantic-mobile.png`
 - `public/cinematic/previews/live-globe-proof-atlantic-comparison.png`

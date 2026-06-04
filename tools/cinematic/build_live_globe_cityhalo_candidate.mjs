@@ -6,17 +6,17 @@ const repoRoot = path.resolve(path.dirname(new URL(import.meta.url).pathname), "
 const textureDir = path.join(repoRoot, "public", "cinematic", "textures");
 
 const inputPaths = {
-  albedo: path.join(textureDir, "deadhead-earth-europe-candidate-albedo.webp"),
-  emission: path.join(textureDir, "deadhead-earth-europe-candidate-emission.webp"),
-  clouds: path.join(textureDir, "deadhead-earth-europe-candidate-clouds.webp"),
-  metadata: path.join(textureDir, "deadhead-earth-europe-candidate-metadata.json"),
+  albedo: path.join(textureDir, "jmpseat-earth-europe-candidate-albedo.webp"),
+  emission: path.join(textureDir, "jmpseat-earth-europe-candidate-emission.webp"),
+  clouds: path.join(textureDir, "jmpseat-earth-europe-candidate-clouds.webp"),
+  metadata: path.join(textureDir, "jmpseat-earth-europe-candidate-metadata.json"),
 };
 
 const outputPaths = {
-  albedo: path.join(textureDir, "deadhead-earth-cityhalo-candidate-albedo.webp"),
-  emission: path.join(textureDir, "deadhead-earth-cityhalo-candidate-emission.webp"),
-  clouds: path.join(textureDir, "deadhead-earth-cityhalo-candidate-clouds.webp"),
-  metadata: path.join(textureDir, "deadhead-earth-cityhalo-candidate-metadata.json"),
+  albedo: path.join(textureDir, "jmpseat-earth-cityhalo-candidate-albedo.webp"),
+  emission: path.join(textureDir, "jmpseat-earth-cityhalo-candidate-emission.webp"),
+  clouds: path.join(textureDir, "jmpseat-earth-cityhalo-candidate-clouds.webp"),
+  metadata: path.join(textureDir, "jmpseat-earth-cityhalo-candidate-metadata.json"),
 };
 
 function clampUnit(value) {

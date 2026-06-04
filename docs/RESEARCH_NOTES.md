@@ -2,7 +2,7 @@
 
 Date accessed: May 28, 2026.
 
-Working name note: "Deadhead Club" is a working product name pending legal and trademark clearance. This document does not claim legal or trademark clearance.
+Brand note: jmpseat is the canonical product and app name. This document does not claim legal or trademark clearance for the name.
 
 These notes summarize public web research used to refine the planning docs. Sources are summarized in original language; long copyrighted passages are intentionally not copied.
 
@@ -24,7 +24,7 @@ These notes summarize public web research used to refine the planning docs. Sour
 - URL: https://apps.apple.com/us/app/flight-crew-view/id999316238
 - Source type: app-store listing
 - Supports: Flight Crew View positions around schedule download/storage, FLICA support, crew assistant, legality calculations, hotel/airport info, crew chat, friend tracking, discounts, and subscriptions.
-- Product-plan impact: reinforced that Deadhead Club should not try to beat schedule/roster utility in V1 and should avoid airline portal/login dependency. App reviews also informed the risk note around company security policies and third-party schedule access.
+- Product-plan impact: reinforced that jmpseat should not try to beat schedule/roster utility in V1 and should avoid airline portal/login dependency. App reviews also informed the risk note around company security policies and third-party schedule access.
 
 ### Flight Crew View Support - Delta schedule import
 
@@ -38,7 +38,7 @@ These notes summarize public web research used to refine the planning docs. Sour
 - URL: https://support.stafftraveler.com/en/help/what-is-stafftraveler
 - Source type: authoritative product support
 - Supports: StaffTraveler is positioned as a worldwide community for non-rev travelers, flight-load requests, airline employee hotel/car deals, and city tips.
-- Product-plan impact: confirmed Deadhead Club should not build flight-load request infrastructure in V1 and should treat deals/tips as supporting utility.
+- Product-plan impact: confirmed jmpseat should not build flight-load request infrastructure in V1 and should treat deals/tips as supporting utility.
 
 ### StaffTraveler - How do I prove that I work(ed) for an airline?
 
@@ -52,7 +52,7 @@ These notes summarize public web research used to refine the planning docs. Sour
 - URL: https://connect.crewlounge.aero/
 - Source type: authoritative product marketing
 - Supports: CrewLounge CONNECT is roster/calendar-first, with roster export, sharing, privacy controls, layover meetups, restaurants/discounts, hotel room and pickup utilities.
-- Product-plan impact: validated that Deadhead Club should not clone a roster/calendar-first app in V1 and should defer integrations.
+- Product-plan impact: validated that jmpseat should not clone a roster/calendar-first app in V1 and should defer integrations.
 
 ### CrewLounge CONNECT App Store
 
@@ -279,7 +279,7 @@ These sources were used for `docs/LEGAL_POLICY_REQUIREMENTS.md`. Date accessed: 
 - URL: https://www.uspto.gov/trademarks/basics
 - Source type: government
 - Supports: Trademarks identify source of goods or services, and federal trademark rights require review of mark use and registration requirements.
-- Policy impact: reinforced that "Deadhead Club" must remain a working name pending legal/trademark clearance and that public launch needs a documented clearance decision.
+- Policy impact: reinforced that "jmpseat" must remain a working name pending legal/trademark clearance and that public launch needs a documented clearance decision.
 - Limitations: general public guidance, not a clearance search or legal opinion.
 
 ### USPTO - Likelihood of confusion
@@ -288,7 +288,7 @@ These sources were used for `docs/LEGAL_POLICY_REQUIREMENTS.md`. Date accessed: 
 - Source type: government
 - Supports: Trademark conflicts can arise when marks are similar and goods/services are related enough to create consumer confusion.
 - Policy impact: informed counsel questions about software, online social networking, aviation, travel, recruiting, marketplace, apparel, merch, domain, social handle, and common-law conflicts.
-- Limitations: does not determine whether Deadhead Club is available or registrable.
+- Limitations: does not determine whether jmpseat is available or registrable.
 
 ### USPTO - Search trademark database
 
@@ -440,7 +440,7 @@ These sources were used for `docs/LEGAL_POLICY_REQUIREMENTS.md`. Date accessed: 
 - Source type: official docs
 - Supports: OpenAI provides moderation capabilities for API users.
 - Policy impact: informed AI Safety Filter and moderation-assistant planning while preserving human final review.
-- Limitations: moderation tooling is assistive and does not replace Deadhead Club policy enforcement.
+- Limitations: moderation tooling is assistive and does not replace jmpseat policy enforcement.
 
 ### Supabase - Row Level Security
 
@@ -713,7 +713,7 @@ Accessed: May 28, 2026
 - Source type: official documentation
 - Supports: React Three Fiber performance planning should consider on-demand rendering, reuse of geometries/materials, instancing for repeated objects, level of detail, performance monitoring, and adaptive pixel ratio strategies.
 - Product-plan impact: informed the Airside Journey V2 recommendation to lazy-load 3D, cap DPR, reuse resources, avoid heavy object counts, and keep mobile scenes small.
-- Limitations: Framework guidance, not Deadhead Club-specific UX validation or device benchmark data.
+- Limitations: Framework guidance, not jmpseat-specific UX validation or device benchmark data.
 
 ### React Three Fiber Performance Pitfalls
 

@@ -1,23 +1,23 @@
 {
   "generated_at": "2026-05-30T23:50:57.770Z",
   "inputs": {
-    "albedo": "public/cinematic/textures/deadhead-earth-albedo-v4.webp",
-    "emission": "public/cinematic/textures/deadhead-earth-emission-v4.webp",
-    "clouds": "public/cinematic/textures/deadhead-earth-clouds-v4.webp",
-    "prior_metadata": "public/cinematic/textures/deadhead-earth-lookdev-metadata-v4.json"
+    "albedo": "public/cinematic/textures/jmpseat-earth-albedo-v4.webp",
+    "emission": "public/cinematic/textures/jmpseat-earth-emission-v4.webp",
+    "clouds": "public/cinematic/textures/jmpseat-earth-clouds-v4.webp",
+    "prior_metadata": "public/cinematic/textures/jmpseat-earth-lookdev-metadata-v4.json"
   },
   "outputs": {
-    "albedo": "public/cinematic/textures/deadhead-earth-cityrim-candidate-albedo.webp",
-    "emission": "public/cinematic/textures/deadhead-earth-cityrim-candidate-emission.webp",
-    "clouds": "public/cinematic/textures/deadhead-earth-cityrim-candidate-clouds.webp",
-    "metadata": "public/cinematic/textures/deadhead-earth-cityrim-candidate-metadata.json"
+    "albedo": "public/cinematic/textures/jmpseat-earth-cityrim-candidate-albedo.webp",
+    "emission": "public/cinematic/textures/jmpseat-earth-cityrim-candidate-emission.webp",
+    "clouds": "public/cinematic/textures/jmpseat-earth-cityrim-candidate-clouds.webp",
+    "metadata": "public/cinematic/textures/jmpseat-earth-cityrim-candidate-metadata.json"
   },
   "candidate_goal": "Single safe globe-only city-light and rim candidate for /lab/live-globe-proof.",
   "reused_runtime_maps": {
-    "oceanMask": "public/cinematic/textures/deadhead-earth-ocean-mask-v4.webp",
-    "desertMask": "public/cinematic/textures/deadhead-earth-desert-suppression-v4.webp",
-    "iceMask": "public/cinematic/textures/deadhead-earth-ice-suppression-v4.webp",
-    "nightHalo": "public/cinematic/textures/deadhead-earth-emission-halo-v4.webp"
+    "oceanMask": "public/cinematic/textures/jmpseat-earth-ocean-mask-v4.webp",
+    "desertMask": "public/cinematic/textures/jmpseat-earth-desert-suppression-v4.webp",
+    "iceMask": "public/cinematic/textures/jmpseat-earth-ice-suppression-v4.webp",
+    "nightHalo": "public/cinematic/textures/jmpseat-earth-emission-halo-v4.webp"
   },
   "transforms": [
     "Copied the current v4 albedo unchanged to preserve the working ocean depth, land values, and cloud/surface balance.",

@@ -1,10 +1,10 @@
 # Trust and Safety
 
-Working name note: "Deadhead Club" is a working product name pending legal and trademark clearance. This document does not claim legal or trademark clearance.
+Brand note: jmpseat is the canonical product and app name. This document does not claim legal or trademark clearance for the name.
 
 ## Safety Position
 
-Deadhead Club must be designed for aviation privacy from day one. Airline people need practical and candid spaces, but the product cannot allow content that exposes passengers, crew, live operations, hotels, airport security procedures, or confidential company information.
+jmpseat must be designed for aviation privacy from day one. Airline people need practical and candid spaces, but the product cannot allow content that exposes passengers, crew, live operations, hotels, airport security procedures, or confidential company information.
 
 The trust model should follow privacy-by-design and safety-by-design: minimize collection, restrict access, log sensitive access, define deletion paths, and review high-impact decisions with humans.
 

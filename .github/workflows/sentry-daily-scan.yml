@@ -14,7 +14,7 @@ concurrency:
 
 env:
   NODE_VERSION: "22"
-  SENTRY_MONITOR_SLUG: deadheadclub-daily-scan
+  SENTRY_MONITOR_SLUG: jmpseat-daily-scan
   SENTRY_MONITOR_SCHEDULE: "0 14 * * *"
   SENTRY_MONITOR_TIMEZONE: UTC
 

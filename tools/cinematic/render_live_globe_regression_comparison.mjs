@@ -8,7 +8,7 @@ const previewsDir = path.join(repoRoot, "public", "cinematic", "previews");
 const comparisonPath = path.join(previewsDir, "live-globe-texture-regression-comparison.png");
 const recoveredDesktopPath = path.join(previewsDir, "live-globe-proof-recovered-desktop.png");
 const recoveredMobilePath = path.join(previewsDir, "live-globe-proof-recovered-mobile.png");
-const referencePath = path.join(repoRoot, "docs", "landing", "references", "deadhead-globe-material-reference.jpg");
+const referencePath = path.join(repoRoot, "docs", "landing", "references", "jmpseat-globe-material-reference.jpg");
 
 const baseUrl = process.env.LIVE_GLOBE_BASE_URL ?? "http://127.0.0.1:3001";
 

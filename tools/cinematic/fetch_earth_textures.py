@@ -1,4 +1,4 @@
-"""Prepare local Earth texture assets for the Deadhead cinematic globe.
+"""Prepare local Earth texture assets for the jmpseat cinematic globe.
 
 This helper does not hotlink runtime assets. It localizes the existing NASA
 day/night files when available and creates documented procedural fallbacks for
@@ -142,7 +142,7 @@ def generate_specular(destination: Path, allow_overwrite: bool) -> str:
 
 def write_docs(statuses: dict[str, str]) -> None:
     lines = [
-        "# Deadhead Cinematic Earth Texture Sources",
+        "# jmpseat Cinematic Earth Texture Sources",
         "",
         f"Updated: {datetime.now(timezone.utc).isoformat()}",
         "",

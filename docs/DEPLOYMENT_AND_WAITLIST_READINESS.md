@@ -1,6 +1,6 @@
 # Deployment and Waitlist Readiness
 
-Working name note: "Deadhead Club" is a working product name pending legal and trademark clearance. This guide does not claim legal or trademark clearance.
+Brand note: jmpseat is the canonical product and app name. This document does not claim legal or trademark clearance for the name.
 
 Product principle: Utility first. Community second. Social feed last.
 
@@ -10,7 +10,7 @@ Identity principle: Verified privately. Anonymous publicly. Accountable internal
 
 This guide prepares the current M1A splash/waitlist app for preview or production deployment and connection to an external waitlist form.
 
-M1A is a public validation surface, not the full Deadhead Club product. Deployment should help review the landing page, connect a safe external waitlist CTA, and support controlled first outreach. It should not add internal waitlist storage, user accounts, verification, community features, AI, payments, analytics SDKs, or airline integrations.
+M1A is a public validation surface, not the full jmpseat product. Deployment should help review the landing page, connect a safe external waitlist CTA, and support controlled first outreach. It should not add internal waitlist storage, user accounts, verification, community features, AI, payments, analytics SDKs, or airline integrations.
 
 ## 2. Current App Scope
 
@@ -74,11 +74,11 @@ If a respondent includes sensitive information in a free-text answer, do not cop
 
 Form title:
 
-> Join the Deadhead Club private beta waitlist
+> Join the jmpseat private beta waitlist
 
 Form description:
 
-> Deadhead Club is a working-name concept for a verified off-duty network for airline people. We are validating demand for base intel, layover boards, anonymous but accountable crew discussion, career tools, and crew-friendly perks before opening private beta access.
+> jmpseat is a working-name concept for a verified off-duty network for airline people. We are validating demand for base intel, layover boards, anonymous but accountable crew discussion, career tools, and crew-friendly perks before opening private beta access.
 
 Privacy/safety note:
 
@@ -86,7 +86,7 @@ Privacy/safety note:
 
 Confirmation message:
 
-> You're on the waitlist. If your base, role, or airline fits the first private beta group, we may reach out for a short interview and separate verification steps. Deadhead Club is a working name pending legal/trademark clearance and is not affiliated with or endorsed by any airline, airport, union, or employer.
+> You're on the waitlist. If your base, role, or airline fits the first private beta group, we may reach out for a short interview and separate verification steps. jmpseat is a working name pending legal/trademark clearance and is not affiliated with or endorsed by any airline, airport, union, or employer.
 
 ## 6. Environment Variable Setup
 

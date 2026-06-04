@@ -1,6 +1,6 @@
 # Scalability and Architecture Requirements
 
-Working name note: "jmpseat" is the intended public-facing name for the product direction described here. Older planning docs may still reference "Deadhead Club" as a working name.
+Brand note: jmpseat is the canonical product and app name. This document does not claim legal or trademark clearance for the name.
 
 ## 1. Purpose
 

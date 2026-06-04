@@ -22,7 +22,7 @@ If any of these are missing, the workflow will fail immediately with a clear err
 
 ## Result in Sentry
 
-The workflow reports to the monitor slug `deadheadclub-daily-scan`.
+The workflow reports to the monitor slug `jmpseat-daily-scan`.
 
 On the first successful run, Sentry should create or update the monitor using this schedule:
 

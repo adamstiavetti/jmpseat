@@ -1,4 +1,4 @@
-"""Render isolated globe material proof frames for the Deadhead cinematic hero.
+"""Render isolated globe material proof frames for the jmpseat cinematic hero.
 
 Run from the repo root:
   blender --background --python tools/cinematic/render_globe_material_proof.py
@@ -23,7 +23,7 @@ PUBLIC_ROOT = REPO_ROOT / "public" / "cinematic"
 TEXTURE_DIR = PUBLIC_ROOT / "textures"
 PREVIEW_DIR = PUBLIC_ROOT / "previews"
 DOC_PATH = REPO_ROOT / "docs" / "landing" / "globe-material-debug-latest.md"
-REFERENCE_GLOBE_SPEC = REPO_ROOT / "docs" / "landing" / "references" / "deadhead-globe-material-reference.jpg"
+REFERENCE_GLOBE_SPEC = REPO_ROOT / "docs" / "landing" / "references" / "jmpseat-globe-material-reference.jpg"
 
 EARTH_DAY_TEXTURE = TEXTURE_DIR / "earth_day.jpg"
 EARTH_NIGHT_TEXTURE = TEXTURE_DIR / "earth_night.jpg"
@@ -1480,7 +1480,7 @@ def write_debug_doc(texture_statuses: dict[str, str], passed: bool) -> None:
         "",
         "## Globe-Only Reference Rubric",
         "",
-        "Scores are 0-5 and are judged against `docs/landing/references/deadhead-globe-material-reference.jpg`. This material proof intentionally excludes aircraft and route arcs until the globe surface itself passes.",
+        "Scores are 0-5 and are judged against `docs/landing/references/jmpseat-globe-material-reference.jpg`. This material proof intentionally excludes aircraft and route arcs until the globe surface itself passes.",
         "",
         "| Category | Score | Notes |",
         "| --- | ---: | --- |",
@@ -1489,7 +1489,7 @@ def write_debug_doc(texture_statuses: dict[str, str], passed: bool) -> None:
         "| Deep ocean control | 3/5 | Oceans stayed dark, but the blue tonality is not yet rich or integrated like the supplied reference. |",
         "| Warm geographic city lights | 4/5 | City lights are warm and geography-shaped, but not yet as dense/refined as the reference. |",
         "| Atmosphere restraint | 4/5 | Rim is thin and secondary; it no longer coats the front face like cyan glass. |",
-        "| Overall match to globe-only design spec | 2/5 | The variants remain visibly below the supplied Deadhead reference globe. |",
+        "| Overall match to globe-only design spec | 2/5 | The variants remain visibly below the supplied jmpseat reference globe. |",
         "| **Total** | **21/30** | **Failed; do not reinsert into hero.** |",
         "",
         "## Source Texture Audit",

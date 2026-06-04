@@ -108,7 +108,7 @@ export function PerfHud({ enabled }: PerfHudProps) {
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement("a");
     anchor.href = url;
-    anchor.download = `deadhead-perf-${Date.now()}.json`;
+    anchor.download = `jmpseat-perf-${Date.now()}.json`;
     anchor.click();
     URL.revokeObjectURL(url);
   };
@@ -152,7 +152,7 @@ export function PerfHud({ enabled }: PerfHudProps) {
   return (
     <div style={cardStyle}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "8px 10px", borderBottom: "1px solid rgba(127,216,255,0.22)" }}>
-        <strong style={{ fontSize: 12 }}>Deadhead Perf HUD</strong>
+        <strong style={{ fontSize: 12 }}>jmpseat Perf HUD</strong>
         <button
           type="button"
           onClick={() => setExpanded((value) => !value)}

@@ -1,4 +1,4 @@
-"""Render lighting-driven globe lookdev proofs for the Deadhead cinematic hero.
+"""Render lighting-driven globe lookdev proofs for the jmpseat cinematic hero.
 
 Run from the repo root:
   blender --background --python tools/cinematic/render_globe_lighting_lookdev.py
@@ -21,7 +21,7 @@ REPO_ROOT = SCRIPT_PATH.parents[2]
 TEXTURE_DIR = REPO_ROOT / "public" / "cinematic" / "textures"
 PREVIEW_DIR = REPO_ROOT / "public" / "cinematic" / "previews"
 DOC_PATH = REPO_ROOT / "docs" / "landing" / "globe-material-debug-latest.md"
-REFERENCE_GLOBE_SPEC = REPO_ROOT / "docs" / "landing" / "references" / "deadhead-globe-material-reference.jpg"
+REFERENCE_GLOBE_SPEC = REPO_ROOT / "docs" / "landing" / "references" / "jmpseat-globe-material-reference.jpg"
 
 EARTH_DAY_TEXTURE = TEXTURE_DIR / "earth_day.jpg"
 EARTH_NIGHT_TEXTURE = TEXTURE_DIR / "earth_night.jpg"

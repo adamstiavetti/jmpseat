@@ -1,10 +1,10 @@
 # Technical Architecture
 
-Working name note: "Deadhead Club" is a working product name pending legal and trademark clearance. This document does not claim legal or trademark clearance.
+Brand note: jmpseat is the canonical product and app name. This document does not claim legal or trademark clearance for the name.
 
 ## MVP Architecture Recommendation
 
-Deadhead Club should start with a pragmatic web architecture that supports fast iteration, strong privacy controls, and admin moderation from day one.
+jmpseat should start with a pragmatic web architecture that supports fast iteration, strong privacy controls, and admin moderation from day one.
 
 Scale-readiness rule:
 

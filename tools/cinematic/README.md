@@ -1,6 +1,6 @@
-# Deadhead Cinematic Blender Pipeline
+# jmpseat Cinematic Blender Pipeline
 
-This folder contains the local Blender-first asset/previs pipeline for the Deadhead cinematic waitlist hero.
+This folder contains the local Blender-first asset/previs pipeline for the jmpseat cinematic waitlist hero.
 
 The scripts create first-pass physical assets and camera validation previews:
 
@@ -17,30 +17,30 @@ The scripts create first-pass physical assets and camera validation previews:
 From the repo root:
 
 ```bash
-blender --background --python tools/cinematic/build_deadhead_hero_scene.py
+blender --background --python tools/cinematic/build_jmpseat_hero_scene.py
 ```
 
 To export GLBs and refresh the manifest without rendering previews:
 
 ```bash
-blender --background --python tools/cinematic/export_deadhead_assets.py
+blender --background --python tools/cinematic/export_jmpseat_assets.py
 ```
 
 Or:
 
 ```bash
-blender --background --python tools/cinematic/build_deadhead_hero_scene.py -- --skip-renders
+blender --background --python tools/cinematic/build_jmpseat_hero_scene.py -- --skip-renders
 ```
 
 ## Outputs
 
-- `public/cinematic/models/deadhead-scanner-printer.glb`
-- `public/cinematic/models/deadhead-ticket-plane.glb`
-- `public/cinematic/models/deadhead-aircraft.glb`
-- `public/cinematic/models/deadhead-globe-helpers.glb`
-- `public/cinematic/models/deadhead-route-guides.glb`
-- `public/cinematic/previews/deadhead-hero-mobile-preview.png`
-- `public/cinematic/previews/deadhead-hero-desktop-preview.png`
+- `public/cinematic/models/jmpseat-scanner-printer.glb`
+- `public/cinematic/models/jmpseat-ticket-plane.glb`
+- `public/cinematic/models/jmpseat-aircraft.glb`
+- `public/cinematic/models/jmpseat-globe-helpers.glb`
+- `public/cinematic/models/jmpseat-route-guides.glb`
+- `public/cinematic/previews/jmpseat-hero-mobile-preview.png`
+- `public/cinematic/previews/jmpseat-hero-desktop-preview.png`
 - `public/cinematic/manifest.json`
 
 These assets are blockout/previs quality. They exist to establish physical scale, camera framing, and R3F loader contracts before final art direction.

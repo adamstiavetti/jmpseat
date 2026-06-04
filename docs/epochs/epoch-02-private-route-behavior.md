@@ -49,4 +49,4 @@ The locked route experience is informational scaffolding, not a security boundar
 
 - Added this route-behavior note for the app repo
 - Reused and extended the shared private-shell placeholder config rather than duplicating route copy
-- Preserved alignment with the planning docs in `deadheadclub-main-docs`
+- Preserved alignment with the planning docs in `jmpseat-main-docs`

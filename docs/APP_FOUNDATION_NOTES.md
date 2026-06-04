@@ -1,6 +1,6 @@
 # App Foundation Notes
 
-Working name note: "Deadhead Club" is a working product name pending legal and trademark clearance. This app foundation does not claim legal or trademark clearance.
+Brand note: jmpseat is the canonical product and app name. This document does not claim legal or trademark clearance for the name.
 
 Product principle: Utility first. Community second. Social feed last.
 
@@ -8,7 +8,7 @@ Identity principle: Verified privately. Anonymous publicly. Accountable internal
 
 ## M1A Scope
 
-M1A creates the first narrow app-code slice for Deadhead Club:
+M1A creates the first narrow app-code slice for jmpseat:
 
 - Minimal Next.js App Router foundation.
 - TypeScript strict mode.
@@ -26,7 +26,7 @@ This slice is a validation asset and founder-pitch surface. It is not the full p
 
 ## Visual Direction
 
-The splash page follows the approved Deadhead Club mockup direction:
+The splash page follows the approved jmpseat mockup direction:
 
 - Premium dark aviation-native landing page.
 - Airside Night palette.

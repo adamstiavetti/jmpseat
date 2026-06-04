@@ -14,11 +14,11 @@ const assetNeeds = [
 ];
 
 const loaderPlaceholders = [
-  "/cinematic/models/deadhead-scanner-printer.glb",
-  "/cinematic/models/deadhead-ticket-plane.glb",
-  "/cinematic/models/deadhead-aircraft.glb",
-  "/cinematic/models/deadhead-globe-helpers.glb",
-  "/cinematic/models/deadhead-route-guides.glb",
+  "/cinematic/models/jmpseat-scanner-printer.glb",
+  "/cinematic/models/jmpseat-ticket-plane.glb",
+  "/cinematic/models/jmpseat-aircraft.glb",
+  "/cinematic/models/jmpseat-globe-helpers.glb",
+  "/cinematic/models/jmpseat-route-guides.glb",
 ];
 
 export default function CinematicPipelinePage() {
@@ -66,7 +66,7 @@ function GlobePlaceholder() {
 }
 
 function RoutePlaceholder() {
-  // TODO(R3F): Use thin native curves, optionally seeded by /cinematic/models/deadhead-route-guides.glb.
+  // TODO(R3F): Use thin native curves, optionally seeded by /cinematic/models/jmpseat-route-guides.glb.
   return (
     <svg className={styles.routeSystem} viewBox="0 0 1000 620" role="img" aria-label="RouteSystem placeholder arcs">
       <path d="M154 316 C288 118 680 106 846 272" />
@@ -80,7 +80,7 @@ function RoutePlaceholder() {
 }
 
 function AircraftPlaceholder() {
-  // TODO(R3F): Load /cinematic/models/deadhead-aircraft.glb behind a safe missing-asset fallback.
+  // TODO(R3F): Load /cinematic/models/jmpseat-aircraft.glb behind a safe missing-asset fallback.
   return (
     <div className={styles.aircraftSystem} aria-label="AircraftSystem placeholder markers">
       <span className={`${styles.aircraftMarker} ${styles.aircraftOne}`}>AircraftSystem</span>
@@ -91,7 +91,7 @@ function AircraftPlaceholder() {
 }
 
 function ScannerPlaceholder() {
-  // TODO(R3F): Load /cinematic/models/deadhead-scanner-printer.glb behind a safe missing-asset fallback.
+  // TODO(R3F): Load /cinematic/models/jmpseat-scanner-printer.glb behind a safe missing-asset fallback.
   return (
     <div className={styles.scannerSystem}>
       <div className={styles.scannerBody}>
@@ -105,7 +105,7 @@ function ScannerPlaceholder() {
 }
 
 function TicketOverlay() {
-  // TODO(R3F): Align DOM ticket text/CTA with /cinematic/models/deadhead-ticket-plane.glb or scene geometry.
+  // TODO(R3F): Align DOM ticket text/CTA with /cinematic/models/jmpseat-ticket-plane.glb or scene geometry.
   return (
     <article className={styles.ticketSystem} aria-label="TicketSystem placeholder with integrated ENTER CTA">
       <div className={styles.ticketTopRow}>
@@ -139,7 +139,7 @@ function CameraNotesPanel() {
   return (
     <aside className={styles.notesPanel} aria-labelledby="lab-title">
       <p className={styles.kicker}>Cinematic pipeline lab</p>
-      <h1 id="lab-title">Deadhead hero composition scaffold</h1>
+      <h1 id="lab-title">jmpseat hero composition scaffold</h1>
       <p>
         This route is intentionally a foundation layer. It exposes the component boundaries for the
         future asset-driven Three.js/R3F scene without pretending the placeholders are final art.

@@ -1,6 +1,6 @@
 # M0 Validation Operating Packet
 
-Working name note: "Deadhead Club" is a working product name pending legal and trademark clearance. This packet does not claim legal or trademark clearance.
+Brand note: jmpseat is the canonical product and app name. This document does not claim legal or trademark clearance for the name.
 
 Product principle: Utility first. Community second. Social feed last.
 
@@ -49,7 +49,7 @@ M0 passes only if qualified demand, community concentration, ambassador pool, an
 
 Default strategy: one base across multiple roles.
 
-This is better than launching everywhere because Deadhead Club needs density, trust, and useful local knowledge. A single base can validate Base Boards, role diversity, commuter questions, layover-adjacent knowledge, new-hire support, and cross-role utility without creating an empty nationwide community.
+This is better than launching everywhere because jmpseat needs density, trust, and useful local knowledge. A single base can validate Base Boards, role diversity, commuter questions, layover-adjacent knowledge, new-hire support, and cross-role utility without creating an empty nationwide community.
 
 Final base selection placeholder:
 
@@ -198,7 +198,7 @@ Target length: 20 minutes.
 
 Opening:
 
-- "This is product discovery for a working-name concept called Deadhead Club. It is not affiliated with any airline, and we are not asking for confidential information."
+- "This is product discovery for a working-name concept called jmpseat. It is not affiliated with any airline, and we are not asking for confidential information."
 - "Please do not share passenger information, exact crew hotel details, schedules, airport security procedures, or confidential company documents."
 
 Questions:
@@ -240,7 +240,7 @@ Selection criteria:
 Screening questions:
 
 - What base or role knowledge would you seed first?
-- What should never be posted in Deadhead Club?
+- What should never be posted in jmpseat?
 - How would you explain verified privately, anonymous publicly, accountable internally?
 - Who could you invite without spamming?
 - What conflicts would prevent you from helping?
@@ -306,11 +306,11 @@ Do-not-spam rules:
 
 Direct message to airline worker:
 
-> Hey `[Name]`, I am validating a working-name concept called Deadhead Club: an off-duty utility community for airline people around base intel, layover tips, anonymous but accountable crew talk, career tools, and crew-friendly perks. It is not affiliated with any airline and I am not asking for confidential info. Would you be open to a quick 20-minute feedback call?
+> Hey `[Name]`, I am validating a working-name concept called jmpseat: an off-duty utility community for airline people around base intel, layover tips, anonymous but accountable crew talk, career tools, and crew-friendly perks. It is not affiliated with any airline and I am not asking for confidential info. Would you be open to a quick 20-minute feedback call?
 
 Ambassador invite:
 
-> You seem like someone who knows the real base/role details people always ask about. I am looking for a few beta ambassadors to help shape Deadhead Club before anything public launches. Ambassadors would help seed useful ideas, invite trusted peers, and flag safety concerns. They would not verify users, moderate, or represent any airline. Interested in talking?
+> You seem like someone who knows the real base/role details people always ask about. I am looking for a few beta ambassadors to help shape jmpseat before anything public launches. Ambassadors would help seed useful ideas, invite trusted peers, and flag safety concerns. They would not verify users, moderate, or represent any airline. Interested in talking?
 
 Interview request:
 
@@ -318,7 +318,7 @@ Interview request:
 
 Waitlist invite:
 
-> I am collecting interest for a private beta of Deadhead Club, a working-name off-duty network for airline people. The waitlist helps choose the first focused base/community. It will not ask for badge uploads, IDs, schedules, or credentials. Want the link when it is ready?
+> I am collecting interest for a private beta of jmpseat, a working-name off-duty network for airline people. The waitlist helps choose the first focused base/community. It will not ask for badge uploads, IDs, schedules, or credentials. Want the link when it is ready?
 
 Follow-up after signup:
 
@@ -345,7 +345,7 @@ Open-ended questions:
 - What would make this worth joining?
 - What would make you not trust it?
 - What would you want in your base board on day one?
-- What should Deadhead Club never allow?
+- What should jmpseat never allow?
 
 Interpretation:
 

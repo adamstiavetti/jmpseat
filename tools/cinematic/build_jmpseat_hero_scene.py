@@ -1,7 +1,7 @@
-"""Build Deadhead cinematic hero previs assets with Blender.
+"""Build jmpseat cinematic hero previs assets with Blender.
 
 Run from the repo root:
-  blender --background --python tools/cinematic/build_deadhead_hero_scene.py
+  blender --background --python tools/cinematic/build_jmpseat_hero_scene.py
 
 This script intentionally creates first-pass blockout assets, not final art.
 It gives the web scene real GLB geometry and camera validation renders so the
@@ -39,14 +39,14 @@ EARTH_DAY_CINEMATIC_TEXTURE = TEXTURE_DIR / "earth_day_cinematic.jpg"
 EARTH_CITY_LIGHTS_CINEMATIC_TEXTURE = TEXTURE_DIR / "earth_city_lights_cinematic.png"
 
 ASSET_PATHS = {
-    "scannerPrinter": MODEL_DIR / "deadhead-scanner-printer.glb",
-    "ticketPlane": MODEL_DIR / "deadhead-ticket-plane.glb",
-    "aircraft": MODEL_DIR / "deadhead-aircraft.glb",
-    "globeHelpers": MODEL_DIR / "deadhead-globe-helpers.glb",
-    "routeGuides": MODEL_DIR / "deadhead-route-guides.glb",
-    "mobilePreview": PREVIEW_DIR / "deadhead-hero-mobile-preview.png",
-    "desktopPreview": PREVIEW_DIR / "deadhead-hero-desktop-preview.png",
-    "contactSheet": PREVIEW_DIR / "deadhead-hero-contact-sheet.png",
+    "scannerPrinter": MODEL_DIR / "jmpseat-scanner-printer.glb",
+    "ticketPlane": MODEL_DIR / "jmpseat-ticket-plane.glb",
+    "aircraft": MODEL_DIR / "jmpseat-aircraft.glb",
+    "globeHelpers": MODEL_DIR / "jmpseat-globe-helpers.glb",
+    "routeGuides": MODEL_DIR / "jmpseat-route-guides.glb",
+    "mobilePreview": PREVIEW_DIR / "jmpseat-hero-mobile-preview.png",
+    "desktopPreview": PREVIEW_DIR / "jmpseat-hero-desktop-preview.png",
+    "contactSheet": PREVIEW_DIR / "jmpseat-hero-contact-sheet.png",
     "debugEarthDay": PREVIEW_DIR / "debug-earth-day-only.png",
     "debugEarthNight": PREVIEW_DIR / "debug-earth-night-city-lights-only.png",
     "debugEarthFinal": PREVIEW_DIR / "debug-earth-final-material.png",
@@ -55,8 +55,8 @@ ASSET_PATHS = {
 }
 
 REFERENCE_PATHS = {
-    "mobileReference": REFERENCE_DIR / "deadheadwaitlistglobemobile.jpeg",
-    "desktopReference": REFERENCE_DIR / "deadheadwaitlistglobedesktop.jpeg",
+    "mobileReference": REFERENCE_DIR / "jmpseatwaitlistglobemobile.jpeg",
+    "desktopReference": REFERENCE_DIR / "jmpseatwaitlistglobedesktop.jpeg",
 }
 
 REVIEW_SCORES = [
@@ -805,7 +805,7 @@ def create_environment_floor(materials: dict[str, bpy.types.Material]) -> list[b
 
 
 def setup_lighting() -> None:
-    bpy.context.scene.world = bpy.data.worlds.new("Deadhead_Dark_World")
+    bpy.context.scene.world = bpy.data.worlds.new("Jmpseat_Dark_World")
     bpy.context.scene.world.color = (0.002, 0.007, 0.014)
 
     bpy.ops.object.light_add(type="AREA", location=(0, -3.2, 5.6))
@@ -983,7 +983,7 @@ def create_contact_sheet() -> bool:
     paste_image_into_contact_sheet(pixels, sheet_width, REFERENCE_PATHS["mobileReference"], left_x, mobile_y, column_width, mobile_row_height)
     paste_image_into_contact_sheet(pixels, sheet_width, ASSET_PATHS["mobilePreview"], right_x, mobile_y, column_width, mobile_row_height)
 
-    contact = bpy.data.images.new("deadhead_hero_contact_sheet", width=sheet_width, height=sheet_height, alpha=True)
+    contact = bpy.data.images.new("jmpseat_hero_contact_sheet", width=sheet_width, height=sheet_height, alpha=True)
     contact.pixels.foreach_set(pixels)
     contact.filepath_raw = str(ASSET_PATHS["contactSheet"])
     contact.file_format = "PNG"
@@ -1010,7 +1010,7 @@ def write_render_review_latest(contact_sheet_created: bool) -> None:
         )
 
     lines = [
-        "# Latest Deadhead Hero Render Review",
+        "# Latest jmpseat Hero Render Review",
         "",
         f"Generated: {datetime.now(timezone.utc).isoformat()}",
         "",
@@ -1122,7 +1122,7 @@ def write_manifest() -> None:
         ("debugEarthFinalWithAtmosphere", ASSET_PATHS["debugEarthFinalWithAtmosphere"], "Debug render showing final globe material with atmosphere/cloud shells enabled."),
     ]
     manifest = {
-        "name": "Deadhead cinematic waitlist hero asset manifest",
+        "name": "jmpseat cinematic waitlist hero asset manifest",
         "generatedAt": datetime.now(timezone.utc).isoformat(),
         "pipeline": "Blender-first scripted previs and GLB export",
         "assets": [
@@ -1209,7 +1209,7 @@ def build_scene(skip_renders: bool = False) -> None:
     contact_sheet_created = create_contact_sheet()
     write_render_review_latest(contact_sheet_created)
     write_manifest()
-    print(f"Deadhead cinematic assets written under {PUBLIC_ROOT}")
+    print(f"jmpseat cinematic assets written under {PUBLIC_ROOT}")
     print(f"Preview helper globe retained in scene with {len(preview_globe_parts)} blockout objects")
 
 

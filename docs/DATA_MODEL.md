@@ -1,6 +1,6 @@
 # Data Model
 
-Working name note: "Deadhead Club" is a working product name pending legal and trademark clearance. This document does not claim legal or trademark clearance.
+Brand note: jmpseat is the canonical product and app name. This document does not claim legal or trademark clearance for the name.
 
 This is a first-pass implementation-ready model. It is intentionally moderate in complexity and should be refined during technical design.
 

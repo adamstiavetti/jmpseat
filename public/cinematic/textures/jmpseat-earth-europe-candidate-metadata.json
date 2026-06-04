@@ -1,18 +1,18 @@
 {
   "generated_at": "2026-05-31T01:51:29.997Z",
   "inputs": {
-    "albedo": "public/cinematic/textures/deadhead-earth-atlantic-candidate-albedo.webp",
-    "emission": "public/cinematic/textures/deadhead-earth-atlantic-candidate-emission.webp",
-    "clouds": "public/cinematic/textures/deadhead-earth-atlantic-candidate-clouds.webp",
-    "oceanMask": "public/cinematic/textures/deadhead-earth-ocean-mask-v4.webp",
-    "desertMask": "public/cinematic/textures/deadhead-earth-desert-suppression-v4.webp",
-    "prior_metadata": "public/cinematic/textures/deadhead-earth-atlantic-candidate-metadata.json"
+    "albedo": "public/cinematic/textures/jmpseat-earth-atlantic-candidate-albedo.webp",
+    "emission": "public/cinematic/textures/jmpseat-earth-atlantic-candidate-emission.webp",
+    "clouds": "public/cinematic/textures/jmpseat-earth-atlantic-candidate-clouds.webp",
+    "oceanMask": "public/cinematic/textures/jmpseat-earth-ocean-mask-v4.webp",
+    "desertMask": "public/cinematic/textures/jmpseat-earth-desert-suppression-v4.webp",
+    "prior_metadata": "public/cinematic/textures/jmpseat-earth-atlantic-candidate-metadata.json"
   },
   "outputs": {
-    "albedo": "public/cinematic/textures/deadhead-earth-europe-candidate-albedo.webp",
-    "emission": "public/cinematic/textures/deadhead-earth-europe-candidate-emission.webp",
-    "clouds": "public/cinematic/textures/deadhead-earth-europe-candidate-clouds.webp",
-    "metadata": "public/cinematic/textures/deadhead-earth-europe-candidate-metadata.json"
+    "albedo": "public/cinematic/textures/jmpseat-earth-europe-candidate-albedo.webp",
+    "emission": "public/cinematic/textures/jmpseat-earth-europe-candidate-emission.webp",
+    "clouds": "public/cinematic/textures/jmpseat-earth-europe-candidate-clouds.webp",
+    "metadata": "public/cinematic/textures/jmpseat-earth-europe-candidate-metadata.json"
   },
   "candidate_goal": "Single safe Europe/eastern-Atlantic readability correction for /lab/live-globe-proof.",
   "transforms": [
@@ -27,9 +27,9 @@
     "No routes, aircraft, scanner, ticket, ENTER CTA, chapter cards, placement, framing, orientation, rotation, homepage, or waitlist changes are encoded here."
   ],
   "inherited_from_atlantic": {
-    "albedo": "public/cinematic/textures/deadhead-earth-atlantic-candidate-albedo.webp",
-    "emission": "public/cinematic/textures/deadhead-earth-atlantic-candidate-emission.webp",
-    "clouds": "public/cinematic/textures/deadhead-earth-atlantic-candidate-clouds.webp",
-    "metadata": "public/cinematic/textures/deadhead-earth-atlantic-candidate-metadata.json"
+    "albedo": "public/cinematic/textures/jmpseat-earth-atlantic-candidate-albedo.webp",
+    "emission": "public/cinematic/textures/jmpseat-earth-atlantic-candidate-emission.webp",
+    "clouds": "public/cinematic/textures/jmpseat-earth-atlantic-candidate-clouds.webp",
+    "metadata": "public/cinematic/textures/jmpseat-earth-atlantic-candidate-metadata.json"
   }
 }

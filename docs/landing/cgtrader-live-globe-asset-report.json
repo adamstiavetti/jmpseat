@@ -1,5 +1,5 @@
 {
-  "asset_dir": "/Users/ClawdBot/deadheadclub/Globe",
+  "asset_dir": "/Users/ClawdBot/jmpseat/Globe",
   "detected_sources": {
     "blend": "Globe/uploads_files_6328163_Earth.blend",
     "fbx": "Globe/uploads_files_6328163_cgtrader_optimized_Earth.fbx",
@@ -43,7 +43,7 @@
     "path": "public/cinematic/models/cgtrader-earth-live-proof.glb",
     "exists": true,
     "status": "generated",
-    "stdout_tail": "00:02.585  blend            | Read blend: \"/Users/ClawdBot/deadheadclub/Globe/uploads_files_6328163_Earth.blend\"\nINFO Draco mesh compression is available, use library at /Applications/Blender.app/Contents/Resources/5.1/scripts/addons_core/io_scene_gltf2/libextern_draco.dylib\n12:51:51 | INFO: Starting glTF 2.0 export\n12:51:51 | INFO: Extracting primitive: Sphere.003\n12:51:51 | INFO: Primitives created: 1\n12:51:51 | INFO: Finished glTF 2.0 export in 0.026237964630126953 s\n\nBlender 5.1.2 (hash ec6e62d40fa9 built 2026-05-19 01:30:33)\n\nBlender quit\n",
+    "stdout_tail": "00:02.585  blend            | Read blend: \"/Users/ClawdBot/jmpseat/Globe/uploads_files_6328163_Earth.blend\"\nINFO Draco mesh compression is available, use library at /Applications/Blender.app/Contents/Resources/5.1/scripts/addons_core/io_scene_gltf2/libextern_draco.dylib\n12:51:51 | INFO: Starting glTF 2.0 export\n12:51:51 | INFO: Extracting primitive: Sphere.003\n12:51:51 | INFO: Primitives created: 1\n12:51:51 | INFO: Finished glTF 2.0 export in 0.026237964630126953 s\n\nBlender 5.1.2 (hash ec6e62d40fa9 built 2026-05-19 01:30:33)\n\nBlender quit\n",
     "stderr_tail": ""
   }
 }

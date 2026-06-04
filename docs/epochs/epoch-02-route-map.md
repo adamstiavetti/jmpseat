@@ -1,6 +1,6 @@
 # Epoch 02 Route Map
 
-Working name note: "Deadhead Club" is a working product name pending legal and trademark clearance. This route map does not claim legal or trademark clearance.
+Brand note: jmpseat is the canonical product and app name. This document does not claim legal or trademark clearance for the name.
 
 Product principle: Utility first. Community second. Social feed last.
 

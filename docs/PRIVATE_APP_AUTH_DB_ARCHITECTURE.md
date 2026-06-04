@@ -1,12 +1,12 @@
 # Private App Auth DB Architecture
 
-Working name note: "Deadhead Club" is a working product name pending legal and trademark clearance. This document does not claim legal or trademark clearance.
+Brand note: jmpseat is the canonical product and app name. This document does not claim legal or trademark clearance for the name.
 
 Product principle: Utility first. Community second. Social feed last.
 
 Identity principle: Verified privately. Anonymous publicly. Accountable internally.
 
-Deadhead Club is not affiliated with or endorsed by any airline, airport, union, or employer unless explicitly obtained and documented.
+jmpseat is not affiliated with or endorsed by any airline, airport, union, or employer unless explicitly obtained and documented.
 
 ## 1. Purpose
 
@@ -179,7 +179,7 @@ Verification artifacts, if ever accepted, must not be processed by AI and must n
 
 ## 9. Anonymous Identity Model
 
-Deadhead Club needs separate layers of identity:
+jmpseat needs separate layers of identity:
 
 - Private account identity: login email, internal user ID, account status.
 - Private verification identity: work email domain, verification method, reviewer, verification decision, optional artifact metadata.

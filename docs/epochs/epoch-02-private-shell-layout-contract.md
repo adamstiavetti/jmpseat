@@ -1,6 +1,6 @@
 # Epoch 02 Private Shell Layout Contract
 
-Working name note: "Deadhead Club" is a working product name pending legal and trademark clearance. This shell contract does not claim legal or trademark clearance.
+Brand note: jmpseat is the canonical product and app name. This document does not claim legal or trademark clearance for the name.
 
 Product principle: Utility first. Community second. Social feed last.
 

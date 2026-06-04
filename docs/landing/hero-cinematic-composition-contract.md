@@ -1,9 +1,9 @@
-# Deadhead Waitlist Hero Cinematic Composition Contract
+# jmpseat Waitlist Hero Cinematic Composition Contract
 
-This contract defines the visual target for the Deadhead waitlist hero based on the supplied mobile and desktop reference frames:
+This contract defines the visual target for the jmpseat waitlist hero based on the supplied mobile and desktop reference frames:
 
-- `/Users/ClawdBot/Downloads/deadheadwaitlistglobemobile.png`
-- `/Users/ClawdBot/Downloads/deadheadwaitlistglobedesktop.png`
+- `/Users/ClawdBot/Downloads/jmpseatwaitlistglobemobile.png`
+- `/Users/ClawdBot/Downloads/jmpseatwaitlistglobedesktop.png`
 
 The goal is to prevent another generic WebGL or CSS mockup result. Future work should treat the hero as an art-directed cinematic aviation scene, not a decorative website background.
 

@@ -60,4 +60,4 @@ The locked messaging is intentional product scaffolding, not a security boundary
 ## Docs Impact
 
 - Added this local implementation note so the app repo records what `/app` currently does
-- Kept the implementation aligned with the planning docs in `deadheadclub-main-docs`
+- Kept the implementation aligned with the planning docs in `jmpseat-main-docs`

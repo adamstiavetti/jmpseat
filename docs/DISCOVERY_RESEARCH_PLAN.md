@@ -1,6 +1,6 @@
 # Discovery Research Plan
 
-Working name note: "Deadhead Club" is a working product name pending legal and trademark clearance. This research plan does not claim legal or trademark clearance.
+Brand note: jmpseat is the canonical product and app name. This document does not claim legal or trademark clearance for the name.
 
 Product principle: Utility first. Community second. Social feed last.
 
@@ -10,9 +10,9 @@ This is a documentation-only research plan. It does not create app code, framewo
 
 ## 1. Purpose
 
-This document governs discovery research before deeper MVP build. It defines how Deadhead Club should gather evidence about airline-worker pain, current alternatives, first-community density, privacy and verification comfort, and feature priority before moving from no-code validation into app implementation.
+This document governs discovery research before deeper MVP build. It defines how jmpseat should gather evidence about airline-worker pain, current alternatives, first-community density, privacy and verification comfort, and feature priority before moving from no-code validation into app implementation.
 
-Web research is useful for market discovery, competitor teardown, verification patterns, trust/safety risks, and policy constraints. It does not fully replace real user validation. Deadhead Club still needs direct interviews, waitlist behavior, ambassador commitments, and eventually beta usage to confirm whether the product should be built and which features deserve priority.
+Web research is useful for market discovery, competitor teardown, verification patterns, trust/safety risks, and policy constraints. It does not fully replace real user validation. jmpseat still needs direct interviews, waitlist behavior, ambassador commitments, and eventually beta usage to confirm whether the product should be built and which features deserve priority.
 
 Discovery is not complete yet. Findings should be treated as assumptions until they are supported by repeated user evidence or beta behavior.
 
@@ -27,7 +27,7 @@ Target user pain:
 Current alternatives:
 
 - What do users use today: Flight Crew View, StaffTraveler, CrewLounge CONNECT, CrewVIP, Facebook groups, Reddit, group chats, notes, coworkers, union resources, company resources, or personal networks?
-- What works well enough that Deadhead Club should not try to replace it?
+- What works well enough that jmpseat should not try to replace it?
 - What is fragmented, unsafe, hard to search, stale, or untrusted?
 
 Competitor gaps:
@@ -73,7 +73,7 @@ Deal/perk demand:
 
 Privacy/safety objections:
 
-- What would make users distrust Deadhead Club immediately?
+- What would make users distrust jmpseat immediately?
 - Which data should never be collected?
 - Are users worried about employer visibility, doxxing, harassment, exact crew hotel exposure, passenger information, airport security content, or company-confidential information?
 
@@ -86,7 +86,7 @@ First beta community choice:
 
 ### Competitor Teardown
 
-Review direct and adjacent competitors for positioning, feature sets, trust model, pricing, and V1 boundaries. Focus on what Deadhead Club should not copy as much as what it can learn.
+Review direct and adjacent competitors for positioning, feature sets, trust model, pricing, and V1 boundaries. Focus on what jmpseat should not copy as much as what it can learn.
 
 Targets:
 
@@ -106,7 +106,7 @@ Outputs:
 - Repeated praise patterns.
 - Repeated complaint patterns.
 - Privacy/security concerns.
-- Feature requests that overlap or conflict with Deadhead Club's V1.
+- Feature requests that overlap or conflict with jmpseat's V1.
 - Quotes summarized in original language without copying long copyrighted passages.
 
 ### Public Forum / Social Listening
@@ -270,7 +270,7 @@ Audience: flight attendants, pilots, gate agents, ramp agents, dispatchers, crew
 
 Opening:
 
-- "This is discovery for a working-name concept called Deadhead Club. It is not affiliated with any airline."
+- "This is discovery for a working-name concept called jmpseat. It is not affiliated with any airline."
 - "The goal is to understand your workflow and pain points before building deeper app features."
 - "Please do not share passenger information, exact crew hotel details, schedules, portal credentials, airport security procedures, live operational details, or confidential company documents."
 
@@ -286,7 +286,7 @@ Script:
 8. Would a verified aviation-worker community be more useful than public groups? Why or why not?
 9. Would you be comfortable verifying privately if public participation could use a handle or anonymous mode where allowed?
 10. What verification method would feel acceptable: work email, non-upload manual review, founder-known verification, live/non-stored visual confirmation, or something else?
-11. What should Deadhead Club never collect?
+11. What should jmpseat never collect?
 12. Would anonymous but internally accountable posting make you more likely or less likely to participate?
 13. Rank these features: Crew Rooms, Base Boards, Layover Boards, Jumpseat Brief, The Galley, NonRev Deals, Ready Room, Ramp Talk, Crew Rest.
 14. Which feature would make the product useful even if the rest were basic?
@@ -308,9 +308,9 @@ Close:
 First research tasks:
 
 1. Flight Crew View review mining.
-   - Goal: identify schedule-tool praise, complaints, privacy/security concerns, and boundaries Deadhead Club should avoid.
+   - Goal: identify schedule-tool praise, complaints, privacy/security concerns, and boundaries jmpseat should avoid.
 2. StaffTraveler positioning and verification review.
-   - Goal: understand non-rev load positioning, verification expectations, and why Deadhead Club should not build flight-load requests in V1.
+   - Goal: understand non-rev load positioning, verification expectations, and why jmpseat should not build flight-load requests in V1.
 3. CrewVIP feature/positioning review.
    - Goal: understand deals, crew perks, AI layover planner, and why deals should remain a supporting layer.
 4. CrewLounge CONNECT feature/positioning review.

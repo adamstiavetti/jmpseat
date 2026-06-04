@@ -1,6 +1,6 @@
 # Docs Consistency Review
 
-Working name note: "Deadhead Club" is a working product name pending legal and trademark clearance. This review does not claim legal or trademark clearance.
+Brand note: jmpseat is the canonical product and app name. This document does not claim legal or trademark clearance for the name.
 
 Product principle: Utility first. Community second. Social feed last.
 
@@ -8,7 +8,7 @@ Identity principle: Verified privately. Anonymous publicly. Accountable internal
 
 ## 1. Purpose
 
-This is a review-only consistency check across the Deadhead Club planning docs. It compares product scope, beta gates, legal/policy requirements, safety boundaries, technical sequencing, and future build guidance.
+This is a review-only consistency check across the jmpseat planning docs. It compares product scope, beta gates, legal/policy requirements, safety boundaries, technical sequencing, and future build guidance.
 
 This report does not implement corrections, rewrite product docs, create policy documents, scaffold app code, or expand V1 scope. Corrections are listed as proposed follow-up tasks.
 
@@ -17,14 +17,14 @@ This report does not implement corrections, rewrite product docs, create policy 
 | Document | Purpose |
 | --- | --- |
 | `README.md` | Repo overview, north star, audience, MVP summary, docs index, and repo boundary. |
-| `docs/DEADHEAD_CLUB_BLUEPRINT.md` | Full product vision, positioning, capability map, MVP definition, roadmap, safety, monetization, technical summary, and initial build sequence. |
+| `docs/JMPSEAT_BLUEPRINT.md` | Full product vision, positioning, capability map, MVP definition, roadmap, safety, monetization, technical summary, and initial build sequence. |
 | `docs/MVP_SCOPE.md` | Exact V1 inclusion, exclusion, and MVP acceptance criteria. |
 | `docs/FEATURE_ROADMAP.md` | Phase 1 through Phase 4 roadmap and deferred features. |
 | `docs/TRUST_AND_SAFETY.md` | Aviation-specific safety rules, identity model, verification tiers, moderation workflow, and AI moderation boundaries. |
 | `docs/MONETIZATION.md` | Free/premium/sponsored/affiliate/recruiting/marketplace/crash-pad monetization direction and display-ad rationale. |
 | `docs/DATA_MODEL.md` | First-pass implementation-ready entities, relationships, and model boundaries. |
 | `docs/TECHNICAL_ARCHITECTURE.md` | MVP stack recommendation, security/privacy/AI/search/payment/deployment guidance, and future coding standards. |
-| `docs/COMPETITIVE_POSITIONING.md` | Competitor comparison and Deadhead Club wedge. |
+| `docs/COMPETITIVE_POSITIONING.md` | Competitor comparison and jmpseat wedge. |
 | `docs/BUILD_TICKETS.md` | Initial implementation backlog and ticket-level dependencies. |
 | `docs/RESEARCH_NOTES.md` | Public source log supporting competitor, verification, aviation safety, technical, security, and policy recommendations. |
 | `docs/BETA_READINESS_CHECKLIST.md` | Concrete pre-beta and pre-public-launch gates. |

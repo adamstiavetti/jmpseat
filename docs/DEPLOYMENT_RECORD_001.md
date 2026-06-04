@@ -1,6 +1,6 @@
 # Deployment Record 001
 
-Working name note: "Deadhead Club" is a working product name pending legal and trademark clearance. This record does not claim legal or trademark clearance.
+Brand note: jmpseat is the canonical product and app name. This document does not claim legal or trademark clearance for the name.
 
 Product principle: Utility first. Community second. Social feed last.
 
@@ -11,9 +11,9 @@ Identity principle: Verified privately. Anonymous publicly. Accountable internal
 | Item | Value |
 | --- | --- |
 | Deployment date | May 28, 2026 |
-| Production URL | https://deadheadclub.vercel.app |
+| Production URL | https://jmpseat.vercel.app |
 | Tally waitlist URL | https://tally.so/r/jav6aa |
-| Vercel project | `adam-stiavetti-s-projects/deadheadclub` |
+| Vercel project | `adam-stiavetti-s-projects/jmpseat` |
 | Deployment ID | `dpl_k17dPLscuejXiXUx87uvxLatkdCb` |
 | Current deployed commit | `7805fddfaf3ed6b04cc34d0187bca12fc69d138c` |
 
@@ -57,7 +57,7 @@ The app should show the external waitlist CTA instead of the fallback message.
 
 ## 5. Manual Verification Checklist
 
-- [ ] Production site loads at https://deadheadclub.vercel.app.
+- [ ] Production site loads at https://jmpseat.vercel.app.
 - [ ] Waitlist CTA opens https://tally.so/r/jav6aa.
 - [ ] Fallback message is not visible.
 - [ ] `/app` remains a private beta placeholder.

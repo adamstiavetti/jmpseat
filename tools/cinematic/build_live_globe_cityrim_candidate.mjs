@@ -6,17 +6,17 @@ const repoRoot = path.resolve(path.dirname(new URL(import.meta.url).pathname), "
 const textureDir = path.join(repoRoot, "public", "cinematic", "textures");
 
 const inputPaths = {
-  albedo: path.join(textureDir, "deadhead-earth-albedo-v4.webp"),
-  emission: path.join(textureDir, "deadhead-earth-emission-v4.webp"),
-  clouds: path.join(textureDir, "deadhead-earth-clouds-v4.webp"),
-  metadata: path.join(textureDir, "deadhead-earth-lookdev-metadata-v4.json"),
+  albedo: path.join(textureDir, "jmpseat-earth-albedo-v4.webp"),
+  emission: path.join(textureDir, "jmpseat-earth-emission-v4.webp"),
+  clouds: path.join(textureDir, "jmpseat-earth-clouds-v4.webp"),
+  metadata: path.join(textureDir, "jmpseat-earth-lookdev-metadata-v4.json"),
 };
 
 const outputPaths = {
-  albedo: path.join(textureDir, "deadhead-earth-cityrim-candidate-albedo.webp"),
-  emission: path.join(textureDir, "deadhead-earth-cityrim-candidate-emission.webp"),
-  clouds: path.join(textureDir, "deadhead-earth-cityrim-candidate-clouds.webp"),
-  metadata: path.join(textureDir, "deadhead-earth-cityrim-candidate-metadata.json"),
+  albedo: path.join(textureDir, "jmpseat-earth-cityrim-candidate-albedo.webp"),
+  emission: path.join(textureDir, "jmpseat-earth-cityrim-candidate-emission.webp"),
+  clouds: path.join(textureDir, "jmpseat-earth-cityrim-candidate-clouds.webp"),
+  metadata: path.join(textureDir, "jmpseat-earth-cityrim-candidate-metadata.json"),
 };
 
 function clampUnit(value) {

@@ -1,6 +1,6 @@
 # Landing Page Waitlist Plan
 
-Working name note: "Deadhead Club" is a working name pending legal and trademark clearance. This plan does not claim legal or trademark clearance.
+Brand note: jmpseat is the canonical product and app name. This document does not claim legal or trademark clearance for the name.
 
 Product principle: Utility first. Community second. Social feed last.
 
@@ -59,7 +59,7 @@ The landing page should lead with current airline workers. Aspiring-worker acces
 
 Primary positioning:
 
-- Deadhead Club is the off-duty network for airline people.
+- jmpseat is the off-duty network for airline people.
 
 Product category:
 
@@ -79,10 +79,10 @@ Core principle:
 
 Positioning guardrails:
 
-- Do not present Deadhead Club as a schedule app.
-- Do not present Deadhead Club as a non-rev load request tool.
-- Do not present Deadhead Club as a dating or meetup app.
-- Do not present Deadhead Club as officially affiliated with any airline.
+- Do not present jmpseat as a schedule app.
+- Do not present jmpseat as a non-rev load request tool.
+- Do not present jmpseat as a dating or meetup app.
+- Do not present jmpseat as officially affiliated with any airline.
 - Do not present anonymous posting as consequence-free.
 
 ## 5. Landing Page Sections
@@ -91,7 +91,7 @@ Recommended section order:
 
 1. Hero.
 2. Problem.
-3. What Deadhead Club helps with.
+3. What jmpseat helps with.
 4. Feature preview.
 5. Why verified matters.
 6. Privacy and anonymity explanation.
@@ -106,7 +106,7 @@ Recommended section order:
 
 Hero headline:
 
-> Deadhead Club is the off-duty network for airline people.
+> jmpseat is the off-duty network for airline people.
 
 Hero subheadline:
 
@@ -122,7 +122,7 @@ Secondary CTA:
 
 Short product description:
 
-> Deadhead Club is built for flight attendants, pilots, gate agents, ramp agents, dispatchers, schedulers, airport ops, regional workers, new hires, and commuters. Verify privately, participate under a public handle or room-approved anonymous identity, and help build useful aviation-worker knowledge that is easier to find than group chats and safer than public forums.
+> jmpseat is built for flight attendants, pilots, gate agents, ramp agents, dispatchers, schedulers, airport ops, regional workers, new hires, and commuters. Verify privately, participate under a public handle or room-approved anonymous identity, and help build useful aviation-worker knowledge that is easier to find than group chats and safer than public forums.
 
 Feature bullets:
 
@@ -138,7 +138,7 @@ Feature bullets:
 
 Privacy/anonymity explanation:
 
-> Deadhead Club is designed around a simple identity model: verified privately, anonymous publicly, accountable internally. Beta users may need to prove aviation affiliation behind the scenes, but public participation can happen through a handle or anonymous mode where room rules allow it. Anonymous does not mean consequence-free: safety rules still apply.
+> jmpseat is designed around a simple identity model: verified privately, anonymous publicly, accountable internally. Beta users may need to prove aviation affiliation behind the scenes, but public participation can happen through a handle or anonymous mode where room rules allow it. Anonymous does not mean consequence-free: safety rules still apply.
 
 Ambassador invitation:
 
@@ -146,11 +146,11 @@ Ambassador invitation:
 
 Waitlist confirmation message:
 
-> You're on the waitlist. If your base, role, or airline fits the first private beta group, we may reach out for verification and a short user interview. Deadhead Club is still a working name and private beta product, not a public launch.
+> You're on the waitlist. If your base, role, or airline fits the first private beta group, we may reach out for verification and a short user interview. jmpseat is still a working name and private beta product, not a public launch.
 
 Footer disclaimer:
 
-> Deadhead Club is a working name pending legal/trademark clearance. Deadhead Club is not affiliated with, endorsed by, or officially connected to any airline unless explicitly stated. Do not submit passenger private information, confidential company documents, exact crew hotel details, live operations-sensitive information, or airport security procedures.
+> jmpseat is a working name pending legal/trademark clearance. jmpseat is not affiliated with, endorsed by, or officially connected to any airline unless explicitly stated. Do not submit passenger private information, confidential company documents, exact crew hotel details, live operations-sensitive information, or airport security procedures.
 
 ## 7. Waitlist Form Fields
 
@@ -161,7 +161,7 @@ Required fields:
 - Aviation role.
 - Base/airport.
 - Current status: active worker, former worker, new hire, student/aspiring.
-- What they want most from Deadhead Club.
+- What they want most from jmpseat.
 - Willingness to be contacted for private beta.
 - Agreement to basic safety expectations.
 
@@ -312,7 +312,7 @@ Open-ended questions:
 - What would make this worth joining?
 - What would make you not trust this?
 - What base or layover question do you wish someone had already answered?
-- What should Deadhead Club never allow?
+- What should jmpseat never allow?
 
 Interpreting responses:
 
@@ -353,12 +353,12 @@ Public-facing principles:
 - Public participation uses a handle or allowed anonymous mode.
 - Internal accountability exists for safety.
 - Trust and safety rules apply from day one.
-- Deadhead Club is not for live operations-sensitive information.
+- jmpseat is not for live operations-sensitive information.
 
 Required messaging:
 
 - No official airline affiliation unless true.
-- Deadhead Club is a working name pending legal/trademark clearance.
+- jmpseat is a working name pending legal/trademark clearance.
 - Do not submit sensitive aviation/security information.
 - Do not submit passenger private information.
 - Do not submit exact crew hotel details.
@@ -368,7 +368,7 @@ Required messaging:
 
 Suggested safety note:
 
-> Deadhead Club is designed for off-duty utility and community, not live operations. Do not share passenger information, airport security procedures, exact crew hotel details, live schedules, live locations, or confidential company documents.
+> jmpseat is designed for off-duty utility and community, not live operations. Do not share passenger information, airport security procedures, exact crew hotel details, live schedules, live locations, or confidential company documents.
 
 ## 14. Do-Not-Promise List
 

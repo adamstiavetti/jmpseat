@@ -1,5 +1,5 @@
 {
-  "name": "Deadhead cinematic waitlist hero asset manifest",
+  "name": "jmpseat cinematic waitlist hero asset manifest",
   "generatedAt": "2026-05-30T13:27:54.955778+00:00",
   "pipeline": "Blender-first scripted previs and GLB export",
   "assets": [
@@ -26,49 +26,49 @@
     },
     {
       "id": "scannerPrinter",
-      "path": "/cinematic/models/deadhead-scanner-printer.glb",
+      "path": "/cinematic/models/jmpseat-scanner-printer.glb",
       "purpose": "Sleek black scanner/printer GLB with slot and amber light strips.",
       "exists": true
     },
     {
       "id": "ticketPlane",
-      "path": "/cinematic/models/deadhead-ticket-plane.glb",
+      "path": "/cinematic/models/jmpseat-ticket-plane.glb",
       "purpose": "Thin physical ticket/card surface aligned to emerge from the scanner.",
       "exists": true
     },
     {
       "id": "aircraft",
-      "path": "/cinematic/models/deadhead-aircraft.glb",
+      "path": "/cinematic/models/jmpseat-aircraft.glb",
       "purpose": "Small optimized passenger aircraft GLB for route placement.",
       "exists": true
     },
     {
       "id": "globeHelpers",
-      "path": "/cinematic/models/deadhead-globe-helpers.glb",
+      "path": "/cinematic/models/jmpseat-globe-helpers.glb",
       "purpose": "Optional atmosphere shell and reference rings for globe composition.",
       "exists": true
     },
     {
       "id": "routeGuides",
-      "path": "/cinematic/models/deadhead-route-guides.glb",
+      "path": "/cinematic/models/jmpseat-route-guides.glb",
       "purpose": "Thin route guide curves for later R3F curve reconstruction.",
       "exists": true
     },
     {
       "id": "mobilePreview",
-      "path": "/cinematic/previews/deadhead-hero-mobile-preview.png",
+      "path": "/cinematic/previews/jmpseat-hero-mobile-preview.png",
       "purpose": "Vertical framing preview: globe over scanner over ticket.",
       "exists": true
     },
     {
       "id": "desktopPreview",
-      "path": "/cinematic/previews/deadhead-hero-desktop-preview.png",
+      "path": "/cinematic/previews/jmpseat-hero-desktop-preview.png",
       "purpose": "Wide cinematic framing preview: globe/scanner/ticket composition.",
       "exists": true
     },
     {
       "id": "contactSheet",
-      "path": "/cinematic/previews/deadhead-hero-contact-sheet.png",
+      "path": "/cinematic/previews/jmpseat-hero-contact-sheet.png",
       "purpose": "Reference comparison contact sheet for mobile and desktop render review.",
       "exists": true
     },

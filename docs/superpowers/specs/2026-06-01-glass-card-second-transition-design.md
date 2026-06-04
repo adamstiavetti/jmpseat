@@ -1,7 +1,7 @@
 # Glass Card Second Transition Design
 
 ## Goal
-Integrate the `two_piece_cut_glass_card_FFC56F` asset into the latter portion of the second transition on the Deadhead Club live globe waitlist route so it rises from below frame, settles horizontally facing camera with the smaller piece on screen-left, and receives the hero aircraft through the center cut as the next journey object.
+Integrate the `two_piece_cut_glass_card_FFC56F` asset into the latter portion of the second transition on the jmpseat live globe waitlist route so it rises from below frame, settles horizontally facing camera with the smaller piece on screen-left, and receives the hero aircraft through the center cut as the next journey object.
 
 ## Scope
 This change affects only the live globe waitlist scene choreography on `/lab/live-globe-proof`. The glass card is a 3D scene object inside the second-page phase. It does not replace the second background/environment.

@@ -1,16 +1,17 @@
-# Deadhead Club
+# jmpseat
 
-Deadhead Club is a verified off-duty network for airline people: flight attendants, pilots, gate agents, ramp agents, dispatchers, crew schedulers, airport operations teams, regional airline workers, new hires, commuters, and eventually aspiring aviation workers with limited access.
+jmpseat is a verified off-duty network for airline people: flight attendants, pilots, gate agents, ramp agents, dispatchers, crew schedulers, airport operations teams, regional airline workers, new hires, commuters, and eventually aspiring aviation workers with limited access.
 
-Working name note: "Deadhead Club" is a working product name pending legal and trademark clearance. This repo does not claim that the name is cleared for legal or trademark use.
+Brand note: jmpseat is the canonical product and app name. This document does not claim legal or trademark clearance for the name.
+Rename note: Deadhead Club is retired and should not be used in current docs, UI, code, or planning. Older Git history may still contain legacy references.
 
-This repository contains Deadhead Club product planning docs and the first narrow app foundation slice: an M1A public splash/waitlist landing page. It intentionally does not include authentication, database migrations, Supabase configuration, API routes, verification uploads, community features, AI implementation, payments, or persistence.
+This repository contains jmpseat product planning docs and the first narrow app foundation slice: an M1A public splash/waitlist landing page. It intentionally does not include authentication, database migrations, Supabase configuration, API routes, verification uploads, community features, AI implementation, payments, or persistence.
 
 ## Product North Star
 
 Utility first. Community second. Social feed last.
 
-Deadhead Club should become the trusted aviation-worker utility layer for base intel, layover planning, anonymous crew talk, career movement, and crew-friendly perks. The identity model is:
+jmpseat should become the trusted aviation-worker utility layer for base intel, layover planning, anonymous crew talk, career movement, and crew-friendly perks. The identity model is:
 
 Verified privately. Anonymous publicly. Accountable internally.
 
@@ -18,7 +19,7 @@ Users prove aviation affiliation behind the scenes, then participate under a pub
 
 ## Audience
 
-Deadhead Club serves the broader airline ecosystem, not only pilots and flight attendants:
+jmpseat serves the broader airline ecosystem, not only pilots and flight attendants:
 
 - Flight attendants
 - Pilots
@@ -34,7 +35,7 @@ Deadhead Club serves the broader airline ecosystem, not only pilots and flight a
 
 ## MVP Summary
 
-V1 should not try to beat schedule, roster, or non-rev load tools. Research confirms that Flight Crew View, CrewLounge CONNECT, StaffTraveler, and several newer layover/social apps already compete strongly on those surfaces. Deadhead Club's wedge is verified anonymous discussion, base intelligence, layover boards, AI summaries, career tools, safety-first moderation, and crew-friendly marketplace context.
+V1 should not try to beat schedule, roster, or non-rev load tools. Research confirms that Flight Crew View, CrewLounge CONNECT, StaffTraveler, and several newer layover/social apps already compete strongly on those surfaces. jmpseat's wedge is verified anonymous discussion, base intelligence, layover boards, AI summaries, career tools, safety-first moderation, and crew-friendly marketplace context.
 
 Core V1 capabilities:
 
@@ -55,7 +56,7 @@ V1 explicitly excludes airline portal login, schedule scraping, public nearby cr
 
 ## Docs Index
 
-- [Deadhead Club Blueprint](docs/DEADHEAD_CLUB_BLUEPRINT.md)
+- [jmpseat Blueprint](docs/JMPSEAT_BLUEPRINT.md)
 - [MVP Scope](docs/MVP_SCOPE.md)
 - [First Release MVP](docs/FIRST_RELEASE_MVP.md)
 - [Feature Roadmap](docs/FEATURE_ROADMAP.md)

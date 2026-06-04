@@ -27,24 +27,24 @@ Preserved intentionally:
 ## Brief Material Audit
 
 - Albedo/base:
-  - baseline source set: `public/cinematic/textures/deadhead-earth-albedo-v4.webp`
-  - accepted candidate default: `public/cinematic/textures/deadhead-earth-cityrim-candidate-albedo.webp`
+  - baseline source set: `public/cinematic/textures/jmpseat-earth-albedo-v4.webp`
+  - accepted candidate default: `public/cinematic/textures/jmpseat-earth-cityrim-candidate-albedo.webp`
 - Emission/city lights:
-  - baseline source set: `public/cinematic/textures/deadhead-earth-emission-v4.webp`
-  - accepted candidate default: `public/cinematic/textures/deadhead-earth-cityrim-candidate-emission.webp`
-  - halo support layer: `public/cinematic/textures/deadhead-earth-emission-halo-v4.webp`
+  - baseline source set: `public/cinematic/textures/jmpseat-earth-emission-v4.webp`
+  - accepted candidate default: `public/cinematic/textures/jmpseat-earth-cityrim-candidate-emission.webp`
+  - halo support layer: `public/cinematic/textures/jmpseat-earth-emission-halo-v4.webp`
 - Clouds:
-  - baseline source set: `public/cinematic/textures/deadhead-earth-clouds-v4.webp`
-  - accepted candidate default: `public/cinematic/textures/deadhead-earth-cityrim-candidate-clouds.webp`
+  - baseline source set: `public/cinematic/textures/jmpseat-earth-clouds-v4.webp`
+  - accepted candidate default: `public/cinematic/textures/jmpseat-earth-cityrim-candidate-clouds.webp`
 - Atmosphere/rim controls:
   - procedural shader and light-grade controls in `app/lab/live-globe-proof/page.tsx`
 
 ## Candidate Outputs
 
-- `public/cinematic/textures/deadhead-earth-cityrim-candidate-albedo.webp`
-- `public/cinematic/textures/deadhead-earth-cityrim-candidate-emission.webp`
-- `public/cinematic/textures/deadhead-earth-cityrim-candidate-clouds.webp`
-- `public/cinematic/textures/deadhead-earth-cityrim-candidate-metadata.json`
+- `public/cinematic/textures/jmpseat-earth-cityrim-candidate-albedo.webp`
+- `public/cinematic/textures/jmpseat-earth-cityrim-candidate-emission.webp`
+- `public/cinematic/textures/jmpseat-earth-cityrim-candidate-clouds.webp`
+- `public/cinematic/textures/jmpseat-earth-cityrim-candidate-metadata.json`
 - `public/cinematic/previews/live-globe-proof-cityrim-desktop.png`
 - `public/cinematic/previews/live-globe-proof-cityrim-mobile.png`
 - `public/cinematic/previews/live-globe-proof-cityrim-comparison.png`

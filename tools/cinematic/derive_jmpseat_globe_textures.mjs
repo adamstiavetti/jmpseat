@@ -16,21 +16,21 @@ const INPUTS = {
 };
 
 const OUTPUTS = {
-  albedo: path.join(textureDir, `deadhead-earth-albedo-${version}.webp`),
-  emission: path.join(textureDir, `deadhead-earth-emission-${version}.webp`),
-  emissionHalo: path.join(textureDir, `deadhead-earth-emission-halo-${version}.webp`),
-  clouds: path.join(textureDir, `deadhead-earth-clouds-${version}.webp`),
-  oceanMask: path.join(textureDir, `deadhead-earth-ocean-mask-${version}.webp`),
-  desertMask: path.join(textureDir, `deadhead-earth-desert-suppression-${version}.webp`),
-  iceMask: path.join(textureDir, `deadhead-earth-ice-suppression-${version}.webp`),
+  albedo: path.join(textureDir, `jmpseat-earth-albedo-${version}.webp`),
+  emission: path.join(textureDir, `jmpseat-earth-emission-${version}.webp`),
+  emissionHalo: path.join(textureDir, `jmpseat-earth-emission-halo-${version}.webp`),
+  clouds: path.join(textureDir, `jmpseat-earth-clouds-${version}.webp`),
+  oceanMask: path.join(textureDir, `jmpseat-earth-ocean-mask-${version}.webp`),
+  desertMask: path.join(textureDir, `jmpseat-earth-desert-suppression-${version}.webp`),
+  iceMask: path.join(textureDir, `jmpseat-earth-ice-suppression-${version}.webp`),
   metadata:
     version === "v2"
-      ? path.join(textureDir, "deadhead-earth-lookdev-metadata.json")
-      : path.join(textureDir, `deadhead-earth-lookdev-metadata-${version}.json`),
-  albedoPreview: path.join(previewDir, `deadhead-earth-albedo-${version}-preview.png`),
-  emissionPreview: path.join(previewDir, `deadhead-earth-emission-${version}-preview.png`),
-  emissionHaloPreview: path.join(previewDir, `deadhead-earth-emission-halo-${version}-preview.png`),
-  cloudsPreview: path.join(previewDir, `deadhead-earth-clouds-${version}-preview.png`),
+      ? path.join(textureDir, "jmpseat-earth-lookdev-metadata.json")
+      : path.join(textureDir, `jmpseat-earth-lookdev-metadata-${version}.json`),
+  albedoPreview: path.join(previewDir, `jmpseat-earth-albedo-${version}-preview.png`),
+  emissionPreview: path.join(previewDir, `jmpseat-earth-emission-${version}-preview.png`),
+  emissionHaloPreview: path.join(previewDir, `jmpseat-earth-emission-halo-${version}-preview.png`),
+  cloudsPreview: path.join(previewDir, `jmpseat-earth-clouds-${version}-preview.png`),
 };
 
 const clamp01 = (value) => Math.min(1, Math.max(0, value));
@@ -359,9 +359,9 @@ async function main() {
       cloud_alpha: statSummary(cloudSamples),
     },
     procedural_supporting_maps: [
-      `deadhead-earth-ocean-mask-${version}.webp`,
-      `deadhead-earth-desert-suppression-${version}.webp`,
-      `deadhead-earth-ice-suppression-${version}.webp`,
+      `jmpseat-earth-ocean-mask-${version}.webp`,
+      `jmpseat-earth-desert-suppression-${version}.webp`,
+      `jmpseat-earth-ice-suppression-${version}.webp`,
     ],
     notes: [
       "Raw CGTrader assets remain private under the ignored Globe/ source directory.",

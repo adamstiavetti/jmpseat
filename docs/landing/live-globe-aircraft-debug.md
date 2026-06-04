@@ -14,7 +14,7 @@ Date: 2026-05-31
 - Initial `t` value: `0.01`
 - Motion: `t` advances by `speed * delta`, loops with `THREE.MathUtils.euclideanModulo(...)`
 - Route-progress scale: aircraft starts very small near `t=0`, reaches maximum size around `t=0.5`, and shrinks back near `t=1`
-- Aircraft model path: `public/cinematic/models/deadhead-aircraft-v1.glb`
+- Aircraft model path: `public/cinematic/models/jmpseat-aircraft-v1.glb`
 - Forward-axis correction used: `AIRCRAFT_FORWARD_AXIS_CORRECTION = identity quaternion`
 
 ## Contract Result

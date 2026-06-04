@@ -1,10 +1,10 @@
 # MVP Scope
 
-Working name note: "Deadhead Club" is a working product name pending legal and trademark clearance. This document does not claim legal or trademark clearance.
+Brand note: jmpseat is the canonical product and app name. This document does not claim legal or trademark clearance for the name.
 
 ## MVP Goal
 
-The MVP should prove that verified airline people will use Deadhead Club as a practical utility community for base intel, layover planning, anonymous crew discussion, and crew-friendly perks.
+The MVP should prove that verified airline people will use jmpseat as a practical utility community for base intel, layover planning, anonymous crew discussion, and crew-friendly perks.
 
 V1 should not compete directly with roster/schedule apps, non-rev load request tools, dating/meetup apps, or full crew marketplaces.
 

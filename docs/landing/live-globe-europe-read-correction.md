@@ -29,23 +29,23 @@ Preserved intentionally:
 ## Brief Material Audit
 
 - Albedo/base:
-  - prior accepted default: `public/cinematic/textures/deadhead-earth-atlantic-candidate-albedo.webp`
-  - accepted Europe default: `public/cinematic/textures/deadhead-earth-europe-candidate-albedo.webp`
+  - prior accepted default: `public/cinematic/textures/jmpseat-earth-atlantic-candidate-albedo.webp`
+  - accepted Europe default: `public/cinematic/textures/jmpseat-earth-europe-candidate-albedo.webp`
 - Emission/city lights:
-  - prior accepted default: `public/cinematic/textures/deadhead-earth-atlantic-candidate-emission.webp`
-  - accepted Europe default: `public/cinematic/textures/deadhead-earth-europe-candidate-emission.webp`
+  - prior accepted default: `public/cinematic/textures/jmpseat-earth-atlantic-candidate-emission.webp`
+  - accepted Europe default: `public/cinematic/textures/jmpseat-earth-europe-candidate-emission.webp`
 - Clouds:
   - preserved from the accepted Atlantic state
-  - `public/cinematic/textures/deadhead-earth-europe-candidate-clouds.webp`
+  - `public/cinematic/textures/jmpseat-earth-europe-candidate-clouds.webp`
 - Atmosphere/rim controls:
   - procedural shader and runtime grade controls in `app/lab/live-globe-proof/page.tsx`
 
 ## Candidate Outputs
 
-- `public/cinematic/textures/deadhead-earth-europe-candidate-albedo.webp`
-- `public/cinematic/textures/deadhead-earth-europe-candidate-emission.webp`
-- `public/cinematic/textures/deadhead-earth-europe-candidate-clouds.webp`
-- `public/cinematic/textures/deadhead-earth-europe-candidate-metadata.json`
+- `public/cinematic/textures/jmpseat-earth-europe-candidate-albedo.webp`
+- `public/cinematic/textures/jmpseat-earth-europe-candidate-emission.webp`
+- `public/cinematic/textures/jmpseat-earth-europe-candidate-clouds.webp`
+- `public/cinematic/textures/jmpseat-earth-europe-candidate-metadata.json`
 - `public/cinematic/previews/live-globe-proof-europe-desktop.png`
 - `public/cinematic/previews/live-globe-proof-europe-mobile.png`
 - `public/cinematic/previews/live-globe-proof-europe-comparison.png`

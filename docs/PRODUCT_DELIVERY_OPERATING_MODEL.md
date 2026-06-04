@@ -1,6 +1,6 @@
 # Product Delivery Operating Model
 
-Working name note: "Deadhead Club" is a working product name pending legal and trademark clearance. This document does not claim legal or trademark clearance.
+Brand note: jmpseat is the canonical product and app name. This document does not claim legal or trademark clearance for the name.
 
 Product principle: Utility first. Community second. Social feed last.
 
@@ -10,9 +10,9 @@ This is a documentation-only operating model. It does not create app code, frame
 
 ## 1. Purpose
 
-This document governs how Deadhead Club work should move from idea to validated product. It exists to keep discovery, validation, MVP scope, build sequencing, and feature expansion aligned across founder, product, engineering, design, legal/policy, and future Codex sessions.
+This document governs how jmpseat work should move from idea to validated product. It exists to keep discovery, validation, MVP scope, build sequencing, and feature expansion aligned across founder, product, engineering, design, legal/policy, and future Codex sessions.
 
-The goal is to avoid building features before validating the assumptions behind them. Deadhead Club should not expand V1 because a feature sounds useful, a competitor has it, or it is easy to build. New work should move through evidence, scope, acceptance criteria, and review.
+The goal is to avoid building features before validating the assumptions behind them. jmpseat should not expand V1 because a feature sounds useful, a competitor has it, or it is easy to build. New work should move through evidence, scope, acceptance criteria, and review.
 
 This model preserves the current repo boundary: no app feature implementation without explicit approval and a scoped branch.
 
@@ -52,7 +52,7 @@ Primary artifacts:
 
 ### Phase 1 - Problem/Solution Validation
 
-Goal: validate that Deadhead Club's proposed solution matches real airline-worker pain.
+Goal: validate that jmpseat's proposed solution matches real airline-worker pain.
 
 Required validation:
 

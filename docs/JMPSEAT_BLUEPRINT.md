@@ -1,10 +1,10 @@
-# Deadhead Club Blueprint
+# jmpseat Blueprint
 
-Working name note: "Deadhead Club" is a working product name pending legal and trademark clearance. This document does not claim legal or trademark clearance.
+Brand note: jmpseat is the canonical product and app name. This document does not claim legal or trademark clearance for the name.
 
 ## Product Vision
 
-Deadhead Club is a verified aviation-worker utility community for base intel, layover planning, anonymous crew talk, career movement, and crew-friendly perks.
+jmpseat is a verified aviation-worker utility community for base intel, layover planning, anonymous crew talk, career movement, and crew-friendly perks.
 
 The product should not become generic social media. Its durable value is the verified aviation-specific knowledge graph created by workers across airlines, bases, roles, airports, and career stages.
 
@@ -18,7 +18,7 @@ Airline workers rely on fragmented tools and communities:
 - Facebook groups and Reddit capture scattered institutional knowledge, but verification, moderation, retrieval, and privacy are inconsistent.
 - Anonymous workplace communities like Blind validate the power of verified anonymous discussion, but are not aviation-specific and do not address crew hotel, airport security, live schedule, or passenger privacy risks.
 
-Deadhead Club should make off-duty aviation knowledge easier to trust, search, summarize, and reuse.
+jmpseat should make off-duty aviation knowledge easier to trust, search, summarize, and reuse.
 
 ## Target Users
 
@@ -44,7 +44,7 @@ Future limited-access users:
 
 ## Core Positioning
 
-Deadhead Club is a verified off-duty network for airline people.
+jmpseat is a verified off-duty network for airline people.
 
 It owns the utility layer around:
 
@@ -74,10 +74,10 @@ The product should separate:
 
 Competitor research supports these planning decisions:
 
-- Flight Crew View and CrewLounge CONNECT have strong schedule, roster, calendar, hotel, and crew-connect utility. Deadhead Club should not enter V1 as a schedule app.
-- StaffTraveler is tightly positioned around non-rev load requests and staff-travel utility. Deadhead Club should not build flight-load request infrastructure in V1.
-- CrewVIP validates crew discounts and location-based offers, but deals alone are not a strong enough wedge for Deadhead Club.
-- Newer crew social and layover apps show demand for layover chat, crew verification, meetups, crash pads, and nearby crew features. They also highlight risk: Deadhead Club should avoid public live location tracking and dating/swiping behavior in V1.
+- Flight Crew View and CrewLounge CONNECT have strong schedule, roster, calendar, hotel, and crew-connect utility. jmpseat should not enter V1 as a schedule app.
+- StaffTraveler is tightly positioned around non-rev load requests and staff-travel utility. jmpseat should not build flight-load request infrastructure in V1.
+- CrewVIP validates crew discounts and location-based offers, but deals alone are not a strong enough wedge for jmpseat.
+- Newer crew social and layover apps show demand for layover chat, crew verification, meetups, crash pads, and nearby crew features. They also highlight risk: jmpseat should avoid public live location tracking and dating/swiping behavior in V1.
 - Blind validates work-email verification and anonymous professional discussion, but also shows that employer email verification can create perceived privacy risk if employer mail logs reveal verification attempts.
 - TSA Sensitive Security Information guidance and aviation privacy sources support strict bans on airport security procedures, live operations-sensitive information, and careless handling of passenger or crew-location data.
 

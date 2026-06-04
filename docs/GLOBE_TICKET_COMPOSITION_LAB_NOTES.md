@@ -2,7 +2,7 @@
 
 ## 1. Purpose Of Phase A
 
-Phase A creates a static composition prototype for the future Deadhead Club waitlist hero sequence: globe -> printer -> ticket -> waitlist CTA.
+Phase A creates a static composition prototype for the future jmpseat waitlist hero sequence: globe -> printer -> ticket -> waitlist CTA.
 
 This is a visual composition lab only. It does not build the final landing page, add animation, add interaction, create product features, replace `/`, or modify `/app`.
 

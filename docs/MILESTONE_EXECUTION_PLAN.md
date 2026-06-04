@@ -1,6 +1,6 @@
 # Milestone Execution Plan
 
-Working name note: "Deadhead Club" is a working product name pending legal and trademark clearance. This plan does not claim legal or trademark clearance.
+Brand note: jmpseat is the canonical product and app name. This document does not claim legal or trademark clearance for the name.
 
 Product principle: Utility first. Community second. Social feed last.
 
@@ -10,7 +10,7 @@ This is a documentation-only execution plan. It does not scaffold app code, crea
 
 ## 1. Purpose
 
-This document converts the existing planning artifacts into a practical execution sequence for Deadhead Club's MVP and private beta.
+This document converts the existing planning artifacts into a practical execution sequence for jmpseat's MVP and private beta.
 
 The plan connects product tickets, beta readiness gates, and private beta operating decisions into milestones that a founder, engineer, designer, and future Codex session can use to move from planning to implementation.
 

@@ -6,19 +6,19 @@ const repoRoot = path.resolve(path.dirname(new URL(import.meta.url).pathname), "
 const textureDir = path.join(repoRoot, "public", "cinematic", "textures");
 
 const inputPaths = {
-  albedo: path.join(textureDir, "deadhead-earth-atlantic-candidate-albedo.webp"),
-  emission: path.join(textureDir, "deadhead-earth-atlantic-candidate-emission.webp"),
-  clouds: path.join(textureDir, "deadhead-earth-atlantic-candidate-clouds.webp"),
-  oceanMask: path.join(textureDir, "deadhead-earth-ocean-mask-v4.webp"),
-  desertMask: path.join(textureDir, "deadhead-earth-desert-suppression-v4.webp"),
-  metadata: path.join(textureDir, "deadhead-earth-atlantic-candidate-metadata.json"),
+  albedo: path.join(textureDir, "jmpseat-earth-atlantic-candidate-albedo.webp"),
+  emission: path.join(textureDir, "jmpseat-earth-atlantic-candidate-emission.webp"),
+  clouds: path.join(textureDir, "jmpseat-earth-atlantic-candidate-clouds.webp"),
+  oceanMask: path.join(textureDir, "jmpseat-earth-ocean-mask-v4.webp"),
+  desertMask: path.join(textureDir, "jmpseat-earth-desert-suppression-v4.webp"),
+  metadata: path.join(textureDir, "jmpseat-earth-atlantic-candidate-metadata.json"),
 };
 
 const outputPaths = {
-  albedo: path.join(textureDir, "deadhead-earth-europe-candidate-albedo.webp"),
-  emission: path.join(textureDir, "deadhead-earth-europe-candidate-emission.webp"),
-  clouds: path.join(textureDir, "deadhead-earth-europe-candidate-clouds.webp"),
-  metadata: path.join(textureDir, "deadhead-earth-europe-candidate-metadata.json"),
+  albedo: path.join(textureDir, "jmpseat-earth-europe-candidate-albedo.webp"),
+  emission: path.join(textureDir, "jmpseat-earth-europe-candidate-emission.webp"),
+  clouds: path.join(textureDir, "jmpseat-earth-europe-candidate-clouds.webp"),
+  metadata: path.join(textureDir, "jmpseat-earth-europe-candidate-metadata.json"),
 };
 
 function clampUnit(value) {
