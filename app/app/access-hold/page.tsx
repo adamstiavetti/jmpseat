@@ -8,6 +8,7 @@ import {
   type BetaAccessStatus,
 } from "../../../src/lib/betaAccess/betaAccess";
 import { getCurrentAppAccessContext } from "../../../src/lib/betaAccess/server";
+import { getPrivateAppGateResult } from "../../../src/lib/privateApp/access";
 import { getSupabaseBrowserEnv } from "../../../src/lib/supabase/config";
 
 type AccessHoldPageProps = {
@@ -62,17 +63,14 @@ export default async function AccessHoldPage({
   }
 
   const context = await getCurrentAppAccessContext();
+  const gate = getPrivateAppGateResult({
+    routeKind: "access-hold",
+    nextPath: AUTH_ROUTES.accessHold,
+    context,
+  });
 
-  if (!context.user) {
-    redirect(`${AUTH_ROUTES.login}?next=${encodeURIComponent(AUTH_ROUTES.accessHold)}`);
-  }
-
-  if (context.profileLoadError || !context.hasCompletedProfile) {
-    redirect(AUTH_ROUTES.profile);
-  }
-
-  if (context.betaActive) {
-    redirect(AUTH_ROUTES.app);
+  if (gate.kind === "redirect") {
+    redirect(gate.path);
   }
 
   const error = searchError ?? context.betaLoadError ?? undefined;

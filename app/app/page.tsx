@@ -4,17 +4,19 @@ import {
 } from "../../src/lib/privateApp/privateShellPlaceholder";
 import { PrivateShellPlaceholder } from "../../src/components/privateApp/PrivateShellPlaceholder";
 import { redirect } from "next/navigation";
-import {
-  getAppEntryRedirect,
-  getCurrentAppAccessContext,
-} from "../../src/lib/betaAccess/server";
+import { getCurrentAppAccessContext } from "../../src/lib/betaAccess/server";
+import { getPrivateAppGateResult } from "../../src/lib/privateApp/access";
 
 export default async function AppPlaceholder() {
   const context = await getCurrentAppAccessContext();
-  const redirectPath = getAppEntryRedirect(context, PRIVATE_SHELL_ROUTE);
+  const gate = getPrivateAppGateResult({
+    routeKind: "private-root",
+    nextPath: PRIVATE_SHELL_ROUTE,
+    context,
+  });
 
-  if (redirectPath) {
-    redirect(redirectPath);
+  if (gate.kind === "redirect") {
+    redirect(gate.path);
   }
 
   return (

@@ -485,6 +485,9 @@ Implement the invite-only beta-access state that sits between auth and aviation 
 **Title**  
 Implement Private-App Access Gates
 
+**Status**  
+Implemented for the bounded private-route access hardening slice. See [Epoch 03 Private App Access Gates Implementation](epoch-03-private-app-access-gates-implementation.md).
+
 **Goal**  
 Replace Epoch 02 placeholder-only private entry behavior with real access-gated route behavior while preserving honest blocked states.
 

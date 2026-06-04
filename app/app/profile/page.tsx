@@ -3,8 +3,9 @@ import { redirect } from "next/navigation";
 import { AuthCard } from "../../../src/components/auth/AuthCard";
 import styles from "../../../src/components/auth/auth.module.css";
 import { AUTH_ROUTES } from "../../../src/lib/auth/routes";
+import { getCurrentAppAccessContext } from "../../../src/lib/betaAccess/server";
 import { saveProfileAction } from "../../../src/lib/profile/actions";
-import { getCurrentProfileContext } from "../../../src/lib/profile/server";
+import { getPrivateAppGateResult } from "../../../src/lib/privateApp/access";
 import { getSupabaseBrowserEnv } from "../../../src/lib/supabase/config";
 
 type ProfilePageProps = {
@@ -37,13 +38,18 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
     );
   }
 
-  const context = await getCurrentProfileContext();
+  const context = await getCurrentAppAccessContext();
+  const gate = getPrivateAppGateResult({
+    routeKind: "profile",
+    nextPath: AUTH_ROUTES.profile,
+    context,
+  });
 
-  if (!context.user) {
-    redirect(`${AUTH_ROUTES.login}?next=${encodeURIComponent(AUTH_ROUTES.profile)}`);
+  if (gate.kind === "redirect") {
+    redirect(gate.path);
   }
 
-  const error = searchError ?? context.loadError ?? undefined;
+  const error = searchError ?? context.profileLoadError ?? undefined;
 
   return (
     <AuthCard

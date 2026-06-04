@@ -1,5 +1,7 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { PrivateShellPlaceholder } from "../../../src/components/privateApp/PrivateShellPlaceholder";
+import { getCurrentAppAccessContext } from "../../../src/lib/betaAccess/server";
+import { getPrivateAppGateResult } from "../../../src/lib/privateApp/access";
 import { getPrivateShellChildRoute } from "../../../src/lib/privateApp/privateShellPlaceholder";
 
 type PrivateRoutePlaceholderPageProps = {
@@ -16,6 +18,17 @@ export default async function PrivateRoutePlaceholderPage({
 
   if (!route) {
     notFound();
+  }
+
+  const context = await getCurrentAppAccessContext();
+  const gate = getPrivateAppGateResult({
+    routeKind: "private-child",
+    nextPath: route.path,
+    context,
+  });
+
+  if (gate.kind === "redirect") {
+    redirect(gate.path);
   }
 
   return (

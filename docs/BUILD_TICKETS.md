@@ -15,6 +15,7 @@ Supplemental epoch-specific ticket packs:
 - [Epoch 03: Auth Route Account State Map](epochs/epoch-03-auth-route-account-state-map.md)
 - [Epoch 03: Account Profile Foundation Implementation](epochs/epoch-03-account-profile-foundation-implementation.md)
 - [Epoch 03: Beta Access Model Implementation](epochs/epoch-03-beta-access-model-implementation.md)
+- [Epoch 03: Private App Access Gates Implementation](epochs/epoch-03-private-app-access-gates-implementation.md)
 - [Verification Method Decision](VERIFICATION_METHOD_DECISION.md)
 
 Documentation hygiene reminder:
