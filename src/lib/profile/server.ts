@@ -4,6 +4,7 @@ import { AUTH_ROUTES, resolveAuthenticatedAppPath } from "../auth/routes";
 import { getSupabaseBrowserEnv } from "../supabase/config";
 import { createClient } from "../supabase/server";
 import {
+  PROFILE_STORAGE_NOT_READY_MESSAGE,
   getProfileCompletionState,
   type AppProfileRecord,
   type ProfileCompletionState,
@@ -40,7 +41,7 @@ function buildPath(path: string, params: Record<string, string | null | undefine
 }
 
 export function getProfileStorageErrorMessage() {
-  return "Profile storage is not ready yet. Apply the profiles migration to this Supabase project before using account profiles.";
+  return PROFILE_STORAGE_NOT_READY_MESSAGE;
 }
 
 export async function getCurrentProfileContext(): Promise<CurrentProfileContext> {

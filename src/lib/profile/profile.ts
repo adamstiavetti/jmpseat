@@ -19,6 +19,12 @@ export type ProfileCompletionState = {
   missingFields: ProfileFoundationField[];
 };
 
+export const PROFILE_DUPLICATE_HANDLE_MESSAGE =
+  "That handle is already taken. Try another one.";
+
+export const PROFILE_STORAGE_NOT_READY_MESSAGE =
+  "Profile storage is not ready yet. Apply the profiles migration to this Supabase project before using account profiles.";
+
 function normalizeValue(value: string | null | undefined) {
   const normalized = value?.trim() ?? "";
   return normalized.length > 0 ? normalized : null;
@@ -59,4 +65,25 @@ export function getProfileCompletionState(
     isComplete: missingFields.length === 0,
     missingFields,
   };
+}
+
+export function getProfileSaveErrorMessage(error: {
+  code?: string | null;
+  message?: string | null;
+  details?: string | null;
+  hint?: string | null;
+} | null | undefined) {
+  const combined = [
+    error?.message ?? "",
+    error?.details ?? "",
+    error?.hint ?? "",
+  ]
+    .join(" ")
+    .toLowerCase();
+
+  if (error?.code === "23505" && combined.includes("handle")) {
+    return PROFILE_DUPLICATE_HANDLE_MESSAGE;
+  }
+
+  return PROFILE_STORAGE_NOT_READY_MESSAGE;
 }

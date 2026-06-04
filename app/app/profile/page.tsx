@@ -135,8 +135,9 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
 
         <p className={styles.hint}>
           Claimed airline, role, and base are self-declared profile details for
-          onboarding only. They do not grant verified access and they do not
-          replace the later worker-verification workflow.
+          onboarding only. They are not verified claims yet. Completing this
+          profile does not grant beta access. Completing this profile does not
+          verify airline-worker status.
         </p>
 
         <button className={styles.button} type="submit">

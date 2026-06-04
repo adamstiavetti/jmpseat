@@ -40,6 +40,7 @@ The migration also:
 - enables RLS
 - limits read/insert/update to the authenticated owner row
 - keeps the table private by default
+- updates `updated_at` through a database trigger on profile changes
 
 ## Profile Fields And Meaning
 
@@ -114,6 +115,7 @@ These files currently handle:
 The profile onboarding surface clearly states:
 
 - profile details are self-declared
+- claimed airline, role, and base are not verified claims yet
 - profile completion is not beta approval
 - profile completion is not worker verification
 

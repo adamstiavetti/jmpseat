@@ -11,6 +11,21 @@ create table public.profiles (
   constraint profiles_handle_lowercase check (handle is null or handle = lower(handle))
 );
 
+create or replace function public.set_profiles_updated_at()
+returns trigger
+language plpgsql
+as $$
+begin
+  new.updated_at = now();
+  return new;
+end;
+$$;
+
+create trigger set_profiles_updated_at
+before update on public.profiles
+for each row
+execute function public.set_profiles_updated_at();
+
 alter table public.profiles enable row level security;
 
 comment on table public.profiles is 'Self-declared account/profile foundation fields for jmpseat onboarding. These are not verified worker claims.';

@@ -6,10 +6,10 @@ import { AUTH_ROUTES } from "../auth/routes";
 import { getSupabaseBrowserEnv } from "../supabase/config";
 import { createClient } from "../supabase/server";
 import {
+  getProfileSaveErrorMessage,
   getProfileCompletionState,
   normalizeProfileInput,
 } from "./profile";
-import { getProfileStorageErrorMessage } from "./server";
 
 function getString(formData: FormData, key: string) {
   const value = formData.get(key);
@@ -93,7 +93,7 @@ export async function saveProfileAction(formData: FormData) {
   if (error) {
     redirect(
       buildRedirect(AUTH_ROUTES.profile, {
-        error: getProfileStorageErrorMessage(),
+        error: getProfileSaveErrorMessage(error),
       }),
     );
   }
