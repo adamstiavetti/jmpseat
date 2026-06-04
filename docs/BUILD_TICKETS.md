@@ -27,6 +27,7 @@ Supplemental epoch-specific ticket packs:
 - [Epoch 04: Verification Request Evidence Flows Implementation](epochs/epoch-04-verification-request-evidence-flows-implementation.md)
 - [Epoch 04: Human Review Queue Foundation Implementation](epochs/epoch-04-human-review-queue-foundation-implementation.md)
 - [Epoch 04: Verification Security Events Implementation](epochs/epoch-04-verification-security-events-implementation.md)
+- [Epoch 04: Claims-Based Authorization Preparation](epochs/epoch-04-claims-based-authorization-preparation.md)
 - [Supabase Runtime Setup](ops/supabase-runtime-setup.md)
 - [Supabase CLI Migration Workflow](ops/supabase-cli-migration-workflow.md)
 - [Verification Method Decision](VERIFICATION_METHOD_DECISION.md)

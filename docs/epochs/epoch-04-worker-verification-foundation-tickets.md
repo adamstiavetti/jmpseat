@@ -661,6 +661,9 @@ Extend the existing security/audit baseline for verification submission and revi
 **Title**  
 Define Claims-Based Authorization Preparation
 
+**Status**
+Complete for implementation. See [Epoch 04 Claims-Based Authorization Preparation](epoch-04-claims-based-authorization-preparation.md).
+
 **Objective**  
 Define how future rooms/boards will rely on approved verification claims rather than self-declared profile fields.
 
