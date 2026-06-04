@@ -136,6 +136,18 @@ export default async function VerificationReviewQueuePage({
                         <li key={`${entry.request.id}-${index}`} className={styles.listItem}>
                           <strong>{evidence.evidence_type}</strong>
                           <div className={styles.meta}>
+                            status: {evidence.status}
+                          </div>
+                          <div className={styles.meta}>
+                            redaction acknowledged: {evidence.redaction_acknowledged ? "yes" : "no"}
+                          </div>
+                          <div className={styles.meta}>
+                            uploaded at: {evidence.uploaded_at ?? evidence.created_at}
+                          </div>
+                          <div className={styles.meta}>
+                            delete after: {evidence.delete_after ?? "not set"}
+                          </div>
+                          <div className={styles.meta}>
                             domain: {typeof evidence.metadata.email_domain === "string" ? evidence.metadata.email_domain : "none"}
                           </div>
                           <div className={styles.meta}>
@@ -143,6 +155,12 @@ export default async function VerificationReviewQueuePage({
                           </div>
                           <div className={styles.meta}>
                             support result: {typeof evidence.metadata.support_result === "string" ? evidence.metadata.support_result : "none"}
+                          </div>
+                          <div className={styles.meta}>
+                            mime type: {typeof evidence.metadata.mime_type === "string" ? evidence.metadata.mime_type : "none"}
+                          </div>
+                          <div className={styles.meta}>
+                            file size: {typeof evidence.metadata.file_size_bytes === "number" ? evidence.metadata.file_size_bytes : "none"}
                           </div>
                         </li>
                       ))}
