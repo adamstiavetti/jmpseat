@@ -1,0 +1,96 @@
+.stack {
+  display: grid;
+  gap: 20px;
+}
+
+.section {
+  display: grid;
+  gap: 12px;
+  padding: 16px 18px;
+  border: 1px solid rgba(176, 191, 209, 0.14);
+  border-radius: 18px;
+  background: rgba(8, 13, 22, 0.64);
+}
+
+.sectionTitle,
+.cardTitle {
+  margin: 0;
+  color: #eef3f9;
+}
+
+.sectionText {
+  margin: 0;
+  color: #b3c0cf;
+  line-height: 1.55;
+}
+
+.queue {
+  display: grid;
+  gap: 14px;
+}
+
+.card {
+  display: grid;
+  gap: 10px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: rgba(5, 9, 16, 0.72);
+  border: 1px solid rgba(176, 191, 209, 0.12);
+}
+
+.evidenceBlock {
+  display: grid;
+  gap: 8px;
+}
+
+.evidenceTitle {
+  margin: 0;
+  color: #d9e7f7;
+  font-size: 0.95rem;
+}
+
+.list {
+  margin: 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 8px;
+  color: #d9e3ef;
+}
+
+.listItem {
+  line-height: 1.45;
+}
+
+.meta {
+  color: #96a7ba;
+  font-size: 0.92rem;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.buttonApprove,
+.buttonReject,
+.buttonResubmit {
+  border: 0;
+  border-radius: 999px;
+  padding: 11px 16px;
+  color: #071018;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.buttonApprove {
+  background: linear-gradient(135deg, #d4f3dc 0%, #83d79d 100%);
+}
+
+.buttonReject {
+  background: linear-gradient(135deg, #ffd7df 0%, #ef91a8 100%);
+}
+
+.buttonResubmit {
+  background: linear-gradient(135deg, #d8e8fb 0%, #8db8e1 100%);
+}
