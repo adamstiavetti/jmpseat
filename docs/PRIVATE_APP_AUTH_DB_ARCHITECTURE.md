@@ -39,6 +39,7 @@ The public splash page remains safe and public. The private app must remain inac
 - Public copy must not imply airline affiliation, employer endorsement, or legal/trademark clearance.
 - V1-excluded features stay out of scope unless a later reviewed milestone reopens them.
 - Future auth and DB implementation must follow `SCALABILITY_AND_ARCHITECTURE_REQUIREMENTS.md` so private-app foundations remain scale-ready without premature infrastructure complexity.
+- Future auth and account architecture must also follow `MOBILE_APP_STRATEGY.md` so web-first implementation remains compatible with a later native mobile client.
 
 V1 exclusions remain:
 
@@ -122,6 +123,8 @@ Auth/data separation requirements:
 - Auth identity, profile, beta access, verification state, and authorization rules must remain separate concerns.
 - Private access cannot rely on client-only gates.
 - Auth-provider metadata should not become the only source of truth for core application state.
+- Session handling, redirects, password reset, email verification, and account-state transitions should be designed so future mobile deep-link and session-persistence flows can reuse the same backend model.
+- Account, profile, beta-access, and authorization state should be shared across clients rather than embedded inside web-only route assumptions.
 
 ## 7. Beta Access Control Model
 
@@ -232,6 +235,11 @@ Audit requirements:
 ## 11. RLS / Authorization Plan
 
 RLS is required for exposed tables, but RLS is not sufficient by itself. Product-specific authorization must also be enforced through server-side helpers.
+
+Mobile-compatibility rule:
+
+- Web route guards may improve UX, but they are not the security boundary.
+- Private access, beta access, verification gating, and content permissions must remain enforceable through server-side and database-side checks that a future mobile client can use without depending on Next.js route behavior.
 
 Rule categories:
 

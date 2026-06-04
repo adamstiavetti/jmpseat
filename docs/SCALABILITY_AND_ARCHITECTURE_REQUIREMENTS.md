@@ -26,6 +26,7 @@ Working assumptions:
 - Avoid microservices unless required later.
 - Keep clear boundaries between public marketing, auth/account, private app, community content, moderation/admin, and future AI.
 - Maintain server/client separation.
+- Treat scale-readiness as multi-client readiness too; future backend and domain decisions should avoid web-only assumptions when a native mobile client is expected later.
 - Avoid putting authorization only in client-side code.
 - Avoid unbounded reads or "load everything" patterns.
 - Design each feature with pagination, filtering, authorization, and indexing in mind.
@@ -41,6 +42,7 @@ Working assumptions:
 - Do not treat auth provider metadata as the only source of truth for core app data.
 - Plan for base/role/airline/board filtering.
 - Plan for future search without requiring a full rewrite.
+- Plan core data access so web and future native mobile clients can share stable contracts instead of coupling reads and writes to web-only route structures.
 
 ## 5. Authorization and Security Requirements
 
@@ -120,3 +122,4 @@ Any future ticket touching auth, profiles, beta access, verification, boards, ro
 - indexing considerations
 - moderation/audit impact
 - whether the change creates new private or sensitive data
+- whether the change is web-only, mobile-ready, or shared-core, and how future mobile reuse is preserved when relevant

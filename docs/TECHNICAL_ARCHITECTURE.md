@@ -12,6 +12,12 @@ Scale-readiness rule:
 - jmpseat should be built for tens of thousands of registered users with scale-ready but not overbuilt architecture.
 - Simplicity is still the MVP goal, but future auth, data, storage, authorization, moderation, and search decisions should not assume tiny data volume forever.
 
+Multi-client rule:
+
+- Future implementation must also follow `MOBILE_APP_STRATEGY.md`.
+- jmpseat is web-first, but it should be treated as a multi-client product by design.
+- Current work may optimize for the responsive web MVP, but backend contracts, auth/account state, authorization, verification, moderation, and content rules should not assume the web client will be the only client forever.
+
 Recommended stack:
 
 - Frontend: Next.js / React.
@@ -26,6 +32,11 @@ Recommended stack:
 - Deployment: Vercel plus managed Postgres/Supabase.
 - Admin moderation dashboard from day one.
 - Native mobile deferred until web MVP proves demand.
+
+Web-first / mobile-later note:
+
+- Next.js is the current delivery surface for the MVP.
+- Future native mobile should reuse the same backend, auth, data, and authorization rules rather than triggering a rewrite of core product logic.
 
 ## Best-Practice Baseline
 

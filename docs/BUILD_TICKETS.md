@@ -19,6 +19,12 @@ Documentation hygiene reminder:
 Scalability guardrail:
 
 - Future auth, database, community, moderation, storage, search, admin, and AI tickets should follow `SCALABILITY_AND_ARCHITECTURE_REQUIREMENTS.md`.
+- Future auth, account/profile, beta-access, verification, community, moderation, notifications, storage, admin, and AI tickets should also follow `MOBILE_APP_STRATEGY.md`.
+
+Client-scope rule:
+
+- Future implementation tickets must identify whether the work is `web-only`, `mobile-ready`, or `shared-core`.
+- If a ticket is `shared-core` or `mobile-ready`, it must describe how the logic, data access, and authorization rules can be reused by a future mobile client.
 
 ## Required First Implementation Sequence
 
