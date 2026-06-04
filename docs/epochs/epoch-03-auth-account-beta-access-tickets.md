@@ -280,6 +280,9 @@ Define the real route and state transitions needed for auth, onboarding, and blo
 **Title**  
 Implement Auth Foundation
 
+**Status**  
+Implemented for the bounded auth foundation slice. See [Epoch 03 Auth Foundation Implementation](epoch-03-auth-foundation-implementation.md).
+
 **Goal**  
 Implement real account creation, login, logout, and session handling for the private app.
 
@@ -326,6 +329,7 @@ Implement real account creation, login, logout, and session handling for the pri
 - auth/session utilities
 - environment/config docs
 - test coverage for auth flow
+- `docs/epochs/epoch-03-auth-foundation-implementation.md`
 
 **Validation Steps**
 
