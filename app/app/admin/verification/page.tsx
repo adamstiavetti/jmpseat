@@ -154,6 +154,12 @@ export default async function VerificationReviewQueuePage({
                             airline: {typeof evidence.metadata.airline === "string" ? evidence.metadata.airline : "none"}
                           </div>
                           <div className={styles.meta}>
+                            requested airline: {typeof evidence.metadata.requested_airline === "string" ? evidence.metadata.requested_airline : "none"}
+                          </div>
+                          <div className={styles.meta}>
+                            routing context source: {typeof evidence.metadata.routing_context_source === "string" ? evidence.metadata.routing_context_source : "none"}
+                          </div>
+                          <div className={styles.meta}>
                             support result: {typeof evidence.metadata.support_result === "string" ? evidence.metadata.support_result : "none"}
                           </div>
                           <div className={styles.meta}>
