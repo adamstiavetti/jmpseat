@@ -3,6 +3,10 @@
 import { redirect } from "next/navigation";
 
 import { AUTH_ROUTES } from "../auth/routes";
+import {
+  getVerificationRequestEventType,
+} from "../securityEvents/securityEvents";
+import { recordSecurityEvent } from "../securityEvents/server";
 import { getSupabaseBrowserEnv } from "../supabase/config";
 import { createClient } from "../supabase/server";
 import { planWorkEmailVerificationSubmission } from "./requestFlow";
@@ -116,6 +120,20 @@ export async function submitWorkEmailVerificationAction(formData: FormData) {
   });
 
   if (submission.kind === "invalid_email" || submission.kind === "unsupported_domain") {
+    await recordSecurityEvent({
+      userId: user.id,
+      eventType: getVerificationRequestEventType({
+        submissionKind: submission.kind,
+      }),
+      route: VERIFICATION_ROUTE,
+      result: submission.kind,
+      metadata: {
+        email_domain: submission.kind === "unsupported_domain" ? submission.domain : null,
+        verification_method: "work_email",
+        support_result:
+          submission.kind === "unsupported_domain" ? "unsupported_domain" : "invalid_email",
+      },
+    });
     redirect(
       buildRedirect(VERIFICATION_ROUTE, {
         error: submission.message,
@@ -124,6 +142,19 @@ export async function submitWorkEmailVerificationAction(formData: FormData) {
   }
 
   if (submission.kind === "duplicate_request") {
+    await recordSecurityEvent({
+      userId: user.id,
+      eventType: getVerificationRequestEventType({
+        submissionKind: submission.kind,
+      }),
+      route: VERIFICATION_ROUTE,
+      result: "duplicate_active",
+      metadata: {
+        verification_request_id: submission.requestId,
+        verification_method: "work_email",
+        status: "submitted",
+      },
+    });
     redirect(
       buildRedirect(VERIFICATION_ROUTE, {
         message: submission.message,
@@ -145,6 +176,20 @@ export async function submitWorkEmailVerificationAction(formData: FormData) {
         }),
       );
     }
+
+    await recordSecurityEvent({
+      userId: user.id,
+      eventType: "verification_evidence.created",
+      route: VERIFICATION_ROUTE,
+      result: "attached_missing_evidence",
+      metadata: {
+        verification_request_id: submission.requestId,
+        evidence_type: submission.evidence.evidence_type,
+        email_domain: submission.evidence.metadata.email_domain,
+        support_result: submission.evidence.metadata.support_result,
+        claim_value: submission.evidence.metadata.airline,
+      },
+    });
 
     redirect(
       buildRedirect(VERIFICATION_ROUTE, {
@@ -181,6 +226,36 @@ export async function submitWorkEmailVerificationAction(formData: FormData) {
       }),
     );
   }
+
+  await recordSecurityEvent({
+    userId: user.id,
+    eventType: getVerificationRequestEventType({
+      submissionKind: submission.kind,
+    }),
+    route: VERIFICATION_ROUTE,
+    result: "submitted",
+    metadata: {
+      verification_request_id: createdRequest.id,
+      verification_method: submission.request.method,
+      status: submission.request.status,
+      email_domain: submission.evidence.metadata.email_domain,
+      support_result: submission.evidence.metadata.support_result,
+    },
+  });
+
+  await recordSecurityEvent({
+    userId: user.id,
+    eventType: "verification_evidence.created",
+    route: VERIFICATION_ROUTE,
+    result: "created",
+    metadata: {
+      verification_request_id: createdRequest.id,
+      evidence_type: submission.evidence.evidence_type,
+      email_domain: submission.evidence.metadata.email_domain,
+      support_result: submission.evidence.metadata.support_result,
+      claim_value: submission.evidence.metadata.airline,
+    },
+  });
 
   redirect(
     buildRedirect(VERIFICATION_ROUTE, {

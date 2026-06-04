@@ -6,11 +6,13 @@ import path from "node:path";
 import {
   SECURITY_EVENT_TYPES,
   getPrivateAccessEventType,
+  getVerificationRequestEventType,
+  getVerificationReviewEventType,
   recordSecurityEventWithInsert,
   sanitizeSecurityEventMetadata,
 } from "../../src/lib/securityEvents/securityEvents.ts";
 
-test("security event taxonomy stays aligned with the bounded E03-T07 baseline", () => {
+test("security event taxonomy stays aligned with the bounded verification audit surface", () => {
   assert.deepEqual(SECURITY_EVENT_TYPES, [
     "auth.sign_in_attempt",
     "auth.sign_in_success",
@@ -30,6 +32,17 @@ test("security event taxonomy stays aligned with the bounded E03-T07 baseline", 
     "profile.upsert_success",
     "profile.upsert_failed",
     "beta_access.checked",
+    "verification_request.submitted",
+    "verification_request.unsupported_domain",
+    "verification_request.invalid_work_email",
+    "verification_request.duplicate_active",
+    "verification_evidence.created",
+    "verification_review.approved",
+    "verification_review.rejected",
+    "verification_review.needs_resubmission",
+    "verification_review.unauthorized_attempt",
+    "verification_review.self_review_blocked",
+    "verification_claim.issued",
   ]);
 });
 
@@ -43,6 +56,20 @@ test("security event metadata strips sensitive or noisy values", () => {
       badge_id: "12345",
       employee_id: "67890",
       proof_type: "badge",
+      work_email: "crew.member@airline.test",
+      raw_work_email: "crew.member@airline.test",
+      email_local_part: "crew.member",
+      badge_number: "999",
+      barcode_content: "abc123",
+      qr_code: "qrcode",
+      ocr_text: "full extracted proof text",
+      raw_proof_text: "raw badge text",
+      storage_path: "user/request/evidence.png",
+      passenger_data: "passenger",
+      trip_data: "trip screenshot",
+      crew_hotel_information: "hotel",
+      secret_key: "secret",
+      access_token: "token",
       route: "/app",
       result: "redirect_login",
       next_path: "/app/home",
@@ -54,6 +81,46 @@ test("security event metadata strips sensitive or noisy values", () => {
       result: "redirect_login",
       next_path: "/app/home",
     },
+  );
+});
+
+test("verification request and review events map to bounded event types", () => {
+  assert.equal(
+    getVerificationRequestEventType({ submissionKind: "create_request" }),
+    "verification_request.submitted",
+  );
+  assert.equal(
+    getVerificationRequestEventType({ submissionKind: "unsupported_domain" }),
+    "verification_request.unsupported_domain",
+  );
+  assert.equal(
+    getVerificationRequestEventType({ submissionKind: "invalid_email" }),
+    "verification_request.invalid_work_email",
+  );
+  assert.equal(
+    getVerificationRequestEventType({ submissionKind: "duplicate_request" }),
+    "verification_request.duplicate_active",
+  );
+
+  assert.equal(
+    getVerificationReviewEventType({ action: "approve" }),
+    "verification_review.approved",
+  );
+  assert.equal(
+    getVerificationReviewEventType({ action: "reject" }),
+    "verification_review.rejected",
+  );
+  assert.equal(
+    getVerificationReviewEventType({ action: "request_resubmission" }),
+    "verification_review.needs_resubmission",
+  );
+  assert.equal(
+    getVerificationReviewEventType({ outcome: "unauthorized" }),
+    "verification_review.unauthorized_attempt",
+  );
+  assert.equal(
+    getVerificationReviewEventType({ outcome: "self_review_blocked" }),
+    "verification_review.self_review_blocked",
   );
 });
 

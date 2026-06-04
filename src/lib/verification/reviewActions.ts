@@ -3,6 +3,10 @@
 import { redirect } from "next/navigation";
 
 import { AUTH_ROUTES } from "../auth/routes";
+import {
+  getVerificationReviewEventType,
+} from "../securityEvents/securityEvents";
+import { recordSecurityEvent } from "../securityEvents/server";
 import { getSupabaseBrowserEnv } from "../supabase/config";
 import { createClient } from "../supabase/server";
 import { planVerificationReviewDecision } from "./review";
@@ -122,6 +126,23 @@ export async function submitVerificationReviewAction(formData: FormData) {
   });
 
   if (plan.kind !== "apply_review") {
+    if (plan.kind === "unauthorized" || plan.kind === "self_review_blocked") {
+      await recordSecurityEvent({
+        userId: user.id,
+        eventType: getVerificationReviewEventType({
+          outcome: plan.kind,
+        }),
+        route: REVIEW_ROUTE,
+        result: plan.kind,
+        metadata: {
+          verification_request_id: requestId,
+          review_action: action,
+          verification_method: requestResult.data.method,
+          status: requestResult.data.status,
+        },
+      });
+    }
+
     redirect(
       buildRedirect(REVIEW_ROUTE, {
         error: plan.message,
@@ -129,10 +150,15 @@ export async function submitVerificationReviewAction(formData: FormData) {
     );
   }
 
+  let insertedClaims:
+    | Array<{ id: string; claim_type: string; claim_value: string | null }>
+    | null = null;
+
   if (plan.claimsToInsert.length > 0) {
-    const { error: claimsError } = await supabase
+    const { data: claimRows, error: claimsError } = await supabase
       .from("verification_claims")
-      .insert(plan.claimsToInsert);
+      .insert(plan.claimsToInsert)
+      .select("id, claim_type, claim_value");
 
     if (claimsError) {
       redirect(
@@ -142,6 +168,8 @@ export async function submitVerificationReviewAction(formData: FormData) {
         }),
       );
     }
+
+    insertedClaims = claimRows ?? [];
   }
 
   const { error: requestUpdateError } = await supabase
@@ -173,6 +201,37 @@ export async function submitVerificationReviewAction(formData: FormData) {
           "The review action audit row could not be recorded. The request status may already be updated.",
       }),
     );
+  }
+
+  await recordSecurityEvent({
+    userId: user.id,
+    eventType: getVerificationReviewEventType({
+      action: action as "approve" | "reject" | "request_resubmission",
+    }),
+    route: REVIEW_ROUTE,
+    result: plan.requestUpdate.status,
+    metadata: {
+      verification_request_id: requestId,
+      review_action: action,
+      status: plan.requestUpdate.status,
+      verification_method: requestResult.data.method,
+    },
+  });
+
+  for (const claim of insertedClaims ?? []) {
+    await recordSecurityEvent({
+      userId: user.id,
+      eventType: "verification_claim.issued",
+      route: REVIEW_ROUTE,
+      result: "issued",
+      metadata: {
+        verification_request_id: requestId,
+        verification_claim_id: claim.id,
+        claim_type: claim.claim_type,
+        claim_value: claim.claim_value,
+        review_action: action,
+      },
+    });
   }
 
   redirect(
