@@ -53,7 +53,7 @@ The storage policy posture is intentionally narrow.
 Allowed:
 
 - authenticated users may upload only to their own path prefix
-- authenticated users may delete only their own path prefix for bounded rollback cleanup
+- authenticated users may delete only their own path prefix for bounded rollback cleanup when no live `verification_evidence` row references the object yet
 
 Not allowed:
 

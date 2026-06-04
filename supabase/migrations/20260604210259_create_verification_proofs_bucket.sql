@@ -50,6 +50,14 @@ using (
     || auth.uid()::text
     || '/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}[.](jpg|jpeg|png)$'
   )
+  and not exists (
+    select 1
+    from public.verification_evidence
+    where verification_evidence.user_id = auth.uid()
+      and verification_evidence.storage_bucket = bucket_id
+      and verification_evidence.storage_path = name
+      and verification_evidence.deleted_at is null
+  )
 );
 
 create or replace function public.create_redacted_proof_verification_submission(

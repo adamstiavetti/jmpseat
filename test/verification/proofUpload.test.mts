@@ -176,6 +176,8 @@ test("proof upload migration creates a private bucket, bounded storage policies,
   assert.match(sql, /for insert/i);
   assert.match(sql, /for delete/i);
   assert.match(sql, /to authenticated/i);
+  assert.match(sql, /not exists\s*\(\s*select 1\s*from public\.verification_evidence/i);
+  assert.match(sql, /verification_evidence\.storage_path = name/i);
   assert.match(sql, /create or replace function public\.create_redacted_proof_verification_submission/i);
   assert.match(sql, /security definer/i);
   assert.match(sql, /set search_path = public/i);
