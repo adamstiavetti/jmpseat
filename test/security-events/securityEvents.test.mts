@@ -60,6 +60,8 @@ test("security event taxonomy stays aligned with the bounded verification audit 
     "reviewer_scope.granted",
     "reviewer_scope.revoked",
     "reviewer_scope.unauthorized_attempt",
+    "operator_audit.viewed",
+    "operator_audit.unauthorized_attempt",
   ]);
 });
 

@@ -213,6 +213,24 @@ test("reviewer-scope management migration extends the event-type constraint for 
   assert.match(sql, /reviewer_scope\.unauthorized_attempt/i);
 });
 
+test("verification audit inspection migration extends the event-type constraint for audit-on-audit events", () => {
+  const migrationsDir = new URL("../../supabase/migrations/", import.meta.url);
+  const migrationName = readdirSync(migrationsDir).find((name) =>
+    name.endsWith("_add_operator_verification_audit_inspection.sql"),
+  );
+
+  assert.ok(migrationName, "expected verification audit inspection migration");
+
+  const sql = readFileSync(
+    new URL(`../../supabase/migrations/${migrationName}`, import.meta.url),
+    "utf8",
+  );
+
+  assert.match(sql, /drop constraint if exists security_events_event_type_check/i);
+  assert.match(sql, /operator_audit\.viewed/i);
+  assert.match(sql, /operator_audit\.unauthorized_attempt/i);
+});
+
 test("proof retention implementation records deletion audit events without logging paths or proof data", () => {
   const source = readFileSync(
     new URL("../../src/lib/verification/proofRetentionCore.ts", import.meta.url),

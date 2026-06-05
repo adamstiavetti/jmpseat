@@ -269,13 +269,17 @@ export function buildAdminNavigation(input: {
       grantedScopes: input.operatorScopes,
       implemented: true,
     }),
-    buildOperatorUnavailableItem({
+    buildOperatorNavigationItem({
       key: "audit_inspection",
       label: "Audit Inspection",
       path: ADMIN_ROUTES.auditInspection,
-      description: "Future metadata-only inspection of verification and security events.",
-      requiredScopes: ["operator.read_audit"],
+      description: "Metadata-only inspection of verification request state and security events.",
+      requiredScopes: [
+        "operator.read_audit",
+        "operator.read_verification_requests",
+      ],
       grantedScopes: input.operatorScopes,
+      implemented: true,
     }),
     buildOperatorUnavailableItem({
       key: "proof_cleanup",

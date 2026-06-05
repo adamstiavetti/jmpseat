@@ -235,7 +235,7 @@ Acceptance criteria:
 
 ### E05-T05 Verification Audit Inspection
 
-Status: not started.
+Status: implemented; pending review, migration apply, and runtime proof.
 
 Objective:
 

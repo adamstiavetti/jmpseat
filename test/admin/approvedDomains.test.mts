@@ -87,16 +87,17 @@ test("future operator sections remain disabled while implemented operator tools 
     navigation.find((item) => item.path === ADMIN_ROUTES.reviewerScopes)?.status,
     "available",
   );
+  assert.equal(
+    navigation.find((item) => item.path === ADMIN_ROUTES.auditInspection)?.status,
+    "available",
+  );
 
-  for (const path of [
-    ADMIN_ROUTES.auditInspection,
-    ADMIN_ROUTES.proofCleanup,
-  ]) {
-    const item = navigation.find((entry) => entry.path === path);
+  const proofCleanupItem = navigation.find(
+    (entry) => entry.path === ADMIN_ROUTES.proofCleanup,
+  );
 
-    assert.equal(item?.status, "disabled");
-    assert.equal(item?.availabilityLabel, "Authorized, not built yet");
-  }
+  assert.equal(proofCleanupItem?.status, "disabled");
+  assert.equal(proofCleanupItem?.availabilityLabel, "Authorized, not built yet");
 });
 
 test("approved-domains page enforces operator scope server-side and uses the shared admin shell", () => {

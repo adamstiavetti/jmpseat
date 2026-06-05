@@ -139,17 +139,18 @@ test("admin shell nav links only to implemented operator routes for scoped opera
     navigation.find((item) => item.path === ADMIN_ROUTES.reviewerScopes)?.status,
     "available",
   );
+  assert.equal(
+    navigation.find((item) => item.path === ADMIN_ROUTES.auditInspection)?.status,
+    "available",
+  );
 
-  for (const path of [
-    ADMIN_ROUTES.auditInspection,
-    ADMIN_ROUTES.proofCleanup,
-  ]) {
-    const item = navigation.find((entry) => entry.path === path);
+  const proofCleanupItem = navigation.find(
+    (entry) => entry.path === ADMIN_ROUTES.proofCleanup,
+  );
 
-    assert.equal(item?.status, "disabled");
-    assert.equal(item?.availabilityLabel, "Authorized, not built yet");
-    assert.match(item?.reason ?? "", /later Epoch 05 ticket/i);
-  }
+  assert.equal(proofCleanupItem?.status, "disabled");
+  assert.equal(proofCleanupItem?.availabilityLabel, "Authorized, not built yet");
+  assert.match(proofCleanupItem?.reason ?? "", /later Epoch 05 ticket/i);
 });
 
 test("/app/admin\\/verification keeps reviewer-only queue behavior inside the shared shell", () => {

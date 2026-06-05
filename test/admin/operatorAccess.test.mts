@@ -154,19 +154,22 @@ test("admin nav only enables implemented operator sections for matching scopes",
   const reviewerScopes = navigation.find(
     (entry) => entry.key === "reviewer_scopes",
   );
+  const auditInspection = navigation.find(
+    (entry) => entry.key === "audit_inspection",
+  );
 
   assert.equal(approvedDomains?.status, "available");
   assert.equal(approvedDomains?.availabilityLabel, "Available now");
   assert.equal(reviewerScopes?.status, "available");
   assert.equal(reviewerScopes?.availabilityLabel, "Available now");
+  assert.equal(auditInspection?.status, "available");
+  assert.equal(auditInspection?.availabilityLabel, "Available now");
 
-  for (const key of ["audit_inspection", "proof_cleanup"] as const) {
-    const item = navigation.find((entry) => entry.key === key);
+  const proofCleanup = navigation.find((entry) => entry.key === "proof_cleanup");
 
-    assert.equal(item?.status, "disabled");
-    assert.equal(item?.availabilityLabel, "Authorized, not built yet");
-    assert.match(item?.reason ?? "", /not implemented yet/i);
-  }
+  assert.equal(proofCleanup?.status, "disabled");
+  assert.equal(proofCleanup?.availabilityLabel, "Authorized, not built yet");
+  assert.match(proofCleanup?.reason ?? "", /not implemented yet/i);
 });
 
 test("operator grants migration creates bounded grants, helper functions, and self-escalation protections", () => {
