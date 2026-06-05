@@ -60,6 +60,7 @@ Supplemental epoch-specific ticket packs:
 - [Reviewer Scope Management Runtime Pass](ops/reviewer-scope-management-runtime-pass.md)
 - [Verification Audit Inspection Runtime Pass](ops/verification-audit-inspection-runtime-pass.md)
 - [Proof Cleanup Monitoring Runtime Pass](ops/proof-cleanup-monitoring-runtime-pass.md)
+- [Protected Manual Proof Cleanup Controls Runtime Pass](ops/protected-manual-proof-cleanup-controls-runtime-pass.md)
 - [Proof Retention Cleanup Operator Runbook](ops/proof-retention-cleanup-operator-runbook.md)
 - [Proof Retention Cleanup Scheduler Compatibility](ops/proof-retention-cleanup-scheduler-compatibility.md)
 - [Supabase Runtime Setup](ops/supabase-runtime-setup.md)

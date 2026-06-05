@@ -166,6 +166,10 @@ event list also includes `proof_cleanup.manual_requested`,
 `proof_cleanup.manual_completed`, `proof_cleanup.manual_denied`, and
 `proof_cleanup.manual_failed` after the manual controls migration is applied.
 
+That behavior is now runtime-validated as part of the E05-T07 linked-runtime
+pass recorded in
+`docs/ops/protected-manual-proof-cleanup-controls-runtime-pass.md`.
+
 ## 8. Validation Status
 
 Runtime validation is complete for the linked Supabase runtime.

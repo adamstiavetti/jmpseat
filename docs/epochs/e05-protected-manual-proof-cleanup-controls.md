@@ -49,8 +49,9 @@ The migration does not create broad delete RPCs, does not grant normal users
 cleanup permissions, does not update `verification_evidence`, and does not
 interact with Storage objects.
 
-Runtime validation remains pending until this branch is reviewed, merged, the
-migration is applied, and a runtime proof is recorded.
+The migration was applied to the linked Supabase runtime during the E05-T07
+runtime pass. See
+`docs/ops/protected-manual-proof-cleanup-controls-runtime-pass.md`.
 
 ## 3. Authorization
 
@@ -149,17 +150,37 @@ proof files only.
 
 ## 7. Validation Status
 
-Source/test validation is part of this implementation branch.
+Runtime validation is complete for the linked Supabase runtime.
+Runtime validation was pending until the E05-T07 migration was reviewed,
+merged, applied, and validated in the linked runtime pass.
 
-Runtime validation is pending. The E05-T07 migration must be reviewed, merged,
-applied to the linked Supabase runtime, and validated before this ticket is
-marked runtime-proven.
+The runtime proof verified:
+
+- migration applied cleanly
+- `operator.run_proof_cleanup` is required for manual cleanup controls
+- `operator.monitor_proof_cleanup` alone does not grant cleanup execution
+- typed confirmation and bounded limits are enforced
+- `proof_cleanup.manual_requested` is a hard execution precondition
+- a live zero-eligible cleanup run returns safe summary-only counts
+- manual cleanup outcome events are visible through proof cleanup monitoring
+- outcome-audit-failure branches return an explicit audit-integrity failure
+  state instead of falsely reporting clean success/failure
+- no bucket/path/object/evidence-id delete controls exist
+- no raw proof files, proof contents, signed URLs, public URLs, storage paths,
+  filenames, tokens, sessions, secrets, or service-role behavior are exposed
+
+Important precision:
+
+- the linked runtime had zero eligible expired proof rows, so this pass did not
+  force a live destructive delete
+- the normal live audit-success path was validated directly
+- outcome-audit-failure handling was validated through safe injected recorder
+  failure rather than intentionally breaking remote audit plumbing
 
 ## 8. Source-Of-Truth Status
 
-This document records the E05-T07 implementation scope before runtime
-validation.
+This document records the E05-T07 implementation scope and linked-runtime
+validation outcome.
 
-No Supabase `db push`, production commands, deployments, secrets, arbitrary
-deletion controls, raw proof access, or community tools are part of this
-implementation task.
+No production commands, deployments, secrets, arbitrary deletion controls, raw
+proof access, or community tools are part of this ticket.

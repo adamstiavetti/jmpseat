@@ -299,7 +299,7 @@ Acceptance criteria:
 
 ### E05-T07 Protected Manual Cleanup Controls
 
-Status: implemented; runtime validation pending.
+Status: implemented and runtime-proven.
 
 Objective:
 
@@ -328,6 +328,8 @@ Acceptance criteria:
 - Unauthorized users are denied.
 - The existing cleanup helper remains the only deletion path.
 - Audit events and responses are sanitized.
+- Runtime proof recorded in
+  [Protected Manual Proof Cleanup Controls Runtime Pass](../ops/protected-manual-proof-cleanup-controls-runtime-pass.md).
 
 ### E05-T08 Epoch 05 Runtime Validation And Handoff
 
