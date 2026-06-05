@@ -33,6 +33,7 @@ Supplemental epoch-specific ticket packs:
 - [Product Pivot: Airline Email Verification And Community-Managed Boards](strategy/product-pivot-email-verification-community-boards.md) - forward direction: airline-email access for general app use and community-admin approval for restricted boards.
 - [Airline Email Access Gate Decision](strategy/airline-email-access-gate-decision.md) - defines private-testing, first-base launch, and long-term app access gates for confirmed approved airline employee email.
 - [Board / Community Access Model Decision](strategy/board-community-access-model-decision.md) - defines general baseboards, restricted boards, board memberships, access requests, and community-admin authority.
+- [Proof-System Freeze / Deprecation Plan](strategy/proof-system-freeze-deprecation-plan.md) - freezes proof upload as a forward product path while preserving legacy cleanup, audit, and data-retirement safety.
 - [E05-T01: Operator Access Model Decision](epochs/e05-operator-access-model-decision.md)
 - [E05-T02: Admin Shell And Navigation Foundation](epochs/e05-admin-shell-navigation-foundation.md)
 - [E05 Operator Grants Foundation](epochs/e05-operator-grants-foundation.md) - explicit operator grants plus a one-time protected bootstrap route for the zero-grant state.
@@ -75,7 +76,7 @@ Documentation hygiene reminder:
 - Future tickets should identify documentation impact and include docs-update acceptance criteria when applicable. See `PRODUCT_DELIVERY_OPERATING_MODEL.md`.
 - Current implementation work is paused for the product pivot. E05-T08 should not proceed until pivot planning is complete, and future tasks should not expand proof-upload verification unless explicitly instructed.
 - E05-T07 runtime proof is committed on `main`; if an older or parallel branch still has uncommitted E05-T07 runtime-proof docs, commit those before starting pivot planning.
-- Next pivot docs should focus on proof-system freeze/deprecation, baseboard MVP scope, community-admin responsibilities/disclaimers, and launch-readiness gate transition planning.
+- Next pivot docs should focus on baseboard MVP scope, community-admin responsibilities/disclaimers, and launch-readiness gate transition planning.
 
 Scalability guardrail:
 
