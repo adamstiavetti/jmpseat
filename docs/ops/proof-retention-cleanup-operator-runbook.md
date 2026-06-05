@@ -151,6 +151,10 @@ If Vercel Cron cannot send the required custom header directly, use a later scop
 
 Do not implement scheduler compatibility without a scoped review because this route deletes private proof objects.
 
+Scheduler compatibility decision:
+
+- [Proof Retention Cleanup Scheduler Compatibility](proof-retention-cleanup-scheduler-compatibility.md)
+
 ## Manual Operator Checklist
 
 Before running cleanup:
