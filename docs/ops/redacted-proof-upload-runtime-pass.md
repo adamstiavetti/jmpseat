@@ -191,26 +191,27 @@ Fix:
 
 ## Controlled Reviewer Proof Viewing Status
 
-Controlled reviewer proof viewing is now implemented in app code as a bounded server-authorized short-lived signed-URL flow.
+Controlled reviewer proof viewing is now runtime-proven separately as a bounded server-authorized short-lived signed-URL flow.
 
-However, this artifact does not claim live runtime proof for that viewing path yet.
+See:
 
-Runtime validation is still needed after:
+- [Controlled Proof Viewing Runtime Pass](controlled-proof-viewing-runtime-pass.md)
 
-- the reviewed proof-view security-events migration is pushed remotely
-- the runtime environment includes the server-only `SUPABASE_SERVICE_ROLE_KEY`
-
-Until that runtime pass is complete, this document should still be read as proof of:
+This artifact should now be read as proof of:
 
 - upload and storage correctness
 - routing-context persistence
 - reviewer-routing correctness
-- metadata-only queue behavior outside active proof retrieval
+- metadata-only queue behavior
+
+The proof-view runtime artifact covers:
+
+- the original server-action redirect bug
+- the fix in `74096a4`
+- the successful reviewer proof-view runtime pass
 
 ## Remaining Limitations
 
-- no reviewer proof viewing yet
-- no runtime-proven signed proof retrieval yet
 - no proof retention automation yet
 - no AI
 - no automatic approval
