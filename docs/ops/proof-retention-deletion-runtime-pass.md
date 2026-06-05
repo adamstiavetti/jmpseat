@@ -146,7 +146,8 @@ They were deferred in live runtime to avoid mutating additional rows or objects 
 
 - no scheduled cron or Edge Function trigger is wired yet in runtime
 - protected trigger foundation is implemented
-- protected trigger runtime validation found and fixed a route-specific audit-event gap; it still needs a post-fix runtime re-test
+- protected trigger runtime validation found and fixed a route-specific audit-event gap
+- post-fix protected trigger runtime validation is recorded in [Proof Retention Cleanup Trigger Runtime Pass](proof-retention-cleanup-trigger-runtime-pass.md)
 - no operator UI exists for cleanup
 - no finalized retention-policy or legal review is recorded yet
 - no finalized production privacy notice is recorded yet
@@ -181,11 +182,13 @@ Fix now prepared:
 - the recorder still uses the shared metadata sanitizer
 - normal user/session security-event recording remains unchanged
 
-Post-fix runtime validation still needs to confirm the protected route now records deletion scheduled/deleted events without leaking storage paths, URLs, filenames, proof contents, employee identifiers, badge data, OCR text, or secrets.
+Post-fix runtime validation confirmed that the protected route now records deletion scheduled/deleted events without leaking Storage paths, URLs, filenames, proof contents, employee identifiers, badge data, OCR text, or secrets.
+
+See [Proof Retention Cleanup Trigger Runtime Pass](proof-retention-cleanup-trigger-runtime-pass.md).
 
 ## Recommended Next Work
 
-1. Runtime-retest the protected cleanup trigger with operator-secret authentication after the audit-event fix merges.
+1. Configure the chosen scheduler for the protected cleanup trigger.
 2. Add operator tooling for cleanup failures and retries.
 3. Finalize production privacy and legal copy for proof retention/deletion.
 4. Add approved-domain and reviewer-scope operator tooling.

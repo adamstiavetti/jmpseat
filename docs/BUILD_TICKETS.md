@@ -43,6 +43,7 @@ Supplemental epoch-specific ticket packs:
 - [Redacted Proof Upload Runtime Pass](ops/redacted-proof-upload-runtime-pass.md)
 - [Controlled Proof Viewing Runtime Pass](ops/controlled-proof-viewing-runtime-pass.md)
 - [Proof Retention Deletion Runtime Pass](ops/proof-retention-deletion-runtime-pass.md)
+- [Proof Retention Cleanup Trigger Runtime Pass](ops/proof-retention-cleanup-trigger-runtime-pass.md)
 - [Supabase Runtime Setup](ops/supabase-runtime-setup.md)
 - [Supabase CLI Migration Workflow](ops/supabase-cli-migration-workflow.md)
 - [Verification Method Decision](VERIFICATION_METHOD_DECISION.md)
