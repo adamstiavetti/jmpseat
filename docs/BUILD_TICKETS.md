@@ -38,6 +38,7 @@ Supplemental epoch-specific ticket packs:
 - [Controlled Reviewer Proof Viewing Foundation](epochs/controlled-reviewer-proof-viewing-foundation.md)
 - [Proof Retention Deletion Automation Design](epochs/proof-retention-deletion-automation-design.md)
 - [Proof Retention Deletion Cleanup Foundation](epochs/proof-retention-deletion-cleanup-foundation.md)
+- [Proof Retention Cleanup Trigger Foundation](epochs/proof-retention-cleanup-trigger-foundation.md)
 - [Verification Runtime Pass: American Airlines Test](ops/verification-runtime-pass-american-airlines.md)
 - [Redacted Proof Upload Runtime Pass](ops/redacted-proof-upload-runtime-pass.md)
 - [Controlled Proof Viewing Runtime Pass](ops/controlled-proof-viewing-runtime-pass.md)

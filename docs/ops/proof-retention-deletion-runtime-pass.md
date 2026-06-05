@@ -144,14 +144,15 @@ They were deferred in live runtime to avoid mutating additional rows or objects 
 
 ## Remaining Limitations
 
-- no scheduled cron or Edge Function trigger is wired yet
+- no scheduled cron or Edge Function trigger is wired yet in runtime
+- protected trigger foundation is now implemented, but still needs dedicated runtime trigger validation after deployment or local operator-secret setup
 - no operator UI exists for cleanup
 - no finalized retention-policy or legal review is recorded yet
 - no finalized production privacy notice is recorded yet
 
 ## Recommended Next Work
 
-1. Implement the actual scheduled cleanup trigger mechanism.
+1. Runtime-validate the protected cleanup trigger with operator-secret authentication.
 2. Add operator tooling for cleanup failures and retries.
 3. Finalize production privacy and legal copy for proof retention/deletion.
 4. Add approved-domain and reviewer-scope operator tooling.
