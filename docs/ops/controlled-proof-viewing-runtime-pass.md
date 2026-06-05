@@ -179,3 +179,7 @@ The next privacy-critical design step is documented in:
 
 - [Proof Retention Deletion Automation Design](../epochs/proof-retention-deletion-automation-design.md)
 - [Proof Retention Deletion Cleanup Foundation](../epochs/proof-retention-deletion-cleanup-foundation.md)
+
+The completed cleanup runtime proof is documented in:
+
+- [Proof Retention Deletion Runtime Pass](proof-retention-deletion-runtime-pass.md)
