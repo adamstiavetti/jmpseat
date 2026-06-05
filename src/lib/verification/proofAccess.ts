@@ -8,6 +8,7 @@ import { createStorageAdminClient, STORAGE_ADMIN_UNAVAILABLE_MESSAGE } from "../
 import { createClient } from "../supabase/server";
 import { hasActiveReviewerScope, type ReviewerScope } from "./review";
 import {
+  normalizeProofViewAuditUuid,
   resolveProofViewAccess,
   type ProofViewReasonCode,
 } from "./proofAccessCore";
@@ -92,8 +93,8 @@ async function recordDeniedProofViewEvent(input: {
     route: VERIFICATION_REVIEW_ROUTE,
     result: "denied",
     metadata: {
-      verification_request_id: input.requestId,
-      verification_evidence_id: input.evidenceId,
+      verification_request_id: normalizeProofViewAuditUuid(input.requestId),
+      verification_evidence_id: normalizeProofViewAuditUuid(input.evidenceId),
       evidence_type: input.evidenceType ?? null,
       status: input.status ?? null,
       reason_code: input.reasonCode,

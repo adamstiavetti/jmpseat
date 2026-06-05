@@ -5,6 +5,7 @@ import { existsSync, readFileSync } from "node:fs";
 import {
   MAX_PROOF_VIEW_SIGNED_URL_TTL_SECONDS,
   PROOF_VIEW_SIGNED_URL_TTL_SECONDS,
+  normalizeProofViewAuditUuid,
   resolveProofViewAccess,
 } from "../../src/lib/verification/proofAccessCore.ts";
 
@@ -14,6 +15,17 @@ test("proof access TTL stays short-lived and bounded", () => {
   assert.ok(
     PROOF_VIEW_SIGNED_URL_TTL_SECONDS <= MAX_PROOF_VIEW_SIGNED_URL_TTL_SECONDS,
   );
+});
+
+test("proof view audit ids accept only UUIDs and drop forged paths or URLs", () => {
+  const validUuid = "2946d7b9-882b-4c99-ad53-25f234531236";
+
+  assert.equal(normalizeProofViewAuditUuid(validUuid), validUuid);
+  assert.equal(normalizeProofViewAuditUuid(` ${validUuid} `), validUuid);
+  assert.equal(normalizeProofViewAuditUuid("user/request/evidence.png"), null);
+  assert.equal(normalizeProofViewAuditUuid("https://example.com/signed"), null);
+  assert.equal(normalizeProofViewAuditUuid("badge-number-123"), null);
+  assert.equal(normalizeProofViewAuditUuid(null), null);
 });
 
 test("proof access requires an authenticated reviewer", () => {

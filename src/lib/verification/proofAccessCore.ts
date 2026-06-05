@@ -63,6 +63,16 @@ export type ProofViewAccessResult =
   | DeniedProofViewAccess
   | AllowedProofViewAccess;
 
+export function normalizeProofViewAuditUuid(value: string | null | undefined) {
+  const normalized = value?.trim() ?? "";
+
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+    normalized,
+  )
+    ? normalized
+    : null;
+}
+
 function isReviewableProofRequestStatus(status: string) {
   return REVIEWABLE_PROOF_REQUEST_STATUSES.some(
     (candidate) => candidate === status,
