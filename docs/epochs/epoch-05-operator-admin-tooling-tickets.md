@@ -204,7 +204,7 @@ Acceptance criteria:
 
 ### E05-T04 Reviewer Scope Management
 
-Status: implemented; pending review, migration apply, and runtime proof.
+Status: implemented and runtime-proven.
 
 Objective:
 
@@ -235,7 +235,7 @@ Acceptance criteria:
 
 ### E05-T05 Verification Audit Inspection
 
-Status: implemented; pending review, migration apply, and runtime proof.
+Status: implemented and runtime-proven.
 
 Objective:
 

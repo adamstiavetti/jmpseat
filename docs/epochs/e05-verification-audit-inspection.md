@@ -57,8 +57,9 @@ The migration does not redefine `can_review_verification_request(...)`, does
 not update verification requests, and does not insert verification claims.
 Existing reviewer queue behavior and claim issuance rules remain unchanged.
 
-The migration is intentionally not applied in this task. Runtime validation is
-required after review, merge, and migration apply.
+The migration was applied to the linked Supabase runtime during the E05-T05
+runtime pass. See
+`docs/ops/verification-audit-inspection-runtime-pass.md`.
 
 ## 3. Operator Authorization
 
@@ -178,15 +179,14 @@ That slice still needs:
 
 Manual cleanup controls remain a later ticket and are not implemented here.
 
-## 8. Runtime Follow-Up
+## 8. Runtime Validation
 
-Runtime validation is still required after this branch is reviewed, merged, and
-the migration is applied to the linked Supabase project.
+Runtime validation is complete for the linked Supabase runtime.
 
-Runtime proof should verify:
+The runtime proof verified:
 
-- migration applies cleanly
-- users without audit-inspection scopes cannot access `/app/admin/audit`
+- migration applied cleanly
+- users without audit-inspection scopes cannot access audit RPC data
 - reviewer scope alone does not activate audit inspection
 - `operator.read_verification_requests` can inspect verification request
   metadata without security-event list access
@@ -197,11 +197,16 @@ Runtime proof should verify:
   proof contents are exposed
 - audit-on-audit events persist
 - existing reviewer queue behavior remains reviewer-scope based
+- malformed `request_id` handling remains covered by automated regression
+  tests and does not convert the whole audit surface to not-ready
+
+The runtime proof also records the observed anonymous RPC behavior: anonymous
+calls are denied safely through structured in-function responses with empty
+arrays in this linked runtime.
 
 ## 9. Source-Of-Truth Status
 
-This document records the E05-T05 implementation outcome before runtime
-validation.
+This document records the E05-T05 implementation and linked-runtime validation
+outcome.
 
-No Supabase `db push`, production commands, deployments, or secrets are part
-of this ticket.
+No production commands, deployments, or secrets are part of this ticket.
