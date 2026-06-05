@@ -54,6 +54,7 @@ Supplemental epoch-specific ticket packs:
 - [Proof Retention Cleanup Trigger Runtime Pass](ops/proof-retention-cleanup-trigger-runtime-pass.md)
 - [Operator Grants Bootstrap Runtime Pass](ops/operator-grants-bootstrap-runtime-pass.md)
 - [Approved Domain Management Runtime Pass](ops/approved-domain-management-runtime-pass.md)
+- [Reviewer Scope Management Runtime Pass](ops/reviewer-scope-management-runtime-pass.md)
 - [Proof Retention Cleanup Operator Runbook](ops/proof-retention-cleanup-operator-runbook.md)
 - [Proof Retention Cleanup Scheduler Compatibility](ops/proof-retention-cleanup-scheduler-compatibility.md)
 - [Supabase Runtime Setup](ops/supabase-runtime-setup.md)

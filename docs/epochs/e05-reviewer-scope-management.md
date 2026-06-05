@@ -155,24 +155,35 @@ Cleanup monitoring remains a later Epoch 05 task and is not implemented here.
 
 ## 8. Runtime Follow-Up
 
-Runtime validation is still required after this branch is reviewed, merged, and
-the migration is applied to the linked Supabase project.
+Runtime validation is complete and recorded in:
 
-Runtime proof should verify:
+- `docs/ops/reviewer-scope-management-runtime-pass.md`
+
+The linked Supabase migration history is clean and
+`20260605213000_add_operator_managed_reviewer_scopes.sql` is applied remotely.
+
+Runtime proof verified:
 
 - migration applies cleanly
 - authorized operators can list/grant/revoke reviewer scopes
-- self-grant and self-revoke are denied safely
+- self-grant denial was exercised safely at runtime
 - duplicate active reviewer scopes are denied safely
 - revoked scopes no longer authorize reviewer queue access
 - reviewer-scope audit events persist
 - reviewer scope does not imply operator access
 - operator scope does not imply reviewer queue access
 
+Implementation and automated tests also confirm self-grant/self-revoke
+protections exist in this slice.
+
+Runtime validation did not force a live self-revoke, because doing so would
+have required temporarily granting reviewer access to the privileged operator.
+The runtime pass confirmed there was no active self reviewer-scope context, and
+the source/automated tests cover the self-revoke denial branch.
+
 ## 9. Source-Of-Truth Status
 
-This document records the E05-T04 implementation outcome before runtime
-validation.
+This document records the E05-T04 implementation and runtime-validation
+outcome.
 
-The migration is intentionally not applied in this task. No production
-commands, deployments, or secrets are part of this ticket.
+No production commands, deployments, or secrets are part of this ticket.
