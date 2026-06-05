@@ -3,7 +3,11 @@ import { redirect } from "next/navigation";
 import { AdminShell } from "../../../../src/components/admin/AdminShell";
 import { AuthCard } from "../../../../src/components/auth/AuthCard";
 import authStyles from "../../../../src/components/auth/auth.module.css";
-import { ADMIN_ROUTES, buildAdminNavigation } from "../../../../src/lib/admin/access";
+import {
+  ADMIN_ROUTES,
+  buildAdminNavigation,
+  getCurrentOperatorAccess,
+} from "../../../../src/lib/admin/access";
 import styles from "./review.module.css";
 import { AUTH_ROUTES } from "../../../../src/lib/auth/routes";
 import { getCurrentAppAccessContext } from "../../../../src/lib/betaAccess/server";
@@ -78,8 +82,10 @@ export default async function VerificationReviewQueuePage({
     redirect(AUTH_ROUTES.accessRestricted);
   }
 
+  const operatorContext = await getCurrentOperatorAccess();
   const navigation = buildAdminNavigation({
     reviewerAuthorized: reviewContext.reviewerAuthorized,
+    operatorScopes: operatorContext.scopes,
   });
 
   return (

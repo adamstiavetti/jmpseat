@@ -169,6 +169,18 @@ test("proof-deletion migration extends the event-type constraint for bounded del
   assert.match(sql, /verification_evidence\.deletion_failed/i);
 });
 
+test("operator grants migration extends the event-type constraint for bounded operator audit events", () => {
+  const sql = readFileSync(
+    new URL("../../supabase/migrations/20260605113000_create_operator_grants_foundation.sql", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(sql, /drop constraint if exists security_events_event_type_check/i);
+  assert.match(sql, /operator_access\.granted/i);
+  assert.match(sql, /operator_access\.revoked/i);
+  assert.match(sql, /operator_access\.unauthorized_attempt/i);
+});
+
 test("proof retention implementation records deletion audit events without logging paths or proof data", () => {
   const source = readFileSync(
     new URL("../../src/lib/verification/proofRetentionCore.ts", import.meta.url),

@@ -7,6 +7,7 @@ import authStyles from "../../../src/components/auth/auth.module.css";
 import {
   ADMIN_ROUTES,
   buildAdminNavigation,
+  getCurrentOperatorAccess,
   OPERATOR_GRANT_IMPLEMENTATION_STATUS,
 } from "../../../src/lib/admin/access";
 import { getCurrentAppAccessContext } from "../../../src/lib/betaAccess/server";
@@ -64,8 +65,10 @@ export default async function AdminHomePage() {
 
   const reviewerContext =
     await getCurrentVerificationReviewerAuthorizationContext();
+  const operatorContext = await getCurrentOperatorAccess();
   const navigation = buildAdminNavigation({
     reviewerAuthorized: reviewerContext.reviewerAuthorized,
+    operatorScopes: operatorContext.scopes,
   });
 
   return (
@@ -75,17 +78,20 @@ export default async function AdminHomePage() {
       description="This safe admin landing page introduces the operational shell without loading privileged operator data. Reviewer authorization remains separate from future operator authorization."
       currentPath={ADMIN_ROUTES.home}
       navigation={navigation}
+      error={operatorContext.loadError ?? undefined}
       message={
         reviewerContext.reviewerAuthorized
           ? "Your account can reach the existing verification reviewer queue through reviewer scope."
-          : "Operator-only sections remain unavailable until explicit operator grants are implemented."
+          : operatorContext.operatorGranted
+            ? "Your account has explicit operator grants, but future operator tools remain unavailable until their routes are built."
+            : "Operator-only sections stay unavailable until your account receives explicit active operator grants."
       }
       footer={
         <p className={authStyles.hint}>
           This shell does not infer operator access from login email, work
-          email, beta access, verification claims, or reviewer scope. Operator
-          grants stay unimplemented in this ticket and therefore resolve as
-          unavailable by default.
+          email, beta access, verification claims, profile text, or reviewer
+          scope. Explicit active operator grants authorize future tools, but
+          only implemented routes become linkable.
         </p>
       }
     >
@@ -137,7 +143,7 @@ export default async function AdminHomePage() {
           <ul className={styles.noteList}>
             <li>Reviewer scope remains separate from operator/admin access.</li>
             <li>
-              Operator-only sections stay disabled while the operator grant
+              Operator-only sections stay scope-gated now that the operator grant
               model is {OPERATOR_GRANT_IMPLEMENTATION_STATUS.replaceAll("_", " ")}.
             </li>
             <li>

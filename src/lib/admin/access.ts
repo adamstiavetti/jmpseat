@@ -1,3 +1,5 @@
+import type { User } from "@supabase/supabase-js";
+
 export const ADMIN_ROUTES = {
   home: "/app/admin",
   verification: "/app/admin/verification",
@@ -7,7 +9,30 @@ export const ADMIN_ROUTES = {
   proofCleanup: "/app/admin/proof-cleanup",
 } as const;
 
-export const OPERATOR_GRANT_IMPLEMENTATION_STATUS = "not_implemented" as const;
+export const OPERATOR_GRANT_IMPLEMENTATION_STATUS = "implemented" as const;
+
+export const OPERATOR_SCOPE_VALUES = [
+  "operator.read_audit",
+  "operator.manage_approved_domains",
+  "operator.manage_reviewer_scopes",
+  "operator.read_verification_requests",
+  "operator.monitor_proof_cleanup",
+  "operator.run_proof_cleanup",
+  "operator.manage_operator_access",
+] as const;
+
+export type OperatorScope = (typeof OPERATOR_SCOPE_VALUES)[number];
+
+export const OPERATOR_ACCESS_NOT_READY_MESSAGE =
+  "Operator access is not ready yet. Apply the operator grants foundation migration to this Supabase project before using operator-only admin sections.";
+
+export type CurrentOperatorAccess = {
+  authConfigured: boolean;
+  user: User | null;
+  scopes: OperatorScope[];
+  operatorGranted: boolean;
+  loadError: string | null;
+};
 
 export type AdminNavigationItem = {
   key:
@@ -24,22 +49,151 @@ export type AdminNavigationItem = {
   reason: string;
 };
 
+function isOperatorScope(value: string): value is OperatorScope {
+  return (OPERATOR_SCOPE_VALUES as readonly string[]).includes(value);
+}
+
+export function filterOperatorScopes(scopes: readonly string[] | null | undefined) {
+  return (scopes ?? []).filter(isOperatorScope);
+}
+
+export function isOperatorGrantActive(input: {
+  status: string | null | undefined;
+  revokedAt: string | null | undefined;
+}) {
+  return input.status === "active" && input.revokedAt == null;
+}
+
+export function getGrantedOperatorScopes(input: {
+  scopes: readonly string[] | null | undefined;
+  status: string | null | undefined;
+  revokedAt: string | null | undefined;
+}) {
+  if (!isOperatorGrantActive(input)) {
+    return [] as OperatorScope[];
+  }
+
+  return filterOperatorScopes(input.scopes);
+}
+
+export function hasOperatorScope(input: {
+  scopes: readonly string[] | null | undefined;
+  scope: OperatorScope;
+}) {
+  return filterOperatorScopes(input.scopes).includes(input.scope);
+}
+
+export function hasAnyOperatorScope(input: {
+  scopes: readonly string[] | null | undefined;
+  requiredScopes: readonly OperatorScope[];
+}) {
+  const grantedScopes = filterOperatorScopes(input.scopes);
+  return input.requiredScopes.some((scope) => grantedScopes.includes(scope));
+}
+
+export async function getCurrentOperatorAccess(): Promise<CurrentOperatorAccess> {
+  const [{ getSupabaseBrowserEnv }, { createClient }] = await Promise.all([
+    import("../supabase/config"),
+    import("../supabase/server"),
+  ]);
+
+  const env = getSupabaseBrowserEnv();
+
+  if (!env.enabled) {
+    return {
+      authConfigured: false,
+      user: null,
+      scopes: [],
+      operatorGranted: false,
+      loadError: null,
+    };
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+
+  if (userError || !user) {
+    return {
+      authConfigured: true,
+      user: null,
+      scopes: [],
+      operatorGranted: false,
+      loadError: userError?.message ?? null,
+    };
+  }
+
+  const scopesResult = await supabase.rpc("current_user_operator_scopes");
+
+  if (scopesResult.error) {
+    return {
+      authConfigured: true,
+      user,
+      scopes: [],
+      operatorGranted: false,
+      loadError: OPERATOR_ACCESS_NOT_READY_MESSAGE,
+    };
+  }
+
+  const scopes = filterOperatorScopes(
+    Array.isArray(scopesResult.data) ? scopesResult.data : [],
+  );
+
+  return {
+    authConfigured: true,
+    user,
+    scopes,
+    operatorGranted: scopes.length > 0,
+    loadError: null,
+  };
+}
+
+export async function requireOperatorScope(scope: OperatorScope) {
+  const access = await getCurrentOperatorAccess();
+
+  if (!hasOperatorScope({ scopes: access.scopes, scope })) {
+    throw new Error(`Operator scope required: ${scope}`);
+  }
+
+  return access;
+}
+
 function buildOperatorUnavailableItem(input: {
   key: AdminNavigationItem["key"];
   label: string;
   path: string;
   description: string;
+  requiredScopes: readonly OperatorScope[];
+  grantedScopes: readonly string[] | null | undefined;
 }): AdminNavigationItem {
+  const authorized = hasAnyOperatorScope({
+    scopes: input.grantedScopes,
+    requiredScopes: input.requiredScopes,
+  });
+
+  const requiredScopeLabel =
+    input.requiredScopes.length === 1
+      ? input.requiredScopes[0]
+      : input.requiredScopes.join(" or ");
+
   return {
     ...input,
     status: "disabled",
-    availabilityLabel: "Unavailable",
-    reason:
-      "Operator grants are not implemented yet, so this operator-only section stays unavailable by default.",
+    availabilityLabel: authorized
+      ? "Authorized, not built yet"
+      : "Requires operator scope",
+    reason: authorized
+      ? `Authorized by explicit active operator grant, but this route is not implemented yet. It remains unavailable until a later Epoch 05 ticket builds the tool.`
+      : `Requires ${requiredScopeLabel}. Reviewer scope, beta access, verification claims, and profile text do not activate operator sections.`,
   };
 }
 
-export function buildAdminNavigation(input: { reviewerAuthorized: boolean }) {
+export function buildAdminNavigation(input: {
+  reviewerAuthorized: boolean;
+  operatorScopes?: readonly string[] | null;
+}) {
   const verificationReviewItem: AdminNavigationItem = input.reviewerAuthorized
     ? {
         key: "verification_review",
@@ -69,24 +223,35 @@ export function buildAdminNavigation(input: { reviewerAuthorized: boolean }) {
       label: "Approved Domains",
       path: ADMIN_ROUTES.approvedDomains,
       description: "Future operator management for approved work-email domains.",
+      requiredScopes: ["operator.manage_approved_domains"],
+      grantedScopes: input.operatorScopes,
     }),
     buildOperatorUnavailableItem({
       key: "reviewer_scopes",
       label: "Reviewer Scopes",
       path: ADMIN_ROUTES.reviewerScopes,
       description: "Future operator management for reviewer-scope grants and revocations.",
+      requiredScopes: ["operator.manage_reviewer_scopes"],
+      grantedScopes: input.operatorScopes,
     }),
     buildOperatorUnavailableItem({
       key: "audit_inspection",
       label: "Audit Inspection",
       path: ADMIN_ROUTES.auditInspection,
       description: "Future metadata-only inspection of verification and security events.",
+      requiredScopes: ["operator.read_audit"],
+      grantedScopes: input.operatorScopes,
     }),
     buildOperatorUnavailableItem({
       key: "proof_cleanup",
       label: "Proof Cleanup",
       path: ADMIN_ROUTES.proofCleanup,
       description: "Future monitoring and bounded manual control for proof cleanup.",
+      requiredScopes: [
+        "operator.monitor_proof_cleanup",
+        "operator.run_proof_cleanup",
+      ],
+      grantedScopes: input.operatorScopes,
     }),
   ] as const;
 }
