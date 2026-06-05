@@ -106,8 +106,12 @@ The airline employee email does not prove:
 - airline endorsement
 - union endorsement
 
-The signup/login design still needs a future decision on whether the login email
-and airline employee verification email must be the same address.
+Login email and airline employee email may be the same, but the model should
+support them being distinct. Login email is the stable account credential, and
+airline employee email is the eligibility credential. If the airline employee
+email changes, the new address should be reverified. See
+`strategy/airline-email-access-gate-decision.md` for the source-of-truth access
+gate decision.
 
 ### Private Testing Versus First-Base Launch Access
 
@@ -326,7 +330,6 @@ This pivot decision does not include:
 
 ## 13. Open Questions
 
-- Should login email and airline employee verification email be the same email?
 - Should users be allowed to later change their airline email?
 - How often should airline email verification expire or refresh?
 - What happens if airline email access is lost?
