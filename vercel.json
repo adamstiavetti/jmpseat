@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/ops/proof-retention-cleanup/cron?limit=10",
+      "schedule": "0 9 * * *"
+    }
+  ]
+}

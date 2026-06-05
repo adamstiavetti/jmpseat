@@ -2,6 +2,8 @@ import type { ProofRetentionCleanupSummary } from "../verification/proofRetentio
 
 export const OPS_PROOF_RETENTION_CLEANUP_ROUTE =
   "/api/ops/proof-retention-cleanup";
+export const OPS_PROOF_RETENTION_CLEANUP_CRON_ROUTE =
+  "/api/ops/proof-retention-cleanup/cron";
 export const OPS_PROOF_RETENTION_CLEANUP_SECRET_HEADER =
   "x-jmpseat-ops-secret";
 export const OPS_PROOF_RETENTION_CLEANUP_SECRET_ENV_KEY =
@@ -77,49 +79,36 @@ export function isAuthorizedOpsProofRetentionCleanupRequest(input: {
   return actualSecret.length > 0 && actualSecret === expectedSecret;
 }
 
-export async function handleOpsProofRetentionCleanupRequest(
+export function isAuthorizedOpsProofRetentionCleanupCronRequest(input: {
+  request: Request;
+  source?: EnvSource;
+}) {
+  const expectedSecret = getOpsProofRetentionCleanupSecret(input.source);
+
+  if (!expectedSecret) {
+    return false;
+  }
+
+  const authorization = input.request.headers.get("authorization")?.trim() ?? "";
+  const [scheme, ...rest] = authorization.split(/\s+/);
+  const actualSecret = rest.join(" ").trim();
+
+  return (
+    scheme?.toLowerCase() === "bearer" &&
+    actualSecret.length > 0 &&
+    actualSecret === expectedSecret
+  );
+}
+
+async function runAuthorizedOpsProofRetentionCleanup(
   request: Request,
   options: {
     source?: EnvSource;
     runCleanup?: CleanupRunner;
     isStorageAdminReady?: (source?: EnvSource) => boolean;
-  } = {},
+  },
 ) {
-  if (request.method !== "POST") {
-    return jsonResponse(
-      {
-        ok: false,
-        error: "Method not allowed.",
-      },
-      405,
-      {
-        allow: "POST",
-      },
-    );
-  }
-
   const source = options.source ?? process.env;
-  const configuredSecret = getOpsProofRetentionCleanupSecret(source);
-
-  if (!configuredSecret) {
-    return jsonResponse(
-      {
-        ok: false,
-        error: "Cleanup trigger is not configured.",
-      },
-      503,
-    );
-  }
-
-  if (!isAuthorizedOpsProofRetentionCleanupRequest({ request, source })) {
-    return jsonResponse(
-      {
-        ok: false,
-        error: "Unauthorized.",
-      },
-      401,
-    );
-  }
 
   try {
     const storageAdminReady =
@@ -164,4 +153,104 @@ export async function handleOpsProofRetentionCleanupRequest(
       500,
     );
   }
+}
+
+export async function handleOpsProofRetentionCleanupRequest(
+  request: Request,
+  options: {
+    source?: EnvSource;
+    runCleanup?: CleanupRunner;
+    isStorageAdminReady?: (source?: EnvSource) => boolean;
+  } = {},
+) {
+  if (request.method !== "POST") {
+    return jsonResponse(
+      {
+        ok: false,
+        error: "Method not allowed.",
+      },
+      405,
+      {
+        allow: "POST",
+      },
+    );
+  }
+
+  const source = options.source ?? process.env;
+  const configuredSecret = getOpsProofRetentionCleanupSecret(source);
+
+  if (!configuredSecret) {
+    return jsonResponse(
+      {
+        ok: false,
+        error: "Cleanup trigger is not configured.",
+      },
+      503,
+    );
+  }
+
+  if (!isAuthorizedOpsProofRetentionCleanupRequest({ request, source })) {
+    return jsonResponse(
+      {
+        ok: false,
+        error: "Unauthorized.",
+      },
+      401,
+    );
+  }
+
+  return runAuthorizedOpsProofRetentionCleanup(request, {
+    ...options,
+    source,
+  });
+}
+
+export async function handleOpsProofRetentionCleanupCronRequest(
+  request: Request,
+  options: {
+    source?: EnvSource;
+    runCleanup?: CleanupRunner;
+    isStorageAdminReady?: (source?: EnvSource) => boolean;
+  } = {},
+) {
+  if (request.method !== "GET") {
+    return jsonResponse(
+      {
+        ok: false,
+        error: "Method not allowed.",
+      },
+      405,
+      {
+        allow: "GET",
+      },
+    );
+  }
+
+  const source = options.source ?? process.env;
+  const configuredSecret = getOpsProofRetentionCleanupSecret(source);
+
+  if (!configuredSecret) {
+    return jsonResponse(
+      {
+        ok: false,
+        error: "Cleanup trigger is not configured.",
+      },
+      503,
+    );
+  }
+
+  if (!isAuthorizedOpsProofRetentionCleanupCronRequest({ request, source })) {
+    return jsonResponse(
+      {
+        ok: false,
+        error: "Unauthorized.",
+      },
+      401,
+    );
+  }
+
+  return runAuthorizedOpsProofRetentionCleanup(request, {
+    ...options,
+    source,
+  });
 }

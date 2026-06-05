@@ -6,6 +6,12 @@ This artifact records that the protected proof-retention cleanup route works aga
 
 It confirms that `/api/ops/proof-retention-cleanup` safely invokes proof cleanup only when authorized by the local operator secret and that route-triggered cleanup now persists deletion audit events.
 
+Scheduler note:
+
+- the manual runtime pass covered only `POST /api/ops/proof-retention-cleanup`
+- a later compatibility slice adds `GET /api/ops/proof-retention-cleanup/cron` for Vercel Cron
+- cron runtime validation still needs to happen after deployment with production `CRON_SECRET` configured to match `OPS_CLEANUP_SECRET`
+
 ## Runtime Environment
 
 - repo path: `/Users/ClawdBot/jmpseat`
@@ -195,8 +201,8 @@ Fix:
 
 ## Recommended Next Work
 
-1. Configure the chosen scheduler for `/api/ops/proof-retention-cleanup`.
-2. Verify scheduler compatibility with the required cleanup secret header.
+1. Validate the Vercel Cron-compatible route after deployment.
+2. Confirm `CRON_SECRET` and `OPS_CLEANUP_SECRET` are configured consistently.
 3. Add operator tooling for cleanup failures and retries.
 4. Add approved-domain and reviewer-scope operator tooling.
 5. Finalize production privacy and legal copy before real uploads at scale.

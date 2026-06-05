@@ -6,11 +6,11 @@ This document records the scheduler compatibility decision for the protected pro
 
 The current route is runtime-proven for manual/operator invocation. The remaining production question is how a scheduler should call it without weakening cleanup authorization or exposing secrets.
 
-This is a design/check artifact only. It does not add scheduler configuration, route code changes, environment secrets, migrations, or runtime scheduling.
+This started as a design/check artifact. The Vercel Cron compatibility slice now adds a separate cron-compatible route and `vercel.json`; it still does not add migrations, runtime scheduling validation, or environment secrets.
 
 ## Current Route Contract
 
-Route:
+Manual route:
 
 - `/api/ops/proof-retention-cleanup`
 
@@ -45,6 +45,20 @@ Response shape:
 
 The response is summary-only and must not expose Storage paths, buckets, signed URLs, public URLs, filenames, proof contents, OCR text, employee identifiers, badge numbers, barcode or QR data, secrets, tokens, or passwords.
 
+Cron route:
+
+- `/api/ops/proof-retention-cleanup/cron`
+
+Method:
+
+- `GET`
+
+Required auth header:
+
+- `Authorization: Bearer <OPS_CLEANUP_SECRET>`
+
+The cron route exists only for scheduler compatibility. It ignores query-string secrets, does not rely on a browser session, and delegates to the same server-only cleanup helper as the manual route.
+
 ## Scheduler Compatibility Question
 
 Before production scheduling, confirm:
@@ -55,7 +69,7 @@ Before production scheduling, confirm:
 - can the scheduler avoid putting secrets in the URL?
 - how does the route remain protected from public abuse?
 
-Current repo findings:
+Current repo findings before the compatibility slice:
 
 - no `vercel.json` is present
 - no local Vercel Cron docs are present in the repo
@@ -63,11 +77,22 @@ Current repo findings:
 - the current route requires `POST` and `x-jmpseat-ops-secret`
 - local runtime validated manual authorized invocation with that header
 
-Because no repo-contained Vercel Cron reference proves method/header support, web or platform-dashboard verification is still needed before implementing production scheduling.
+Current compatibility-slice findings:
+
+- `vercel.json` now targets `/api/ops/proof-retention-cleanup/cron?limit=10`
+- the cron route is `GET`-only
+- the cron route validates bearer authorization
+- no secrets are stored in `vercel.json`
+- production must set Vercel `CRON_SECRET` to the same value as `OPS_CLEANUP_SECRET` for this slice
+- Vercel references:
+  - [Cron Jobs](https://vercel.com/docs/cron-jobs/)
+  - [Managing Cron Jobs](https://vercel.com/docs/cron-jobs/manage-cron-jobs)
+
+Runtime validation after deployment is still needed before treating scheduled cleanup as production-proven.
 
 ## Candidate Production Scheduling Options
 
-### A. Vercel Cron Directly Calls Current Route
+### A. Vercel Cron Directly Calls Current Manual Route
 
 This option keeps the route unchanged.
 
@@ -77,7 +102,7 @@ It is valid only if Vercel Cron can:
 - include `x-jmpseat-ops-secret`
 - source the header value from a protected environment secret
 
-If Vercel Cron cannot send `POST` with custom headers, this option is not compatible with the current route.
+If Vercel Cron cannot send `POST` with custom headers, this option is not compatible with the current manual route.
 
 Do not switch cleanup to `GET` just to satisfy a scheduler.
 
@@ -94,7 +119,7 @@ Future route behavior:
 - never accept the secret in the query string
 - keep summary-only responses
 
-This is a common scheduler-compatible pattern and is the smallest likely route change if Vercel Cron or another scheduler can send bearer authorization more easily than a custom header.
+This remains an option for other schedulers, but the implemented Vercel-compatible route keeps bearer auth isolated from the manual route.
 
 ### C. Add A Separate Internal Cron Route
 
@@ -110,6 +135,8 @@ Tradeoff:
 
 - clearer scheduler boundary
 - more code surface and another route to test
+
+This is the selected MVP compatibility path.
 
 ### D. Use An External Scheduler
 
@@ -140,20 +167,22 @@ This remains a reasonable later option, but the current app already has a runtim
 
 ## Recommendation
 
-Recommended path:
+Implemented path:
 
 1. Keep the current manual operator header:
    - `x-jmpseat-ops-secret`
-2. Verify Vercel Cron method/header support outside the repo before implementing scheduler config.
-3. If direct Vercel Cron cannot call the current route exactly, implement a small compatibility change to also accept:
+2. Keep the current manual route as `POST`-only.
+3. Add a separate cron route:
+   - `GET /api/ops/proof-retention-cleanup/cron`
+4. Require:
    - `Authorization: Bearer <OPS_CLEANUP_SECRET>`
-4. Continue requiring `POST`.
-5. Never accept cleanup secrets in query strings.
-6. Never run cleanup on `GET`.
+5. Configure Vercel Cron to call:
+   - `/api/ops/proof-retention-cleanup/cron?limit=10`
+6. Set Vercel `CRON_SECRET` to the same value as `OPS_CLEANUP_SECRET`.
+7. Never accept cleanup secrets in query strings.
+8. Never expose cleanup controls in user or reviewer UI.
 
 This keeps manual operations stable while giving production scheduling a narrowly scoped compatibility path.
-
-Do not add `vercel.json` cron configuration until route authentication compatibility is confirmed.
 
 ## Security Requirements For Future Scheduler Implementation
 
@@ -164,7 +193,8 @@ Any scheduler implementation must preserve:
 - no logging of `OPS_CLEANUP_SECRET`
 - no logging of `SUPABASE_SERVICE_ROLE_KEY`
 - constant-time-ish secret comparison if practical
-- `POST` only for cleanup execution
+- `POST` only for manual cleanup execution
+- `GET` only for the isolated cron route
 - summary-only route response
 - no Storage path, URL, filename, or proof-content exposure
 - cleanup events persisted for scheduled/deleted/failed paths
@@ -177,11 +207,13 @@ The route must remain server-only and must not expose cleanup controls in user o
 Before enabling production scheduling:
 
 - set `OPS_CLEANUP_SECRET` in Vercel environment variables
+- set `CRON_SECRET` in Vercel environment variables to the same value as `OPS_CLEANUP_SECRET`
 - set `SUPABASE_SERVICE_ROLE_KEY` in Vercel environment variables
 - set app Supabase public environment variables
 - verify secrets are not exposed with `NEXT_PUBLIC_`
-- verify the selected scheduler can call the route with required auth
+- verify Vercel Cron sends the expected bearer authorization
 - test manual protected invocation in preview or production
+- test cron protected invocation in preview or production
 - verify route responses do not include sensitive fields
 - verify no secrets appear in logs
 - verify deletion audit events are recorded
@@ -190,13 +222,13 @@ Only configure the schedule after route authentication compatibility is confirme
 
 ## Runtime Validation Plan
 
-After scheduler compatibility is implemented or configured:
+After deployment:
 
-1. Call the route without auth.
+1. Call the cron route without auth.
    - Expected: denied.
-2. Call the route with wrong auth.
+2. Call the cron route with wrong auth.
    - Expected: denied.
-3. Call the route with correct auth.
+3. Call the cron route with correct bearer auth.
    - Expected: summary-only cleanup response.
 4. Force one dummy expired proof in a non-production or preview fixture.
 5. Run the scheduled/manual route invocation.
@@ -212,10 +244,8 @@ After scheduler compatibility is implemented or configured:
 
 This document does not implement:
 
-- actual scheduler config
-- route code changes
 - environment secret creation
-- runtime scheduling
+- production runtime scheduling validation
 - alerting
 - operator dashboard
 - proof upload changes

@@ -6,7 +6,7 @@ This runbook describes how operators should configure, manually trigger, and mon
 
 The route deletes expired raw redacted proof objects from the private `verification-proofs` bucket, sets `verification_evidence.deleted_at`, and preserves safe database metadata plus audit history.
 
-This runbook does not add a scheduler or change application behavior.
+This runbook covers the manual operator route and the separate Vercel-Cron-compatible route.
 
 ## Route
 
@@ -30,6 +30,20 @@ Required server-side environment:
 
 The route does not require a browser user session. It is intended for server/operator invocation only.
 
+Cron-compatible route:
+
+- `/api/ops/proof-retention-cleanup/cron`
+
+Method:
+
+- `GET`
+
+Required auth header:
+
+- `Authorization: Bearer <OPS_CLEANUP_SECRET>`
+
+This route is for Vercel Cron compatibility only. It does not accept query-string secrets and delegates to the same server-only cleanup helper as the manual route.
+
 ## Environment Setup
 
 Local runtime:
@@ -42,9 +56,11 @@ Local runtime:
 Production runtime:
 
 - configure `OPS_CLEANUP_SECRET` in the production hosting environment
+- configure `CRON_SECRET` in the production hosting environment to the same value as `OPS_CLEANUP_SECRET`
 - configure `SUPABASE_SERVICE_ROLE_KEY` in the production hosting environment
 - keep service-role credentials server-only
 - never use `NEXT_PUBLIC_` for `OPS_CLEANUP_SECRET`
+- never use `NEXT_PUBLIC_` for `CRON_SECRET`
 - never expose the service-role key to browser code
 
 Secret handling:
@@ -130,30 +146,38 @@ Avoid aggressive schedules until operators have visibility into failures and ret
 
 ## Vercel Cron Configuration Design
 
-Desired future scheduler behavior:
+Scheduler behavior:
 
-- call `POST /api/ops/proof-retention-cleanup?limit=10`
-- include operator authorization
+- call `GET /api/ops/proof-retention-cleanup/cron?limit=10`
+- include bearer authorization
 - record deletion audit events
 - return summary-only output
 
-Current route requirement:
+Manual route requirement:
 
 - `x-jmpseat-ops-secret: <OPS_CLEANUP_SECRET>`
 
-Scheduler compatibility must be verified before production scheduling.
+Cron route requirement:
 
-If Vercel Cron cannot send the required custom header directly, use a later scoped implementation change such as:
+- `Authorization: Bearer <OPS_CLEANUP_SECRET>`
 
-- a Vercel Cron route that validates Vercel's cron authorization and then invokes the cleanup helper server-side
-- a protected internal route that validates `CRON_SECRET` or an `Authorization` header
-- extending the existing cleanup route to also accept `Authorization: Bearer <OPS_CLEANUP_SECRET>`
+`vercel.json` targets:
 
-Do not implement scheduler compatibility without a scoped review because this route deletes private proof objects.
+- `/api/ops/proof-retention-cleanup/cron?limit=10`
+
+Production configuration:
+
+- set `OPS_CLEANUP_SECRET`
+- set `CRON_SECRET` to the same value as `OPS_CLEANUP_SECRET`
+- set `SUPABASE_SERVICE_ROLE_KEY`
+
+Runtime scheduler behavior still needs deployment validation because this route deletes private proof objects.
 
 Scheduler compatibility decision:
 
 - [Proof Retention Cleanup Scheduler Compatibility](proof-retention-cleanup-scheduler-compatibility.md)
+- Vercel reference:
+  - [Managing Cron Jobs](https://vercel.com/docs/cron-jobs/manage-cron-jobs)
 
 ## Manual Operator Checklist
 
