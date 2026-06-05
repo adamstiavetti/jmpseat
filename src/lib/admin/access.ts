@@ -281,16 +281,14 @@ export function buildAdminNavigation(input: {
       grantedScopes: input.operatorScopes,
       implemented: true,
     }),
-    buildOperatorUnavailableItem({
+    buildOperatorNavigationItem({
       key: "proof_cleanup",
       label: "Proof Cleanup",
       path: ADMIN_ROUTES.proofCleanup,
-      description: "Future monitoring and bounded manual control for proof cleanup.",
-      requiredScopes: [
-        "operator.monitor_proof_cleanup",
-        "operator.run_proof_cleanup",
-      ],
+      description: "Read-only operator monitoring for proof cleanup status and failures.",
+      requiredScopes: ["operator.monitor_proof_cleanup"],
       grantedScopes: input.operatorScopes,
+      implemented: true,
     }),
   ] as const;
 }

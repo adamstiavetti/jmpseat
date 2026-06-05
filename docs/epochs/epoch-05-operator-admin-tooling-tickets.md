@@ -266,7 +266,7 @@ Acceptance criteria:
 
 ### E05-T06 Proof Cleanup Monitoring
 
-Status: not started.
+Status: implemented; runtime validation pending.
 
 Objective:
 
@@ -279,6 +279,8 @@ Scope:
 - Surface failed cleanup counts and failed evidence IDs safely.
 - Link from evidence/request context to cleanup status without exposing storage paths.
 - Preserve existing cleanup routes and helper logic.
+- Read-only monitoring route implemented in
+  [E05-T06: Proof Cleanup Monitoring](e05-proof-cleanup-monitoring.md).
 
 Security requirements:
 

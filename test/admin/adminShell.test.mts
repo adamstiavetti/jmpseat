@@ -148,9 +148,23 @@ test("admin shell nav links only to implemented operator routes for scoped opera
     (entry) => entry.path === ADMIN_ROUTES.proofCleanup,
   );
 
+  assert.equal(proofCleanupItem?.status, "available");
+  assert.equal(proofCleanupItem?.availabilityLabel, "Available now");
+  assert.match(proofCleanupItem?.reason ?? "", /operator\.monitor_proof_cleanup/i);
+});
+
+test("admin shell nav does not let run-cleanup scope open read-only monitoring", () => {
+  const navigation = buildAdminNavigation({
+    reviewerAuthorized: false,
+    operatorScopes: ["operator.run_proof_cleanup"],
+  });
+  const proofCleanupItem = navigation.find(
+    (entry) => entry.path === ADMIN_ROUTES.proofCleanup,
+  );
+
   assert.equal(proofCleanupItem?.status, "disabled");
-  assert.equal(proofCleanupItem?.availabilityLabel, "Authorized, not built yet");
-  assert.match(proofCleanupItem?.reason ?? "", /later Epoch 05 ticket/i);
+  assert.equal(proofCleanupItem?.availabilityLabel, "Requires operator scope");
+  assert.match(proofCleanupItem?.reason ?? "", /operator\.monitor_proof_cleanup/i);
 });
 
 test("/app/admin\\/verification keeps reviewer-only queue behavior inside the shared shell", () => {

@@ -36,6 +36,7 @@ Supplemental epoch-specific ticket packs:
 - [E05-T03: Approved Email Domain Management](epochs/e05-approved-domain-management.md) - operator-managed approved work-email domains with audited create/update/disable flows.
 - [E05-T04: Reviewer Scope Management](epochs/e05-reviewer-scope-management.md) - operator-managed verification reviewer scopes with audited grant/revoke flows and self-escalation controls.
 - [E05-T05: Verification Audit Inspection](epochs/e05-verification-audit-inspection.md) - operator-scoped metadata-only verification and security-event inspection without raw proof or URL exposure.
+- [E05-T06: Proof Cleanup Monitoring](epochs/e05-proof-cleanup-monitoring.md) - read-only operator monitoring for proof cleanup status, failures, and sanitized cleanup audit events.
 - [Epoch 04: Approved Email Domain Read Policy Fix](epochs/epoch-04-approved-email-domain-read-policy-fix.md)
 - [Verification Transactional Review Action Hardening](epochs/verification-transactional-review-action-hardening.md)
 - [Redacted Proof Upload Storage Foundation](epochs/redacted-proof-upload-storage-foundation.md)

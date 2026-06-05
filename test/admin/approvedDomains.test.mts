@@ -67,7 +67,7 @@ test("approved-domains route becomes available only for the matching operator sc
   assert.match(approvedDomainsItem?.reason ?? "", /operator\.manage_approved_domains/i);
 });
 
-test("future operator sections remain disabled while implemented operator tools are linkable", () => {
+test("implemented operator tools are linkable while scopes stay tool-specific", () => {
   const navigation = buildAdminNavigation({
     reviewerAuthorized: false,
     operatorScopes: [
@@ -96,8 +96,8 @@ test("future operator sections remain disabled while implemented operator tools 
     (entry) => entry.path === ADMIN_ROUTES.proofCleanup,
   );
 
-  assert.equal(proofCleanupItem?.status, "disabled");
-  assert.equal(proofCleanupItem?.availabilityLabel, "Authorized, not built yet");
+  assert.equal(proofCleanupItem?.status, "available");
+  assert.equal(proofCleanupItem?.availabilityLabel, "Available now");
 });
 
 test("approved-domains page enforces operator scope server-side and uses the shared admin shell", () => {

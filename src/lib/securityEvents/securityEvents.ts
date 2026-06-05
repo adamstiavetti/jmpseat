@@ -47,6 +47,8 @@ export const SECURITY_EVENT_TYPES = [
   "reviewer_scope.unauthorized_attempt",
   "operator_audit.viewed",
   "operator_audit.unauthorized_attempt",
+  "proof_cleanup.monitor_viewed",
+  "proof_cleanup.monitor_unauthorized_attempt",
 ] as const;
 
 export type SecurityEventType = (typeof SECURITY_EVENT_TYPES)[number];

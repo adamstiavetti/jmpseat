@@ -99,14 +99,11 @@ test("reviewer scope, beta access, profile text, and verification claims do not 
   );
 });
 
-test("proof cleanup availability can be satisfied by either monitoring or run scope", () => {
+test("proof cleanup monitoring availability requires monitoring scope, not run scope", () => {
   assert.equal(
     hasAnyOperatorScope({
       scopes: ["operator.monitor_proof_cleanup"],
-      requiredScopes: [
-        "operator.monitor_proof_cleanup",
-        "operator.run_proof_cleanup",
-      ],
+      requiredScopes: ["operator.monitor_proof_cleanup"],
     }),
     true,
   );
@@ -114,12 +111,9 @@ test("proof cleanup availability can be satisfied by either monitoring or run sc
   assert.equal(
     hasAnyOperatorScope({
       scopes: ["operator.run_proof_cleanup"],
-      requiredScopes: [
-        "operator.monitor_proof_cleanup",
-        "operator.run_proof_cleanup",
-      ],
+      requiredScopes: ["operator.monitor_proof_cleanup"],
     }),
-    true,
+    false,
   );
 });
 
@@ -167,9 +161,9 @@ test("admin nav only enables implemented operator sections for matching scopes",
 
   const proofCleanup = navigation.find((entry) => entry.key === "proof_cleanup");
 
-  assert.equal(proofCleanup?.status, "disabled");
-  assert.equal(proofCleanup?.availabilityLabel, "Authorized, not built yet");
-  assert.match(proofCleanup?.reason ?? "", /not implemented yet/i);
+  assert.equal(proofCleanup?.status, "available");
+  assert.equal(proofCleanup?.availabilityLabel, "Available now");
+  assert.match(proofCleanup?.reason ?? "", /operator\.monitor_proof_cleanup/i);
 });
 
 test("operator grants migration creates bounded grants, helper functions, and self-escalation protections", () => {

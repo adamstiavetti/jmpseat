@@ -1,0 +1,176 @@
+.stack {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.section {
+  border: 1px solid rgba(28, 38, 53, 0.14);
+  border-radius: 1.25rem;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(244, 248, 246, 0.9)),
+    radial-gradient(circle at 10% 0%, rgba(93, 126, 103, 0.14), transparent 34%);
+  padding: 1.25rem;
+  box-shadow: 0 18px 46px rgba(18, 24, 33, 0.08);
+}
+
+.sectionTitle {
+  margin: 0 0 0.65rem;
+  color: #132019;
+  font-size: clamp(1.05rem, 2vw, 1.35rem);
+  letter-spacing: -0.02em;
+}
+
+.sectionText {
+  margin: 0;
+  color: #526055;
+  line-height: 1.65;
+}
+
+.searchForm {
+  display: grid;
+  gap: 1rem;
+}
+
+.fieldGrid {
+  display: grid;
+  gap: 0.9rem;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+}
+
+.field {
+  display: grid;
+  gap: 0.4rem;
+  color: #526055;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.field input {
+  border: 1px solid rgba(28, 38, 53, 0.16);
+  border-radius: 0.85rem;
+  background: rgba(255, 255, 255, 0.92);
+  color: #132019;
+  font: inherit;
+  padding: 0.75rem 0.85rem;
+}
+
+.searchActions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.buttonSecondary {
+  border: 1px solid rgba(28, 38, 53, 0.16);
+  border-radius: 999px;
+  background: #ffffff;
+  color: #132019;
+  cursor: pointer;
+  display: inline-flex;
+  font: inherit;
+  font-weight: 800;
+  justify-content: center;
+  padding: 0.72rem 1rem;
+  text-decoration: none;
+}
+
+.summaryGrid {
+  display: grid;
+  gap: 0.85rem;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  margin-bottom: 1rem;
+}
+
+.summaryCard {
+  border: 1px solid rgba(28, 38, 53, 0.12);
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.8);
+  display: grid;
+  gap: 0.3rem;
+  padding: 1rem;
+}
+
+.summaryLabel {
+  color: #657267;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.summaryValue {
+  color: #132019;
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+
+.recordList {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.recordCard {
+  border: 1px solid rgba(28, 38, 53, 0.12);
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.82);
+  padding: 1rem;
+}
+
+.recordHeader {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.recordTitle {
+  margin: 0;
+  color: #132019;
+  font-size: 1rem;
+}
+
+.statusBadge {
+  border-radius: 999px;
+  background: #e5efe7;
+  color: #2d4b35;
+  font-size: 0.78rem;
+  font-weight: 800;
+  padding: 0.32rem 0.62rem;
+}
+
+.metadata {
+  display: grid;
+  gap: 0.7rem;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  margin: 0;
+}
+
+.metadata div {
+  min-width: 0;
+}
+
+.metadata dt {
+  color: #68766b;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.metadata dd {
+  color: #132019;
+  margin: 0.18rem 0 0;
+  overflow-wrap: anywhere;
+}
+
+.emptyState {
+  border: 1px dashed rgba(28, 38, 53, 0.22);
+  border-radius: 1rem;
+  color: #657267;
+  margin: 0;
+  padding: 1rem;
+}
