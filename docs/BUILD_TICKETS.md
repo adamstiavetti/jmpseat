@@ -36,6 +36,7 @@ Supplemental epoch-specific ticket packs:
 - [Proof Request Reviewer RLS Routing Fix](epochs/proof-request-reviewer-rls-routing-fix.md)
 - [Controlled Reviewer Proof Viewing Design](epochs/controlled-reviewer-proof-viewing-design.md)
 - [Controlled Reviewer Proof Viewing Foundation](epochs/controlled-reviewer-proof-viewing-foundation.md)
+- [Proof Retention Deletion Automation Design](epochs/proof-retention-deletion-automation-design.md)
 - [Verification Runtime Pass: American Airlines Test](ops/verification-runtime-pass-american-airlines.md)
 - [Redacted Proof Upload Runtime Pass](ops/redacted-proof-upload-runtime-pass.md)
 - [Controlled Proof Viewing Runtime Pass](ops/controlled-proof-viewing-runtime-pass.md)

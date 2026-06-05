@@ -174,3 +174,7 @@ Applicant and non-reviewer boundary:
 3. Finalized privacy and legal copy before real user uploads.
 4. Custom SMTP and auth email branding before public work-email delivery.
 5. Claim-gated community and room rollout after the privacy and verification surfaces are fully settled.
+
+The next privacy-critical design step is documented in:
+
+- [Proof Retention Deletion Automation Design](../epochs/proof-retention-deletion-automation-design.md)
