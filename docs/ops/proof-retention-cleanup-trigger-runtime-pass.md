@@ -196,7 +196,11 @@ Fix:
 ## Recommended Next Work
 
 1. Configure the chosen scheduler for `/api/ops/proof-retention-cleanup`.
-2. Create an operator runbook for manual cleanup trigger use.
+2. Verify scheduler compatibility with the required cleanup secret header.
 3. Add operator tooling for cleanup failures and retries.
 4. Add approved-domain and reviewer-scope operator tooling.
 5. Finalize production privacy and legal copy before real uploads at scale.
+
+Operator runbook:
+
+- [Proof Retention Cleanup Operator Runbook](proof-retention-cleanup-operator-runbook.md)
