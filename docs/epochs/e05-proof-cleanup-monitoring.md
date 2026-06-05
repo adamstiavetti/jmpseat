@@ -53,9 +53,11 @@ operator scope is missing.
 
 The migration does not update or delete `verification_evidence` rows, does not
 interact with Storage objects, does not generate signed URLs, and does not call
-the existing cleanup trigger. Runtime validation remains pending until this
-branch is reviewed, merged, the migration is applied, and a runtime proof is
-recorded.
+the existing cleanup trigger.
+
+The migration was applied to the linked Supabase runtime during the E05-T06
+runtime pass. See
+`docs/ops/proof-cleanup-monitoring-runtime-pass.md`.
 
 ## 3. Operator Authorization
 
@@ -158,16 +160,33 @@ E05-T06 does not implement those controls.
 
 ## 8. Validation Status
 
-Source/test validation is part of this implementation branch.
+Runtime validation is complete for the linked Supabase runtime.
+Runtime validation was pending until this linked-runtime pass completed after
+review, merge, and migration apply.
 
-Runtime validation is pending. The E05-T06 migration must be reviewed, merged,
-applied to the linked Supabase runtime, and validated before this ticket is
-marked runtime-proven.
+The runtime proof verified:
+
+- migration applied cleanly
+- anonymous, non-operator, and reviewer-only monitoring RPC access is denied
+  safely
+- the authorized operator can load cleanup summary, failure list, and event list
+- summary counts are non-negative
+- cleanup responses do not expose raw proof files, proof contents, signed URLs,
+  public URLs, storage paths, filenames, tokens, sessions, secrets, or
+  service-role behavior
+- `proof_cleanup.monitor_viewed` persists for authorized monitoring reads
+- `/app/admin/proof-cleanup` remains read-only
+- existing cleanup trigger, proof viewing, and proof deletion semantics remain
+  unchanged
+
+No separate run-only operator grant existed in the linked runtime, so
+`operator.run_proof_cleanup`-alone denial remains covered by automated source
+tests.
 
 ## 9. Source-Of-Truth Status
 
-This document records the E05-T06 implementation scope before runtime
-validation.
+This document records the E05-T06 implementation and linked-runtime validation
+outcome.
 
-No Supabase `db push`, production commands, deployments, secrets, or manual
-cleanup controls are part of this implementation task.
+No production commands, deployments, secrets, or manual cleanup controls are
+part of this ticket.

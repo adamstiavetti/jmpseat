@@ -266,7 +266,7 @@ Acceptance criteria:
 
 ### E05-T06 Proof Cleanup Monitoring
 
-Status: implemented; runtime validation pending.
+Status: implemented and runtime-proven.
 
 Objective:
 
@@ -281,6 +281,8 @@ Scope:
 - Preserve existing cleanup routes and helper logic.
 - Read-only monitoring route implemented in
   [E05-T06: Proof Cleanup Monitoring](e05-proof-cleanup-monitoring.md).
+- Runtime proof recorded in
+  [Proof Cleanup Monitoring Runtime Pass](../ops/proof-cleanup-monitoring-runtime-pass.md).
 
 Security requirements:
 
