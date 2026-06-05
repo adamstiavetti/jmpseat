@@ -22,15 +22,16 @@ Future Codex tasks must declare which epoch they belong to. Work that does not m
 - Live production site exists: https://jmpseat.vercel.app.
 - Tally waitlist exists: https://tally.so/r/jav6aa.
 - Public splash page exists at `/`.
-- `/app` private beta placeholder exists.
+- `/app` private beta shell exists behind auth/profile/beta gates.
 - Waitlist CTA is wired through `NEXT_PUBLIC_WAITLIST_FORM_URL`.
-- No auth, database, Supabase, API persistence, community functionality, AI, payments, analytics SDK, or internal waitlist capture exists.
+- Supabase-backed auth, profiles, beta access, verification, claims, reviewer queue, proof storage, proof viewing, and proof cleanup foundations exist.
+- No community functionality, AI product feature, payments, analytics SDK, or internal waitlist capture exists.
 - Discovery is desk-researched, not fully user-validated.
 - FA expert interview remains pending.
 - First trusted aviation contact outreach remains pending.
 - Current production deployment is recorded in `DEPLOYMENT_RECORD_001.md`.
-- Future private-app implementation should follow `SCALABILITY_AND_ARCHITECTURE_REQUIREMENTS.md` so auth, data, moderation, storage, and search decisions remain scale-ready without overbuilding.
-- Future private-app implementation should follow `MOBILE_APP_STRATEGY.md` so the web MVP does not create backend, auth, or authorization decisions that block a later native mobile client.
+- Future private-app implementation should continue following `SCALABILITY_AND_ARCHITECTURE_REQUIREMENTS.md` so auth, data, moderation, storage, and search decisions remain scale-ready without overbuilding.
+- Future private-app implementation should continue following `MOBILE_APP_STRATEGY.md` so the web MVP does not create backend, auth, verification, or authorization decisions that block a later native mobile client.
 
 ## 3. Epoch Status Legend
 
@@ -50,8 +51,9 @@ Future Codex tasks must declare which epoch they belong to. Work that does not m
 | 01 | Public Splash + Waitlist | Complete / live | Make concept publicly viewable and capture waitlist interest. | `APP_FOUNDATION_NOTES.md`, `LANDING_PAGE_WAITLIST_PLAN.md`, `DEPLOYMENT_AND_WAITLIST_READINESS.md`, `DEPLOYMENT_RECORD_001.md` | Production loads, CTA opens Tally, fallback removed, Tally test response submitted, mobile page reviewed. | Test response and mobile UX review are not yet recorded. | Submit/verify a Tally test response and review mobile. |
 | 02 | Private App Foundation | Pending | Create locked private app shell behind splash page. | `PRIVATE_APP_AUTH_DB_ARCHITECTURE.md`, `NAMING_AND_INFORMATION_ARCHITECTURE.md`, `MILESTONE_EXECUTION_PLAN.md`, `TECHNICAL_ARCHITECTURE.md` | Private shell exists, route structure defined, no unauthorized access, no real community functionality. | Explicit approval required; M0 validation signal preferred first. | Decide after Epoch 00 feedback whether M1B is justified. |
 | 03 | Auth, Profiles, and Beta Access | Complete | Establish login, profile, invite-only beta access, and access gates. | `epochs/epoch-03-auth-account-beta-access-tickets.md`, `epochs/epoch-03-validation-and-handoff-review.md`, `PRIVATE_APP_AUTH_DB_ARCHITECTURE.md`, `SCALABILITY_AND_ARCHITECTURE_REQUIREMENTS.md`, `MOBILE_APP_STRATEGY.md` | Auth implemented, beta access state exists, invited users can enter, non-invited users are blocked, auth remains separate from aviation verification. | Supabase operator setup and private-beta operations remain ongoing, but the approved implementation scope is complete. | Use the merged Epoch 03 handoff and runtime setup docs as the operator baseline. |
-| 04 | Worker Verification Foundation | Pending | Implement worker-verification foundation, claims, evidence handling rules, and human review baseline. | `VERIFICATION_METHOD_DECISION.md`, `epochs/epoch-04-worker-verification-foundation-tickets.md`, `PRIVATE_APP_AUTH_DB_ARCHITECTURE.md`, `TRUST_AND_SAFETY.md`, `SCALABILITY_AND_ARCHITECTURE_REQUIREMENTS.md`, `MOBILE_APP_STRATEGY.md` | Verification claim model exists, approved verification methods are implemented for the chosen slice, proof handling is private and retention-bounded, human review exists, claims-based authorization direction is explicit, and no employer-system lookup or AI final approval exists. | Verification consent, retention windows, approved-domain inventory, storage policy, and reviewer workflow still need bounded ticket-by-ticket implementation. | Start `E04-T01` and lock the verification claim/lifecycle decision before any upload or review implementation begins. |
-| 05 | Community Structure | Pending | Implement Base Boards, Layover Boards, and verified/role rooms structurally. | `MVP_SCOPE.md`, `BUILD_TICKETS.md`, `FEATURE_ROADMAP.md`, `DISCOVERY_RESEARCH_REPORT_001.md`, `SCALABILITY_AND_ARCHITECTURE_REQUIREMENTS.md`, `MOBILE_APP_STRATEGY.md` | Board/room structures exist, content can be seeded/read-only first, no real anonymous posting until moderation/admin gates are complete. | Requires auth/access and verification state before real member access. | Wait until Epochs 03-04 are underway. |
+| 04 | Worker Verification Foundation | Complete | Implement worker-verification foundation, claims, evidence handling rules, and human review baseline. | `VERIFICATION_METHOD_DECISION.md`, `epochs/epoch-04-worker-verification-foundation-tickets.md`, `epochs/epoch-04-exit-report.md`, `TRUST_AND_SAFETY.md`, `SCALABILITY_AND_ARCHITECTURE_REQUIREMENTS.md`, `MOBILE_APP_STRATEGY.md` | Verification claim model exists, work-email and redacted-proof verification foundations are implemented, proof handling is private and retention-bounded, human review exists, controlled proof viewing exists, cleanup routes exist, claims-based authorization direction is explicit, and no employer-system lookup or AI final approval exists. | Production env/cron monitoring, final privacy/legal copy, custom SMTP/auth email branding, approved-domain tooling, reviewer-scope tooling, and cleanup monitoring remain follow-ups. | Move to Epoch 05 Operator/Admin Tooling Foundation unless a verification bug appears. |
+| 05 | Operator/Admin Tooling Foundation | Recommended next | Make verification operations manageable without manual SQL before community rollout. | `epochs/epoch-04-exit-report.md`, `ops/proof-retention-cleanup-operator-runbook.md`, `ops/proof-retention-cleanup-scheduler-compatibility.md`, `BUILD_TICKETS.md`, `SCALABILITY_AND_ARCHITECTURE_REQUIREMENTS.md`, `MOBILE_APP_STRATEGY.md` | Approved-domain management, reviewer-scope management, cleanup monitoring, and audit inspection have bounded operator paths with safe authorization and logging. | Verification works, but approved domains, reviewer scopes, and cleanup monitoring are still operator/manual-SQL concerns. | Plan Epoch 05 operator/admin tooling before claim-gated community surfaces. |
+| 05B | Community Structure | Pending | Implement Base Boards, Layover Boards, and verified/role rooms structurally after operator controls are acceptable. | `MVP_SCOPE.md`, `BUILD_TICKETS.md`, `FEATURE_ROADMAP.md`, `DISCOVERY_RESEARCH_REPORT_001.md`, `SCALABILITY_AND_ARCHITECTURE_REQUIREMENTS.md`, `MOBILE_APP_STRATEGY.md` | Board/room structures exist, content can be seeded/read-only first, no real anonymous posting until moderation/admin gates are complete. | Requires acceptable operator tooling, trust/legal posture, and moderation plan before real member access. | Wait until Epoch 05 operator/admin tooling or production trust basics are acceptable. |
 | 06 | Moderation, Reporting, and Admin | Pending | Implement safety foundation before real anonymous posting. | `TRUST_AND_SAFETY.md`, `LEGAL_POLICY_REQUIREMENTS.md`, `BETA_READINESS_CHECKLIST.md`, `PRIVATE_APP_AUTH_DB_ARCHITECTURE.md`, `SCALABILITY_AND_ARCHITECTURE_REQUIREMENTS.md`, `MOBILE_APP_STRATEGY.md` | Report flow, moderation queue, admin actions, emergency escalation, and audit/security events exist. | Must precede real anonymous posting and beta UGC. | Design admin/moderation slice before enabling posting. |
 | 11 | Native Mobile Client | Future | Add a native phone app after the core web loop, access model, and moderation foundations are validated. | `MOBILE_APP_STRATEGY.md`, `TECHNICAL_ARCHITECTURE.md`, `PRIVATE_APP_AUTH_DB_ARCHITECTURE.md` | Mobile implementation begins only after core backend, auth, authorization, verification, and community rules are stable enough to reuse. | Web MVP and private-beta product loop are not validated yet. | Keep current implementation web-first while avoiding web-only architecture lock-in. |
 | 07 | Limited Private Beta | Pending | Invite controlled users and validate product behavior. | `PRIVATE_BETA_OPERATING_PLAN.md`, `BETA_READINESS_CHECKLIST.md`, `M0_VALIDATION_OPERATING_PACKET.md` | First beta community selected, first users invited, ambassadors identified, moderation coverage exists, activation/retention/contribution measured. | First community, first 50, policy minimums, verification, moderation, and admin controls not ready. | Continue Epoch 00 validation and policy readiness. |
@@ -214,7 +216,7 @@ Exit criteria:
 
 ### Epoch 04 - Worker Verification Foundation
 
-Status: pending.
+Status: complete.
 
 Purpose:
 
@@ -232,22 +234,26 @@ Primary docs:
 - `SCALABILITY_AND_ARCHITECTURE_REQUIREMENTS.md`
 - `VERIFICATION_METHOD_DECISION.md`
 - `epochs/epoch-04-worker-verification-foundation-tickets.md`
+- `epochs/epoch-04-exit-report.md`
 
 Exit criteria:
 
 - Verification state machine exists.
-- Non-upload manual review supported first.
-- Upload flow remains blocked until controls exist.
+- Work-email verification request flow exists.
+- Approved-domain review path exists.
+- Redacted proof upload/storage exists with private bucket controls.
+- Controlled reviewer proof viewing exists.
+- Proof retention/deletion cleanup helper and protected cleanup routes exist.
 - AI cannot approve verification.
 - Approved email-domain verification, redacted badge/proof review, claim issuance, and raw-proof retention/deletion rules are defined and implemented for the chosen verification slice.
 
-Planned workflow slice:
+Delivered workflow slice:
 
 - email-domain verification for approved airline/employer domains
 - redacted badge/proof upload
 - private storage and controlled reviewer access
 - human review
-- approved claims for airline-worker, airline, role, and base where relevant
+- approved claims for airline-worker and airline where supported by the current bounded paths
 - retention and deletion controls for raw proof
 
 Explicit prohibitions:
@@ -261,8 +267,37 @@ Important follow-up preserved for later ops/brand work:
 
 - customize Supabase auth email templates for jmpseat branding
 - configure custom SMTP/domain sender so confirmation and reset emails do not look third-party
+- add approved-domain operator tooling
+- add reviewer-scope operator tooling
+- add cleanup monitoring and alerting
+- finalize production privacy/legal copy
 
-### Epoch 05 - Community Structure
+### Epoch 05 - Operator/Admin Tooling Foundation
+
+Status: recommended next.
+
+Purpose:
+
+- Make verification operations manageable without manual SQL before community rollout.
+- Reduce operational risk around approved domains, reviewer scopes, cleanup monitoring, and audit inspection.
+
+Primary docs:
+
+- `epochs/epoch-04-exit-report.md`
+- `ops/proof-retention-cleanup-operator-runbook.md`
+- `ops/proof-retention-cleanup-scheduler-compatibility.md`
+- `SCALABILITY_AND_ARCHITECTURE_REQUIREMENTS.md`
+- `MOBILE_APP_STRATEGY.md`
+
+Exit criteria:
+
+- Approved-domain management has a bounded operator path.
+- Reviewer-scope management has a bounded operator path.
+- Cleanup monitoring and failure inspection exist.
+- Audit/security-event inspection exists for verification operations.
+- Operator actions remain authorized, logged, and separate from user-facing community features.
+
+### Epoch 05B - Community Structure
 
 Status: pending.
 
@@ -284,6 +319,11 @@ Exit criteria:
 - Content may be seeded/read-only first.
 - No real anonymous posting until moderation/admin gates are complete.
 - Pagination, indexing, filtering, and access-control plans exist before boards/rooms become real user-facing data surfaces.
+
+Blockers:
+
+- Operator/admin tooling or production trust basics should be acceptable before real member access.
+- Moderation/admin readiness still gates real anonymous posting.
 
 ### Epoch 06 - Moderation, Reporting, and Admin
 
@@ -406,18 +446,23 @@ Exit criteria:
 - Epoch 02 may start only with explicit approval.
 - Epoch 03 must precede verification and community access.
 - Epoch 04 must precede verified-only experiences.
+- Epoch 05 operator/admin tooling is recommended before claim-gated community surfaces.
 - Epoch 06 must precede real anonymous posting.
 - Epoch 07 must not start until beta gates are met.
 - Epoch 08 and Epoch 09 are deferred until core value is proven.
 
 ## 7. Current Recommended Next Actions
 
-- Submit and verify a Tally test response if not already recorded.
-- Review the live site on mobile.
-- Send the live site to 3-5 trusted aviation contacts.
-- Conduct the FA expert interview when available.
-- Capture feedback and update `PROBLEM_SOLUTION_VALIDATION_MATRIX.md`.
-- Only then decide whether to proceed to Epoch 02 / M1B private app shell.
+- Plan Epoch 05 Operator/Admin Tooling Foundation.
+- Define approved-domain operator management.
+- Define reviewer-scope operator management.
+- Define cleanup monitoring, failure inspection, and alerting.
+- Continue product validation outreach in parallel:
+  - submit and verify a Tally test response if not already recorded
+  - review the live site on mobile
+  - send the live site to 3-5 trusted aviation contacts
+  - conduct the FA expert interview when available
+  - capture feedback and update `PROBLEM_SOLUTION_VALIDATION_MATRIX.md`
 
 ## 8. Codex Workflow Rules by Epoch
 
@@ -432,21 +477,17 @@ Exit criteria:
 
 ## 9. What Must Not Be Built Yet
 
-- Auth.
-- Database.
-- Supabase.
-- Internal waitlist capture.
-- Verification uploads.
 - Real anonymous posting.
-- Crew Rooms functionality.
-- Base Boards functionality.
-- Layover Boards functionality.
-- AI.
+- Crew Rooms functionality beyond explicitly scoped claim-gated structure.
+- Base Boards functionality beyond explicitly scoped claim-gated structure.
+- Layover Boards functionality beyond explicitly scoped claim-gated structure.
+- AI product features or AI verification approval.
 - Payments.
 - Marketplace.
 - Nearby crew tracking.
 - Schedule import.
 - Airline portal login.
+- Employer-system lookup.
 - Non-rev load requests.
 - Dating/swiping.
 
@@ -460,10 +501,10 @@ Exit criteria:
 
 ## 11. Recommended Next Codex Task
 
-Recommended next task: `docs: record initial trusted-contact feedback after outreach`.
+Recommended next task: `docs: define Epoch 05 operator admin tooling plan`.
 
 Use Plan/Goals: yes.
 
-If the FA expert interview happens first, use: `docs: update validation matrix after FA expert interview`.
+If production readiness is prioritized first, use: `docs: define production trust legal ops plan`.
 
-Do not start app feature work as the immediate next task unless explicitly approved.
+Do not start claim-gated community work as the immediate next task unless explicitly approved.
