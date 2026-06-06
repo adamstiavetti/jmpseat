@@ -26,6 +26,7 @@ This pack is based on:
 - `docs/strategy/community-admin-responsibilities-disclaimer-policy.md`
 - `docs/strategy/launch-readiness-gate-transition-plan.md`
 - `docs/strategy/beta-invite-code-foundation-decision.md`
+- `docs/ops/auth-email-branding-confirmation-template-plan.md`
 
 ## 3. Non-Negotiable Boundaries
 
@@ -48,17 +49,18 @@ Recommended order:
 2. `FBMVP-T02` Airline-email verification access state design/implementation. Helper implementation complete and merged; see `docs/epochs/fbmvp-t02-airline-email-verification-access-state-design.md` and `docs/epochs/fbmvp-t02-airline-email-verification-access-state-implementation.md`.
 3. `FBMVP-T03` Private-testing versus first-base-launch gate implementation. Implemented and merged; see `docs/epochs/fbmvp-t03-private-testing-versus-first-base-launch-gate-implementation.md`.
 4. `FBMVP-T03A` Beta invite-code foundation. Implemented and runtime-proven on the linked Supabase runtime; see `docs/strategy/beta-invite-code-foundation-decision.md`, `docs/epochs/fbmvp-t03a-beta-invite-code-foundation-implementation.md`, and `docs/ops/beta-invite-code-foundation-runtime-pass.md`.
-5. `FBMVP-T04` Onboarding/signup flow update. Implemented and ready for review; see `docs/epochs/fbmvp-t04-onboarding-signup-flow-update.md`.
-6. `FBMVP-T05` Base and board data model design.
-7. `FBMVP-T06` Board membership and access request model.
-8. `FBMVP-T07` Community-admin role model.
-9. `FBMVP-T08` General baseboard route foundation.
-10. `FBMVP-T09` Restricted board request-access flow.
-11. `FBMVP-T10` Community-admin request review UI.
-12. `FBMVP-T11` Text-only posts and replies MVP.
-13. `FBMVP-T12` Basic moderation/reporting MVP.
-14. `FBMVP-T13` Trust/disclaimer copy placement.
-15. `FBMVP-T14` First-base launch readiness validation.
+5. `FBMVP-T04` Onboarding/signup flow update. Implemented and merged; see `docs/epochs/fbmvp-t04-onboarding-signup-flow-update.md`.
+6. Auth email branding / confirmation template manual ops. Planned; see `docs/ops/auth-email-branding-confirmation-template-plan.md`. This should be completed before founder/Yuri Vercel testing or public-ish Closed Beta Login entry.
+7. `FBMVP-T05` Base and board data model design.
+8. `FBMVP-T06` Board membership and access request model.
+9. `FBMVP-T07` Community-admin role model.
+10. `FBMVP-T08` General baseboard route foundation.
+11. `FBMVP-T09` Restricted board request-access flow.
+12. `FBMVP-T10` Community-admin request review UI.
+13. `FBMVP-T11` Text-only posts and replies MVP.
+14. `FBMVP-T12` Basic moderation/reporting MVP.
+15. `FBMVP-T13` Trust/disclaimer copy placement.
+16. `FBMVP-T14` First-base launch readiness validation.
 
 ## 5. Per-Ticket Detail
 
@@ -293,7 +295,7 @@ Stop-before-commit/review requirements:
 
 ### FBMVP-T04 Onboarding/Signup Flow Update
 
-Status: implemented and ready for review. See `docs/epochs/fbmvp-t04-onboarding-signup-flow-update.md`.
+Status: implemented and merged. See `docs/epochs/fbmvp-t04-onboarding-signup-flow-update.md`.
 
 Goal: Update onboarding and signup so airline employee email is collected or verified as the eligibility credential while login credentials remain stable account credentials.
 
@@ -347,7 +349,8 @@ Stop-before-commit/review requirements:
 
 Follow-up before founder/Yuri Vercel testing or public-ish waitlist login entry:
 
-- Supabase confirmation email template / custom SMTP / auth email branding polish.
+- Supabase confirmation email template / custom SMTP / auth email branding polish, following `docs/ops/auth-email-branding-confirmation-template-plan.md`.
+- Keep the Closed Beta Login landing entry deferred until this auth email experience is configured and validated.
 
 ### FBMVP-T05 Base And Board Data Model Design
 
@@ -859,7 +862,9 @@ Rationale:
 
 Next ticket after `FBMVP-T03`: `FBMVP-T03A Beta Invite-Code Foundation`, because private testing still needs a clear batch/single-use invite-code model before onboarding and access-hold copy depend on invite redemption behavior.
 
-Next auth-flow task after `FBMVP-T04`: Supabase confirmation email template / custom SMTP / auth email branding polish, because the user-facing flow now describes the correct gates but confirmation/reset emails still need jmpseat-branded trust polish before founder/Yuri Vercel testing or public-ish waitlist login entry.
+Next auth-flow task after `FBMVP-T04`: follow `docs/ops/auth-email-branding-confirmation-template-plan.md` to configure and validate Supabase confirmation/reset email branding, custom SMTP or sender-domain decisions, redirect URLs, and safe test-email behavior. The user-facing flow now describes the correct gates, but confirmation/reset emails still need jmpseat-branded trust polish before founder/Yuri Vercel testing or public-ish waitlist login entry.
+
+The public landing Closed Beta Login entry remains deferred until that auth email plan is executed and reviewed.
 
 ## 8. Validation Standards
 
