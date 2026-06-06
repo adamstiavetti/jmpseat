@@ -6,6 +6,7 @@ export const AUTH_ROUTES = {
   app: "/app",
   profile: "/app/profile",
   verification: "/app/verification",
+  verificationConfirm: "/app/verification/confirm",
   accessHold: "/app/access-hold",
   accessRestricted: "/app/access-restricted",
 } as const;

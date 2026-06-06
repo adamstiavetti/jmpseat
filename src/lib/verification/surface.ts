@@ -127,9 +127,9 @@ export function getWorkEmailSurfaceState({
 
   return {
     kind: "available",
-    title: "Airline-email request tracking is available for supported domains",
+    title: "Airline-email confirmation is available for supported domains",
     description:
-      "Approved domains can start an airline-email request here, but this ticket still stops short of email delivery, automatic approval, launch-gate access, or claim issuance.",
+      "Approved domains can receive a confirmation email here. Confirmation verifies control of the email address only and does not issue role, base, or restricted-board claims.",
   };
 }
 

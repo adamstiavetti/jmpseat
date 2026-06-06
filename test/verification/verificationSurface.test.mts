@@ -100,9 +100,9 @@ test("work-email surface state explains unavailable or deferred self-serve submi
     getWorkEmailSurfaceState({ approvedDomainCount: 2 }),
     {
       kind: "available",
-      title: "Airline-email request tracking is available for supported domains",
+      title: "Airline-email confirmation is available for supported domains",
       description:
-        "Approved domains can start an airline-email request here, but this ticket still stops short of email delivery, automatic approval, launch-gate access, or claim issuance.",
+        "Approved domains can receive a confirmation email here. Confirmation verifies control of the email address only and does not issue role, base, or restricted-board claims.",
     },
   );
 });
@@ -119,7 +119,11 @@ test("/app/verification copy freezes proof upload while preserving airline-email
   assert.match(source, /does\s+not\s+grant\s+role,\s+base,\s+or\s+restricted-board\s+membership/i);
   assert.match(source, /approved airline-controlled domain/i);
   assert.match(source, /only approved airline-controlled domains are currently supported/i);
-  assert.match(source, /submit work-email verification request/i);
+  assert.match(source, /sends a confirmation\s+link to that inbox/i);
+  assert.match(source, /Send confirmation email/i);
+  assert.match(source, /Check your airline employee email inbox/i);
+  assert.match(source, /hashed confirmation tokens/i);
+  assert.doesNotMatch(source, /does not send a custom verification\s+email yet/i);
   assert.match(source, /no employer-system lookup/i);
   assert.match(source, /Proof upload is frozen/i);
   assert.match(source, /no longer asks normal users to upload badges/i);

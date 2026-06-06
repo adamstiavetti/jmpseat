@@ -16,6 +16,7 @@ test("auth routes stay aligned with E03-T02", () => {
     app: "/app",
     profile: "/app/profile",
     verification: "/app/verification",
+    verificationConfirm: "/app/verification/confirm",
     accessHold: "/app/access-hold",
     accessRestricted: "/app/access-restricted",
   });

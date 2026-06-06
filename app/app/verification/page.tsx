@@ -176,8 +176,9 @@ export default async function VerificationPage({ searchParams }: VerificationPag
           </p>
           <p className={styles.sectionText}>
             Only approved airline-controlled domains are currently supported.
-            Work-email request creation does not send a custom verification
-            email yet and does not issue claims automatically.
+            Submitting an approved airline employee email sends a confirmation
+            link to that inbox. Confirmation verifies email control only and
+            does not issue role, base, or restricted-board claims.
           </p>
           <p className={styles.sectionText}>{workEmailState.description}</p>
           <form className={styles.form} action={submitWorkEmailVerificationAction}>
@@ -196,12 +197,13 @@ export default async function VerificationPage({ searchParams }: VerificationPag
               />
             </div>
             <button className={styles.button} type="submit">
-              Submit work-email verification request
+              Send confirmation email
             </button>
           </form>
           <p className={styles.muted}>
-            This page stores only metadata needed to start the request. It does
-            not store your raw work email in verification evidence metadata.
+            Check your airline employee email inbox after submitting. jmpseat
+            stores metadata and hashed confirmation tokens only; it does not
+            store your raw work email in verification evidence metadata.
           </p>
         </section>
 
