@@ -54,6 +54,8 @@ Current linked-project caveat:
 Recommended local founder-testing path:
 
 1. Ensure the required env vars exist locally.
+   Start from `.env.example` so `JMPSEAT_LAUNCH_MODE` is documented alongside
+   the Supabase browser env vars.
 2. Run:
 
 ```bash
@@ -101,6 +103,8 @@ Recommended preview/founder-testing path:
 2. Review the existing Vercel link and make sure the project naming and scope
    are correct for jmpseat.
 3. Add the required runtime env vars in Vercel.
+   Use `.env.example` as the source-of-truth checklist for env-var names, then
+   set `JMPSEAT_LAUNCH_MODE=private_testing` for founder/Yuri preview testing.
 4. Create a preview deployment from the current repo state.
 5. Test login, signup, redirect, profile, airline-email verification, and beta
    invite-code behavior in preview.
@@ -126,6 +130,10 @@ Current repo-documented env names:
 - `OPERATOR_BOOTSTRAP_SECRET`
 - `CRON_SECRET`
 - `JMPSEAT_LAUNCH_MODE`
+
+For founder/Yuri preview setup, use `.env.example` as the checklist and set:
+
+- `JMPSEAT_LAUNCH_MODE=private_testing`
 
 Practical founder-testing minimum:
 
