@@ -44,7 +44,7 @@ This pack is based on:
 Recommended order:
 
 1. `FBMVP-T01` Freeze user-facing proof verification surfaces. Implemented and merged; see `docs/epochs/fbmvp-t01-freeze-user-facing-proof-verification-surfaces.md`.
-2. `FBMVP-T02` Airline-email verification access state design/implementation. Design-planned; see `docs/epochs/fbmvp-t02-airline-email-verification-access-state-design.md`. Recommended next task after review: implementation.
+2. `FBMVP-T02` Airline-email verification access state design/implementation. Helper implementation complete pending review; see `docs/epochs/fbmvp-t02-airline-email-verification-access-state-design.md` and `docs/epochs/fbmvp-t02-airline-email-verification-access-state-implementation.md`.
 3. `FBMVP-T03` Private-testing versus first-base-launch gate implementation.
 4. `FBMVP-T04` Onboarding/signup flow update.
 5. `FBMVP-T05` Base and board data model design.
@@ -116,16 +116,21 @@ Stop-before-commit/review requirements:
 
 ### FBMVP-T02 Airline-Email Verification Access State Design/Implementation
 
-Status: design-planned; implementation pending review. See `docs/epochs/fbmvp-t02-airline-email-verification-access-state-design.md`.
+Status: helper implementation complete pending review. See `docs/epochs/fbmvp-t02-airline-email-verification-access-state-design.md` and `docs/epochs/fbmvp-t02-airline-email-verification-access-state-implementation.md`.
 
 Goal: Refactor existing work-email verification into the forward `airline_email_verified` app-level access state.
 
-Scope:
+Implemented scope:
 
-- Decide exact table/claim/state changes from existing verification tables.
-- Preserve approved domain management.
-- Support verification timestamp and future expiry/refresh fields if selected.
-- Keep login email and airline employee email distinct where needed.
+- Add a pure helper/adapter that derives safe airline-email access state from existing approved-domain, verification request, evidence, and claim records.
+- Preserve approved domain management without schema changes.
+- Support verification timestamp, pending, unsupported-domain, revoked, expired, not-verified, and not-ready states.
+- Keep login email and airline employee email distinct.
+
+Deferred scope:
+
+- Schema normalization for future expiry/refresh/revocation complexity, if later justified by a reviewed migration task.
+- Gate integration and launch-mode behavior.
 
 Out of scope:
 
@@ -134,16 +139,13 @@ Out of scope:
 - Launch gate switch.
 - Proof upload.
 
-Likely files/areas:
+Implemented files/areas:
 
-- `src/lib/verification/workEmail.ts`
-- `src/lib/verification/requestFlow.ts`
-- `src/lib/verification/claimsAuth.ts`
-- `supabase/migrations`
-- verification and security-event tests
-- approved-domain docs/tests
+- `src/lib/verification/airlineEmailAccess.ts`
+- `test/verification/airlineEmailAccess.test.mts`
+- `docs/epochs/fbmvp-t02-airline-email-verification-access-state-implementation.md`
 
-Migration likely needed: yes.
+Migration likely needed: no for the helper/adapter implementation. Future schema work may still be reviewed separately if the adapter becomes insufficient.
 
 Authorization/security boundaries:
 
@@ -779,7 +781,7 @@ Rationale:
 - It aligns current visible verification copy with the pivot.
 - It preserves legacy proof ops/admin safety while making the forward product direction clear.
 
-Next ticket after `FBMVP-T01`: `FBMVP-T02 Airline-Email Verification Access State Design/Implementation`, because it creates the actual forward eligibility state that later launch gates and baseboards depend on.
+Next ticket after `FBMVP-T02`: `FBMVP-T03 Private-Testing Versus First-Base-Launch Gate Implementation`, because it consumes the forward airline-email eligibility state without mixing launch-mode work into the helper.
 
 ## 8. Validation Standards
 
