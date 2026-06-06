@@ -2,6 +2,7 @@ export const AUTH_ROUTES = {
   login: "/login",
   signup: "/signup",
   callback: "/auth/callback",
+  confirm: "/auth/confirm",
   resetPassword: "/reset-password",
   app: "/app",
   profile: "/app/profile",

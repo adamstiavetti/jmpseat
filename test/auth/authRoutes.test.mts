@@ -12,6 +12,7 @@ test("auth routes stay aligned with E03-T02", () => {
     login: "/login",
     signup: "/signup",
     callback: "/auth/callback",
+    confirm: "/auth/confirm",
     resetPassword: "/reset-password",
     app: "/app",
     profile: "/app/profile",
