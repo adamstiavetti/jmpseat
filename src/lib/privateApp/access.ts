@@ -22,6 +22,7 @@ type PrivateRouteContext = {
   hasCompletedProfile: boolean;
   launchMode: JmpseatLaunchMode;
   betaActive: boolean;
+  operatorPrivateAppAccess: boolean;
   airlineEmailAccessState: AirlineEmailAccessState;
   profileLoadError: string | null;
   betaLoadError: string | null;
@@ -29,8 +30,8 @@ type PrivateRouteContext = {
 };
 
 type PrivateAppGateResult =
-  | { kind: "allow" }
-  | { kind: "redirect"; path: string };
+  | { kind: "allow"; accessSource: "normal_gate" | "operator_internal" }
+  | { kind: "redirect"; path: string; accessSource: "blocked" };
 
 function buildPath(path: string, params: Record<string, string | null | undefined>) {
   const search = new URLSearchParams();
@@ -73,7 +74,18 @@ function hasAirlineEmailAccessForLaunchMode(context: PrivateRouteContext) {
   );
 }
 
+function hasOperatorPrivateAppAccessForLaunchMode(context: PrivateRouteContext) {
+  return (
+    context.operatorPrivateAppAccess &&
+    (context.launchMode === "private_testing" || context.launchMode === "internal_test")
+  );
+}
+
 function shouldHoldForAccess(context: PrivateRouteContext) {
+  if (hasOperatorPrivateAppAccessForLaunchMode(context)) {
+    return false;
+  }
+
   return (
     (doesLaunchModeRequireBeta(context.launchMode) &&
       (Boolean(context.betaLoadError) || !hasBetaAccessForLaunchMode(context))) ||
@@ -92,41 +104,43 @@ export function getPrivateAppGateResult({
   context: PrivateRouteContext;
 }): PrivateAppGateResult {
   if (!context.authConfigured) {
-    return { kind: "allow" };
+    return { kind: "allow", accessSource: "normal_gate" };
   }
 
   if (!context.user) {
     return {
       kind: "redirect",
       path: buildPath(PRIVATE_APP_ROUTES.login, { next: nextPath }),
+      accessSource: "blocked",
     };
   }
 
   if (routeKind === "profile") {
-    return { kind: "allow" };
+    return { kind: "allow", accessSource: "normal_gate" };
   }
 
   if (context.profileLoadError) {
     return {
       kind: "redirect",
       path: buildPath(PRIVATE_APP_ROUTES.profile, { error: context.profileLoadError }),
+      accessSource: "blocked",
     };
   }
 
   if (!context.hasCompletedProfile) {
-    return { kind: "redirect", path: PRIVATE_APP_ROUTES.profile };
+    return { kind: "redirect", path: PRIVATE_APP_ROUTES.profile, accessSource: "blocked" };
   }
 
   if (routeKind === "verification") {
-    return { kind: "allow" };
+    return { kind: "allow", accessSource: "normal_gate" };
   }
 
   if (routeKind === "access-hold") {
     if (!shouldHoldForAccess(context)) {
-      return { kind: "redirect", path: PRIVATE_APP_ROUTES.app };
+      return { kind: "redirect", path: PRIVATE_APP_ROUTES.app, accessSource: "blocked" };
     }
 
-    return { kind: "allow" };
+    return { kind: "allow", accessSource: "normal_gate" };
   }
 
   if (doesLaunchModeRequireBeta(context.launchMode) && context.betaLoadError) {
@@ -135,11 +149,16 @@ export function getPrivateAppGateResult({
       path: buildPath(PRIVATE_APP_ROUTES.accessHold, {
         error: getAccessHoldError(context),
       }),
+      accessSource: "blocked",
     };
   }
 
   if (!hasBetaAccessForLaunchMode(context)) {
-    return { kind: "redirect", path: PRIVATE_APP_ROUTES.accessHold };
+    if (hasOperatorPrivateAppAccessForLaunchMode(context)) {
+      return { kind: "allow", accessSource: "operator_internal" };
+    }
+
+    return { kind: "redirect", path: PRIVATE_APP_ROUTES.accessHold, accessSource: "blocked" };
   }
 
   if (context.airlineEmailLoadError) {
@@ -148,17 +167,26 @@ export function getPrivateAppGateResult({
       path: buildPath(PRIVATE_APP_ROUTES.accessHold, {
         error: context.airlineEmailLoadError,
       }),
+      accessSource: "blocked",
     };
   }
 
   if (!hasAirlineEmailAccessForLaunchMode(context)) {
-    return { kind: "redirect", path: PRIVATE_APP_ROUTES.accessHold };
+    if (hasOperatorPrivateAppAccessForLaunchMode(context)) {
+      return { kind: "allow", accessSource: "operator_internal" };
+    }
+
+    return { kind: "redirect", path: PRIVATE_APP_ROUTES.accessHold, accessSource: "blocked" };
   }
 
-  return { kind: "allow" };
+  return { kind: "allow", accessSource: "normal_gate" };
 }
 
 export type { PrivateRouteKind, PrivateRouteContext, PrivateAppGateResult };
+
+export function getPrivateAccessSource(gate: PrivateAppGateResult) {
+  return gate.accessSource;
+}
 
 export function getPrivateRouteAuditResult(
   gate: PrivateAppGateResult,

@@ -1,4 +1,5 @@
 import {
+  OPERATOR_PRIVATE_APP_ACCESS_MESSAGE,
   PRIVATE_SHELL_MESSAGE,
   PRIVATE_SHELL_ROUTE,
 } from "../../src/lib/privateApp/privateShellPlaceholder";
@@ -6,6 +7,7 @@ import { PrivateShellPlaceholder } from "../../src/components/privateApp/Private
 import { redirect } from "next/navigation";
 import { getCurrentAppAccessContext } from "../../src/lib/betaAccess/server";
 import {
+  getPrivateAccessSource,
   getPrivateAppGateResult,
   getPrivateRouteAuditResult,
 } from "../../src/lib/privateApp/access";
@@ -27,6 +29,10 @@ export default async function AppPlaceholder() {
     result: getPrivateRouteAuditResult(gate, context),
     metadata: {
       route_kind: "private-root",
+      access_source: getPrivateAccessSource(gate),
+      ...(getPrivateAccessSource(gate) === "operator_internal"
+        ? { operator_private_app_access: true }
+        : {}),
     },
   });
 
@@ -37,7 +43,11 @@ export default async function AppPlaceholder() {
   return (
     <PrivateShellPlaceholder
       currentPath={PRIVATE_SHELL_ROUTE}
-      message={PRIVATE_SHELL_MESSAGE}
+      message={
+        context.operatorPrivateAppAccess
+          ? OPERATOR_PRIVATE_APP_ACCESS_MESSAGE
+          : PRIVATE_SHELL_MESSAGE
+      }
     />
   );
 }

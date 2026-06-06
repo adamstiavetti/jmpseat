@@ -21,6 +21,7 @@ import {
 import { AUTH_ROUTES } from "../../../../src/lib/auth/routes";
 import { getCurrentAppAccessContext } from "../../../../src/lib/betaAccess/server";
 import {
+  getPrivateAccessSource,
   getPrivateAppGateResult,
   getPrivateRouteAuditResult,
 } from "../../../../src/lib/privateApp/access";
@@ -61,6 +62,10 @@ export default async function ApprovedDomainsPage({
     metadata: {
       route_kind: "private-child",
       section: "admin-approved-domains",
+      access_source: getPrivateAccessSource(gate),
+      ...(getPrivateAccessSource(gate) === "operator_internal"
+        ? { operator_private_app_access: true }
+        : {}),
     },
   });
 

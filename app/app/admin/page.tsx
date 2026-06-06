@@ -12,6 +12,7 @@ import {
 } from "../../../src/lib/admin/access";
 import { getCurrentAppAccessContext } from "../../../src/lib/betaAccess/server";
 import {
+  getPrivateAccessSource,
   getPrivateAppGateResult,
   getPrivateRouteAuditResult,
 } from "../../../src/lib/privateApp/access";
@@ -56,6 +57,10 @@ export default async function AdminHomePage() {
     metadata: {
       route_kind: "private-child",
       section: "admin-home",
+      access_source: getPrivateAccessSource(gate),
+      ...(getPrivateAccessSource(gate) === "operator_internal"
+        ? { operator_private_app_access: true }
+        : {}),
     },
   });
 

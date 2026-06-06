@@ -14,6 +14,7 @@ import {
 } from "../../../src/lib/betaAccess/inviteCodes";
 import { getCurrentAppAccessContext } from "../../../src/lib/betaAccess/server";
 import {
+  getPrivateAccessSource,
   getPrivateAppGateResult,
   getPrivateRouteAuditResult,
 } from "../../../src/lib/privateApp/access";
@@ -110,6 +111,10 @@ export default async function AccessHoldPage({
     metadata: {
       route_kind: "access-hold",
       beta_status: context.betaStatus,
+      access_source: getPrivateAccessSource(gate),
+      ...(getPrivateAccessSource(gate) === "operator_internal"
+        ? { operator_private_app_access: true }
+        : {}),
     },
   });
 
@@ -125,6 +130,7 @@ export default async function AccessHoldPage({
   const canShowInviteForm =
     doesLaunchModeRequireBeta(context.launchMode) &&
     !context.betaActive &&
+    !context.operatorPrivateAppAccess &&
     context.airlineEmailAccessState.airlineEmailVerified;
 
   return (

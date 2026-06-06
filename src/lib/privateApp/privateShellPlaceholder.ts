@@ -35,6 +35,17 @@ export const PRIVATE_SHELL_MESSAGE: PrivateShellMessage = {
     "This locked placeholder is product scaffolding only. It is not beta approval, worker verification, or a real community access grant.",
 };
 
+export const OPERATOR_PRIVATE_APP_ACCESS_MESSAGE: PrivateShellMessage = {
+  eyebrow: "jmpseat Internal Access",
+  title: "Internal access is active for this account.",
+  description:
+    "This account has explicit operator/internal access to the private app placeholder during private testing.",
+  detail:
+    "This access path is operational only. It does not mark this account as airline-email verified, airline-worker eligible, or generally beta-approved.",
+  disclaimer:
+    "This internal path does not grant beta to normal users or issue role, base, or restricted-board claims. The placeholder remains product scaffolding only.",
+};
+
 export const PRIVATE_SHELL_NAV_ITEMS: readonly PrivateShellNavItem[] = [
   {
     label: "Home Base",

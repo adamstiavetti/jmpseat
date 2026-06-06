@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 
 import {
+  OPERATOR_PRIVATE_APP_ACCESS_MESSAGE,
   PRIVATE_SHELL_CHILD_ROUTE_RECORD,
   PRIVATE_SHELL_MESSAGE,
   PRIVATE_SHELL_NAV_ITEMS,
@@ -24,6 +25,22 @@ test("private shell message stays honest about locked beta access", () => {
   assert.match(
     PRIVATE_SHELL_MESSAGE.detail,
     /account login and profile setup exist now/i,
+  );
+});
+
+test("operator internal access message stays separate from airline-email verification and community claims", () => {
+  assert.equal(OPERATOR_PRIVATE_APP_ACCESS_MESSAGE.eyebrow, "jmpseat Internal Access");
+  assert.match(
+    OPERATOR_PRIVATE_APP_ACCESS_MESSAGE.description,
+    /explicit operator\/internal access/i,
+  );
+  assert.match(
+    OPERATOR_PRIVATE_APP_ACCESS_MESSAGE.detail,
+    /does not mark this account as airline-email verified/i,
+  );
+  assert.match(
+    OPERATOR_PRIVATE_APP_ACCESS_MESSAGE.disclaimer,
+    /does not grant beta to normal users or issue role, base, or restricted-board claims/i,
   );
 });
 
@@ -95,6 +112,10 @@ test("public and private route source files stay separated", () => {
   assert.match(publicRouteSource, /Join the private beta waitlist\./);
   assert.doesNotMatch(publicRouteSource, /PrivateShellPlaceholder/);
   assert.match(privateRootSource, /PrivateShellPlaceholder/);
+  assert.match(privateRootSource, /context\.operatorPrivateAppAccess/);
+  assert.match(privateRootSource, /access_source/);
+  assert.match(privateRootSource, /operator_private_app_access/);
+  assert.doesNotMatch(privateRootSource, /operator_uuid|operator_email/i);
   assert.doesNotMatch(privateRootSource, /Join the private beta waitlist\./);
   assert.doesNotMatch(privateChildSource, /Join the private beta waitlist\./);
   assert.doesNotMatch(privateRootSource, /fetch\(|axios|supabase|prisma|api\//);

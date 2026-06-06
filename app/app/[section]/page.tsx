@@ -2,6 +2,7 @@ import { notFound, redirect } from "next/navigation";
 import { PrivateShellPlaceholder } from "../../../src/components/privateApp/PrivateShellPlaceholder";
 import { getCurrentAppAccessContext } from "../../../src/lib/betaAccess/server";
 import {
+  getPrivateAccessSource,
   getPrivateAppGateResult,
   getPrivateRouteAuditResult,
 } from "../../../src/lib/privateApp/access";
@@ -40,6 +41,10 @@ export default async function PrivateRoutePlaceholderPage({
     metadata: {
       route_kind: "private-child",
       section,
+      access_source: getPrivateAccessSource(gate),
+      ...(getPrivateAccessSource(gate) === "operator_internal"
+        ? { operator_private_app_access: true }
+        : {}),
     },
   });
 

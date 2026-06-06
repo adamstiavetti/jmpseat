@@ -40,12 +40,25 @@ function createContext(overrides: Partial<Parameters<typeof getPrivateAppGateRes
     hasCompletedProfile: true,
     launchMode: "private_testing" as const,
     betaActive: true,
+    operatorPrivateAppAccess: false,
     airlineEmailAccessState: VERIFIED_AIRLINE_EMAIL,
     profileLoadError: null,
     betaLoadError: null,
     airlineEmailLoadError: null,
     ...overrides,
   };
+}
+
+function expectNormalAllow() {
+  return { kind: "allow", accessSource: "normal_gate" as const };
+}
+
+function expectOperatorAllow() {
+  return { kind: "allow", accessSource: "operator_internal" as const };
+}
+
+function expectBlockedRedirect(path: string) {
+  return { kind: "redirect", path, accessSource: "blocked" as const };
 }
 
 test("launch mode helper defaults safely and keeps canonical mode names explicit", () => {
@@ -73,7 +86,7 @@ test("shared private-app gate sends signed-out users to login", () => {
       nextPath: "/app",
       context: createContext({ user: null }),
     }),
-    { kind: "redirect", path: "/login?next=%2Fapp" },
+    expectBlockedRedirect("/login?next=%2Fapp"),
   );
 });
 
@@ -84,7 +97,7 @@ test("shared private-app gate sends incomplete profiles to /app/profile", () => 
       nextPath: "/app/home",
       context: createContext({ hasCompletedProfile: false, betaActive: true }),
     }),
-    { kind: "redirect", path: "/app/profile" },
+    expectBlockedRedirect("/app/profile"),
   );
 });
 
@@ -95,7 +108,7 @@ test("verification remedy route still requires login and profile completion", ()
       nextPath: "/app/verification",
       context: createContext({ user: null }),
     }),
-    { kind: "redirect", path: "/login?next=%2Fapp%2Fverification" },
+    expectBlockedRedirect("/login?next=%2Fapp%2Fverification"),
   );
 
   assert.deepEqual(
@@ -104,7 +117,7 @@ test("verification remedy route still requires login and profile completion", ()
       nextPath: "/app/verification",
       context: createContext({ hasCompletedProfile: false }),
     }),
-    { kind: "redirect", path: "/app/profile" },
+    expectBlockedRedirect("/app/profile"),
   );
 });
 
@@ -118,7 +131,7 @@ test("verification remedy route is reachable before airline-email access is appr
         airlineEmailAccessState: NOT_VERIFIED_AIRLINE_EMAIL,
       }),
     }),
-    { kind: "allow" },
+    expectNormalAllow(),
   );
 
   assert.deepEqual(
@@ -130,7 +143,7 @@ test("verification remedy route is reachable before airline-email access is appr
         airlineEmailAccessState: NOT_VERIFIED_AIRLINE_EMAIL,
       }),
     }),
-    { kind: "redirect", path: "/app/access-hold" },
+    expectBlockedRedirect("/app/access-hold"),
   );
 });
 
@@ -141,7 +154,7 @@ test("shared private-app gate sends non-active beta users to /app/access-hold", 
       nextPath: "/app/home",
       context: createContext({ betaActive: false }),
     }),
-    { kind: "redirect", path: "/app/access-hold" },
+    expectBlockedRedirect("/app/access-hold"),
   );
 });
 
@@ -156,7 +169,7 @@ test("private testing requires active beta and verified airline-email access", (
         airlineEmailAccessState: NOT_VERIFIED_AIRLINE_EMAIL,
       }),
     }),
-    { kind: "redirect", path: "/app/access-hold" },
+    expectBlockedRedirect("/app/access-hold"),
   );
 
   assert.deepEqual(
@@ -169,7 +182,7 @@ test("private testing requires active beta and verified airline-email access", (
         airlineEmailAccessState: VERIFIED_AIRLINE_EMAIL,
       }),
     }),
-    { kind: "redirect", path: "/app/access-hold" },
+    expectBlockedRedirect("/app/access-hold"),
   );
 });
 
@@ -184,7 +197,7 @@ test("first-base launch allows verified launched-population users without manual
         airlineEmailAccessState: VERIFIED_AIRLINE_EMAIL,
       }),
     }),
-    { kind: "allow" },
+    expectNormalAllow(),
   );
 });
 
@@ -199,7 +212,7 @@ test("broader launch still requires airline-email verification while bypassing b
         airlineEmailAccessState: VERIFIED_AIRLINE_EMAIL,
       }),
     }),
-    { kind: "allow" },
+    expectNormalAllow(),
   );
 
   assert.deepEqual(
@@ -212,7 +225,7 @@ test("broader launch still requires airline-email verification while bypassing b
         airlineEmailAccessState: NOT_VERIFIED_AIRLINE_EMAIL,
       }),
     }),
-    { kind: "redirect", path: "/app/access-hold" },
+    expectBlockedRedirect("/app/access-hold"),
   );
 });
 
@@ -227,7 +240,53 @@ test("internal test mode stays private-testing strict", () => {
         airlineEmailAccessState: VERIFIED_AIRLINE_EMAIL,
       }),
     }),
-    { kind: "redirect", path: "/app/access-hold" },
+    expectBlockedRedirect("/app/access-hold"),
+  );
+});
+
+test("explicit operator access can enter the private app during private testing without airline-email or beta approval", () => {
+  assert.deepEqual(
+    getPrivateAppGateResult({
+      routeKind: "private-child",
+      nextPath: "/app/home",
+      context: createContext({
+        launchMode: "private_testing",
+        betaActive: false,
+        operatorPrivateAppAccess: true,
+        airlineEmailAccessState: NOT_VERIFIED_AIRLINE_EMAIL,
+      }),
+    }),
+    expectOperatorAllow(),
+  );
+
+  assert.deepEqual(
+    getPrivateAppGateResult({
+      routeKind: "private-child",
+      nextPath: "/app/home",
+      context: createContext({
+        launchMode: "internal_test",
+        betaActive: false,
+        operatorPrivateAppAccess: true,
+        airlineEmailAccessState: NOT_VERIFIED_AIRLINE_EMAIL,
+      }),
+    }),
+    expectOperatorAllow(),
+  );
+});
+
+test("operator private-app access does not change normal first-base or broader-launch airline-email gates", () => {
+  assert.deepEqual(
+    getPrivateAppGateResult({
+      routeKind: "private-child",
+      nextPath: "/app/home",
+      context: createContext({
+        launchMode: "first_base_launch",
+        betaActive: false,
+        operatorPrivateAppAccess: true,
+        airlineEmailAccessState: NOT_VERIFIED_AIRLINE_EMAIL,
+      }),
+    }),
+    expectBlockedRedirect("/app/access-hold"),
   );
 });
 
@@ -251,6 +310,7 @@ test("airline-email access storage failures fail closed without leaking internal
     {
       kind: "redirect",
       path: "/app/access-hold?error=Airline-email+verification+storage+is+not+ready+yet.+Apply+the+verification+foundation+migration+before+using+airline-email+app+access+gates.",
+      accessSource: "blocked",
     },
   );
 });
@@ -262,7 +322,7 @@ test("shared private-app gate allows active-beta users into known private routes
       nextPath: "/app/home",
       context: createContext(),
     }),
-    { kind: "allow" },
+    expectNormalAllow(),
   );
 });
 
@@ -273,7 +333,7 @@ test("profile route stays available to signed-in users even if beta is not activ
       nextPath: "/app/profile",
       context: createContext({ betaActive: false }),
     }),
-    { kind: "allow" },
+    expectNormalAllow(),
   );
 });
 
@@ -284,7 +344,22 @@ test("access-hold redirects active beta users back to /app", () => {
       nextPath: "/app/access-hold",
       context: createContext({ betaActive: true }),
     }),
-    { kind: "redirect", path: "/app" },
+    expectBlockedRedirect("/app"),
+  );
+});
+
+test("access-hold redirects operator private-app access back to /app without implying airline-email verification", () => {
+  assert.deepEqual(
+    getPrivateAppGateResult({
+      routeKind: "access-hold",
+      nextPath: "/app/access-hold",
+      context: createContext({
+        betaActive: false,
+        operatorPrivateAppAccess: true,
+        airlineEmailAccessState: NOT_VERIFIED_AIRLINE_EMAIL,
+      }),
+    }),
+    expectBlockedRedirect("/app"),
   );
 });
 
@@ -298,7 +373,7 @@ test("access-hold remains available for active beta users who still need airline
         airlineEmailAccessState: NOT_VERIFIED_AIRLINE_EMAIL,
       }),
     }),
-    { kind: "allow" },
+    expectNormalAllow(),
   );
 });
 
@@ -313,7 +388,7 @@ test("access-hold redirects first-base launch users only after airline-email acc
         airlineEmailAccessState: VERIFIED_AIRLINE_EMAIL,
       }),
     }),
-    { kind: "redirect", path: "/app" },
+    expectBlockedRedirect("/app"),
   );
 });
 
@@ -324,7 +399,7 @@ test("missing beta migration does not silently grant child-route access", () => 
       nextPath: "/app/home",
       context: createContext({ betaLoadError: "Beta storage missing", betaActive: false }),
     }),
-    { kind: "redirect", path: "/app/access-hold?error=Beta+storage+missing" },
+    expectBlockedRedirect("/app/access-hold?error=Beta+storage+missing"),
   );
 });
 
@@ -335,6 +410,9 @@ test("private child route resolves access before rendering placeholders", () => 
   );
 
   assert.match(source, /getPrivateAppGateResult|resolve/i);
+  assert.match(source, /access_source/);
+  assert.match(source, /operator_private_app_access/);
+  assert.doesNotMatch(source, /operator_uuid|operator_email|current_user_operator_scopes.*metadata/i);
   assert.match(source, /redirect\(/i);
 });
 
@@ -366,6 +444,8 @@ test("server access context derives airline-email state without loading proof st
 
   assert.match(source, /getCurrentAirlineEmailAccessState/);
   assert.match(source, /JMPSEAT_LAUNCH_MODE|getJmpseatLaunchMode/);
+  assert.match(source, /current_user_operator_scopes/);
+  assert.match(source, /operatorPrivateAppAccess/);
   assert.match(source, /request_id, evidence_type, status, uploaded_at, metadata/);
   assert.doesNotMatch(source, /storage_bucket|storage_path|signedUrl|publicUrl|proofFile|objectKey|SUPABASE_SERVICE_ROLE/i);
 });

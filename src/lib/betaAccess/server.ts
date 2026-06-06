@@ -1,5 +1,6 @@
 import type { User } from "@supabase/supabase-js";
 
+import { filterOperatorScopes } from "../admin/access";
 import { AUTH_ROUTES, sanitizeNextPath } from "../auth/routes";
 import { getPrivateAppGateResult } from "../privateApp/access";
 import { getJmpseatLaunchMode, type JmpseatLaunchMode } from "../privateApp/launchMode";
@@ -84,6 +85,7 @@ export type CurrentAppAccessContext = {
   launchMode: JmpseatLaunchMode;
   betaStatus: BetaAccessStatus;
   betaActive: boolean;
+  operatorPrivateAppAccess: boolean;
   airlineEmailAccessState: AirlineEmailAccessState;
   profileLoadError: string | null;
   betaLoadError: string | null;
@@ -135,6 +137,7 @@ export async function getCurrentAppAccessContext(): Promise<CurrentAppAccessCont
       launchMode,
       betaStatus: "none",
       betaActive: false,
+      operatorPrivateAppAccess: false,
       airlineEmailAccessState: getUnavailableAirlineEmailAccessState(),
       profileLoadError: null,
       betaLoadError: null,
@@ -158,6 +161,7 @@ export async function getCurrentAppAccessContext(): Promise<CurrentAppAccessCont
       launchMode,
       betaStatus: "none",
       betaActive: false,
+      operatorPrivateAppAccess: false,
       airlineEmailAccessState: getUnavailableAirlineEmailAccessState(),
       profileLoadError: userError?.message ?? null,
       betaLoadError: null,
@@ -172,6 +176,7 @@ export async function getCurrentAppAccessContext(): Promise<CurrentAppAccessCont
     verificationRequestsResult,
     verificationEvidenceResult,
     verificationClaimsResult,
+    operatorScopesResult,
   ] = await Promise.all([
     supabase
       .from("profiles")
@@ -208,7 +213,12 @@ export async function getCurrentAppAccessContext(): Promise<CurrentAppAccessCont
       .eq("user_id", user.id)
       .order("approved_at", { ascending: false })
       .returns<QueryVerificationClaimRow[]>(),
+    supabase.rpc("current_user_operator_scopes"),
   ]);
+
+  const operatorScopes = filterOperatorScopes(
+    Array.isArray(operatorScopesResult.data) ? operatorScopesResult.data : [],
+  );
 
   const profileCompletion = getProfileCompletionState(profileResult.data);
   const betaStatus = betaResult.error ? "none" : getBetaAccessState(betaResult.data);
@@ -239,6 +249,7 @@ export async function getCurrentAppAccessContext(): Promise<CurrentAppAccessCont
     launchMode,
     betaStatus,
     betaActive: isBetaAccessActive(betaStatus),
+    operatorPrivateAppAccess: operatorScopes.length > 0,
     airlineEmailAccessState,
     profileLoadError: profileResult.error
       ? "Profile storage is not ready yet. Apply the profiles migration to this Supabase project before using account profiles."
