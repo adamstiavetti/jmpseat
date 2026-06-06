@@ -85,9 +85,9 @@ export default async function VerificationPage({ searchParams }: VerificationPag
 
   return (
     <AuthCard
-      eyebrow="First-Base Access Planning"
+      eyebrow="Airline employee email"
       title="Airline-email access status"
-      description="jmpseat is moving general app eligibility toward confirmed approved airline employee email. Badge, document, and proof upload are frozen as forward access paths."
+      description="jmpseat app access uses confirmed approved airline employee email as the eligibility credential. Badge, document, and proof upload are frozen as forward access paths."
       error={searchError ?? verificationContext.loadError ?? undefined}
       message={message}
       footer={
@@ -168,9 +168,9 @@ export default async function VerificationPage({ searchParams }: VerificationPag
             login email, and your employee email is not public.
           </p>
           <p className={styles.sectionText}>
-            This request path tracks airline-email eligibility foundations only.
-            It does not implement the launch gate, does not grant access
-            automatically, and does not prove role, base, or restricted-board
+            App entry now checks your profile, airline-email eligibility, and
+            beta access when private testing requires it. Airline-email
+            eligibility does not grant role, base, or restricted-board
             membership.
           </p>
           <p className={styles.sectionText}>

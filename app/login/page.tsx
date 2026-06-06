@@ -21,9 +21,9 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
 
   return (
     <AuthCard
-      eyebrow="Epoch 03 Auth"
+      eyebrow="jmpseat account"
       title="Log in"
-      description="Sign in to your jmpseat account. Auth proves account control only. It does not equal beta approval or worker verification."
+      description="Sign in to your jmpseat account. Airline employee email verification is required for app access, and closed beta/private testing may also require a beta invite code."
       error={error}
       message={message}
       footer={

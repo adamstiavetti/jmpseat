@@ -21,9 +21,16 @@ test("auth pages and callback route exist", () => {
   );
 
   assert.match(login, /login/i);
+  assert.match(login, /airline employee email verification is required/i);
+  assert.match(login, /closed beta/i);
+  assert.match(login, /invite code/i);
+  assert.doesNotMatch(login, /publicly open|open to everyone|invite code alone grants access/i);
   assert.match(signup, /signup/i);
-  assert.match(signup, /does not equal beta approval/i);
-  assert.match(signup, /does not equal worker verification/i);
+  assert.match(signup, /login email can be separate from your airline employee email/i);
+  assert.match(signup, /airline employee email verification is required/i);
+  assert.match(signup, /closed beta/i);
+  assert.match(signup, /invite code/i);
+  assert.doesNotMatch(signup, /publicly open|open to everyone|invite code alone grants access/i);
   assert.match(reset, /reset/i);
   assert.match(callback, /exchangeCodeForSession|redirect/i);
 });

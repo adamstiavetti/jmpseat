@@ -20,9 +20,9 @@ export default async function SignupPage({ searchParams }: SignupPageProps) {
 
   return (
     <AuthCard
-      eyebrow="Epoch 03 Auth"
+      eyebrow="jmpseat account"
       title="Sign up"
-      description="Create a jmpseat account for web auth. Account creation does not equal beta approval. Account creation does not equal worker verification."
+      description="Create a jmpseat login account. Airline employee email verification is required for app access, and closed beta/private testing may also require a beta invite code."
       error={error}
       message={message}
       footer={
@@ -62,7 +62,9 @@ export default async function SignupPage({ searchParams }: SignupPageProps) {
         </div>
 
         <p className={styles.hint}>
-          Use any email you want for account login. Beta approval and airline-worker verification happen through separate later flows.
+          Your login email can be separate from your airline employee email.
+          An invite code helps only when private testing requires beta access;
+          it does not replace airline-email verification.
         </p>
 
         <button className={styles.button} type="submit">

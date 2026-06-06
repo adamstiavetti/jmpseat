@@ -294,9 +294,13 @@ test("access-hold shows invite redemption only after airline-email verification 
   );
 
   assert.match(source, /redeemBetaInviteCodeAction/);
+  assert.match(source, /doesLaunchModeRequireBeta\(context\.launchMode\)/);
+  assert.match(source, /!context\.betaActive/);
   assert.match(source, /airlineEmailAccessState\.airlineEmailVerified/);
   assert.match(source, /Invite codes control private-testing capacity only/i);
   assert.match(source, /do not replace airline-email verification/i);
+  assert.match(source, /first-base or broader launch/i);
+  assert.match(source, /does\s+not\s+require\s+a\s+beta\s+invite\s+code/i);
   assert.doesNotMatch(
     source,
     /type="file"|accept=|storage_path|signed_url|proof_file|badge_file/i,

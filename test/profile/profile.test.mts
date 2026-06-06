@@ -56,9 +56,11 @@ test("dedicated profile onboarding page exists and keeps verification separate",
   );
 
   assert.match(source, /Complete your profile/i);
+  assert.match(source, /minimal onboarding/i);
   assert.match(source, /self-declared/i);
   assert.match(source, /not verified claims yet/i);
   assert.match(source, /does not grant beta access/i);
+  assert.match(source, /airline\s+employee\s+email\s+verification\s+remains\s+separate/i);
   assert.match(source, /does not\s+verify\s+airline-worker status/i);
   assert.doesNotMatch(source, /badge upload|storage|reviewer|worker verification request/i);
 });

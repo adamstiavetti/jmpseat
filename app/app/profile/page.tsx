@@ -68,15 +68,16 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
 
   return (
     <AuthCard
-      eyebrow="Epoch 03 Profile"
+      eyebrow="Profile onboarding"
       title="Complete your profile"
-      description="Add the minimum self-declared account details for private-app onboarding. These fields are not verified claims yet."
+      description="Add the minimum self-declared account details for minimal onboarding. These fields are not verified claims yet."
       error={error}
       message={message}
       footer={
         <p className={styles.hint}>
           Profile completion does not equal beta approval, worker verification,
-          or airline/base/role-specific access.
+          or airline/base/role-specific access. Airline employee email
+          verification remains separate.
         </p>
       }
     >
@@ -158,7 +159,8 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
           Claimed airline, role, and base are self-declared profile details for
           onboarding only. They are not verified claims yet. Completing this
           profile does not grant beta access. Completing this profile does not
-          verify airline-worker status.
+          verify airline-worker status. Airline employee email verification
+          remains separate.
         </p>
 
         <button className={styles.button} type="submit">

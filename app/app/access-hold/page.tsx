@@ -140,7 +140,8 @@ export default async function AccessHoldPage({
         <p className={styles.hint}>
           We will notify you when private-testing beta access is approved.
           Beta access is temporary rollout control and remains separate from
-          airline-email eligibility.
+          airline-email eligibility. First-base or broader launch access does
+          not require a beta invite code when beta is bypassed.
         </p>
       }
     >

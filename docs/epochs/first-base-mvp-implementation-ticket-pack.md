@@ -48,7 +48,7 @@ Recommended order:
 2. `FBMVP-T02` Airline-email verification access state design/implementation. Helper implementation complete and merged; see `docs/epochs/fbmvp-t02-airline-email-verification-access-state-design.md` and `docs/epochs/fbmvp-t02-airline-email-verification-access-state-implementation.md`.
 3. `FBMVP-T03` Private-testing versus first-base-launch gate implementation. Implemented and merged; see `docs/epochs/fbmvp-t03-private-testing-versus-first-base-launch-gate-implementation.md`.
 4. `FBMVP-T03A` Beta invite-code foundation. Implemented and runtime-proven on the linked Supabase runtime; see `docs/strategy/beta-invite-code-foundation-decision.md`, `docs/epochs/fbmvp-t03a-beta-invite-code-foundation-implementation.md`, and `docs/ops/beta-invite-code-foundation-runtime-pass.md`.
-5. `FBMVP-T04` Onboarding/signup flow update.
+5. `FBMVP-T04` Onboarding/signup flow update. Implemented and ready for review; see `docs/epochs/fbmvp-t04-onboarding-signup-flow-update.md`.
 6. `FBMVP-T05` Base and board data model design.
 7. `FBMVP-T06` Board membership and access request model.
 8. `FBMVP-T07` Community-admin role model.
@@ -293,14 +293,17 @@ Stop-before-commit/review requirements:
 
 ### FBMVP-T04 Onboarding/Signup Flow Update
 
+Status: implemented and ready for review. See `docs/epochs/fbmvp-t04-onboarding-signup-flow-update.md`.
+
 Goal: Update onboarding and signup so airline employee email is collected or verified as the eligibility credential while login credentials remain stable account credentials.
 
-Scope:
+Implemented scope:
 
-- Collect or verify airline employee email.
-- Support login email and airline employee email being distinct.
-- Update copy and access-hold states.
-- Keep profile requirements minimal.
+- Updated signup/login copy so account credentials, airline-email eligibility, and closed beta invite-code requirements are legible.
+- Updated access-hold copy while preserving existing launch-mode and invite-code gate behavior.
+- Updated verification page copy to reflect the implemented gate model.
+- Updated profile copy to keep self-declared profile fields separate from airline employee email verification.
+- Kept profile requirements minimal and did not add a migration.
 
 Out of scope:
 
@@ -317,7 +320,7 @@ Likely files/areas:
 - verification request flow modules
 - profile/auth tests
 
-Migration likely needed: possibly, depending on whether separate airline-email fields already exist.
+Migration created: no.
 
 Authorization/security boundaries:
 
@@ -341,6 +344,10 @@ Stop-before-commit/review requirements:
 
 - Stop before commit after implementation and validation.
 - Do not deploy or change live rollout copy without review.
+
+Follow-up before founder/Yuri Vercel testing or public-ish waitlist login entry:
+
+- Supabase confirmation email template / custom SMTP / auth email branding polish.
 
 ### FBMVP-T05 Base And Board Data Model Design
 
@@ -852,7 +859,7 @@ Rationale:
 
 Next ticket after `FBMVP-T03`: `FBMVP-T03A Beta Invite-Code Foundation`, because private testing still needs a clear batch/single-use invite-code model before onboarding and access-hold copy depend on invite redemption behavior.
 
-Next implementation ticket after `FBMVP-T03A`: `FBMVP-T04 Onboarding/Signup Flow Update`, because the launch-mode gate now consumes airline-email eligibility and the next user-facing gap is collecting and verifying the airline employee email credential during signup/onboarding.
+Next auth-flow task after `FBMVP-T04`: Supabase confirmation email template / custom SMTP / auth email branding polish, because the user-facing flow now describes the correct gates but confirmation/reset emails still need jmpseat-branded trust polish before founder/Yuri Vercel testing or public-ish waitlist login entry.
 
 ## 8. Validation Standards
 

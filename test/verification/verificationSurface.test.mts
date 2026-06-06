@@ -115,8 +115,8 @@ test("/app/verification copy freezes proof upload while preserving airline-email
 
   assert.match(source, /confirmed approved airline employee email/i);
   assert.match(source, /employee email is not public/i);
-  assert.match(source, /does not implement the launch gate/i);
-  assert.match(source, /does not grant access\s+automatically/i);
+  assert.match(source, /app\s+entry\s+now\s+checks\s+your\s+profile,\s+airline-email\s+eligibility,\s+and\s+beta\s+access\s+when\s+private\s+testing\s+requires\s+it/i);
+  assert.match(source, /does\s+not\s+grant\s+role,\s+base,\s+or\s+restricted-board\s+membership/i);
   assert.match(source, /approved airline-controlled domain/i);
   assert.match(source, /only approved airline-controlled domains are currently supported/i);
   assert.match(source, /submit work-email verification request/i);
