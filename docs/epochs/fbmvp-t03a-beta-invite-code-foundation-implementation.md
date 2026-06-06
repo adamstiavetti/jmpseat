@@ -12,7 +12,7 @@ FBMVP-T03A adds the beta invite-code foundation for controlled private testing.
 
 Invite codes are private-testing capacity controls only. They do not prove airline eligibility, do not bypass airline-email verification, do not grant restricted-board access, and are not required for `first_base_launch` or `broader_launch` general access.
 
-Runtime validation remains pending until review, merge, migration apply, and a dedicated runtime proof pass.
+Runtime validation is complete for the linked Supabase runtime. See `docs/ops/beta-invite-code-foundation-runtime-pass.md`.
 
 ## Migration
 
@@ -32,7 +32,7 @@ Plaintext invite codes are not stored in the database. The database stores only 
 
 Redeemed invite-code rows preserve useful redemption history even if the redeeming auth user is later deleted. `redeemed_by_user_id` uses `on delete set null`, so it may become null during auth-user cleanup. `redeemed_at` and `redeemed_count` remain the durable redemption indicators, and active/unredeemed rows must still have no redemption user, timestamp, or count.
 
-The migration was not applied remotely in this implementation task.
+The migration has been applied and runtime-proven on the linked Supabase runtime. The runtime proof is recorded in `docs/ops/beta-invite-code-foundation-runtime-pass.md`.
 
 ## Generation Behavior
 
@@ -166,11 +166,11 @@ Focused validation for this branch should include:
 - `npm run build`
 - `git diff --check`
 
-Runtime validation is pending after review, merge, migration apply, and safe runtime proof.
+Runtime validation is complete for the linked Supabase runtime. Production deployment/runtime validation remains separate if this pass was performed against local/dev runtime infrastructure.
 
 ## Next Ticket
 
-Recommended next implementation ticket after review, merge, migration apply, and runtime proof:
+Recommended next implementation ticket after runtime-proof review:
 
 - `FBMVP-T04 Onboarding/Signup Flow Update`
 

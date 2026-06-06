@@ -47,7 +47,7 @@ Recommended order:
 1. `FBMVP-T01` Freeze user-facing proof verification surfaces. Implemented and merged; see `docs/epochs/fbmvp-t01-freeze-user-facing-proof-verification-surfaces.md`.
 2. `FBMVP-T02` Airline-email verification access state design/implementation. Helper implementation complete and merged; see `docs/epochs/fbmvp-t02-airline-email-verification-access-state-design.md` and `docs/epochs/fbmvp-t02-airline-email-verification-access-state-implementation.md`.
 3. `FBMVP-T03` Private-testing versus first-base-launch gate implementation. Implemented and merged; see `docs/epochs/fbmvp-t03-private-testing-versus-first-base-launch-gate-implementation.md`.
-4. `FBMVP-T03A` Beta invite-code foundation. Implementation complete pending review/runtime proof; see `docs/strategy/beta-invite-code-foundation-decision.md` and `docs/epochs/fbmvp-t03a-beta-invite-code-foundation-implementation.md`.
+4. `FBMVP-T03A` Beta invite-code foundation. Implemented and runtime-proven on the linked Supabase runtime; see `docs/strategy/beta-invite-code-foundation-decision.md`, `docs/epochs/fbmvp-t03a-beta-invite-code-foundation-implementation.md`, and `docs/ops/beta-invite-code-foundation-runtime-pass.md`.
 5. `FBMVP-T04` Onboarding/signup flow update.
 6. `FBMVP-T05` Base and board data model design.
 7. `FBMVP-T06` Board membership and access request model.
@@ -227,7 +227,7 @@ Stop-before-commit/review requirements:
 
 ### FBMVP-T03A Beta Invite-Code Foundation
 
-Status: implementation complete pending review/runtime proof. See `docs/strategy/beta-invite-code-foundation-decision.md` and `docs/epochs/fbmvp-t03a-beta-invite-code-foundation-implementation.md`.
+Status: implemented and runtime-proven on the linked Supabase runtime; runtime-proof review pending. See `docs/strategy/beta-invite-code-foundation-decision.md`, `docs/epochs/fbmvp-t03a-beta-invite-code-foundation-implementation.md`, and `docs/ops/beta-invite-code-foundation-runtime-pass.md`.
 
 Goal: Implement the private-testing beta invite-code foundation before onboarding/signup work depends on invite-code copy, access-hold behavior, or beta-access grant semantics.
 
@@ -262,7 +262,7 @@ Implemented files/areas:
 - `app/app/access-hold/page.tsx`
 - beta access and private-app access tests
 
-Migration created: yes. It remains unapplied until a separate reviewed migration-apply/runtime-validation task.
+Migration created and applied to the linked Supabase runtime. Runtime validation is recorded in `docs/ops/beta-invite-code-foundation-runtime-pass.md`.
 
 Authorization/security boundaries:
 
