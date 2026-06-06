@@ -5,6 +5,7 @@ const PRIVATE_APP_ROUTES = {
   login: "/login",
   app: "/app",
   profile: "/app/profile",
+  verification: "/app/verification",
   accessHold: "/app/access-hold",
 } as const;
 
@@ -12,6 +13,7 @@ type PrivateRouteKind =
   | "private-root"
   | "private-child"
   | "profile"
+  | "verification"
   | "access-hold";
 
 type PrivateRouteContext = {
@@ -113,6 +115,10 @@ export function getPrivateAppGateResult({
 
   if (!context.hasCompletedProfile) {
     return { kind: "redirect", path: PRIVATE_APP_ROUTES.profile };
+  }
+
+  if (routeKind === "verification") {
+    return { kind: "allow" };
   }
 
   if (routeKind === "access-hold") {

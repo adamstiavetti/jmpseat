@@ -88,6 +88,52 @@ test("shared private-app gate sends incomplete profiles to /app/profile", () => 
   );
 });
 
+test("verification remedy route still requires login and profile completion", () => {
+  assert.deepEqual(
+    getPrivateAppGateResult({
+      routeKind: "verification",
+      nextPath: "/app/verification",
+      context: createContext({ user: null }),
+    }),
+    { kind: "redirect", path: "/login?next=%2Fapp%2Fverification" },
+  );
+
+  assert.deepEqual(
+    getPrivateAppGateResult({
+      routeKind: "verification",
+      nextPath: "/app/verification",
+      context: createContext({ hasCompletedProfile: false }),
+    }),
+    { kind: "redirect", path: "/app/profile" },
+  );
+});
+
+test("verification remedy route is reachable before airline-email access is approved", () => {
+  assert.deepEqual(
+    getPrivateAppGateResult({
+      routeKind: "verification",
+      nextPath: "/app/verification",
+      context: createContext({
+        betaActive: false,
+        airlineEmailAccessState: NOT_VERIFIED_AIRLINE_EMAIL,
+      }),
+    }),
+    { kind: "allow" },
+  );
+
+  assert.deepEqual(
+    getPrivateAppGateResult({
+      routeKind: "private-child",
+      nextPath: "/app/home",
+      context: createContext({
+        betaActive: false,
+        airlineEmailAccessState: NOT_VERIFIED_AIRLINE_EMAIL,
+      }),
+    }),
+    { kind: "redirect", path: "/app/access-hold" },
+  );
+});
+
 test("shared private-app gate sends non-active beta users to /app/access-hold", () => {
   assert.deepEqual(
     getPrivateAppGateResult({

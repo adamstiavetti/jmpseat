@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import Link from "next/link";
 
 import { AuthCard } from "../../../src/components/auth/AuthCard";
 import styles from "../../../src/components/auth/auth.module.css";
@@ -175,10 +176,15 @@ export default async function AccessHoldPage({
       ) : null}
 
       {!context.airlineEmailAccessState.airlineEmailVerified ? (
-        <p className={styles.hint}>
-          Beta invite codes do not replace airline-email verification. Confirm
-          an approved airline employee email before redeeming a code.
-        </p>
+        <div className={styles.form}>
+          <p className={styles.hint}>
+            Beta invite codes do not replace airline-email verification. Confirm
+            an approved airline employee email before redeeming a code.
+          </p>
+          <Link className={styles.button} href={AUTH_ROUTES.verification}>
+            Verify airline employee email
+          </Link>
+        </div>
       ) : null}
 
       <p className={styles.hint}>

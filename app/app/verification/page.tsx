@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { AuthCard } from "../../../src/components/auth/AuthCard";
 import authStyles from "../../../src/components/auth/auth.module.css";
 import styles from "./verification.module.css";
+import { AUTH_ROUTES } from "../../../src/lib/auth/routes";
 import { getCurrentAppAccessContext } from "../../../src/lib/betaAccess/server";
 import {
   getPrivateAppGateResult,
@@ -53,18 +54,18 @@ export default async function VerificationPage({ searchParams }: VerificationPag
 
   const accessContext = await getCurrentAppAccessContext();
   const gate = getPrivateAppGateResult({
-    routeKind: "private-child",
-    nextPath: "/app/verification",
+    routeKind: "verification",
+    nextPath: AUTH_ROUTES.verification,
     context: accessContext,
   });
 
   await recordSecurityEvent({
     userId: accessContext.user?.id,
     eventType: getPrivateAccessEventType(gate),
-    route: "/app/verification",
+    route: AUTH_ROUTES.verification,
     result: getPrivateRouteAuditResult(gate, accessContext),
     metadata: {
-      route_kind: "private-child",
+      route_kind: "verification",
       section: "verification",
     },
   });

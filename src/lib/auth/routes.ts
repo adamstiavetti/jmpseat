@@ -5,6 +5,7 @@ export const AUTH_ROUTES = {
   resetPassword: "/reset-password",
   app: "/app",
   profile: "/app/profile",
+  verification: "/app/verification",
   accessHold: "/app/access-hold",
   accessRestricted: "/app/access-restricted",
 } as const;

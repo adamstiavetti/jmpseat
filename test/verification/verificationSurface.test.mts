@@ -135,3 +135,30 @@ test("/app/verification copy freezes proof upload while preserving airline-email
   assert.doesNotMatch(source, /employee IDs|badge numbers|barcodes|QR codes|crew hotel info/i);
   assert.doesNotMatch(source, /public url|download button|automatic approval|openai|ai pre-check/i);
 });
+
+test("/app/verification is configured as the airline-email remedy route", () => {
+  const source = readFileSync(
+    new URL("../../app/app/verification/page.tsx", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(source, /routeKind:\s*"verification"/);
+  assert.match(source, /AUTH_ROUTES\.verification/);
+  assert.doesNotMatch(source, /routeKind:\s*"private-child"/);
+});
+
+test("access-hold links missing airline-email users to verification before invite redemption", () => {
+  const source = readFileSync(
+    new URL("../../app/app/access-hold/page.tsx", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(source, /AUTH_ROUTES\.verification/);
+  assert.match(source, /Verify airline employee email/);
+  assert.match(source, /Beta invite codes do not replace airline-email verification/);
+  assert.match(source, /context\.airlineEmailAccessState\.airlineEmailVerified/);
+  assert.doesNotMatch(source, /submitRedactedProofVerificationAction/i);
+  assert.doesNotMatch(source, /encType="multipart\/form-data"/i);
+  assert.doesNotMatch(source, /name="proof_file"/i);
+  assert.doesNotMatch(source, /type="file"/i);
+});
