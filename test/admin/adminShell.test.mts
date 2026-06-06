@@ -5,7 +5,6 @@ import { readFileSync } from "node:fs";
 import {
   ADMIN_ROUTES,
   buildAdminNavigation,
-  OPERATOR_SCOPE_VALUES,
   OPERATOR_GRANT_IMPLEMENTATION_STATUS,
 } from "../../src/lib/admin/access.ts";
 
@@ -13,6 +12,7 @@ test("admin routes stay bounded to the admin shell", () => {
   assert.deepEqual(ADMIN_ROUTES, {
     home: "/app/admin",
     verification: "/app/admin/verification",
+    operatorAccess: "/app/admin/operator-access",
     approvedDomains: "/app/admin/approved-domains",
     reviewerScopes: "/app/admin/reviewer-scopes",
     auditInspection: "/app/admin/audit",
@@ -93,7 +93,10 @@ test("admin landing copy distinguishes operator grants from implemented-tool ava
 test("admin shell nav keeps unimplemented operator sections disabled even with matching explicit grants", () => {
   const navigation = buildAdminNavigation({
     reviewerAuthorized: false,
-    operatorScopes: [OPERATOR_SCOPE_VALUES[1], OPERATOR_SCOPE_VALUES[2]],
+    operatorScopes: [
+      "operator.manage_approved_domains",
+      "operator.manage_reviewer_scopes",
+    ],
   });
 
   const approvedDomains = navigation.find(
@@ -101,6 +104,9 @@ test("admin shell nav keeps unimplemented operator sections disabled even with m
   );
   const reviewerScopes = navigation.find(
     (item) => item.key === "reviewer_scopes",
+  );
+  const operatorAccess = navigation.find(
+    (item) => item.key === "operator_access",
   );
   const auditInspection = navigation.find(
     (item) => item.key === "audit_inspection",
@@ -112,6 +118,7 @@ test("admin shell nav keeps unimplemented operator sections disabled even with m
   assert.equal(reviewerScopes?.status, "available");
   assert.equal(reviewerScopes?.availabilityLabel, "Available now");
   assert.match(reviewerScopes?.reason ?? "", /operator\.manage_reviewer_scopes/i);
+  assert.equal(operatorAccess?.status, "disabled");
   assert.equal(auditInspection?.status, "disabled");
 });
 
@@ -119,6 +126,7 @@ test("admin shell nav links only to implemented operator routes for scoped opera
   const navigation = buildAdminNavigation({
     reviewerAuthorized: true,
     operatorScopes: [
+      "operator.manage_operator_access",
       "operator.manage_approved_domains",
       "operator.manage_reviewer_scopes",
       "operator.read_audit",
@@ -129,6 +137,10 @@ test("admin shell nav links only to implemented operator routes for scoped opera
 
   assert.equal(
     navigation.find((item) => item.path === ADMIN_ROUTES.verification)?.status,
+    "available",
+  );
+  assert.equal(
+    navigation.find((item) => item.path === ADMIN_ROUTES.operatorAccess)?.status,
     "available",
   );
   assert.equal(
@@ -165,6 +177,22 @@ test("admin shell nav lets run-cleanup scope open proof cleanup controls", () =>
   assert.equal(proofCleanupItem?.status, "available");
   assert.equal(proofCleanupItem?.availabilityLabel, "Available now");
   assert.match(proofCleanupItem?.reason ?? "", /operator\.run_proof_cleanup/i);
+});
+
+test("admin shell nav keeps operator grant management restricted to manage-operator-access scope", () => {
+  const navigation = buildAdminNavigation({
+    reviewerAuthorized: false,
+    operatorScopes: ["operator.internal_private_app_access"],
+  });
+  const operatorAccessItem = navigation.find(
+    (entry) => entry.path === ADMIN_ROUTES.operatorAccess,
+  );
+
+  assert.equal(operatorAccessItem?.status, "disabled");
+  assert.match(
+    operatorAccessItem?.reason ?? "",
+    /operator\.manage_operator_access/i,
+  );
 });
 
 test("/app/admin\\/verification keeps reviewer-only queue behavior inside the shared shell", () => {

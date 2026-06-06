@@ -3,6 +3,7 @@ import type { User } from "@supabase/supabase-js";
 export const ADMIN_ROUTES = {
   home: "/app/admin",
   verification: "/app/admin/verification",
+  operatorAccess: "/app/admin/operator-access",
   approvedDomains: "/app/admin/approved-domains",
   reviewerScopes: "/app/admin/reviewer-scopes",
   auditInspection: "/app/admin/audit",
@@ -12,6 +13,7 @@ export const ADMIN_ROUTES = {
 export const OPERATOR_GRANT_IMPLEMENTATION_STATUS = "implemented" as const;
 
 export const OPERATOR_SCOPE_VALUES = [
+  "operator.internal_private_app_access",
   "operator.read_audit",
   "operator.manage_approved_domains",
   "operator.manage_reviewer_scopes",
@@ -38,6 +40,7 @@ export type CurrentOperatorAccess = {
 export type AdminNavigationItem = {
   key:
     | "verification_review"
+    | "operator_access"
     | "approved_domains"
     | "reviewer_scopes"
     | "audit_inspection"
@@ -252,6 +255,15 @@ export function buildAdminNavigation(input: {
 
   return [
     verificationReviewItem,
+    buildOperatorNavigationItem({
+      key: "operator_access",
+      label: "Operator Access",
+      path: ADMIN_ROUTES.operatorAccess,
+      description: "Grant the minimal internal private-app operator access to another existing account after first-operator bootstrap is closed.",
+      requiredScopes: ["operator.manage_operator_access"],
+      grantedScopes: input.operatorScopes,
+      implemented: true,
+    }),
     buildOperatorNavigationItem({
       key: "approved_domains",
       label: "Approved Domains",

@@ -1,0 +1,95 @@
+.stack {
+  display: grid;
+  gap: 20px;
+}
+
+.section {
+  display: grid;
+  gap: 12px;
+  padding: 18px;
+  border: 1px solid rgba(176, 191, 209, 0.14);
+  border-radius: 18px;
+  background: rgba(8, 13, 22, 0.64);
+}
+
+.sectionTitle {
+  margin: 0;
+  color: #eef3f9;
+}
+
+.sectionText {
+  margin: 0;
+  color: #b3c0cf;
+  line-height: 1.55;
+}
+
+.hint {
+  margin: 0;
+  color: #96a7ba;
+  line-height: 1.5;
+  font-size: 0.94rem;
+}
+
+.createForm {
+  display: grid;
+  gap: 16px;
+}
+
+.fieldPair {
+  display: grid;
+  gap: 14px;
+}
+
+.field {
+  display: grid;
+  gap: 8px;
+}
+
+.field label {
+  color: #dce7f3;
+  font-size: 0.95rem;
+}
+
+.field input {
+  width: 100%;
+  border-radius: 12px;
+  border: 1px solid rgba(176, 191, 209, 0.18);
+  background: rgba(3, 8, 15, 0.78);
+  color: #eef3f9;
+  padding: 12px 14px;
+}
+
+.field input::placeholder {
+  color: #7f92a6;
+}
+
+.formActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.buttonPrimary {
+  appearance: none;
+  border: 1px solid rgba(206, 219, 233, 0.2);
+  background: linear-gradient(135deg, #dde7f4 0%, #b8ccdf 100%);
+  color: #08111d;
+  font-weight: 700;
+  border-radius: 999px;
+  padding: 11px 18px;
+  cursor: pointer;
+}
+
+.boundaryList {
+  margin: 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 8px;
+  color: #d9e3ef;
+}
+
+@media (min-width: 720px) {
+  .fieldPair {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

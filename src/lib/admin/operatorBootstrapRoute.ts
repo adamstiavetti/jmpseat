@@ -3,6 +3,7 @@ export const OPERATOR_BOOTSTRAP_SECRET_HEADER =
   "x-jmpseat-operator-bootstrap-secret";
 export const OPERATOR_BOOTSTRAP_SECRET_ENV_KEY = "OPERATOR_BOOTSTRAP_SECRET";
 export const INITIAL_OPERATOR_BOOTSTRAP_SCOPES = [
+  "operator.internal_private_app_access",
   "operator.read_audit",
   "operator.manage_approved_domains",
   "operator.manage_reviewer_scopes",

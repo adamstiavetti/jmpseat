@@ -106,3 +106,25 @@ That runtime pass should confirm:
 - the account is still not treated as airline-email verified
 - normal users remain bound to the existing beta and airline-email gates
 - `jmpseat.com` can later be removed as a temporary founder test domain without breaking founder/admin internal access
+
+## Follow-Up Path
+
+The original founder/admin private-app access change assumed an explicit
+operator grant could already be aligned for the target account.
+
+After runtime inspection, the missing gap was post-bootstrap grant management:
+
+- the one-time `/api/ops/operator-bootstrap` path is intentionally closed once
+  any active operator grant exists
+- a later founder/admin account therefore needs an authenticated existing
+  operator to grant access through a normal managed path
+
+That follow-up is now implemented separately in:
+
+- `epochs/operator-grant-management-implementation.md`
+
+Runtime proof is still required for the combined flow:
+
+- existing operator grants founder/admin internal access
+- founder/admin enters `/app` through `operator_internal`
+- temporary `jmpseat.com` approved-domain abuse can be removed afterward
