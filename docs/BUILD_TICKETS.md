@@ -36,6 +36,7 @@ Supplemental epoch-specific ticket packs:
 - [Proof-System Freeze / Deprecation Plan](strategy/proof-system-freeze-deprecation-plan.md) - freezes proof upload as a forward product path while preserving legacy cleanup, audit, and data-retirement safety.
 - [First-Base MVP Scope](strategy/first-base-mvp-scope.md) - defines the first complete base launch package, including airline-email access, boards, posting/Q&A, moderation expectations, trust copy, and launch boundaries.
 - [Community Admin Responsibilities / Disclaimer Policy](strategy/community-admin-responsibilities-disclaimer-policy.md) - defines board-scoped community-admin responsibilities, limits, privacy boundaries, non-sponsorship disclaimers, abuse controls, and escalation expectations.
+- [Launch-Readiness Gate Transition Plan](strategy/launch-readiness-gate-transition-plan.md) - defines the explicit transition from private-testing beta gates to first-base launch gates without removing beta too early, requiring one-by-one beta grants, or bypassing airline-email verification.
 - [E05-T01: Operator Access Model Decision](epochs/e05-operator-access-model-decision.md)
 - [E05-T02: Admin Shell And Navigation Foundation](epochs/e05-admin-shell-navigation-foundation.md)
 - [E05 Operator Grants Foundation](epochs/e05-operator-grants-foundation.md) - explicit operator grants plus a one-time protected bootstrap route for the zero-grant state.
@@ -78,7 +79,7 @@ Documentation hygiene reminder:
 - Future tickets should identify documentation impact and include docs-update acceptance criteria when applicable. See `PRODUCT_DELIVERY_OPERATING_MODEL.md`.
 - Current implementation work is paused for the product pivot. E05-T08 should not proceed until pivot planning is complete, and future tasks should not expand proof-upload verification unless explicitly instructed.
 - E05-T07 runtime proof is committed on `main`; if an older or parallel branch still has uncommitted E05-T07 runtime-proof docs, commit those before starting pivot planning.
-- Next pivot docs should focus on launch-readiness gate transition planning, content/moderation policy if needed, and the first implementation ticket pack after docs decisions are complete.
+- Next pivot docs should focus on content/moderation policy if needed and the first implementation ticket pack after docs decisions are complete.
 
 Scalability guardrail:
 
