@@ -11,12 +11,12 @@ export type SendWorkEmailConfirmationEmailResult =
 
 export async function sendWorkEmailConfirmationEmail({
   to,
-  confirmationUrl,
+  confirmationCode,
   source = process.env,
   fetchImpl = fetch,
 }: {
   to: string;
-  confirmationUrl: string;
+  confirmationCode: string;
   source?: Record<string, string | undefined>;
   fetchImpl?: typeof fetch;
 }): Promise<SendWorkEmailConfirmationEmailResult> {
@@ -30,7 +30,7 @@ export async function sendWorkEmailConfirmationEmail({
     };
   }
 
-  const email = buildWorkEmailConfirmationEmail({ confirmationUrl });
+  const email = buildWorkEmailConfirmationEmail({ confirmationCode });
   const response = await fetchImpl("https://api.resend.com/emails", {
     method: "POST",
     headers: {
@@ -51,7 +51,7 @@ export async function sendWorkEmailConfirmationEmail({
       ok: false,
       status: response.status,
       message:
-        "The confirmation email could not be sent yet. Try again in a moment.",
+        "The verification code email could not be sent yet. Try again in a moment.",
     };
   }
 

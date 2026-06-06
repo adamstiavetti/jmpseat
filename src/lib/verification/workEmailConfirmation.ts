@@ -1,6 +1,8 @@
-import { createHash, randomBytes } from "node:crypto";
+import { createHash, randomBytes, randomInt } from "node:crypto";
 
 export const WORK_EMAIL_CONFIRMATION_TOKEN_TTL_HOURS = 24;
+export const WORK_EMAIL_CONFIRMATION_CODE_TTL_MINUTES = 15;
+export const WORK_EMAIL_CONFIRMATION_CODE_LENGTH = 6;
 export const WORK_EMAIL_CONFIRMATION_PENDING_COOKIE =
   "jmpseat_work_email_confirmation";
 export const WORK_EMAIL_CONFIRMATION_PENDING_COOKIE_MAX_AGE_SECONDS = 10 * 60;
@@ -11,6 +13,13 @@ export const WORK_EMAIL_CONFIRMATION_EMAIL_SUBJECT =
 export type WorkEmailConfirmationToken = {
   token: string;
   tokenHash: string;
+  expiresAt: string;
+};
+
+export type WorkEmailConfirmationCode = {
+  code: string;
+  codeNonce: string;
+  codeHash: string;
   expiresAt: string;
 };
 
@@ -52,7 +61,7 @@ export function getWorkEmailConfirmationAppUrlConfig(
     return {
       ok: false,
       message:
-        "Work-email confirmation links need NEXT_PUBLIC_APP_URL configured for this environment.",
+        "Work-email confirmation emails need NEXT_PUBLIC_APP_URL configured for this environment.",
     };
   }
 
@@ -66,13 +75,23 @@ export function getWorkEmailConfirmationAppUrlConfig(
     return {
       ok: false,
       message:
-        "Work-email confirmation links need a valid NEXT_PUBLIC_APP_URL value.",
+        "Work-email confirmation emails need a valid NEXT_PUBLIC_APP_URL value.",
     };
   }
 }
 
 export function hashWorkEmailConfirmationSecret(value: string) {
   return createHash("sha256").update(value, "utf8").digest("hex");
+}
+
+export function hashWorkEmailConfirmationCode({
+  code,
+  codeNonce,
+}: {
+  code: string;
+  codeNonce: string;
+}) {
+  return hashWorkEmailConfirmationSecret(`${codeNonce}:${code}`);
 }
 
 export function isWorkEmailConfirmationSelectorValid(
@@ -176,6 +195,30 @@ export function generateWorkEmailConfirmationToken({
   };
 }
 
+export function generateWorkEmailConfirmationCode({
+  now = new Date(),
+}: {
+  now?: Date;
+} = {}): WorkEmailConfirmationCode {
+  const code = randomInt(
+    0,
+    10 ** WORK_EMAIL_CONFIRMATION_CODE_LENGTH,
+  )
+    .toString()
+    .padStart(WORK_EMAIL_CONFIRMATION_CODE_LENGTH, "0");
+  const codeNonce = randomBytes(16).toString("base64url");
+  const expiresAt = new Date(
+    now.getTime() + WORK_EMAIL_CONFIRMATION_CODE_TTL_MINUTES * 60 * 1000,
+  ).toISOString();
+
+  return {
+    code,
+    codeNonce,
+    codeHash: hashWorkEmailConfirmationCode({ code, codeNonce }),
+    expiresAt,
+  };
+}
+
 export function getWorkEmailHash(workEmail: string) {
   const normalizedEmail = normalizeConfirmationWorkEmail(workEmail);
 
@@ -202,16 +245,16 @@ export function buildWorkEmailConfirmationUrl({
 }
 
 export function buildWorkEmailConfirmationEmail({
-  confirmationUrl,
+  confirmationCode,
 }: {
-  confirmationUrl: string;
+  confirmationCode: string;
 }) {
   const text = [
     "Verify your airline employee email for jmpseat.",
     "",
-    "Confirm this airline employee email to continue app access setup.",
+    "Enter this six-digit code in jmpseat to continue app access setup.",
     "",
-    `Confirm your email: ${confirmationUrl}`,
+    `Verification code: ${confirmationCode}`,
     "",
     "This verifies control of this email address only.",
     "It does not verify role, base, seniority, or employer endorsement.",
@@ -222,8 +265,8 @@ export function buildWorkEmailConfirmationEmail({
 
   const html = [
     "<p>Verify your airline employee email for jmpseat.</p>",
-    "<p>Confirm this airline employee email to continue app access setup.</p>",
-    `<p><a href="${confirmationUrl}">Confirm your airline employee email</a></p>`,
+    "<p>Enter this six-digit code in jmpseat to continue app access setup.</p>",
+    `<p><strong>${confirmationCode}</strong></p>`,
     "<p>This verifies control of this email address only.</p>",
     "<p>It does not verify role, base, seniority, or employer endorsement.</p>",
     "<p>jmpseat is independent and not sponsored by any airline.</p>",

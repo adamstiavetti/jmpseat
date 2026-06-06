@@ -129,7 +129,7 @@ export function getWorkEmailSurfaceState({
     kind: "available",
     title: "Airline-email confirmation is available for supported domains",
     description:
-      "Approved domains can receive a confirmation email here. Confirmation verifies control of the email address only and does not issue role, base, or restricted-board claims.",
+      "Approved domains can receive a six-digit verification code here. Confirmation verifies control of the email address only and does not issue role, base, or restricted-board claims.",
   };
 }
 

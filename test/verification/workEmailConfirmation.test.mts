@@ -3,6 +3,8 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 
 import {
+  WORK_EMAIL_CONFIRMATION_CODE_LENGTH,
+  WORK_EMAIL_CONFIRMATION_CODE_TTL_MINUTES,
   WORK_EMAIL_CONFIRMATION_EMAIL_SUBJECT,
   WORK_EMAIL_CONFIRMATION_PENDING_COOKIE,
   WORK_EMAIL_CONFIRMATION_PENDING_COOKIE_MAX_AGE_SECONDS,
@@ -10,11 +12,13 @@ import {
   buildWorkEmailConfirmationUrl,
   decodePendingWorkEmailConfirmation,
   encodePendingWorkEmailConfirmation,
+  generateWorkEmailConfirmationCode,
   generateWorkEmailConfirmationToken,
   getWorkEmailConfirmationAppUrlConfig,
   getWorkEmailConfirmationDomain,
   getWorkEmailConfirmationEmailConfig,
   getWorkEmailHash,
+  hashWorkEmailConfirmationCode,
   hashWorkEmailConfirmationSecret,
   isWorkEmailConfirmationSelectorValid,
   isWorkEmailConfirmationTokenValid,
@@ -29,6 +33,43 @@ test("work-email confirmation tokens store only hashes and expiry metadata", () 
   assert.equal(token.tokenHash, hashWorkEmailConfirmationSecret(token.token));
   assert.notEqual(token.tokenHash, token.token);
   assert.equal(token.expiresAt, "2026-06-07T12:00:00.000Z");
+});
+
+test("work-email confirmation codes use short-lived six-digit hashed secrets", () => {
+  const code = generateWorkEmailConfirmationCode({
+    now: new Date("2026-06-06T12:00:00.000Z"),
+  });
+
+  assert.equal(WORK_EMAIL_CONFIRMATION_CODE_LENGTH, 6);
+  assert.equal(WORK_EMAIL_CONFIRMATION_CODE_TTL_MINUTES, 15);
+  assert.match(code.code, /^[0-9]{6}$/);
+  assert.match(code.codeNonce, /^[A-Za-z0-9_-]{16,}$/);
+  assert.equal(
+    code.codeHash,
+    hashWorkEmailConfirmationCode({
+      code: code.code,
+      codeNonce: code.codeNonce,
+    }),
+  );
+  assert.notEqual(code.codeHash, hashWorkEmailConfirmationSecret(code.code));
+  assert.notEqual(code.codeHash, code.code);
+  assert.equal(code.expiresAt, "2026-06-06T12:15:00.000Z");
+});
+
+test("work-email confirmation code hashes are row-specific to avoid duplicate-code collisions", () => {
+  const code = "314159";
+  const firstHash = hashWorkEmailConfirmationCode({
+    code,
+    codeNonce: "first-row-specific-nonce",
+  });
+  const secondHash = hashWorkEmailConfirmationCode({
+    code,
+    codeNonce: "second-row-specific-nonce",
+  });
+
+  assert.notEqual(firstHash, secondHash);
+  assert.notEqual(firstHash, hashWorkEmailConfirmationSecret(code));
+  assert.notEqual(secondHash, hashWorkEmailConfirmationSecret(code));
 });
 
 test("work-email confirmation link points to the app confirmation route", () => {
@@ -75,15 +116,17 @@ test("auth sign-in metadata cannot receive a work-email confirmation token throu
 
 test("work-email confirmation email copy stays scoped to email control", () => {
   const email = buildWorkEmailConfirmationEmail({
-    confirmationUrl: "https://preview.jmpseat.app/app/verification/confirm?selector=s&token=t",
+    confirmationCode: "123456",
   });
   const combined = `${email.subject}\n${email.text}\n${email.html}`;
 
   assert.equal(email.subject, WORK_EMAIL_CONFIRMATION_EMAIL_SUBJECT);
-  assert.match(combined, /Confirm this airline employee email to continue app access setup/i);
+  assert.match(combined, /Enter this six-digit code in jmpseat to continue app access setup/i);
+  assert.match(combined, /123456/);
   assert.match(combined, /verifies control of this email address only/i);
   assert.match(combined, /does not verify role, base, seniority, or employer endorsement/i);
   assert.match(combined, /independent and not sponsored by any airline/i);
+  assert.doesNotMatch(combined, /app\/verification\/confirm|selector=|token=|href=/i);
   assert.doesNotMatch(combined, /proof upload|badge upload|document upload|official airline verification|beta invite/i);
 });
 
@@ -118,36 +161,71 @@ test("work-email hashes and domain extraction avoid raw local-part storage", () 
 });
 
 test("work-email confirmation migration creates hashed lifecycle and confirmation RPC", () => {
-  const sql = readFileSync(
+  const baseSql = readFileSync(
     new URL("../../supabase/migrations/20260606160833_add_work_email_confirmation_flow.sql", import.meta.url),
     "utf8",
   );
+  const codeSql = readFileSync(
+    new URL("../../supabase/migrations/20260606233000_add_work_email_confirmation_code_flow.sql", import.meta.url),
+    "utf8",
+  );
 
-  assert.match(sql, /create table public\.work_email_confirmation_tokens/i);
-  assert.match(sql, /email_hash text not null/i);
-  assert.match(sql, /token_hash text not null unique/i);
-  assert.match(sql, /status in \('active', 'used', 'expired', 'revoked'\)/i);
-  assert.match(sql, /create or replace function public\.confirm_work_email_confirmation_token_for_user/i);
-  assert.match(sql, /request\.status in \('submitted', 'pending_review', 'needs_resubmission'\)/i);
-  assert.match(sql, /update public\.verification_requests\s+set status = 'approved'/i);
-  assert.match(sql, /update public\.verification_evidence\s+set status = 'accepted'/i);
-  assert.doesNotMatch(sql, /insert into public\.verification_claims/i);
-  assert.doesNotMatch(sql, /claim_type\s*=\s*'role'|claim_type\s*=\s*'base'|grant beta/i);
+  assert.match(baseSql, /create table public\.work_email_confirmation_tokens/i);
+  assert.match(baseSql, /email_hash text not null/i);
+  assert.match(baseSql, /token_hash text not null unique/i);
+  assert.match(baseSql, /status in \('active', 'used', 'expired', 'revoked'\)/i);
+  assert.match(baseSql, /create or replace function public\.confirm_work_email_confirmation_token_for_user/i);
+  assert.match(codeSql, /add column code_nonce text/i);
+  assert.match(codeSql, /add column failed_attempts integer not null default 0/i);
+  assert.match(codeSql, /create or replace function public\.confirm_work_email_confirmation_code_for_user/i);
+  assert.match(codeSql, /requested_code text/i);
+  assert.match(codeSql, /extensions\.digest\(confirmation\.code_nonce \|\| ':' \|\| v_requested_code, 'sha256'\)/i);
+  assert.match(codeSql, /and code_nonce is not null/i);
+  assert.match(codeSql, /failed_attempts = confirmation\.failed_attempts \+ 1/i);
+  assert.match(codeSql, /confirmation_source', 'work_email_confirmation_code'/i);
+  assert.match(codeSql, /status = 'revoked'/i);
+  assert.match(
+    codeSql,
+    /revoke execute on function public\.create_work_email_confirmation_token_for_user\(uuid, text, text, text, timestamptz\) from public/i,
+  );
+  assert.match(
+    codeSql,
+    /revoke execute on function public\.create_work_email_confirmation_token_for_user\(uuid, text, text, text, timestamptz\) from authenticated/i,
+  );
+  assert.match(codeSql, /Legacy link-token verifier creation is not normal-user callable/i);
+  assert.doesNotMatch(codeSql, /create or replace function public\.create_work_email_confirmation_code_for_user/i);
+  assert.doesNotMatch(codeSql, /requested_token_hash|requested_code_nonce/i);
+  assert.doesNotMatch(codeSql, /grant execute on function public\.create_work_email_confirmation_code_for_user/i);
+  assert.doesNotMatch(
+    codeSql,
+    /grant execute on function public\.create_work_email_confirmation_token_for_user\(uuid, text, text, text, timestamptz\) to authenticated/i,
+  );
+  assert.doesNotMatch(codeSql, /insert into public\.verification_claims/i);
+  assert.doesNotMatch(codeSql, /claim_type\s*=\s*'role'|claim_type\s*=\s*'base'|grant beta/i);
 });
 
-test("work-email confirmation action sends only after approved-domain request tracking", () => {
+test("work-email confirmation actions send and verify codes after approved-domain request tracking", () => {
   const source = readFileSync(
     new URL("../../src/lib/verification/actions.ts", import.meta.url),
     "utf8",
   );
 
-  assert.match(source, /sendConfirmationForWorkEmailRequest/);
-  assert.match(source, /create_work_email_confirmation_token_for_user/);
+  assert.match(source, /sendConfirmationCodeForWorkEmailRequest/);
+  assert.match(source, /createWorkEmailConfirmationCodeForUser/);
+  assert.match(source, /createStorageAdminClient/);
+  assert.match(source, /code_nonce: codeNonce/);
+  assert.match(source, /token_hash: codeHash/);
+  assert.match(source, /confirm_work_email_confirmation_code_for_user/);
+  assert.match(source, /requested_code: verificationCode/);
   assert.match(source, /sendWorkEmailConfirmationEmail/);
   assert.match(source, /work_email_verification\.email_sent/);
   assert.match(source, /work_email_verification\.email_send_failed/);
-  assert.match(source, /Confirmation email sent/);
-  assert.doesNotMatch(source, /console\.log|console\.error|raw_work_email|verificationUrl/);
+  assert.match(source, /Verification code sent/);
+  assert.match(source, /verifyWorkEmailConfirmationCodeAction/);
+  assert.doesNotMatch(source, /create_work_email_confirmation_code_for_user/);
+  assert.doesNotMatch(source, /requested_token_hash|requested_code_nonce/);
+  assert.doesNotMatch(source, /requested_code_hash: hashWorkEmailConfirmationSecret\(verificationCode\)/);
+  assert.doesNotMatch(source, /console\.log|console\.error|raw_work_email|confirmationUrl/);
 });
 
 test("work-email confirmation route hashes tokens and keeps app gates unchanged", () => {
@@ -166,6 +244,7 @@ test("work-email confirmation route hashes tokens and keeps app gates unchanged"
   assert.doesNotMatch(source, /next_path.*selector|next_path.*token/s);
   assert.match(source, /hashWorkEmailConfirmationSecret\(input\.token\)/);
   assert.match(source, /confirm_work_email_confirmation_token_for_user/);
+  assert.doesNotMatch(source, /create_work_email_confirmation_token_for_user/);
   assert.match(source, /work_email_verification\.confirmed/);
   assert.match(source, /work_email_verification\.confirm_failed/);
   assert.match(source, /getCurrentAppAccessContext/);

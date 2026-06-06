@@ -80,6 +80,24 @@ test("security event taxonomy stays aligned with the bounded verification audit 
   ]);
 });
 
+test("security event metadata keeps verification codes and token-like secrets out of audit payloads", () => {
+  assert.deepEqual(
+    sanitizeSecurityEventMetadata({
+      verification_code: "123456",
+      verificationCode: "123456",
+      confirmation_code: "123456",
+      confirmationCode: "123456",
+      magic_link: "secret",
+      verification_link: "secret",
+      callback_token: "secret",
+      email_domain: "airline.test",
+    }),
+    {
+      email_domain: "airline.test",
+    },
+  );
+});
+
 test("security event metadata strips sensitive or noisy values", () => {
   assert.deepEqual(
     sanitizeSecurityEventMetadata({

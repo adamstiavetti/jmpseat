@@ -13,7 +13,10 @@ import {
 import { getPrivateAccessEventType } from "../../../src/lib/securityEvents/securityEvents";
 import { recordSecurityEvent } from "../../../src/lib/securityEvents/server";
 import { getSupabaseBrowserEnv } from "../../../src/lib/supabase/config";
-import { submitWorkEmailVerificationAction } from "../../../src/lib/verification/actions";
+import {
+  submitWorkEmailVerificationAction,
+  verifyWorkEmailConfirmationCodeAction,
+} from "../../../src/lib/verification/actions";
 import { getCurrentVerificationSurfaceContext } from "../../../src/lib/verification/server";
 import {
   formatClaimDisplayValue,
@@ -181,8 +184,9 @@ export default async function VerificationPage({ searchParams }: VerificationPag
           </p>
           <p className={styles.sectionText}>
             Only approved airline-controlled domains are currently supported.
-            Submitting an approved airline employee email sends a confirmation
-            link to that inbox. Confirmation verifies email control only and
+            Submitting an approved airline employee email sends a six-digit
+            verification code to that inbox. Confirmation verifies email
+            control only and
             does not issue role, base, or restricted-board claims.
           </p>
           <p className={styles.sectionText}>{workEmailState.description}</p>
@@ -202,13 +206,36 @@ export default async function VerificationPage({ searchParams }: VerificationPag
               />
             </div>
             <button className={styles.button} type="submit">
-              Send confirmation email
+              Send verification code
+            </button>
+          </form>
+          <form className={styles.form} action={verifyWorkEmailConfirmationCodeAction}>
+            <div className={styles.field}>
+              <label className={styles.label} htmlFor="verification-code">
+                Enter verification code
+              </label>
+              <input
+                className={styles.input}
+                id="verification-code"
+                name="verification_code"
+                type="text"
+                inputMode="numeric"
+                autoComplete="one-time-code"
+                pattern="[0-9]{6}"
+                maxLength={6}
+                placeholder="123456"
+                required
+              />
+            </div>
+            <button className={styles.button} type="submit">
+              Verify code
             </button>
           </form>
           <p className={styles.muted}>
-            Check your airline employee email inbox after submitting. jmpseat
-            stores metadata and hashed confirmation tokens only; it does not
-            store your raw work email in verification evidence metadata.
+            Check your airline employee email inbox for the current code after
+            submitting. jmpseat stores metadata and hashed verification codes
+            only; it does not store your raw work email in verification
+            evidence metadata.
           </p>
         </section>
 

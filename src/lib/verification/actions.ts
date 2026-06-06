@@ -9,11 +9,11 @@ import {
 import { recordSecurityEvent } from "../securityEvents/server";
 import { getSupabaseBrowserEnv } from "../supabase/config";
 import { createClient } from "../supabase/server";
+import { createStorageAdminClient } from "../supabase/storageAdmin";
 import { sendWorkEmailConfirmationEmail } from "./workEmailConfirmationEmail";
 import {
-  buildWorkEmailConfirmationUrl,
-  generateWorkEmailConfirmationToken,
-  getWorkEmailConfirmationAppUrlConfig,
+  WORK_EMAIL_CONFIRMATION_CODE_LENGTH,
+  generateWorkEmailConfirmationCode,
   getWorkEmailConfirmationDomain,
   getWorkEmailHash,
 } from "./workEmailConfirmation";
@@ -61,6 +61,14 @@ type WorkEmailConfirmationRpcResult = {
   ok?: boolean;
   code?: string;
   token_id?: string | null;
+  verification_request_id?: string | null;
+  email_domain?: string | null;
+};
+
+type WorkEmailConfirmationCodeInsertResult = {
+  ok: boolean;
+  code: string;
+  token_id: string | null;
 };
 
 function getString(formData: FormData, key: string) {
@@ -89,7 +97,29 @@ function getRpcPayload(data: unknown): WorkEmailConfirmationRpcResult {
 }
 
 function getWorkEmailConfirmationFailureMessage() {
-  return "The work-email confirmation email could not be sent yet. Try again in a moment.";
+  return "The work-email verification code could not be sent yet. Try again in a moment.";
+}
+
+function getVerificationCode(value: string) {
+  const normalized = value.replace(/\s+/g, "");
+  return new RegExp(`^[0-9]{${WORK_EMAIL_CONFIRMATION_CODE_LENGTH}}$`).test(normalized)
+    ? normalized
+    : null;
+}
+
+function getWorkEmailCodeVerificationFailureMessage(code: string | undefined) {
+  switch (code) {
+    case "expired_code":
+      return "That verification code has expired. Request a new code and try again.";
+    case "already_used":
+      return "That verification code has already been used. Request a new code if you still need to finish verification.";
+    case "too_many_attempts":
+      return "Too many incorrect verification attempts closed that code. Request a new code and try again.";
+    case "verification_request_not_confirmable":
+      return "That verification code no longer matches an active approved-domain request.";
+    default:
+      return "That verification code could not be confirmed. Check the latest code and try again.";
+  }
 }
 
 async function revokeWorkEmailConfirmationToken({
@@ -104,7 +134,122 @@ async function revokeWorkEmailConfirmationToken({
   });
 }
 
-async function sendConfirmationForWorkEmailRequest({
+async function createWorkEmailConfirmationCodeForUser({
+  userId,
+  requestId,
+  emailDomain,
+  emailHash,
+  codeHash,
+  codeNonce,
+  expiresAt,
+}: {
+  userId: string;
+  requestId: string;
+  emailDomain: string;
+  emailHash: string;
+  codeHash: string;
+  codeNonce: string;
+  expiresAt: string;
+}): Promise<WorkEmailConfirmationCodeInsertResult> {
+  try {
+    const admin = createStorageAdminClient();
+
+    const requestResult = await admin
+      .from("verification_requests")
+      .select("id")
+      .eq("id", requestId)
+      .eq("user_id", userId)
+      .eq("method", "work_email")
+      .in("status", ["submitted", "pending_review", "needs_resubmission"])
+      .maybeSingle<{ id: string }>();
+
+    if (requestResult.error || !requestResult.data) {
+      return {
+        ok: false,
+        code: "verification_request_not_confirmable",
+        token_id: null,
+      };
+    }
+
+    const evidenceResult = await admin
+      .from("verification_evidence")
+      .select("id")
+      .eq("request_id", requestId)
+      .eq("user_id", userId)
+      .eq("evidence_type", "work_email")
+      .in("status", ["submitted", "pending"])
+      .eq("metadata->>email_domain", emailDomain)
+      .eq("metadata->>support_result", "supported_domain")
+      .eq("metadata->>verification_method", "work_email")
+      .maybeSingle<{ id: string }>();
+
+    if (evidenceResult.error || !evidenceResult.data) {
+      return {
+        ok: false,
+        code: "verification_request_not_confirmable",
+        token_id: null,
+      };
+    }
+
+    const domainResult = await admin
+      .from("approved_email_domains")
+      .select("domain")
+      .eq("domain", emailDomain)
+      .eq("status", "active")
+      .maybeSingle<{ domain: string }>();
+
+    if (domainResult.error || !domainResult.data) {
+      return {
+        ok: false,
+        code: "verification_request_not_confirmable",
+        token_id: null,
+      };
+    }
+
+    const revokeResult = await admin
+      .from("work_email_confirmation_tokens")
+      .update({
+        status: "revoked",
+        updated_at: new Date().toISOString(),
+      })
+      .eq("user_id", userId)
+      .eq("verification_request_id", requestId)
+      .eq("status", "active");
+
+    if (revokeResult.error) {
+      return { ok: false, code: "code_revoke_failed", token_id: null };
+    }
+
+    const insertResult = await admin
+      .from("work_email_confirmation_tokens")
+      .insert({
+        user_id: userId,
+        verification_request_id: requestId,
+        email_domain: emailDomain,
+        email_hash: emailHash,
+        token_hash: codeHash,
+        code_nonce: codeNonce,
+        status: "active",
+        expires_at: expiresAt,
+      })
+      .select("id")
+      .single<{ id: string }>();
+
+    if (insertResult.error || !insertResult.data) {
+      return { ok: false, code: "code_create_failed", token_id: null };
+    }
+
+    return {
+      ok: true,
+      code: "code_created",
+      token_id: insertResult.data.id,
+    };
+  } catch {
+    return { ok: false, code: "code_storage_not_configured", token_id: null };
+  }
+}
+
+async function sendConfirmationCodeForWorkEmailRequest({
   supabase,
   userId,
   requestId,
@@ -117,7 +262,6 @@ async function sendConfirmationForWorkEmailRequest({
 }) {
   const emailDomain = getWorkEmailConfirmationDomain(workEmail);
   const emailHash = getWorkEmailHash(workEmail);
-  const appUrlConfig = getWorkEmailConfirmationAppUrlConfig();
 
   if (!emailDomain || !emailHash) {
     return {
@@ -126,28 +270,19 @@ async function sendConfirmationForWorkEmailRequest({
     };
   }
 
-  if (!appUrlConfig.ok) {
-    return {
-      ok: false as const,
-      message: appUrlConfig.message,
-    };
-  }
-
-  const token = generateWorkEmailConfirmationToken();
-  const createTokenResult = await supabase.rpc(
-    "create_work_email_confirmation_token_for_user",
-    {
-      requested_verification_request_id: requestId,
-      requested_email_domain: emailDomain,
-      requested_email_hash: emailHash,
-      requested_token_hash: token.tokenHash,
-      requested_expires_at: token.expiresAt,
-    },
-  );
-  const tokenPayload = getRpcPayload(createTokenResult.data);
+  const confirmationCode = generateWorkEmailConfirmationCode();
+  const tokenPayload = await createWorkEmailConfirmationCodeForUser({
+    userId,
+    requestId,
+    emailDomain,
+    emailHash,
+    codeHash: confirmationCode.codeHash,
+    codeNonce: confirmationCode.codeNonce,
+    expiresAt: confirmationCode.expiresAt,
+  });
   const tokenId = tokenPayload.token_id;
 
-  if (createTokenResult.error || !tokenPayload.ok || !tokenId) {
+  if (!tokenPayload.ok || !tokenId) {
     await recordSecurityEvent({
       userId,
       eventType: "work_email_verification.email_send_failed",
@@ -178,14 +313,9 @@ async function sendConfirmationForWorkEmailRequest({
     },
   });
 
-  const confirmationUrl = buildWorkEmailConfirmationUrl({
-    appUrl: appUrlConfig.appUrl,
-    selector: tokenId,
-    token: token.token,
-  });
   const sendResult = await sendWorkEmailConfirmationEmail({
     to: workEmail,
-    confirmationUrl,
+    confirmationCode: confirmationCode.code,
   });
 
   if (!sendResult.ok) {
@@ -228,7 +358,7 @@ async function sendConfirmationForWorkEmailRequest({
   return {
     ok: true as const,
     message:
-      "Confirmation email sent. Check your airline employee email inbox and click the confirmation link to continue app access setup.",
+      "Verification code sent. Check your airline employee email inbox for the current code, then enter it here to continue app access setup.",
   };
 }
 
@@ -323,7 +453,7 @@ export async function submitWorkEmailVerificationAction(formData: FormData) {
   }
 
   if (submission.kind === "duplicate_request") {
-    const confirmation = await sendConfirmationForWorkEmailRequest({
+    const confirmation = await sendConfirmationCodeForWorkEmailRequest({
       supabase,
       userId: user.id,
       requestId: submission.requestId,
@@ -336,7 +466,7 @@ export async function submitWorkEmailVerificationAction(formData: FormData) {
         submissionKind: submission.kind,
       }),
       route: VERIFICATION_ROUTE,
-      result: confirmation.ok ? "duplicate_confirmation_sent" : "duplicate_active",
+      result: confirmation.ok ? "duplicate_code_sent" : "duplicate_active",
       metadata: {
         verification_request_id: submission.requestId,
         verification_method: "work_email",
@@ -382,7 +512,7 @@ export async function submitWorkEmailVerificationAction(formData: FormData) {
       },
     });
 
-    const confirmation = await sendConfirmationForWorkEmailRequest({
+    const confirmation = await sendConfirmationCodeForWorkEmailRequest({
       supabase,
       userId: user.id,
       requestId: submission.requestId,
@@ -457,7 +587,7 @@ export async function submitWorkEmailVerificationAction(formData: FormData) {
     },
   });
 
-  const confirmation = await sendConfirmationForWorkEmailRequest({
+  const confirmation = await sendConfirmationCodeForWorkEmailRequest({
     supabase,
     userId: user.id,
     requestId: createdRequest.id,
@@ -471,6 +601,84 @@ export async function submitWorkEmailVerificationAction(formData: FormData) {
         : confirmation.message,
     }),
   );
+}
+
+export async function verifyWorkEmailConfirmationCodeAction(formData: FormData) {
+  const env = getSupabaseBrowserEnv();
+
+  if (!env.enabled) {
+    redirect(
+      buildRedirect(VERIFICATION_ROUTE, {
+        error:
+          "Supabase auth is not configured yet. Add NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY.",
+      }),
+    );
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+
+  if (userError || !user) {
+    redirect(
+      buildRedirect(AUTH_ROUTES.login, {
+        next: VERIFICATION_ROUTE,
+      }),
+    );
+  }
+
+  const verificationCode = getVerificationCode(getString(formData, "verification_code"));
+
+  if (!verificationCode) {
+    redirect(
+      buildRedirect(VERIFICATION_ROUTE, {
+        error: `Enter the ${WORK_EMAIL_CONFIRMATION_CODE_LENGTH}-digit verification code from your airline employee email.`,
+      }),
+    );
+  }
+
+  const confirmResult = await supabase.rpc(
+    "confirm_work_email_confirmation_code_for_user",
+    {
+      requested_code: verificationCode,
+    },
+  );
+  const payload = getRpcPayload(confirmResult.data);
+
+  if (confirmResult.error || !payload.ok) {
+    await recordSecurityEvent({
+      userId: user.id,
+      eventType: "work_email_verification.confirm_failed",
+      route: VERIFICATION_ROUTE,
+      result: payload.code ?? "confirm_failed",
+      metadata: {
+        verification_method: "work_email",
+      },
+    });
+
+    redirect(
+      buildRedirect(VERIFICATION_ROUTE, {
+        error: getWorkEmailCodeVerificationFailureMessage(payload.code),
+      }),
+    );
+  }
+
+  await recordSecurityEvent({
+    userId: user.id,
+    eventType: "work_email_verification.confirmed",
+    route: VERIFICATION_ROUTE,
+    result: "confirmed",
+    metadata: {
+      verification_request_id: payload.verification_request_id ?? null,
+      email_domain: payload.email_domain ?? null,
+      verification_method: "work_email",
+      confirmation_source: "work_email_confirmation_code",
+    },
+  });
+
+  redirect(AUTH_ROUTES.app);
 }
 
 function getUploadedFile(formData: FormData, key: string) {
