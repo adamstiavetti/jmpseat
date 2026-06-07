@@ -42,10 +42,12 @@ export function applyAccountCodeInput(
 }
 
 type AccountCodeInputProps = {
+  codeName?: string;
   label?: string;
 };
 
 export function AccountCodeInput({
+  codeName = "account_code",
   label = "Six-digit account confirmation code",
 }: AccountCodeInputProps) {
   const [digits, setDigits] = useState<string[]>(
@@ -94,7 +96,7 @@ export function AccountCodeInput({
   return (
     <fieldset className={styles.accountCodeFieldset}>
       <legend className={styles.loginLabel}>{label}</legend>
-      <input type="hidden" name="account_code" value={code} />
+      <input type="hidden" name={codeName} value={code} />
       <div className={styles.accountCodeDigits} role="group" aria-label={label}>
         {digits.map((digit, index) => (
           <input

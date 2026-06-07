@@ -50,7 +50,8 @@ test("auth pages and callback route exist", () => {
   assert.match(accountConfirmation, /ACCOUNT_CONFIRMATION_CODE_LENGTH = 6/);
   assert.match(accountCodeInput, /Array\(ACCOUNT_CONFIRMATION_CODE_LENGTH\)\.fill\(""\)/);
   assert.match(accountCodeInput, /applyAccountCodeInput/);
-  assert.match(accountCodeInput, /name="account_code"/);
+  assert.match(accountCodeInput, /codeName = "account_code"/);
+  assert.match(accountCodeInput, /name=\{codeName\}/);
   assert.match(accountCodeInput, /autoComplete=\{index === 0 \? "one-time-code" : "off"\}/);
   assert.match(accountCodeInput, /onPaste=\{handlePaste\}/);
   assert.match(accountCodeInput, /handleKeyDown/);
@@ -132,7 +133,8 @@ test("account signup code confirmation stays Supabase-native and separate from a
   assert.match(signup, /pendingSignupEmail \? null :/);
   assert.match(signup, /Your pending signup session expired/i);
   assert.match(signup, /disabled=\{!pendingSignupEmail\}/);
-  assert.match(accountCodeInput, /name="account_code"/);
+  assert.match(accountCodeInput, /codeName = "account_code"/);
+  assert.match(accountCodeInput, /name=\{codeName\}/);
   assert.doesNotMatch(signup, /placeholder="000000"/);
   assert.match(accountCodeInput, /aria-label=\{`Digit \$\{index \+ 1\} of \$\{ACCOUNT_CONFIRMATION_CODE_LENGTH\}`\}/);
   assert.match(accountCodeInput, /if \(!incomingDigits\) \{\s*nextDigits\[startIndex\] = "";/s);

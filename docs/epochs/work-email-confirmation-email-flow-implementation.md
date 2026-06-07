@@ -16,11 +16,15 @@ when the user enters the code back into jmpseat.
 
 ## Surfaces Changed
 
-- `/app/verification` now explains that submitting an approved airline employee
-  email sends a six-digit verification code to that inbox and exposes a second
-  form for entering the current code.
+- `/app/access-hold` is now the canonical user-facing airline employee email
+  verification surface. It accepts the approved airline employee email inline,
+  then swaps to a masked sent-confirmation state with six digit boxes for the
+  current code.
+- `/app/verification` is deprecated as a standalone page and redirects users to
+  `/app/access-hold`.
 - `/app/verification/confirm` remains as a backward-compatible route for any
-  older link-based confirmations that are still in flight.
+  older link-based confirmations that are still in flight. Failure states return
+  to `/app/access-hold`.
 - `src/lib/verification/actions.ts` now sends and verifies work-email codes
   only after an approved-domain work-email request/evidence row exists.
 - Code verifier row creation is server-owned through the service-role-backed
@@ -109,6 +113,8 @@ pending-confirmation cookie handoff:
 - the token does not enter login query strings, hidden login fields, or auth
   `next_path` security-event metadata,
 - the pending cookie is cleared after success or failure.
+- failed or invalid legacy confirmation attempts return to `/app/access-hold`
+  with safe generic error copy.
 
 Successful code verification updates the existing work-email request to
 `approved` and work-email evidence to `accepted` with confirmation metadata.
@@ -119,6 +125,10 @@ After successful code verification, the user is sent back through the existing
 private-app gate by redirecting to `/app`. If the gate allows entry, the user
 lands in the app; otherwise the existing gate redirects to the exact
 profile/access-hold path it already controls.
+
+For the current user-facing flow, the user normally starts and completes
+airline employee email verification from `/app/access-hold`. The deprecated
+`/app/verification` page should not be treated as a primary UI surface.
 
 ## Access-State Integration
 

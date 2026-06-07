@@ -4,6 +4,13 @@ Date: 2026-06-06
 
 ## Summary
 
+Current-state note: this runtime fix has been superseded by the auth
+design-system overhaul. `/app/access-hold` is now the canonical access status
+and airline employee email verification surface. `/app/verification` is
+deprecated as a standalone page and redirects to `/app/access-hold`; the
+`/app/verification/confirm` route remains only for legacy-compatible work-email
+confirmation links.
+
 Founder-testing surfaced an access dead-end in the current private-testing flow:
 
 - the user could sign up or log in
@@ -12,23 +19,31 @@ Founder-testing surfaced an access dead-end in the current private-testing flow:
 - `/app/access-hold` explained the missing airline-email requirement
 - `/app/verification` was still treated as a normal private child route, so it redirected back to `/app/access-hold`
 
-The fix makes `/app/verification` a remedy route for authenticated users who have completed profile onboarding but still need airline employee email verification.
+The original fix made `/app/verification` a remedy route for authenticated users
+who had completed profile onboarding but still needed airline employee email
+verification. That remedy has since moved inline to `/app/access-hold`.
 
 ## Behavior
 
-`/app/access-hold` now gives missing-airline-email users a clear "Verify airline employee email" link to `/app/verification`.
+`/app/access-hold` now gives missing-airline-email users the airline employee
+email input and six-digit code confirmation flow directly on the access-hold
+page.
 
-`/app/verification` remains protected by:
+`/app/verification` no longer renders a standalone remedy UI. It redirects to
+`/app/access-hold`.
+
+The legacy confirmation route `/app/verification/confirm` remains protected by:
 
 - Supabase auth
 - completed profile onboarding
 
-`/app/verification` no longer requires:
+The current access-hold verification remedy no longer requires:
 
 - active beta access
 - already-approved airline-email eligibility
 
-This keeps the verification page reachable specifically so users can resolve the missing eligibility state.
+This keeps the remedy reachable specifically so users can resolve the missing
+eligibility state without a separate verification page.
 
 ## Gate Rules Unchanged
 
@@ -42,7 +57,7 @@ This fix does not weaken app entry:
 
 ## Proof Upload Remains Frozen
 
-The verification remedy route still does not reintroduce:
+The access-hold verification remedy still does not reintroduce:
 
 - proof upload
 - badge upload
@@ -50,7 +65,7 @@ The verification remedy route still does not reintroduce:
 - proof-review user flow
 - raw proof files or storage identifiers
 
-The page remains an airline employee email eligibility surface.
+The current page remains an airline employee email eligibility surface.
 
 ## Validation
 

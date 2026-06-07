@@ -221,11 +221,30 @@ test("work-email confirmation actions send and verify codes after approved-domai
   assert.match(source, /work_email_verification\.email_sent/);
   assert.match(source, /work_email_verification\.email_send_failed/);
   assert.match(source, /Verification code sent/);
+  assert.match(source, /getWorkEmailVerificationReturnRoute/);
+  assert.match(source, /setPendingWorkEmailConfirmation/);
+  assert.match(source, /clearPendingWorkEmailConfirmation/);
+  assert.match(source, /return_to/);
   assert.match(source, /verifyWorkEmailConfirmationCodeAction/);
   assert.doesNotMatch(source, /create_work_email_confirmation_code_for_user/);
   assert.doesNotMatch(source, /requested_token_hash|requested_code_nonce/);
   assert.doesNotMatch(source, /requested_code_hash: hashWorkEmailConfirmationSecret\(verificationCode\)/);
   assert.doesNotMatch(source, /console\.log|console\.error|raw_work_email|confirmationUrl/);
+});
+
+test("access-hold pending work-email confirmation cookie stores only masked display state", () => {
+  const source = readFileSync(
+    new URL("../../src/lib/verification/pendingWorkEmail.ts", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(source, /PENDING_WORK_EMAIL_CONFIRMATION_COOKIE/);
+  assert.match(source, /httpOnly:\s*true/);
+  assert.match(source, /sameSite:\s*"lax"/);
+  assert.match(source, /maxAge:\s*PENDING_WORK_EMAIL_CONFIRMATION_MAX_AGE_SECONDS/);
+  assert.match(source, /maskWorkEmailForDisplay/);
+  assert.match(source, /getPendingWorkEmailConfirmation/);
+  assert.doesNotMatch(source, /raw_work_email|work_email:/i);
 });
 
 test("work-email confirmation route hashes tokens and keeps app gates unchanged", () => {

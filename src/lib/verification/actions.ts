@@ -10,6 +10,10 @@ import { recordSecurityEvent } from "../securityEvents/server";
 import { getSupabaseBrowserEnv } from "../supabase/config";
 import { createClient } from "../supabase/server";
 import { createStorageAdminClient } from "../supabase/storageAdmin";
+import {
+  clearPendingWorkEmailConfirmation,
+  setPendingWorkEmailConfirmation,
+} from "./pendingWorkEmail";
 import { sendWorkEmailConfirmationEmail } from "./workEmailConfirmationEmail";
 import {
   WORK_EMAIL_CONFIRMATION_CODE_LENGTH,
@@ -28,6 +32,10 @@ import {
 import { planWorkEmailVerificationSubmission } from "./requestFlow";
 
 const VERIFICATION_ROUTE = "/app/verification";
+const WORK_EMAIL_VERIFICATION_RETURN_ROUTES = new Set<string>([
+  AUTH_ROUTES.verification,
+  AUTH_ROUTES.accessHold,
+]);
 
 type QueryVerificationRequestRow = {
   id: string;
@@ -90,6 +98,13 @@ function buildRedirect(
 
   const suffix = search.toString();
   return suffix ? `${path}?${suffix}` : path;
+}
+
+function getWorkEmailVerificationReturnRoute(formData: FormData) {
+  const returnTo = getString(formData, "return_to");
+  return WORK_EMAIL_VERIFICATION_RETURN_ROUTES.has(returnTo)
+    ? returnTo
+    : AUTH_ROUTES.accessHold;
 }
 
 function getRpcPayload(data: unknown): WorkEmailConfirmationRpcResult {
@@ -363,11 +378,12 @@ async function sendConfirmationCodeForWorkEmailRequest({
 }
 
 export async function submitWorkEmailVerificationAction(formData: FormData) {
+  const returnRoute = getWorkEmailVerificationReturnRoute(formData);
   const env = getSupabaseBrowserEnv();
 
   if (!env.enabled) {
     redirect(
-      buildRedirect(VERIFICATION_ROUTE, {
+      buildRedirect(returnRoute, {
         error:
           "Supabase auth is not configured yet. Add NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY.",
       }),
@@ -383,7 +399,7 @@ export async function submitWorkEmailVerificationAction(formData: FormData) {
   if (userError || !user) {
     redirect(
       buildRedirect(AUTH_ROUTES.login, {
-        next: VERIFICATION_ROUTE,
+        next: returnRoute,
       }),
     );
   }
@@ -414,7 +430,7 @@ export async function submitWorkEmailVerificationAction(formData: FormData) {
 
   if (requestsResult.error || evidenceResult.error || approvedDomainsResult.error) {
     redirect(
-      buildRedirect(VERIFICATION_ROUTE, {
+      buildRedirect(returnRoute, {
         error:
           "Verification request storage is not ready yet. Try again after the verification foundation is available in this environment.",
       }),
@@ -436,7 +452,7 @@ export async function submitWorkEmailVerificationAction(formData: FormData) {
       eventType: getVerificationRequestEventType({
         submissionKind: submission.kind,
       }),
-      route: VERIFICATION_ROUTE,
+      route: returnRoute,
       result: submission.kind,
       metadata: {
         email_domain: submission.kind === "unsupported_domain" ? submission.domain : null,
@@ -446,7 +462,7 @@ export async function submitWorkEmailVerificationAction(formData: FormData) {
       },
     });
     redirect(
-      buildRedirect(VERIFICATION_ROUTE, {
+      buildRedirect(returnRoute, {
         error: submission.message,
       }),
     );
@@ -465,7 +481,7 @@ export async function submitWorkEmailVerificationAction(formData: FormData) {
       eventType: getVerificationRequestEventType({
         submissionKind: submission.kind,
       }),
-      route: VERIFICATION_ROUTE,
+      route: returnRoute,
       result: confirmation.ok ? "duplicate_code_sent" : "duplicate_active",
       metadata: {
         verification_request_id: submission.requestId,
@@ -474,8 +490,12 @@ export async function submitWorkEmailVerificationAction(formData: FormData) {
       },
     });
 
+    if (confirmation.ok) {
+      await setPendingWorkEmailConfirmation(workEmail);
+    }
+
     redirect(
-      buildRedirect(VERIFICATION_ROUTE, {
+      buildRedirect(returnRoute, {
         [confirmation.ok ? "message" : "error"]: confirmation.ok
           ? confirmation.message
           : confirmation.message,
@@ -491,7 +511,7 @@ export async function submitWorkEmailVerificationAction(formData: FormData) {
 
     if (error) {
       redirect(
-        buildRedirect(VERIFICATION_ROUTE, {
+        buildRedirect(returnRoute, {
           error:
             "Your verification request exists, but the work-email evidence metadata could not be attached yet. Try again.",
         }),
@@ -501,7 +521,7 @@ export async function submitWorkEmailVerificationAction(formData: FormData) {
     await recordSecurityEvent({
       userId: user.id,
       eventType: "verification_evidence.created",
-      route: VERIFICATION_ROUTE,
+      route: returnRoute,
       result: "attached_missing_evidence",
       metadata: {
         verification_request_id: submission.requestId,
@@ -519,8 +539,12 @@ export async function submitWorkEmailVerificationAction(formData: FormData) {
       workEmail,
     });
 
+    if (confirmation.ok) {
+      await setPendingWorkEmailConfirmation(workEmail);
+    }
+
     redirect(
-      buildRedirect(VERIFICATION_ROUTE, {
+      buildRedirect(returnRoute, {
         [confirmation.ok ? "message" : "error"]: confirmation.ok
           ? confirmation.message
           : confirmation.message,
@@ -536,7 +560,7 @@ export async function submitWorkEmailVerificationAction(formData: FormData) {
 
   if (requestError || !createdRequest) {
     redirect(
-      buildRedirect(VERIFICATION_ROUTE, {
+      buildRedirect(returnRoute, {
         error:
           "The work-email verification request could not be created. Try again.",
       }),
@@ -550,7 +574,7 @@ export async function submitWorkEmailVerificationAction(formData: FormData) {
 
   if (evidenceError) {
     redirect(
-      buildRedirect(VERIFICATION_ROUTE, {
+      buildRedirect(returnRoute, {
         error:
           "Your verification request was created, but the work-email evidence metadata could not be attached yet. Try again to refresh the request state.",
       }),
@@ -562,7 +586,7 @@ export async function submitWorkEmailVerificationAction(formData: FormData) {
     eventType: getVerificationRequestEventType({
       submissionKind: submission.kind,
     }),
-    route: VERIFICATION_ROUTE,
+    route: returnRoute,
     result: "submitted",
     metadata: {
       verification_request_id: createdRequest.id,
@@ -576,7 +600,7 @@ export async function submitWorkEmailVerificationAction(formData: FormData) {
   await recordSecurityEvent({
     userId: user.id,
     eventType: "verification_evidence.created",
-    route: VERIFICATION_ROUTE,
+    route: returnRoute,
     result: "created",
     metadata: {
       verification_request_id: createdRequest.id,
@@ -594,8 +618,12 @@ export async function submitWorkEmailVerificationAction(formData: FormData) {
     workEmail,
   });
 
+  if (confirmation.ok) {
+    await setPendingWorkEmailConfirmation(workEmail);
+  }
+
   redirect(
-    buildRedirect(VERIFICATION_ROUTE, {
+    buildRedirect(returnRoute, {
       [confirmation.ok ? "message" : "error"]: confirmation.ok
         ? confirmation.message
         : confirmation.message,
@@ -604,11 +632,12 @@ export async function submitWorkEmailVerificationAction(formData: FormData) {
 }
 
 export async function verifyWorkEmailConfirmationCodeAction(formData: FormData) {
+  const returnRoute = getWorkEmailVerificationReturnRoute(formData);
   const env = getSupabaseBrowserEnv();
 
   if (!env.enabled) {
     redirect(
-      buildRedirect(VERIFICATION_ROUTE, {
+      buildRedirect(returnRoute, {
         error:
           "Supabase auth is not configured yet. Add NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY.",
       }),
@@ -624,7 +653,7 @@ export async function verifyWorkEmailConfirmationCodeAction(formData: FormData) 
   if (userError || !user) {
     redirect(
       buildRedirect(AUTH_ROUTES.login, {
-        next: VERIFICATION_ROUTE,
+        next: returnRoute,
       }),
     );
   }
@@ -633,7 +662,7 @@ export async function verifyWorkEmailConfirmationCodeAction(formData: FormData) 
 
   if (!verificationCode) {
     redirect(
-      buildRedirect(VERIFICATION_ROUTE, {
+      buildRedirect(returnRoute, {
         error: `Enter the ${WORK_EMAIL_CONFIRMATION_CODE_LENGTH}-digit verification code from your airline employee email.`,
       }),
     );
@@ -651,7 +680,7 @@ export async function verifyWorkEmailConfirmationCodeAction(formData: FormData) 
     await recordSecurityEvent({
       userId: user.id,
       eventType: "work_email_verification.confirm_failed",
-      route: VERIFICATION_ROUTE,
+      route: returnRoute,
       result: payload.code ?? "confirm_failed",
       metadata: {
         verification_method: "work_email",
@@ -659,7 +688,7 @@ export async function verifyWorkEmailConfirmationCodeAction(formData: FormData) 
     });
 
     redirect(
-      buildRedirect(VERIFICATION_ROUTE, {
+      buildRedirect(returnRoute, {
         error: getWorkEmailCodeVerificationFailureMessage(payload.code),
       }),
     );
@@ -668,7 +697,7 @@ export async function verifyWorkEmailConfirmationCodeAction(formData: FormData) 
   await recordSecurityEvent({
     userId: user.id,
     eventType: "work_email_verification.confirmed",
-    route: VERIFICATION_ROUTE,
+    route: returnRoute,
     result: "confirmed",
     metadata: {
       verification_request_id: payload.verification_request_id ?? null,
@@ -677,6 +706,8 @@ export async function verifyWorkEmailConfirmationCodeAction(formData: FormData) 
       confirmation_source: "work_email_confirmation_code",
     },
   });
+
+  await clearPendingWorkEmailConfirmation();
 
   redirect(AUTH_ROUTES.app);
 }

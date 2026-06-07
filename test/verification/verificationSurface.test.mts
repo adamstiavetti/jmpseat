@@ -107,63 +107,58 @@ test("work-email surface state explains unavailable or deferred self-serve submi
   );
 });
 
-test("/app/verification copy freezes proof upload while preserving airline-email guidance", () => {
+test("/app/verification is deprecated in favor of the access-hold verification flow", () => {
   const source = readFileSync(
     new URL("../../app/app/verification/page.tsx", import.meta.url),
     "utf8",
   );
 
-  assert.match(source, /confirmed approved airline employee email/i);
-  assert.match(source, /employee email is not public/i);
-  assert.match(source, /app\s+entry\s+now\s+checks\s+your\s+profile,\s+airline-email\s+eligibility,\s+and\s+beta\s+access\s+when\s+private\s+testing\s+requires\s+it/i);
-  assert.match(source, /does\s+not\s+grant\s+role,\s+base,\s+or\s+restricted-board\s+membership/i);
-  assert.match(source, /approved airline-controlled domain/i);
-  assert.match(source, /only approved airline-controlled domains are currently supported/i);
-  assert.match(source, /sends a six-digit\s+verification code to that inbox/i);
-  assert.match(source, /Send verification code/i);
-  assert.match(source, /Enter verification code/i);
-  assert.match(source, /Check your airline employee email inbox for the current code/i);
-  assert.match(source, /hashed verification codes/i);
-  assert.match(source, /name="verification_code"/i);
-  assert.doesNotMatch(source, /does not send a custom verification\s+email yet/i);
-  assert.match(source, /no employer-system lookup/i);
-  assert.match(source, /Proof upload is frozen/i);
-  assert.match(source, /no longer asks normal users to upload badges/i);
-  assert.match(source, /runtime-applied\s+safety and cleanup infrastructure/i);
-  assert.match(source, /community-admin approval/i);
+  assert.match(source, /DeprecatedVerificationPage/);
+  assert.match(source, /redirect\(AUTH_ROUTES\.accessHold\)/);
+  assert.doesNotMatch(source, /Airline-email access status/i);
+  assert.doesNotMatch(source, /submitWorkEmailVerificationAction/i);
+  assert.doesNotMatch(source, /verifyWorkEmailConfirmationCodeAction/i);
   assert.doesNotMatch(source, /submitRedactedProofVerificationAction/i);
   assert.doesNotMatch(source, /encType="multipart\/form-data"/i);
   assert.doesNotMatch(source, /name="proof_file"/i);
   assert.doesNotMatch(source, /type="file"/i);
-  assert.doesNotMatch(source, /accept="image\/jpeg,image\/png"/i);
-  assert.doesNotMatch(source, /Upload redacted proof for review/i);
-  assert.doesNotMatch(source, /Requested airline for reviewer routing/i);
-  assert.doesNotMatch(source, /employee IDs|badge numbers|barcodes|QR codes|crew hotel info/i);
-  assert.doesNotMatch(source, /public url|download button|automatic approval|openai|ai pre-check/i);
-  assert.doesNotMatch(source, /confirmation\s+link to that inbox|Send confirmation email|click the confirmation link/i);
 });
 
-test("/app/verification is configured as the airline-email remedy route", () => {
-  const source = readFileSync(
-    new URL("../../app/app/verification/page.tsx", import.meta.url),
+test("work-email verification defaults to access-hold while preserving legacy confirmation compatibility", () => {
+  const actions = readFileSync(
+    new URL("../../src/lib/verification/actions.ts", import.meta.url),
+    "utf8",
+  );
+  const confirmRoute = readFileSync(
+    new URL("../../app/app/verification/confirm/route.ts", import.meta.url),
     "utf8",
   );
 
-  assert.match(source, /routeKind:\s*"verification"/);
-  assert.match(source, /AUTH_ROUTES\.verification/);
-  assert.doesNotMatch(source, /routeKind:\s*"private-child"/);
+  assert.match(actions, /WORK_EMAIL_VERIFICATION_RETURN_ROUTES/);
+  assert.match(actions, /AUTH_ROUTES\.verification/);
+  assert.match(actions, /AUTH_ROUTES\.accessHold/);
+  assert.match(actions, /:\s*AUTH_ROUTES\.accessHold/);
+  assert.match(confirmRoute, /AUTH_ROUTES\.verificationConfirm/);
+  assert.match(confirmRoute, /AUTH_ROUTES\.accessHold/);
 });
 
-test("access-hold links missing airline-email users to verification before invite redemption", () => {
+test("access-hold lets missing airline-email users verify inline before invite redemption", () => {
   const source = readFileSync(
     new URL("../../app/app/access-hold/page.tsx", import.meta.url),
     "utf8",
   );
 
-  assert.match(source, /AUTH_ROUTES\.verification/);
   assert.match(source, /Verify airline employee email/);
+  assert.match(source, /submitWorkEmailVerificationAction/);
+  assert.match(source, /verifyWorkEmailConfirmationCodeAction/);
+  assert.match(source, /name="work_email"/);
+  assert.match(source, /name="return_to"\s+value=\{AUTH_ROUTES\.accessHold\}/);
+  assert.match(source, /pendingWorkEmailConfirmation/);
+  assert.match(source, /We sent a confirmation to/);
+  assert.match(source, /codeName="verification_code"/);
   assert.match(source, /Beta invite codes do not replace airline-email verification/);
   assert.match(source, /context\.airlineEmailAccessState\.airlineEmailVerified/);
+  assert.match(source, /!context\.airlineEmailAccessState\.airlineEmailVerified \? \(/);
   assert.doesNotMatch(source, /submitRedactedProofVerificationAction/i);
   assert.doesNotMatch(source, /encType="multipart\/form-data"/i);
   assert.doesNotMatch(source, /name="proof_file"/i);

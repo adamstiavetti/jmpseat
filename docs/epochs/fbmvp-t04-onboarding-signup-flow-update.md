@@ -8,13 +8,18 @@ jmpseat is not affiliated with or endorsed by any airline, airport, union, or em
 
 ## Summary
 
-FBMVP-T04 updates the user-facing auth, profile, access-hold, and verification copy so the current access journey is coherent after the airline-email access gate, launch-mode gate, and beta invite-code foundation work.
+FBMVP-T04 updated the user-facing auth, profile, and access-hold copy so the current access journey is coherent after the airline-email access gate, launch-mode gate, and beta invite-code foundation work.
+
+Current-state note: the later auth design-system overhaul deprecated
+`/app/verification` as a standalone user-facing page. `/app/access-hold` is now
+the canonical access status and airline employee email verification surface.
 
 The implemented journey is:
 
 - create or log in to a jmpseat account
 - complete minimal profile onboarding
-- verify an approved airline employee email as the app-level eligibility credential
+- verify an approved airline employee email on `/app/access-hold` as the
+  app-level eligibility credential
 - redeem a beta invite code only when `private_testing` or `internal_test` still requires beta access
 - enter the app when the existing gate rules pass
 
@@ -28,7 +33,8 @@ Updated surfaces:
 - `app/login/page.tsx`
 - `app/app/profile/page.tsx`
 - `app/app/access-hold/page.tsx`
-- `app/app/verification/page.tsx`
+- `app/app/verification/page.tsx` was originally updated by this ticket, but
+  later became a compatibility redirect to `/app/access-hold`.
 
 Updated tests:
 
@@ -62,17 +68,19 @@ Current behavior remains:
 
 Copy now clarifies that first-base or broader launch access does not require a beta invite code when beta is bypassed.
 
-## Verification Page Behavior
+## Verification Surface Behavior
 
-`/app/verification` remains the airline employee email eligibility surface.
+`/app/access-hold` is now the airline employee email eligibility surface.
+`/app/verification` is deprecated as a standalone page and redirects to
+`/app/access-hold`.
 
-The page now reflects the already-implemented access model:
+The current access-hold surface reflects the already-implemented access model:
 
 - app entry checks profile completion, airline-email eligibility, and beta access when private testing requires it
 - airline-email eligibility does not grant role, base, or restricted-board membership
-- proof upload remains frozen as a forward access path
 - work email is not public
 - restricted-board access remains a later board/community-admin approval flow
+- proof upload remains frozen as a forward access path
 
 No proof upload, badge upload, document upload, signed URL, public proof URL, storage path, filename, proof content, token, session, or service-role behavior was exposed.
 
@@ -80,7 +88,7 @@ No proof upload, badge upload, document upload, signed URL, public proof URL, st
 
 `/app/profile` remains minimal profile onboarding. This ticket did not add heavier profile requirements.
 
-The profile page continues to treat claimed airline, role, and base as self-declared fields. The page now explicitly reminds users that airline employee email verification remains separate from profile completion.
+The profile page continues to treat claimed airline, role, and base as self-declared fields. Profile completion remains separate from airline employee email verification and beta approval.
 
 ## Gate Rules Unchanged
 

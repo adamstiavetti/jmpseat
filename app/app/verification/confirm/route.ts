@@ -74,7 +74,7 @@ function redirectWithClearedPendingCookie(request: NextRequest, url: URL) {
 function redirectToVerificationError(request: NextRequest, code?: string | null) {
   return redirectWithClearedPendingCookie(
     request,
-    buildRedirect(request, AUTH_ROUTES.verification, {
+    buildRedirect(request, AUTH_ROUTES.accessHold, {
       error: getSafeFailureMessage(code),
     }),
   );
@@ -121,7 +121,7 @@ export async function GET(request: NextRequest) {
 
   if (!env.enabled) {
     return NextResponse.redirect(
-      buildRedirect(request, AUTH_ROUTES.verification, {
+      buildRedirect(request, AUTH_ROUTES.accessHold, {
         error:
           "Supabase auth is not configured yet. Work-email confirmation is unavailable in this environment.",
       }),
