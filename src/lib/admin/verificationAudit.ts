@@ -15,6 +15,7 @@ import {
   normalizeAuditLimit,
   normalizeAuditOffset,
   normalizeSelectedAuditRequestId,
+  redactAuditUserReference,
   sanitizeAuditMetadata,
   type VerificationAuditDetailRecord,
   type VerificationAuditEventRecord,
@@ -113,13 +114,13 @@ function toRequestRecord(row: unknown): VerificationAuditRequestRecord | null {
 
   return {
     id,
-    userId,
+    userId: redactAuditUserReference(userId) ?? "user reference redacted",
     status,
     method,
     requestedClaimTypes: getStringArray(row.requested_claim_types),
     submittedAt: getString(row.submitted_at),
     reviewedAt: getString(row.reviewed_at),
-    reviewedBy: getString(row.reviewed_by),
+    reviewedBy: redactAuditUserReference(getString(row.reviewed_by)),
     expiresAt: getString(row.expires_at),
     createdAt,
     updatedAt,
@@ -217,7 +218,7 @@ function toDetailRecord(row: unknown): VerificationAuditDetailRecord | null {
         return [
           {
             id,
-            reviewerId,
+            reviewerId: redactAuditUserReference(reviewerId) ?? "user reference redacted",
             action,
             createdAt,
             claimId: getString(entry.claim_id),
@@ -251,7 +252,7 @@ function toEventRecord(row: unknown): VerificationAuditEventRecord | null {
   return {
     id,
     eventType,
-    userId: getString(row.user_id),
+    userId: redactAuditUserReference(getString(row.user_id)),
     route: getString(row.route),
     result: getString(row.result),
     metadata: getMetadata(row.metadata),

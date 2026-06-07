@@ -25,7 +25,7 @@ operator grant management path.
 | Admin shell and navigation | runtime-proven | `docs/epochs/e05-admin-shell-navigation-foundation.md`, `docs/ops/operator-grants-bootstrap-runtime-pass.md`, `app/app/admin/page.tsx`, `src/components/admin/AdminShell.tsx`, `src/lib/admin/access.ts`, `test/admin/adminShell.test.mts` | `/app/admin` exists, protected admin navigation exists, normal users do not get privileged tools, and reviewer queue behavior remains separate. |
 | Operator grants foundation and first bootstrap | runtime-proven | `docs/epochs/e05-operator-grants-foundation.md`, `docs/ops/operator-grants-bootstrap-runtime-pass.md`, `app/api/ops/operator-bootstrap/route.ts`, `src/lib/admin/operatorBootstrapRoute.ts`, `supabase/migrations/20260605113000_create_operator_grants_foundation.sql`, `test/admin/operatorBootstrapRoute.test.mts` | First-operator bootstrap was validated in the linked runtime and closes after an active grant exists. |
 | Founder/admin internal private-app access | runtime-proven | `docs/epochs/founder-admin-private-app-access-implementation.md`, `docs/ops/founder-admin-private-app-access-runtime-pass.md`, `docs/ops/auth-detour-closeout-runtime-pass.md`, `src/lib/privateApp/access.ts`, `src/lib/betaAccess/server.ts`, `test/private-app/access.test.mts` | Internal access resolves through `operator_internal` and does not grant beta access, airline-email eligibility, role claims, base claims, or restricted-board claims. |
-| Post-bootstrap operator grant management | implemented-not-runtime-proven | `docs/epochs/operator-grant-management-implementation.md`, `app/app/admin/operator-access/page.tsx`, `src/lib/admin/operatorGrants.ts`, `src/lib/admin/operatorGrantLookup.ts`, `test/admin/operatorAccess.test.mts`, `supabase/migrations/20260606203000_add_operator_internal_private_app_access_scope.sql` | The tool and tests exist. Runtime alignment for founder/admin access succeeded, but the implementation note still records dedicated runtime validation as pending for the authenticated operator UI/RPC path. |
+| Post-bootstrap operator grant management | implemented-not-runtime-proven | `docs/epochs/operator-grant-management-implementation.md`, `docs/ops/operator-grant-audit-metadata-redaction.md`, `app/app/admin/operator-access/page.tsx`, `src/lib/admin/operatorGrants.ts`, `src/lib/admin/operatorGrantLookup.ts`, `test/admin/operatorAccess.test.mts`, `supabase/migrations/20260606203000_add_operator_internal_private_app_access_scope.sql`, `supabase/migrations/20260607103000_redact_operator_grant_audit_metadata.sql` | The tool and tests exist. Runtime alignment for founder/admin access succeeded, but dedicated runtime validation remains pending for the authenticated operator UI/RPC path. The next runtime proof is gated on applying the audit metadata redaction migration first. |
 | Approved-domain management | runtime-proven | `docs/epochs/e05-approved-domain-management.md`, `docs/ops/approved-domain-management-runtime-pass.md`, `app/app/admin/approved-domains/page.tsx`, `src/lib/admin/approvedDomains.ts`, `supabase/migrations/20260605184500_add_operator_managed_approved_email_domains.sql`, `supabase/migrations/20260605190500_fix_approved_domain_test_tld_validation.sql`, `test/admin/approvedDomains.test.mts` | Operator-only list/create/update/disable exists and is runtime-proven. Disabled domains stay hidden from normal work-email reads. |
 | Reviewer-scope management | runtime-proven | `docs/epochs/e05-reviewer-scope-management.md`, `docs/ops/reviewer-scope-management-runtime-pass.md`, `app/app/admin/reviewer-scopes/page.tsx`, `src/lib/admin/reviewerScopes.ts`, `supabase/migrations/20260605213000_add_operator_managed_reviewer_scopes.sql`, `test/admin/reviewerScopes.test.mts` | Operator-controlled reviewer scope grant/revoke exists, with self-escalation protections and linked-runtime proof. |
 | Verification review/admin queue | runtime-proven | `app/app/admin/verification/page.tsx`, `src/lib/verification/review.ts`, `src/lib/verification/reviewActions.ts`, `docs/epochs/epoch-04-human-review-queue-foundation-implementation.md`, `docs/ops/verification-runtime-pass-american-airlines.md`, `test/verification/review.test.mts` | Existing reviewer-scope based queue remains separate from operator/admin access. No proof review expansion is part of the current forward path. |
@@ -63,7 +63,9 @@ Relevant auth-detour artifacts that remain useful to Epoch 5:
 ## Open Epoch 5 Gaps
 
 1. Dedicated post-bootstrap operator grant management runtime proof is still
-   missing for the authenticated operator UI/RPC path.
+   missing for the authenticated operator UI/RPC path. That runtime proof should
+   run only after the operator grant audit metadata redaction migration is
+   applied.
 2. `docs/epochs/epoch-05-operator-admin-tooling-tickets.md` has historical
    status drift: its pivot section says E05-T01 through E05-T07 are implemented
    and runtime-proven, but early ticket sections for E05-T01 through E05-T03
@@ -87,7 +89,8 @@ Goal:
 
 Validate the post-bootstrap `/app/admin/operator-access` path through an
 authenticated existing operator session and reconcile the remaining Epoch 5 docs
-status drift.
+status drift after the operator grant audit metadata redaction migration has
+been applied.
 
 Scope:
 
@@ -99,6 +102,8 @@ Scope:
 - Confirm no beta grant, airline-email eligibility mutation, role claim, base
   claim, or restricted-board claim is issued.
 - Confirm audit metadata stays bounded and does not expose private identifiers.
+- Confirm the operator grant audit metadata redaction migration is applied in
+  the linked runtime before performing grant/revoke proof actions.
 - Update `docs/epochs/operator-grant-management-implementation.md` from
   runtime-pending to runtime-proven if the pass succeeds.
 - Reconcile stale status wording in

@@ -273,6 +273,45 @@ test("operator grant/revoke expected denials return after auditing instead of ra
   assert.doesNotMatch(revokeFunction, /raise exception/i);
 });
 
+test("operator grant audit redaction migration removes target identifiers from grant and revoke event metadata", () => {
+  const migrationsDir = new URL("../../supabase/migrations/", import.meta.url);
+  const migrationName = readdirSync(migrationsDir).find((name) =>
+    name.endsWith("_redact_operator_grant_audit_metadata.sql"),
+  );
+
+  assert.ok(migrationName, "expected operator grant audit metadata redaction migration");
+
+  const sql = readFileSync(
+    new URL(`../../supabase/migrations/${migrationName}`, import.meta.url),
+    "utf8",
+  );
+  const grantFunction = sql.slice(
+    sql.indexOf("create or replace function public.grant_operator_access"),
+    sql.indexOf("create or replace function public.revoke_operator_access"),
+  );
+  const revokeFunction = sql.slice(
+    sql.indexOf("create or replace function public.revoke_operator_access"),
+    sql.indexOf("revoke all on function public.grant_operator_access"),
+  );
+
+  assert.match(grantFunction, /operator_access\.granted/i);
+  assert.match(revokeFunction, /operator_access\.revoked/i);
+  assert.match(grantFunction, /target_user_found', true/i);
+  assert.match(grantFunction, /target_already_had_active_grant', true/i);
+  assert.match(grantFunction, /grant_created', true/i);
+  assert.match(revokeFunction, /target_user_found', true/i);
+  assert.match(revokeFunction, /grant_revoked', true/i);
+  assert.match(`${grantFunction}\n${revokeFunction}`, /operator_access_flow', 'grant_management'/i);
+  assert.doesNotMatch(
+    `${grantFunction}\n${revokeFunction}`,
+    /'target_user_id'\s*,|'targetUserId'\s*,|'actor_user_id'\s*,|'actorUserId'\s*,|'user_id'\s*,\s*target_user_id/i,
+  );
+  assert.doesNotMatch(
+    `${grantFunction}\n${revokeFunction}`,
+    /beta_access|verification_claims|airline_email_verified|restricted_board|role_claim|base_claim/i,
+  );
+});
+
 test("operator grant management source stays server-only, resolves target email privately, and grants only internal access scope", () => {
   const source = readFileSync(
     new URL("../../src/lib/admin/operatorGrants.ts", import.meta.url),

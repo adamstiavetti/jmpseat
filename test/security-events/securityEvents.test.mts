@@ -103,6 +103,7 @@ test("security event metadata strips sensitive or noisy values", () => {
     sanitizeSecurityEventMetadata({
       email: "crew.member@example.com",
       email_domain: "example.com",
+      userId: "user-id",
       password: "secret",
       invited_email: "invite@example.com",
       invite_code: "ABCD-EFGH-JKLM-NPQR",
@@ -135,6 +136,18 @@ test("security event metadata strips sensitive or noisy values", () => {
       route: "/app",
       result: "redirect_login",
       next_path: "/app/home",
+      nested: {
+        userId: "nested-user-id",
+        targetUserId: "target-user-id",
+        actorUserId: "actor-user-id",
+        safe_count: 2,
+      },
+      array_values: [
+        {
+          userId: "array-user-id",
+          safe_label: "array-safe",
+        },
+      ],
       nullish: null,
     }),
     {
@@ -142,6 +155,14 @@ test("security event metadata strips sensitive or noisy values", () => {
       route: "/app",
       result: "redirect_login",
       next_path: "/app/home",
+      nested: {
+        safe_count: 2,
+      },
+      array_values: [
+        {
+          safe_label: "array-safe",
+        },
+      ],
     },
   );
 });

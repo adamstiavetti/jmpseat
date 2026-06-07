@@ -126,6 +126,14 @@ No applied migration was edited.
 
 Runtime validation is still pending after review/merge.
 
+The runtime proof was later blocked during preflight because the original
+operator grant/revoke audit metadata included raw target user identifiers in
+general security-event metadata. The narrow redaction follow-up is documented in:
+
+- `docs/ops/operator-grant-audit-metadata-redaction.md`
+
+Apply that redaction migration before rerunning the runtime proof.
+
 That runtime pass should confirm:
 
 - an existing operator can grant the new internal scope through

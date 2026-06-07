@@ -9,6 +9,7 @@ import {
 import {
   AUDIT_INSPECTION_SCOPES,
   sanitizeAuditMetadata,
+  redactAuditUserReference,
   normalizeAuditLimit,
   normalizeAuditOffset,
   normalizeSelectedAuditRequestId,
@@ -54,6 +55,12 @@ test("audit-inspection shared helpers keep scopes separate and enforce paginatio
   assert.equal(canReadVerificationRequests(["operator.read_audit"]), false);
   assert.equal(canReadAuditEvents(["operator.read_audit"]), true);
   assert.equal(canReadAuditEvents(["operator.read_verification_requests"]), false);
+  assert.equal(redactAuditUserReference(null), null);
+  assert.equal(redactAuditUserReference(""), null);
+  assert.equal(
+    redactAuditUserReference("8b3f2d30-f4f1-4d02-a56b-8ad94d327851"),
+    "user reference redacted",
+  );
   assert.equal(normalizeAuditLimit("1"), 1);
   assert.equal(normalizeAuditLimit("500"), 50);
   assert.equal(normalizeAuditLimit("not-a-number"), 25);
@@ -73,6 +80,13 @@ test("audit metadata sanitizer removes proof paths, URLs, tokens, and raw proof 
   assert.deepEqual(
     sanitizeAuditMetadata({
       request_id: "request-1",
+      target_user_id: "8b3f2d30-f4f1-4d02-a56b-8ad94d327851",
+      targetUserId: "8b3f2d30-f4f1-4d02-a56b-8ad94d327851",
+      actor_user_id: "8b3f2d30-f4f1-4d02-a56b-8ad94d327851",
+      actorUserId: "8b3f2d30-f4f1-4d02-a56b-8ad94d327851",
+      user_id: "8b3f2d30-f4f1-4d02-a56b-8ad94d327851",
+      userId: "8b3f2d30-f4f1-4d02-a56b-8ad94d327851",
+      nested_user_id: "8b3f2d30-f4f1-4d02-a56b-8ad94d327851",
       storage_path: "private/path.png",
       signed_url: "https://signed.example",
       public_url: "https://public.example",
@@ -88,6 +102,8 @@ test("audit metadata sanitizer removes proof paths, URLs, tokens, and raw proof 
       raw_proof_contents: "raw proof contents",
       extracted_text: "extracted proof text",
       nested: {
+        target_user_id: "8b3f2d30-f4f1-4d02-a56b-8ad94d327851",
+        userId: "8b3f2d30-f4f1-4d02-a56b-8ad94d327851",
         proof_filename: "badge.png",
         proof_text: "nested proof text",
         proof_file_contents: "nested proof file contents",
@@ -98,11 +114,14 @@ test("audit metadata sanitizer removes proof paths, URLs, tokens, and raw proof 
       },
       array_values: [
         {
+          targetUserId: "8b3f2d30-f4f1-4d02-a56b-8ad94d327851",
+          userId: "8b3f2d30-f4f1-4d02-a56b-8ad94d327851",
           original_filename: "badge-front.png",
           safe_label: "front",
         },
         {
           nested: {
+            actor_user_id: "8b3f2d30-f4f1-4d02-a56b-8ad94d327851",
             access_token: "token-value",
             proof_content: "array proof content",
             raw_proof_contents: "array raw proof contents",
@@ -170,9 +189,25 @@ test("audit-inspection server module uses scoped RPCs and does not expose servic
   assert.match(source, /operator_audit\.unauthorized_attempt/);
   assert.match(source, /VERIFICATION_AUDIT_NOT_READY_MESSAGE/);
   assert.match(source, /kind: "not_ready"/);
+  assert.match(source, /redactAuditUserReference/);
+  assert.match(source, /userId: redactAuditUserReference\(userId\)/);
+  assert.match(source, /userId: redactAuditUserReference\(getString\(row\.user_id\)\)/);
   assert.doesNotMatch(source, /createStorageAdminClient|SUPABASE_SERVICE_ROLE_KEY/);
   assert.doesNotMatch(source, /\.from\("verification_requests"\)|\.from\("security_events"\)/);
   assert.doesNotMatch(source, /signed_url|public_url|storage_path/i);
+});
+
+test("audit-inspection page renders redacted top-level user references", () => {
+  const source = readFileSync(
+    new URL("../../app/app/admin/audit/page.tsx", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(source, /redactAuditUserReference/);
+  assert.match(source, /formatNullable\(redactAuditUserReference\(request\.userId\)\)/);
+  assert.match(source, /formatNullable\(redactAuditUserReference\(event\.userId\)\)/);
+  assert.doesNotMatch(source, /<dd>\{request\.userId\}<\/dd>/);
+  assert.doesNotMatch(source, /<dd>\{formatNullable\(event\.userId\)\}<\/dd>/);
 });
 
 test("audit-inspection server module rejects malformed selected request ids before UUID RPC", () => {
@@ -251,6 +286,7 @@ test("audit-inspection migration recursively sanitizes metadata for direct RPC c
   assert.match(sql, /raw_proof|raw_proof_text|raw_proof_contents|extracted_text|ocr_text/i);
   assert.match(sql, /signed_url|public_url|\(\^\|_\)url\$|magic_link|session|authorization|cookie/i);
   assert.match(sql, /service_role|service_role_key|access_token|refresh_token/i);
+  assert.match(sql, /target_user_id|targetUserId|actor_user_id|actorUserId|user_id/i);
   assert.doesNotMatch(
     sanitizer,
     /select jsonb_object_agg\(key, value\)[\s\S]*where key !~\*/i,

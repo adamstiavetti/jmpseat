@@ -81,6 +81,12 @@ export type VerificationAuditDetailRecord = VerificationAuditRequestRecord & {
 const REDACTED_AUDIT_METADATA_KEYS = new Set([
   "password",
   "email",
+  "target_user_id",
+  "targetuserid",
+  "actor_user_id",
+  "actoruserid",
+  "user_id",
+  "userid",
   "work_email",
   "raw_work_email",
   "email_local_part",
@@ -131,6 +137,10 @@ const REDACTED_AUDIT_METADATA_KEYS = new Set([
 
 const REDACTED_AUDIT_METADATA_PATTERNS = [
   /password/i,
+  /^target_?user_?id$/i,
+  /^actor_?user_?id$/i,
+  /^user_?id$/i,
+  /(^|_)user_id$/i,
   /(^|_)token$/i,
   /access_token$/i,
   /refresh_token$/i,
@@ -215,6 +225,10 @@ export function sanitizeAuditMetadata(
   });
 
   return Object.fromEntries(entries);
+}
+
+export function redactAuditUserReference(value: string | null | undefined) {
+  return value?.trim() ? "user reference redacted" : null;
 }
 
 export function normalizeAuditLimit(value: string | number | null | undefined) {

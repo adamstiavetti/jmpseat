@@ -15,6 +15,7 @@ import {
   canReadAuditEvents,
   canReadVerificationRequests,
   normalizeAuditLimit,
+  redactAuditUserReference,
 } from "../../../../src/lib/admin/verificationAuditShared";
 import {
   VERIFICATION_AUDIT_ROUTE,
@@ -184,7 +185,8 @@ export default async function VerificationAuditPage({
         <p className={authStyles.hint}>
           Request inspection uses `operator.read_verification_requests`.
           Security-event inspection uses `operator.read_audit`. Reviewer scope
-          does not activate this route.
+          does not activate this route. User references are redacted in the
+          audit display.
         </p>
       }
     >
@@ -243,7 +245,7 @@ export default async function VerificationAuditPage({
                       </div>
                       <div>
                         <dt>User</dt>
-                        <dd>{request.userId}</dd>
+                        <dd>{formatNullable(redactAuditUserReference(request.userId))}</dd>
                       </div>
                       <div>
                         <dt>Counts</dt>
@@ -339,7 +341,7 @@ export default async function VerificationAuditPage({
                       </div>
                       <div>
                         <dt>User</dt>
-                        <dd>{formatNullable(event.userId)}</dd>
+                        <dd>{formatNullable(redactAuditUserReference(event.userId))}</dd>
                       </div>
                       <div>
                         <dt>Route</dt>

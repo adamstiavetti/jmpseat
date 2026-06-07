@@ -86,6 +86,12 @@ export type SecurityEventInsert = {
 const REDACTED_METADATA_KEYS = new Set([
   "password",
   "email",
+  "target_user_id",
+  "targetuserid",
+  "actor_user_id",
+  "actoruserid",
+  "user_id",
+  "userid",
   "invited_email",
   "invite_code",
   "plaintext_code",
@@ -140,6 +146,10 @@ const REDACTED_METADATA_KEYS = new Set([
 
 const REDACTED_METADATA_KEY_PATTERNS = [
   /^employee_id$/,
+  /^target_?user_?id$/,
+  /^actor_?user_?id$/,
+  /^user_?id$/,
+  /(^|_)user_id$/,
   /^badge_(id|number|numbers)$/,
   /^barcode(_content)?$/,
   /^qr(_code|_content)?$/,
