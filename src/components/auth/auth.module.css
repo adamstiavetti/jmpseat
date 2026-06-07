@@ -564,6 +564,27 @@
   line-height: 1.25;
 }
 
+.signupHint {
+  margin: 0.08rem 0 0;
+  color: var(--color-text-secondary);
+  font-size: 0.84rem;
+  line-height: 1.34;
+}
+
+.signupSigninLink {
+  justify-self: center;
+  color: #1769bd;
+  font-size: 0.95rem;
+  font-weight: 750;
+  text-align: center;
+  text-decoration: none;
+}
+
+.signupSigninLink:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.22em;
+}
+
 .loginSecurityIcon {
   width: 1.05rem;
   height: 1.05rem;
@@ -608,9 +629,26 @@
 .loginCreateButton:focus-visible,
 .loginPasswordToggle:focus-visible,
 .loginLinks a:focus-visible,
-.loginWordmark:focus-visible {
+.loginWordmark:focus-visible,
+.signupSigninLink:focus-visible {
   outline: 2px solid var(--color-amber-500);
   outline-offset: 3px;
+}
+
+.signupPage .loginShell {
+  grid-template-rows: 40svh minmax(0, 60svh);
+}
+
+.signupPage .loginTitle {
+  max-width: 20rem;
+}
+
+.signupPage .loginFormPanel {
+  gap: 0.6rem;
+}
+
+.signupPage .loginButton {
+  margin-top: 0.2rem;
 }
 
 @media (max-width: 380px) {
@@ -762,5 +800,21 @@
 
   .loginInputShell {
     min-height: 3.75rem;
+  }
+
+  .signupPage .loginShell {
+    grid-template-rows: 1fr;
+  }
+
+  .signupPage .loginTitle {
+    max-width: 36rem;
+  }
+
+  .signupPage .loginFormPanel {
+    gap: 1rem;
+  }
+
+  .signupPage .loginForm {
+    gap: 1rem;
   }
 }

@@ -23,7 +23,17 @@ function EyeIcon() {
   );
 }
 
-export function PasswordInput() {
+type PasswordInputProps = {
+  autoComplete?: "current-password" | "new-password";
+  minLength?: number;
+  placeholder?: string;
+};
+
+export function PasswordInput({
+  autoComplete = "current-password",
+  minLength,
+  placeholder = "Enter your password",
+}: PasswordInputProps) {
   const [visible, setVisible] = useState(false);
 
   return (
@@ -34,8 +44,9 @@ export function PasswordInput() {
         id="password"
         name="password"
         type={visible ? "text" : "password"}
-        autoComplete="current-password"
-        placeholder="Enter your password"
+        autoComplete={autoComplete}
+        minLength={minLength}
+        placeholder={placeholder}
         required
       />
       <button
