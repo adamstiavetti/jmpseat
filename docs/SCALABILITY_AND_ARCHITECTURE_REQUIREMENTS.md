@@ -90,6 +90,15 @@ Working assumptions:
 
 - Add logging/observability gradually but intentionally.
 - Track auth failures, access-denied events, waitlist submissions, verification attempts, content reports, moderation decisions, and admin actions where applicable.
+- For the post-E05 public waitlist launch, track first-party funnel events such
+  as public page views, CTA clicks, waitlist form opens, waitlist form
+  submissions, submit failures, source/referrer, UTM parameters, and safe
+  device/browser class metadata.
+- Waitlist metrics should avoid sensitive identifiers, proof/badge/document
+  data, account auth data on the public page, plaintext codes, tokens, invite
+  codes, and private emails in event metadata.
+- Vercel Web Analytics can supplement traffic visibility, but first-party
+  product funnel metrics should own waitlist conversion reporting.
 - Plan backup/export needs before production data grows.
 - Keep migrations reviewable and reversible where practical.
 - Avoid schema changes that destroy production data without a migration plan.

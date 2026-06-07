@@ -59,9 +59,23 @@ Brand note: jmpseat is the canonical product and app name. This document does no
 ## 8. Recommended Future Mobile Stack
 
 - Expo / React Native is the likely default candidate for native mobile later.
+- EAS is the preferred future build and release path for Apple App Store and
+  Google Play distribution if native work begins.
 - Final client-stack selection should be made in a future implementation decision, not assumed permanently now.
 - Do not add Expo or React Native dependencies now.
+- Do not add EAS configuration now.
 - Do not restructure into a monorepo yet unless mobile implementation actually begins.
+
+Post-E05 waitlist launch note:
+
+- The public waitlist launch remains web-first on Vercel.
+- `jmpseat.com` should host the public waitlist/marketing page.
+- `beta.jmpseat.com` should host the private beta/auth/admin web app.
+- Supabase should remain the shared backend/auth/database for web and future
+  native clients.
+- Product rules should remain server/database enforced so a future native client
+  can reuse the same access contracts instead of recreating web-only redirect
+  behavior.
 
 ## 9. Future Repo Structure Option
 

@@ -12,6 +12,18 @@ This guide prepares the current M1A splash/waitlist app for preview or productio
 
 M1A is a public validation surface, not the full jmpseat product. Deployment should help review the landing page, connect a safe external waitlist CTA, and support controlled first outreach. It should not add internal waitlist storage, user accounts, verification, community features, AI, payments, analytics SDKs, or airline integrations.
 
+Current post-E05 update:
+
+- Use `ops/post-e05-public-waitlist-launch-plan.md` as the current launch plan
+  for the public `jmpseat.com` waitlist release.
+- `jmpseat.com` should serve the public waitlist/marketing page only.
+- Public `jmpseat.com` should not expose Beta Access.
+- `beta.jmpseat.com` remains the private beta/auth/admin/operator surface.
+- Tally remains the public form capture path.
+- First-party waitlist funnel metrics and an operator/admin dashboard are now
+  planned follow-up work before the public waitlist launch is considered fully
+  instrumented.
+
 ## 2. Current App Scope
 
 Implemented:
