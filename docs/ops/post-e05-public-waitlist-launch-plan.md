@@ -11,9 +11,10 @@ waitlist launch readiness. The public `jmpseat.com` surface should become a
 polished waitlist/marketing page only, while `beta.jmpseat.com` remains the
 private beta, auth, app, admin, and operator surface.
 
-This is a planning note only. It does not implement page changes, metrics,
-Tally integration, admin dashboards, domain changes, Vercel changes, Supabase
-changes, native-app work, deployment, or runtime mutations.
+This is a planning note. The first-party waitlist capture implementation is now
+tracked in `ops/public-waitlist-page-polish.md`. This plan still does not record
+root-domain cutover, deployment, DNS changes, Vercel changes, Supabase runtime
+settings changes, native-app work, admin dashboards, or runtime mutations.
 
 ## Domain Split
 
@@ -45,8 +46,9 @@ checklist:
 - Confirm SEO and social metadata.
 - Confirm no private beta, admin, operator, proof, or privileged language leaks
   onto the public page.
-- Confirm the Tally form opens from the waitlist CTA.
-- Confirm the Tally thank-you or success state.
+- Confirm first-party email capture works.
+- Confirm the post-submit optional product-shaping follow-up appears.
+- Confirm optional answers can be submitted or skipped.
 - Confirm accessibility basics: semantic headings, keyboard CTA access, visible
   focus, label/description clarity, color contrast, and reduced-motion safety if
   motion is present.
@@ -59,18 +61,25 @@ not add account creation, work-email verification, beta invite redemption,
 admin/operator entry, proof upload, badge upload, document upload, proof review,
 community posts, board access, or runtime grants.
 
-## Tally Integration
+## First-Party Waitlist Capture
 
-Tally is the public form capture path for waitlist submissions.
+First-party jmpseat capture is the primary public waitlist path. Tally is no
+longer the primary public waitlist capture path and should be treated as
+backup/research-only unless intentionally reintroduced later.
 
-Configuration:
+Current implementation direction:
 
-- Store the public form destination in `NEXT_PUBLIC_WAITLIST_FORM_URL` or a
-  successor public env name if the implementation changes.
-- Do not include real Tally URLs, private links, form tokens, or secrets in
-  repo docs.
-- Keep the reviewed form URL configured through environment/runtime settings,
-  not hard-coded in source.
+- Capture email directly on the public landing page.
+- Persist email immediately before showing optional follow-up questions.
+- Keep optional survey persistence server-owned so public clients cannot write
+  arbitrary survey payloads directly.
+- Enforce database-side survey allowlists, maximum selection counts, length
+  bounds, empty-string normalization, and sensitive-content rejection.
+- Use the optional question set from
+  `ops/waitlist-question-research-selection.md`.
+- Keep all follow-up questions optional.
+- Do not expose Beta Access on the public page.
+- Keep `beta.jmpseat.com` as the private beta/auth/admin/operator surface.
 
 Data minimization:
 
@@ -87,10 +96,10 @@ Data minimization:
 
 Operations:
 
-- Assign a data owner for Tally responses before public launch.
+- Assign a data owner for first-party waitlist responses before public launch.
 - Keep exports out of the repo unless explicitly redacted and approved.
-- Document the reviewed form fields and success message before cutover.
-- Perform a non-sensitive test submission before public release.
+- Perform non-sensitive runtime validation before public release.
+- Document any future Tally fallback before use.
 
 ## Metrics Capture Plan
 
@@ -102,10 +111,11 @@ Recommended events:
 
 - Public page viewed.
 - Primary CTA clicked.
-- Waitlist form opened.
-- Waitlist form started if Tally can emit or redirect that signal safely.
-- Waitlist form submitted.
+- Waitlist email submitted.
 - Waitlist submit failed.
+- Optional survey viewed.
+- Optional survey submitted.
+- Optional survey skipped.
 - Source/referrer captured.
 - UTM parameters captured.
 - Device class and browser family captured if safe.
@@ -183,20 +193,20 @@ Native:
 
 ## Proposed Next Ticket Sequence
 
-1. `W01 Public Waitlist Page Polish`
-   Polish the public waitlist page for `jmpseat.com`, remove/no-show public Beta
-   Access entry, confirm mobile/SEO/social/accessibility basics, and keep
-   private beta/auth/admin on `beta.jmpseat.com`.
+1. `W01 First-Party Public Waitlist Capture`
+   Implement first-party email capture on the public waitlist page, remove/no-show
+   public Beta Access entry, add optional product-shaping follow-up questions,
+   and keep private beta/auth/admin on `beta.jmpseat.com`.
 
-2. `W02 Tally Waitlist Integration`
-   Wire the reviewed Tally waitlist form through public env configuration,
-   confirm safe form fields and success state, and run a non-sensitive test
-   submission.
+2. `W02 Public Waitlist Runtime Validation`
+   Apply the migration through the normal reviewed runtime path, validate a
+   non-sensitive waitlist submission, duplicate submission, optional survey
+   submission, and skip behavior.
 
 3. `W03 Waitlist Metrics Event Capture`
-   Add first-party public funnel events for page view, CTA click, form open,
-   form submit, submit failure, referrer/source, UTM, and safe device/browser
-   metadata.
+   Add first-party public funnel events for page view, CTA click, email submit,
+   submit failure, optional survey view, optional survey submit, optional survey
+   skip, referrer/source, UTM, and safe device/browser metadata.
 
 4. `W04 Admin Waitlist Metrics Dashboard`
    Add an operator/admin-scoped viewer for waitlist metrics, conversion,

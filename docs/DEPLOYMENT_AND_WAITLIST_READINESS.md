@@ -8,9 +8,14 @@ Identity principle: Verified privately. Anonymous publicly. Accountable internal
 
 ## 1. Purpose
 
-This guide prepares the current M1A splash/waitlist app for preview or production deployment and connection to an external waitlist form.
+This guide prepares the current public waitlist app for preview or production
+deployment and first-party waitlist capture.
 
-M1A is a public validation surface, not the full jmpseat product. Deployment should help review the landing page, connect a safe external waitlist CTA, and support controlled first outreach. It should not add internal waitlist storage, user accounts, verification, community features, AI, payments, analytics SDKs, or airline integrations.
+The public page is a validation surface, not the full jmpseat product.
+Deployment should help review the landing page, validate first-party email
+capture, and support controlled first outreach. It should not add user accounts,
+verification, community features, AI, payments, analytics SDKs, or airline
+integrations.
 
 Current post-E05 update:
 
@@ -19,7 +24,8 @@ Current post-E05 update:
 - `jmpseat.com` should serve the public waitlist/marketing page only.
 - Public `jmpseat.com` should not expose Beta Access.
 - `beta.jmpseat.com` remains the private beta/auth/admin/operator surface.
-- Tally remains the public form capture path.
+- First-party jmpseat capture is the public waitlist path.
+- Tally is backup/research-only unless intentionally reintroduced later.
 - First-party waitlist funnel metrics and an operator/admin dashboard are now
   planned follow-up work before the public waitlist launch is considered fully
   instrumented.
@@ -30,38 +36,35 @@ Implemented:
 
 - Public splash page at `/`.
 - Private beta placeholder at `/app`.
-- External waitlist URL behavior through `NEXT_PUBLIC_WAITLIST_FORM_URL`.
-- Safe fallback message when `NEXT_PUBLIC_WAITLIST_FORM_URL` is missing.
-- No internal data collection.
+- First-party public waitlist email capture.
+- Post-submit optional product-shaping follow-up questions.
+- Safe duplicate submission behavior.
 
 Intentionally not implemented:
 
 - Auth or user accounts.
-- Database, Supabase, migrations, or persistence.
-- API routes for waitlist submissions.
 - Verification uploads or storage.
 - Crew Rooms, Base Boards, Layover Boards, posts, comments, search, moderation, or admin workflows.
 - AI, payments, marketplace, analytics SDK, schedule integrations, airline portal login, flight-load requests, nearby crew tracking, or dating/swiping.
 
-## 3. Tally Waitlist Form Requirements
+## 3. First-Party Waitlist Capture Requirements
 
-Use Tally, or an equivalent external form tool, for waitlist capture. Do not collect waitlist submissions inside the app.
+Use first-party jmpseat capture for the primary public waitlist. Tally should be
+treated as backup/research-only unless a later task intentionally reintroduces
+it.
 
 | Field | Requirement | Notes |
 | --- | --- | --- |
-| Preferred name | Optional | Use for outreach personalization only. |
-| Email | Required | Use for waitlist, interview, and beta invite communication. |
-| Aviation role | Required | Include flight attendant, pilot, gate agent, ramp agent, dispatcher, crew scheduler, airport ops, regional worker, new hire, commuter, and other aviation role. |
-| Base / airport | Required | Use short text or structured choices if a first-base target exists. |
-| Airline/company | Optional | Do not imply airline endorsement, partnership, or employer approval. |
-| Current status | Required | Suggested choices: active worker, former worker, new hire, student/aspiring, other. |
-| Feature interest ranking | Required | Rank Crew Rooms, Base Boards, Layover Boards, Jumpseat Brief, The Galley, NonRev Deals, Ready Room, Ramp Talk, and Crew Rest. |
+| Email | Required | Captured first and used for waitlist and product updates. |
+| Aviation connection | Optional | Helps understand first-community role mix. |
+| Base / airport community | Optional | Helps prioritize launch communities. |
+| Product usefulness drivers | Optional | Multi-select, bounded to keep the follow-up low-friction. |
 | Current alternatives used | Optional | Examples: Facebook groups, Reddit, group chats, crew apps, union pages, coworkers, notes. |
-| Main pain point | Optional | Ask for one base, layover, career, commute, or community pain. |
-| Privacy/verification concern | Optional | Ask what would make private verification comfortable or uncomfortable. |
-| Willing to interview | Optional | Yes/no/maybe. |
-| Willing to be an ambassador | Optional | Yes/no/maybe. |
-| Referral source | Optional | Track personal network, friend, group, Reddit, LinkedIn, or other. |
+| Main pain point | Optional | General free text only. |
+| Verification comfort | Optional | Tests trust and privacy needs without collecting proof. |
+| Willing to shape beta | Optional | Identifies interview volunteers and seed contributors. |
+| Referral source | Optional | Tracks high-level source/channel. |
+| Privacy/trust concern | Optional | General free text only. |
 
 ## 4. Public Waitlist Safety Rules
 
@@ -80,63 +83,37 @@ The public waitlist must not collect:
 - Airport security procedures.
 - Non-rev load information.
 
-If a respondent includes sensitive information in a free-text answer, do not copy it into project docs or summaries. Delete or redact it according to the selected form tool's process.
+If a respondent includes sensitive information in a free-text answer, do not
+copy it into project docs or summaries. Delete or redact it according to the
+selected data-retention process.
 
-## 5. Recommended Tally Copy
+## 5. Recommended Public Waitlist Copy
 
 Form title:
 
 > Join the jmpseat private beta waitlist
 
-Form description:
+Description:
 
-> jmpseat is a working-name concept for a verified off-duty network for airline people. We are validating demand for base intel, layover boards, anonymous but accountable crew discussion, career tools, and crew-friendly perks before opening private beta access.
+> jmpseat is the off-duty network for airline life. Join the waitlist for trusted base intel, layover knowledge, and verified discussion.
 
 Privacy/safety note:
 
-> Please do not upload or submit badges, IDs, employee numbers, schedules, airline portal credentials, exact crew hotel information, passenger information, live location, confidential company documents, or airport security procedures. If invited to beta, any verification steps will happen separately through a private process.
+> Please keep optional answers general. Do not share sensitive or confidential work details.
 
 Confirmation message:
 
-> You're on the waitlist. If your base, role, or airline fits the first private beta group, we may reach out for a short interview and separate verification steps. jmpseat is a working name pending legal/trademark clearance and is not affiliated with or endorsed by any airline, airport, union, or employer.
+> You're on the waitlist. Help us prioritize your invite and shape jmpseat.
 
-## 6. Environment Variable Setup
+Independence disclaimer:
 
-The app reads one public environment variable:
+> jmpseat is independent and is not sponsored by or affiliated with any airline, airport, union, or employer.
 
-```bash
-NEXT_PUBLIC_WAITLIST_FORM_URL=
-```
+## 6. Environment Setup
 
-Local setup:
-
-```bash
-cp .env.example .env.local
-```
-
-Then edit `.env.local`:
-
-```bash
-NEXT_PUBLIC_WAITLIST_FORM_URL=https://your-external-form-url
-```
-
-Vercel Preview setup:
-
-- Add `NEXT_PUBLIC_WAITLIST_FORM_URL` in the Vercel project environment variables.
-- Scope it to Preview.
-- Use the Tally form URL or the approved external waitlist URL.
-- Redeploy the preview after adding or changing the variable.
-
-Vercel Production setup:
-
-- Add `NEXT_PUBLIC_WAITLIST_FORM_URL` in the Vercel project environment variables.
-- Scope it to Production.
-- Use only the reviewed external waitlist URL.
-- Redeploy production after adding or changing the variable.
-
-If the variable is missing, the splash page should show:
-
-> Waitlist form coming soon.
+The first-party waitlist uses the existing Supabase public browser env names for
+server-side RPC calls. Do not commit env values. Do not hard-code private form
+URLs or tokens.
 
 ## 7. Local Verification
 
@@ -170,10 +147,13 @@ Local verification checks:
 
 - `/` loads.
 - `/app` shows the private beta placeholder.
-- Waitlist CTA links to the external URL when `NEXT_PUBLIC_WAITLIST_FORM_URL` is set.
-- Waitlist fallback appears when `NEXT_PUBLIC_WAITLIST_FORM_URL` is missing.
+- Email input appears above the waitlist CTA.
+- Email submission returns a safe success state.
+- Duplicate submission returns a safe success state.
+- Optional survey appears only after email capture.
+- Optional survey can be submitted or skipped.
 - Footer disclaimer is visible.
-- No form fields collect data inside the app.
+- No public Beta Access entry appears.
 
 ## 8. Vercel Preview Deployment
 
@@ -189,27 +169,15 @@ Create or deploy a preview:
 npx vercel
 ```
 
-Add the environment variable:
-
-- Open the Vercel project dashboard.
-- Go to Settings -> Environment Variables.
-- Add `NEXT_PUBLIC_WAITLIST_FORM_URL`.
-- Set the value to the reviewed external waitlist form URL.
-- Select the Preview environment.
-
-Redeploy preview:
-
-```bash
-npx vercel
-```
-
 Preview deployment review:
 
 - Open the preview URL on desktop.
 - Open the preview URL on mobile.
-- Click the waitlist CTA.
-- Confirm the CTA opens the external form in the expected destination.
-- Confirm no sensitive data is requested by the external form.
+- Submit a non-sensitive test email.
+- Confirm the safe success state appears.
+- Confirm optional survey submit behavior.
+- Confirm optional survey skip behavior.
+- Confirm no sensitive data is requested by the public page.
 - Confirm no official airline affiliation or legal/trademark clearance is implied.
 
 ## 9. Vercel Production Deployment
@@ -225,8 +193,8 @@ npx vercel --prod
 Production checks:
 
 - Verify the production URL loads.
-- Verify the waitlist CTA links to the reviewed external form.
-- Verify the fallback state is not accidentally showing unless intentionally deployed without a form URL.
+- Verify the first-party waitlist email form works.
+- Verify the optional survey submit and skip states work.
 - Verify footer disclaimers are visible.
 - Verify `/app` remains a placeholder only.
 - Verify no new features or data collection paths are present.
@@ -237,14 +205,16 @@ Do not deploy production until the founder or designated reviewer approves the p
 
 - [ ] Page loads at `/`.
 - [ ] Mobile layout works.
-- [ ] Waitlist button works when `NEXT_PUBLIC_WAITLIST_FORM_URL` is configured.
-- [ ] Fallback message works if `NEXT_PUBLIC_WAITLIST_FORM_URL` is missing.
-- [ ] External waitlist form does not request sensitive data.
+- [ ] Waitlist email submit works.
+- [ ] Duplicate waitlist email submit is safe and friendly.
+- [ ] Optional survey submit works.
+- [ ] Optional survey skip works.
+- [ ] Public waitlist form does not request sensitive data.
 - [ ] No badge upload, ID upload, schedule, portal credential, exact hotel, passenger info, live location, or confidential document field exists.
 - [ ] No-official-affiliation disclaimer is visible.
 - [ ] Working-name/legal-trademark caveat is visible.
 - [ ] `/app` remains a private beta placeholder only.
-- [ ] No auth, database, Supabase, API persistence, verification uploads, community features, AI, payments, analytics SDK, airline integrations, schedule scraping, flight-load requests, nearby crew tracking, or dating/swiping were added.
+- [ ] No auth, verification uploads, community features, AI, payments, analytics SDK, airline integrations, schedule scraping, flight-load requests, nearby crew tracking, or dating/swiping were added.
 
 ## 11. First Outreach Readiness
 

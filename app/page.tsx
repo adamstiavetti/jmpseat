@@ -2,17 +2,18 @@ import Image from "next/image";
 import Link from "next/link";
 import type { Metadata } from "next";
 import styles from "./page.module.css";
-
-const WAITLIST_FORM_URL =
-  process.env.NEXT_PUBLIC_WAITLIST_FORM_URL?.trim() || "https://tally.so/r/jav6aa";
+import {
+  skipWaitlistSurveyAction,
+  submitWaitlistEmailAction,
+  submitWaitlistSurveyAction,
+} from "../src/lib/waitlist/actions";
+import { WAITLIST_SURVEY_QUESTIONS } from "../src/lib/waitlist/shared";
 
 const TRUST_ITEMS = [
   "verified workers",
   "private by design",
   "built for airline life",
 ] as const;
-
-const BETA_ACCESS_HREF = "/login?next=/app";
 
 const FEATURE_CARDS = [
   {
@@ -42,7 +43,7 @@ const FEATURE_CARDS = [
   {
     label: "verified",
     title: "Verified Entry",
-    copy: "Invite-only beta access for verified airline workers.",
+    copy: "A private beta built around trust, verified context, and careful access.",
     image: "/jmpseat/verified-access-v2.png",
     imageAlt:
       "Travel documents and access materials arranged on a dark tray in warm light.",
@@ -55,18 +56,255 @@ export const metadata: Metadata = {
     "jmpseat. is the off-duty network for airline workers, built for trusted base intel, layover knowledge, and verified discussion.",
 };
 
-function WaitlistCta() {
+type HomeProps = {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+};
+
+type AttributionFields = {
+  utm_source: string;
+  utm_medium: string;
+  utm_campaign: string;
+  utm_content: string;
+  utm_term: string;
+};
+
+function getValue(value: string | string[] | undefined) {
+  return Array.isArray(value) ? value[0] : value;
+}
+
+function getAttributionFields(
+  params: Record<string, string | string[] | undefined>,
+): AttributionFields {
+  return {
+    utm_source: getValue(params.utm_source)?.slice(0, 120) ?? "",
+    utm_medium: getValue(params.utm_medium)?.slice(0, 120) ?? "",
+    utm_campaign: getValue(params.utm_campaign)?.slice(0, 120) ?? "",
+    utm_content: getValue(params.utm_content)?.slice(0, 120) ?? "",
+    utm_term: getValue(params.utm_term)?.slice(0, 120) ?? "",
+  };
+}
+
+function WaitlistHiddenFields({ attribution }: { attribution: AttributionFields }) {
   return (
-    <a
-      className={`${styles.submitButton} ${styles.ctaLink}`}
-      href={WAITLIST_FORM_URL}
-    >
-      join waitlist
-    </a>
+    <>
+      <input type="hidden" name="landing_path" value="/" />
+      {Object.entries(attribution).map(([key, value]) => (
+        <input key={key} type="hidden" name={key} value={value} />
+      ))}
+    </>
   );
 }
 
-export default function Home() {
+function WaitlistEmailForm({
+  attribution,
+  formId,
+}: {
+  attribution: AttributionFields;
+  formId: string;
+}) {
+  return (
+    <form
+      id={formId}
+      className={styles.waitlistForm}
+      action={submitWaitlistEmailAction}
+    >
+      <WaitlistHiddenFields attribution={attribution} />
+      <div className={styles.waitlistField}>
+        <label className={styles.waitlistLabel} htmlFor={`${formId}-email`}>
+          Email
+        </label>
+        <input
+          className={styles.waitlistInput}
+          id={`${formId}-email`}
+          name="email"
+          type="email"
+          autoComplete="email"
+          placeholder="you@example.com"
+          required
+        />
+      </div>
+      <button className={styles.submitButton} type="submit">
+        join waitlist
+      </button>
+    </form>
+  );
+}
+
+function WaitlistSurveyQuestion({
+  question,
+}: {
+  question: (typeof WAITLIST_SURVEY_QUESTIONS)[number];
+}) {
+  if (question.type === "short") {
+    return (
+      <label className={styles.surveyQuestion}>
+        <span>{question.label}</span>
+        <input
+          className={styles.surveyInput}
+          name={question.name}
+          maxLength={question.maxLength}
+          placeholder={question.placeholder}
+        />
+      </label>
+    );
+  }
+
+  if (question.type === "single") {
+    return (
+      <label className={styles.surveyQuestion}>
+        <span>{question.label}</span>
+        <select className={styles.surveyInput} name={question.name} defaultValue="">
+          <option value="">Optional</option>
+          {question.options.map((option) => (
+            <option key={option} value={option}>
+              {option}
+            </option>
+          ))}
+        </select>
+      </label>
+    );
+  }
+
+  return (
+    <fieldset className={styles.surveyQuestion}>
+      <legend>{question.label}</legend>
+      <p className={styles.surveyHint}>Optional. Choose up to {question.maxSelections}.</p>
+      <div className={styles.surveyOptions}>
+        {question.options.map((option) => (
+          <label key={option} className={styles.surveyOption}>
+            <input type="checkbox" name={question.name} value={option} />
+            <span>{option}</span>
+          </label>
+        ))}
+      </div>
+    </fieldset>
+  );
+}
+
+function WaitlistSurveyForm() {
+  return (
+    <div className={styles.surveyCard}>
+      <div className={styles.surveyIntro}>
+        <p className={styles.surveyEyebrow}>optional follow-up</p>
+        <h2>Help us prioritize your invite and shape jmpseat.</h2>
+        <p>
+          These questions are optional. Your waitlist spot is already captured.
+        </p>
+        <p className={styles.surveySafety}>
+          Please keep this general. Do not share sensitive or confidential work
+          details.
+        </p>
+      </div>
+
+      <form className={styles.surveyForm} action={submitWaitlistSurveyAction}>
+        {WAITLIST_SURVEY_QUESTIONS.map((question) => (
+          <WaitlistSurveyQuestion key={question.id} question={question} />
+        ))}
+        <div className={styles.surveyActions}>
+          <button className={styles.submitButton} type="submit">
+            save optional answers
+          </button>
+        </div>
+      </form>
+
+      <form action={skipWaitlistSurveyAction}>
+        <button className={styles.skipButton} type="submit">
+          Skip for now
+        </button>
+      </form>
+    </div>
+  );
+}
+
+function WaitlistPanel({
+  attribution,
+  formId,
+  anchorId,
+  waitlistStatus,
+  surveyStatus,
+}: {
+  attribution: AttributionFields;
+  formId: string;
+  anchorId: string;
+  waitlistStatus: string | undefined;
+  surveyStatus: string | undefined;
+}) {
+  const hasJoined = waitlistStatus === "joined";
+  const surveyFinished = surveyStatus === "saved" || surveyStatus === "skipped";
+
+  if (hasJoined) {
+    return (
+      <div id={anchorId} className={styles.formBlock}>
+        <div className={styles.successCard} role="status">
+          <p className={styles.successEyebrow}>You&apos;re on the waitlist.</p>
+          <h2>We captured your email.</h2>
+          <p>
+            We&apos;ll use it only for jmpseat waitlist and product updates.
+            Optional answers below help us decide which communities and features
+            to prioritize first.
+          </p>
+          {surveyStatus === "saved" ? (
+            <p className={styles.successNote}>Thanks, your optional answers were saved.</p>
+          ) : null}
+          {surveyStatus === "skipped" ? (
+            <p className={styles.successNote}>No problem. You can finish later.</p>
+          ) : null}
+          {surveyStatus === "error" ? (
+            <p className={styles.errorText}>
+              We could not save those optional answers. Your waitlist signup is
+              still captured.
+            </p>
+          ) : null}
+          {surveyStatus === "missing" ? (
+            <p className={styles.errorText}>
+              Your waitlist signup is captured, but this browser session can no
+              longer attach optional answers.
+            </p>
+          ) : null}
+        </div>
+        {surveyFinished ? null : <WaitlistSurveyForm />}
+      </div>
+    );
+  }
+
+  return (
+    <div id={anchorId} className={styles.formBlock}>
+      {waitlistStatus === "invalid_email" ? (
+        <p className={styles.errorText} role="alert">
+          Enter a valid email to join the waitlist.
+        </p>
+      ) : null}
+      {waitlistStatus === "not_ready" ? (
+        <p className={styles.errorText} role="alert">
+          Waitlist capture is not ready in this environment yet.
+        </p>
+      ) : null}
+      {waitlistStatus === "error" ? (
+        <p className={styles.errorText} role="alert">
+          We could not save that email. Please try again.
+        </p>
+      ) : null}
+      <WaitlistEmailForm attribution={attribution} formId={formId} />
+      <p id={`${formId}-helper`} className={styles.helperText}>
+        Early waitlist access for airline-life communities. No account creation
+        or verification happens here.
+      </p>
+      <p className={styles.consentText}>
+        By joining the waitlist, you agree to receive jmpseat updates about
+        early access. We&apos;ll use your email only for waitlist and product
+        updates. Unsubscribe anytime. See our{" "}
+        <Link href="/privacy">Privacy Policy</Link>.
+      </p>
+    </div>
+  );
+}
+
+export default async function Home({ searchParams }: HomeProps) {
+  const params = await searchParams;
+  const attribution = getAttributionFields(params);
+  const waitlistStatus = getValue(params.waitlist);
+  const surveyStatus = getValue(params.survey);
+
   return (
     <main className={styles.page}>
       <section className={styles.hero} aria-labelledby="hero-title">
@@ -84,9 +322,6 @@ export default function Home() {
             <a className={styles.wordmark} href="#top" aria-label="jmpseat. home">
               jmpseat.
             </a>
-            <Link className={styles.betaAccessLink} href={BETA_ACCESS_HREF}>
-              Beta Access
-            </Link>
           </header>
 
           <div id="top" className={styles.heroContent}>
@@ -110,18 +345,13 @@ export default function Home() {
                 ))}
               </ul>
 
-              <div className={styles.formBlock}>
-                <WaitlistCta />
-                <p id="hero-helper" className={styles.helperText}>
-                  Early access for verified airline workers. No badges or IDs here.
-                </p>
-                <p className={styles.consentText}>
-                  By joining the waitlist, you agree to receive jmpseat updates
-                  about early access. We&apos;ll use your email only for
-                  waitlist and product updates. Unsubscribe anytime. See our{" "}
-                  <Link href="/privacy">Privacy Policy</Link>.
-                </p>
-              </div>
+              <WaitlistPanel
+                attribution={attribution}
+                formId="hero-waitlist"
+                anchorId="waitlist"
+                waitlistStatus={waitlistStatus}
+                surveyStatus={surveyStatus}
+              />
             </div>
           </div>
         </div>
@@ -163,7 +393,7 @@ export default function Home() {
           </div>
           <p className={styles.privacyCopy}>
             Verified privately. Anonymous publicly. Built to keep passenger,
-            hotel, and sensitive information out.
+            location, and sensitive information out.
           </p>
         </section>
 
@@ -176,18 +406,13 @@ export default function Home() {
               verified discussion for airline life.
             </p>
           </div>
-          <div className={styles.formBlock}>
-            <WaitlistCta />
-            <p id="footer-helper" className={styles.helperText}>
-              Early access for verified airline workers. Verification happens later through a separate private process.
-            </p>
-            <p className={styles.consentText}>
-              By joining the waitlist, you agree to receive jmpseat updates
-              about early access. We&apos;ll use your email only for waitlist
-              and product updates. Unsubscribe anytime. See our{" "}
-              <Link href="/privacy">Privacy Policy</Link>.
-            </p>
-          </div>
+          <WaitlistPanel
+            attribution={attribution}
+            formId="footer-waitlist"
+            anchorId="footer-waitlist-panel"
+            waitlistStatus={waitlistStatus}
+            surveyStatus={surveyStatus}
+          />
         </section>
 
         <footer className={styles.footer}>
@@ -201,8 +426,8 @@ export default function Home() {
             <a href="mailto:contact@jmpseat.com">Contact</a>
           </nav>
           <p className={styles.footerDisclaimer}>
-            Independent. Not affiliated with any airline, airport, union, or
-            employer.
+            jmpseat is independent and is not sponsored by or affiliated with
+            any airline, airport, union, or employer.
           </p>
         </footer>
       </section>

@@ -51,40 +51,6 @@
   text-decoration: none;
 }
 
-.betaAccessLink {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 2.85rem;
-  padding: 0.72rem 1rem;
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  border-radius: 0.85rem;
-  background: rgba(5, 10, 18, 0.62);
-  color: #ffbd4d;
-  font-size: 0.9rem;
-  font-weight: 700;
-  text-decoration: none;
-  backdrop-filter: blur(16px);
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.28);
-  transition:
-    border-color 120ms ease,
-    background 120ms ease,
-    color 120ms ease,
-    transform 120ms ease;
-}
-
-.betaAccessLink:hover {
-  border-color: rgba(255, 189, 77, 0.5);
-  background: rgba(11, 17, 27, 0.76);
-  color: #ffd48a;
-  transform: translateY(-1px);
-}
-
-.betaAccessLink:focus-visible {
-  outline: 3px solid rgba(255, 196, 92, 0.92);
-  outline-offset: 3px;
-}
-
 .heroContent {
   display: grid;
   min-height: calc(100vh - 5rem);
@@ -157,6 +123,52 @@
   gap: 0.85rem;
 }
 
+.waitlistField {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.waitlistLabel {
+  color: rgba(244, 240, 232, 0.92);
+  font-size: 0.86rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.waitlistInput,
+.surveyInput {
+  width: 100%;
+  min-height: 3.35rem;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 0.95rem;
+  background: rgba(3, 8, 16, 0.72);
+  color: #fff8ef;
+  font: inherit;
+  font-size: 1rem;
+  outline: none;
+  padding: 0 1rem;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  transition:
+    border-color 120ms ease,
+    background 120ms ease,
+    box-shadow 120ms ease;
+}
+
+.waitlistInput::placeholder,
+.surveyInput::placeholder {
+  color: rgba(178, 188, 204, 0.74);
+}
+
+.waitlistInput:focus,
+.surveyInput:focus {
+  border-color: rgba(255, 189, 77, 0.62);
+  background: rgba(6, 13, 24, 0.84);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 0 0 3px rgba(255, 189, 77, 0.16);
+}
+
 .submitButton {
   min-height: 3.35rem;
   border: 0;
@@ -190,6 +202,138 @@
 }
 
 .submitButton:focus-visible {
+  outline: 3px solid rgba(255, 196, 92, 0.92);
+  outline-offset: 3px;
+}
+
+.successCard,
+.surveyCard {
+  display: grid;
+  gap: 0.9rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 1.1rem;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.035)),
+    rgba(4, 10, 19, 0.76);
+  padding: 1rem;
+  box-shadow: 0 24px 50px rgba(0, 0, 0, 0.22);
+  backdrop-filter: blur(16px);
+}
+
+.successEyebrow,
+.surveyEyebrow {
+  margin: 0;
+  color: #ffbd4d;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.successCard h2,
+.surveyIntro h2 {
+  margin: 0;
+  color: #fff8ef;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(1.65rem, 5vw, 2.35rem);
+  font-weight: 400;
+  letter-spacing: -0.035em;
+  line-height: 0.98;
+}
+
+.successCard p,
+.surveyIntro p {
+  margin: 0;
+  color: rgba(219, 225, 235, 0.82);
+  line-height: 1.45;
+}
+
+.successNote {
+  color: rgba(186, 239, 190, 0.9) !important;
+}
+
+.errorText {
+  margin: 0;
+  border: 1px solid rgba(255, 189, 77, 0.28);
+  border-radius: 0.9rem;
+  background: rgba(63, 28, 0, 0.28);
+  color: #ffd99c;
+  font-size: 0.92rem;
+  line-height: 1.45;
+  padding: 0.75rem 0.85rem;
+}
+
+.surveySafety,
+.surveyHint {
+  color: rgba(178, 188, 204, 0.78) !important;
+  font-size: 0.9rem;
+}
+
+.surveyForm {
+  display: grid;
+  gap: 1rem;
+}
+
+.surveyQuestion {
+  display: grid;
+  gap: 0.55rem;
+  min-width: 0;
+  padding: 0;
+  margin: 0;
+  border: 0;
+}
+
+.surveyQuestion span,
+.surveyQuestion legend {
+  color: rgba(249, 247, 242, 0.94);
+  font-size: 0.94rem;
+  font-weight: 750;
+  line-height: 1.25;
+}
+
+.surveyOptions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.surveyOption {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 2.35rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  background: rgba(6, 14, 26, 0.64);
+  color: rgba(229, 235, 244, 0.9);
+  cursor: pointer;
+  font-size: 0.86rem;
+  padding: 0.42rem 0.72rem;
+}
+
+.surveyOption input {
+  accent-color: #ffad26;
+}
+
+.surveyActions {
+  display: grid;
+}
+
+.skipButton {
+  width: max-content;
+  border: 0;
+  background: transparent;
+  color: #ffbd4d;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 700;
+  padding: 0.25rem 0;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.skipButton:focus-visible {
   outline: 3px solid rgba(255, 196, 92, 0.92);
   outline-offset: 3px;
 }
@@ -420,6 +564,15 @@
     padding-inline: 1.35rem;
   }
 
+  .waitlistForm {
+    grid-template-columns: minmax(14rem, 1fr) auto;
+    align-items: end;
+  }
+
+  .surveyActions {
+    justify-items: start;
+  }
+
   .featureGrid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -479,6 +632,10 @@
 
   .bottomCta {
     grid-template-columns: minmax(0, 0.9fr) minmax(18rem, 0.7fr);
+  }
+
+  .bottomCta .waitlistForm {
+    grid-template-columns: 1fr;
   }
 
   .footer {
