@@ -760,7 +760,7 @@ export async function submitRedactedProofVerificationAction(formData: FormData) 
   const redactionAcknowledged =
     formData.get("redaction_acknowledged") === "on";
   const requestedAirline = getString(formData, "requested_airline");
-  const validation = validateRedactedProofUpload({
+  const validation = await validateRedactedProofUpload({
     file: proofFile,
     redactionAcknowledged,
   });

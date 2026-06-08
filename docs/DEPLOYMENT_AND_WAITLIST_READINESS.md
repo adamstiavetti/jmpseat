@@ -53,6 +53,12 @@ Current post-E05 update:
   operator/admin audit readers filter to trusted server-produced rows. No broad
   Supabase `db push`, runtime grants, DNS changes, Supabase setting changes, or
   beta alias disruption occurred.
+- A pending proof-upload content-validation hardening patch stops redacted proof
+  upload from trusting browser MIME metadata or filename extensions alone. Proof
+  files must pass server-side JPEG/PNG byte validation before private Storage
+  upload, while proof bucket privacy, reviewer signed-URL controls, public
+  waitlist behavior, and security-events trust-boundary behavior remain
+  unchanged. Runtime deploy validation remains pending after review/merge.
 - Duplicate-survey-token hardening is migrated, deployed, and runtime-proven on
   apex and `www`: duplicate waitlist submissions no longer receive existing
   survey tokens or edit another signup's optional survey answers. The app still

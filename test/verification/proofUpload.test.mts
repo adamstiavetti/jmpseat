@@ -17,6 +17,50 @@ import {
   VERIFICATION_PROOFS_BUCKET,
 } from "../../src/lib/verification/proofUpload.ts";
 
+const REAL_PNG_BYTES = Uint8Array.from([
+  0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a,
+  0x00, 0x00, 0x00, 0x0d, 0x49, 0x48, 0x44, 0x52,
+  0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01,
+  0x08, 0x06, 0x00, 0x00, 0x00, 0x1f, 0x15, 0xc4,
+  0x89, 0x00, 0x00, 0x00, 0x0a, 0x49, 0x44, 0x41,
+  0x54, 0x78, 0x9c, 0x63, 0x00, 0x01, 0x00, 0x00,
+  0x05, 0x00, 0x01, 0x0d, 0x0a, 0x2d, 0xb4, 0x00,
+  0x00, 0x00, 0x00, 0x49, 0x45, 0x4e, 0x44, 0xae,
+  0x42, 0x60, 0x82,
+]);
+
+const REAL_JPEG_BYTES = Uint8Array.from([
+  0xff, 0xd8,
+  0xff, 0xe0, 0x00, 0x10, 0x4a, 0x46, 0x49, 0x46,
+  0x00, 0x01, 0x01, 0x01, 0x00, 0x48, 0x00, 0x48,
+  0x00, 0x00,
+  0xff, 0xdb, 0x00, 0x43, 0x00,
+  ...Array(64).fill(0x08),
+  0xff, 0xc0, 0x00, 0x11, 0x08, 0x00, 0x01, 0x00,
+  0x01, 0x03, 0x01, 0x11, 0x00, 0x02, 0x11, 0x00,
+  0x03, 0x11, 0x00,
+  0xff, 0xda, 0x00, 0x0c, 0x03, 0x01, 0x00, 0x02,
+  0x11, 0x03, 0x11, 0x00, 0x3f, 0x00, 0x00,
+  0xff, 0xd9,
+]);
+
+function proofFile(input: {
+  name: string;
+  type: string;
+  bytes: Uint8Array;
+}) {
+  return {
+    name: input.name,
+    size: input.bytes.byteLength,
+    type: input.type,
+    arrayBuffer: async () =>
+      input.bytes.buffer.slice(
+        input.bytes.byteOffset,
+        input.bytes.byteOffset + input.bytes.byteLength,
+      ),
+  };
+}
+
 test("proof upload constants stay bounded to a private JPEG/PNG-only first slice", () => {
   assert.equal(VERIFICATION_PROOFS_BUCKET, "verification-proofs");
   assert.deepEqual(VERIFICATION_PROOF_ALLOWED_MIME_TYPES, [
@@ -35,9 +79,9 @@ test("proof upload constants stay bounded to a private JPEG/PNG-only first slice
   ]);
 });
 
-test("proof upload validation requires acknowledgement, JPEG/PNG, and a 5 MB cap", () => {
+test("proof upload validation requires acknowledgement, JPEG/PNG, and a 5 MB cap", async () => {
   assert.deepEqual(
-    validateRedactedProofUpload({
+    await validateRedactedProofUpload({
       file: { name: "proof.png", size: 10, type: "image/png" },
       redactionAcknowledged: false,
     }),
@@ -49,7 +93,7 @@ test("proof upload validation requires acknowledgement, JPEG/PNG, and a 5 MB cap
   );
 
   assert.deepEqual(
-    validateRedactedProofUpload({
+    await validateRedactedProofUpload({
       file: { name: "proof.pdf", size: 10, type: "application/pdf" },
       redactionAcknowledged: true,
     }),
@@ -61,7 +105,7 @@ test("proof upload validation requires acknowledgement, JPEG/PNG, and a 5 MB cap
   );
 
   assert.deepEqual(
-    validateRedactedProofUpload({
+    await validateRedactedProofUpload({
       file: {
         name: "proof.png",
         size: VERIFICATION_PROOF_MAX_FILE_SIZE_BYTES + 1,
@@ -76,18 +120,94 @@ test("proof upload validation requires acknowledgement, JPEG/PNG, and a 5 MB cap
   );
 
   assert.deepEqual(
-    validateRedactedProofUpload({
-      file: { name: "proof.jpeg", size: 512, type: "image/jpeg" },
+    await validateRedactedProofUpload({
+      file: proofFile({
+        name: "proof.jpeg",
+        type: "image/jpeg",
+        bytes: REAL_JPEG_BYTES,
+      }),
       redactionAcknowledged: true,
     }),
     {
       kind: "valid",
-      fileSizeBytes: 512,
+      fileSizeBytes: REAL_JPEG_BYTES.byteLength,
       mimeType: "image/jpeg",
       originalExtension: "jpeg",
       storageExtension: "jpg",
     },
   );
+});
+
+test("proof upload validation accepts real PNG and JPEG bytes only", async () => {
+  assert.deepEqual(
+    await validateRedactedProofUpload({
+      file: proofFile({
+        name: "redacted-proof.png",
+        type: "image/png",
+        bytes: REAL_PNG_BYTES,
+      }),
+      redactionAcknowledged: true,
+    }),
+    {
+      kind: "valid",
+      fileSizeBytes: REAL_PNG_BYTES.byteLength,
+      mimeType: "image/png",
+      originalExtension: "png",
+      storageExtension: "png",
+    },
+  );
+
+  assert.deepEqual(
+    await validateRedactedProofUpload({
+      file: proofFile({
+        name: "redacted-proof.jpg",
+        type: "image/jpeg",
+        bytes: REAL_JPEG_BYTES,
+      }),
+      redactionAcknowledged: true,
+    }),
+    {
+      kind: "valid",
+      fileSizeBytes: REAL_JPEG_BYTES.byteLength,
+      mimeType: "image/jpeg",
+      originalExtension: "jpg",
+      storageExtension: "jpg",
+    },
+  );
+});
+
+test("proof upload validation rejects browser-metadata forgeries and mismatches", async () => {
+  const invalidImageMessage = "Upload a real PNG or JPEG image.";
+  const htmlBytes = new TextEncoder().encode("<script>alert('not an image')</script>");
+  const svgBytes = new TextEncoder().encode("<svg xmlns=\"http://www.w3.org/2000/svg\"><script /></svg>");
+  const pdfBytes = new TextEncoder().encode("%PDF-1.7\n1 0 obj\n<<>>\nendobj\n");
+  const zipBytes = Uint8Array.from([0x50, 0x4b, 0x03, 0x04, 0x14, 0x00]);
+  const randomBytes = Uint8Array.from([0x01, 0x02, 0x03, 0x04, 0x05]);
+
+  for (const file of [
+    proofFile({ name: "fake.png", type: "image/png", bytes: htmlBytes }),
+    proofFile({ name: "fake.jpg", type: "image/jpeg", bytes: htmlBytes }),
+    proofFile({ name: "fake.png", type: "image/png", bytes: svgBytes }),
+    proofFile({ name: "fake.png", type: "image/png", bytes: pdfBytes }),
+    proofFile({ name: "fake.jpg", type: "image/jpeg", bytes: pdfBytes }),
+    proofFile({ name: "fake.png", type: "image/png", bytes: zipBytes }),
+    proofFile({ name: "fake.jpg", type: "image/jpeg", bytes: randomBytes }),
+    proofFile({ name: "fake.jpg", type: "image/jpeg", bytes: REAL_PNG_BYTES }),
+    proofFile({ name: "fake.png", type: "image/png", bytes: REAL_JPEG_BYTES }),
+    proofFile({ name: "truncated.png", type: "image/png", bytes: REAL_PNG_BYTES.slice(0, 20) }),
+    proofFile({ name: "truncated.jpg", type: "image/jpeg", bytes: REAL_JPEG_BYTES.slice(0, 20) }),
+  ]) {
+    assert.deepEqual(
+      await validateRedactedProofUpload({
+        file,
+        redactionAcknowledged: true,
+      }),
+      {
+        kind: "invalid",
+        message: invalidImageMessage,
+      },
+    );
+  }
 });
 
 test("proof storage paths use UUID-only segments and never user filenames or airline labels", () => {
@@ -265,9 +385,10 @@ test("proof upload action uses bounded server validation, private storage, rollb
   );
 
   assert.match(source, /submitRedactedProofVerificationAction/);
-  assert.match(source, /validateRedactedProofUpload/);
+  assert.match(source, /await validateRedactedProofUpload/);
   assert.match(source, /VERIFICATION_PROOFS_BUCKET/);
   assert.match(source, /storage[\s\S]*?from\(VERIFICATION_PROOFS_BUCKET\)[\s\S]*?\.upload/);
+  assert.match(source, /contentType: validation\.mimeType/);
   assert.match(source, /create_redacted_proof_verification_submission/);
   assert.match(source, /cleanupUploadedVerificationProof/);
   assert.match(source, /requested_airline/);
@@ -276,6 +397,7 @@ test("proof upload action uses bounded server validation, private storage, rollb
   assert.match(source, /p_routing_context_source: draft\.evidence\.metadata\.routing_context_source/);
   assert.match(source, /verification_evidence\.uploaded/);
   assert.doesNotMatch(source, /service_role|SUPABASE_SERVICE_ROLE_KEY|signed url|download button|openai|ai pre-check/i);
+  assert.doesNotMatch(source, /contentType:\s*proofFile\.type/);
   assert.doesNotMatch(source, /aa\.com|american airlines/i);
 });
 
