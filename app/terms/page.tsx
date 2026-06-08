@@ -44,7 +44,7 @@ export default function TermsPage() {
             <h2>Accurate information</h2>
             <p>
               If you submit the waitlist form, you must provide accurate
-              information. You may not submit someone else's email address
+              information. You may not submit someone else&apos;s email address
               without permission.
             </p>
           </section>

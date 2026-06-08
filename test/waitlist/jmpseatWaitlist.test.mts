@@ -108,7 +108,7 @@ test("public legal pages use concrete launch-intent effective dates", async () =
   assert.match(privacySource, /Retention/);
   assert.match(privacySource, /reasonable technical and organizational safeguards/);
   assert.match(termsSource, /public jmpseat\s*waitlist/);
-  assert.match(termsSource, /someone else's email address/);
+  assert.match(termsSource, /someone else&apos;s email address/);
   assert.match(termsSource, /spam, scraping,\s*security testing, disruption/);
   assert.match(termsSource, /may reject, remove, or ignore submissions/);
   assert.match(termsSource, /may use that feedback to improve/);
