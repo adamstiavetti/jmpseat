@@ -23,6 +23,10 @@ test("auth pages and callback route exist", () => {
     new URL("../../app/reset-password/page.tsx", import.meta.url),
     "utf8",
   );
+  const accessRestricted = readFileSync(
+    new URL("../../app/app/access-restricted/page.tsx", import.meta.url),
+    "utf8",
+  );
   const callback = readFileSync(
     new URL("../../app/auth/callback/route.ts", import.meta.url),
     "utf8",
@@ -60,6 +64,22 @@ test("auth pages and callback route exist", () => {
   assert.match(signup, /invite code/i);
   assert.doesNotMatch(signup, /publicly open|open to everyone|invite code alone grants access/i);
   assert.match(reset, /reset/i);
+  assert.match(accessRestricted, /RESTRICTED SURFACE/i);
+  assert.match(accessRestricted, /requires additional jmpseat permissions/i);
+  assert.match(accessRestricted, /active, verified, or in private beta/i);
+  assert.match(accessRestricted, /ask a trusted jmpseat operator/i);
+  assert.match(accessRestricted, /review your account permissions/i);
+  assert.match(accessRestricted, /no public self-service/i);
+  assert.match(accessRestricted, /restricted tools/i);
+  assert.match(accessRestricted, /specific reviewer, admin, or operator access/i);
+  assert.match(accessRestricted, /normal app access, reviewer permissions, and/i);
+  assert.match(accessRestricted, /operator\/admin permissions separate/i);
+  assert.doesNotMatch(accessRestricted, /Epoch 04 Review/i);
+  assert.doesNotMatch(accessRestricted, /authorized verification reviewers/i);
+  assert.doesNotMatch(accessRestricted, /self-serve reviewer enrollment path/i);
+  assert.doesNotMatch(accessRestricted, /employer-system lookup/i);
+  assert.doesNotMatch(accessRestricted, /required operator permissions/i);
+  assert.doesNotMatch(accessRestricted, /operator tools/i);
   assert.match(callback, /exchangeCodeForSession|redirect/i);
   assert.match(callback, /That authentication link is missing the expected callback code/i);
   assert.match(callback, /token_hash/i);

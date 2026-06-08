@@ -150,8 +150,17 @@ Recommended storage and viewing:
   survey-response records are not enough for the funnel questions being asked.
 - Use server-side event ingestion where practical so client events stay bounded.
 - Use `/app/admin/waitlist` as the operator/admin-scoped viewer for aggregate
-  waitlist metrics, survey insights, and masked recent submissions.
-- Keep dashboard access operator/admin scoped.
+  waitlist metrics, survey insights, and authorized per-submission contact
+  detail for invite/contact workflow.
+- Keep dashboard access operator/admin scoped, with `operator.read_audit` for
+  aggregate metrics and `operator.view_waitlist_contacts` for raw waitlist
+  contact detail.
+- Fresh first-operator bootstrap should include `operator.view_waitlist_contacts`
+  so a new environment has one usable founder/admin operator for waitlist
+  invite/contact workflow without manual self-escalation.
+- Post-bootstrap operator grant management should be able to grant
+  `operator.view_waitlist_contacts` without opening arbitrary-scope mutation
+  from the client.
 
 Recommended admin metrics cards:
 
@@ -163,7 +172,13 @@ Recommended admin metrics cards:
 - CTA clicks.
 - Conversion rate.
 - Top sources/referrers.
-- Recent submissions, with sensitive data minimized.
+- Recent submissions, with contact emails visible only to authorized
+  operator/admin users with `operator.view_waitlist_contacts`, while
+  `operator.read_audit` users still get masked summaries and internal IDs/tokens
+  remain hidden.
+- `operator.read_audit` alone should not trigger the raw contact-detail query
+  path. It should receive only database-projected masked contact labels for
+  recent summaries, not raw email or normalized email.
 - Failed submissions.
 
 The metrics dashboard should not grant beta access, mutate airline-email
@@ -222,8 +237,9 @@ Native:
 4. `W04 Admin Waitlist Metrics Dashboard`
    Status: implemented on branch. Add `/app/admin/waitlist` as an
    operator/admin-scoped viewer for signup totals, survey completion,
-   sources/referrers, aggregate survey responses, and masked recent submissions
-   without exposing sensitive data. Runtime validation remains pending.
+   sources/referrers, aggregate survey responses, and authorized contact/survey
+   detail without exposing internal IDs, tokens, or public waitlist data.
+   Runtime validation remains pending.
 
 5. `W05 Public Domain Cutover To jmpseat.com`
    Prepare and execute the reversible production-domain cutover so the public

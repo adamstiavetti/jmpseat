@@ -16,6 +16,7 @@ export const OPERATOR_GRANT_IMPLEMENTATION_STATUS = "implemented" as const;
 export const OPERATOR_SCOPE_VALUES = [
   "operator.internal_private_app_access",
   "operator.read_audit",
+  "operator.view_waitlist_contacts",
   "operator.manage_approved_domains",
   "operator.manage_reviewer_scopes",
   "operator.read_verification_requests",
@@ -270,7 +271,8 @@ export function buildAdminNavigation(input: {
       key: "waitlist",
       label: "Waitlist",
       path: ADMIN_ROUTES.waitlist,
-      description: "First-party public waitlist metrics, survey aggregates, and masked recent submissions.",
+      description:
+        "First-party public waitlist demand signals for read-audit operators, with separate waitlist-contact access for raw founder/admin invite workflow detail.",
       requiredScopes: ["operator.read_audit"],
       grantedScopes: input.operatorScopes,
       implemented: true,

@@ -41,11 +41,13 @@ test("waitlist metrics compute aggregate signup and survey counts from fixture d
               "Base tips from people who actually work there",
               "Verified crew lounges based on role",
             ],
+            biggest_pain: "Finding a trusted crew community at new bases.",
             current_tools: ["Reddit"],
             verification_comfort:
               "Comfortable using my company airline email later",
             beta_help: ["I only want launch updates for now"],
             discovery_source: "Team outreach",
+            privacy_concern: "Keep work identity separate from public posting.",
             created_at: "2026-06-07T12:05:00.000Z",
           },
         ],
@@ -59,10 +61,12 @@ test("waitlist metrics compute aggregate signup and survey counts from fixture d
             aviation_connection: "Pilot",
             priority_base: "employee id 123",
             useful_first: ["Commuter or non-rev-adjacent tips"],
+            biggest_pain: "Sorting out who actually knows the base.",
             current_tools: ["Group chats or text threads"],
             verification_comfort: "I need more privacy details first",
             beta_help: ["I would do a short interview"],
             discovery_source: "Instagram or TikTok",
+            privacy_concern: "Do not expose my employee id or base publicly.",
             created_at: "2026-06-02T12:05:00.000Z",
           },
         ],
@@ -100,9 +104,22 @@ test("waitlist metrics compute aggregate signup and survey counts from fixture d
     { label: "ref.example", count: 2 },
     { label: "instagram", count: 1 },
   ]);
+  assert.deepEqual(metrics.topPrivacyConcerns, [
+    { label: "Keep work identity separate from public posting.", count: 1 },
+  ]);
+  assert.deepEqual(metrics.topBetaInterest, [
+    { label: "I only want launch updates for now", count: 1 },
+    { label: "I would do a short interview", count: 1 },
+  ]);
+  assert.equal(metrics.topAcquisitionSource, "ref.example");
+  assert.equal(
+    metrics.topDesiredFeature,
+    "Base tips from people who actually work there",
+  );
+  assert.equal(metrics.emailOnlyCount, 1);
 });
 
-test("waitlist metrics mask recent signup emails and do not expose raw identifiers", () => {
+test("waitlist metrics keep authorized contact emails and survey detail while still excluding ids and tokens", () => {
   const metrics = buildWaitlistDashboardMetrics([
     signup({
       normalized_email: "private.user@example.com",
@@ -112,10 +129,12 @@ test("waitlist metrics mask recent signup emails and do not expose raw identifie
           aviation_connection: "Flight attendant",
           priority_base: "LAX",
           useful_first: ["Layover recommendations"],
+          biggest_pain: "Need better crew recommendations that are actually current.",
           current_tools: ["Coworkers or friends"],
           verification_comfort: "Not applicable yet",
           beta_help: ["I only want launch updates for now"],
           discovery_source: "Friend or coworker",
+          privacy_concern: "Keep my name off public pages.",
           created_at: "2026-06-07T12:05:00.000Z",
         },
       ],
@@ -123,10 +142,66 @@ test("waitlist metrics mask recent signup emails and do not expose raw identifie
   ]);
 
   assert.equal(maskWaitlistEmail("private.user@example.com"), "p...@example.com");
+  assert.equal(metrics.recentSignups[0]?.contactEmail, "private.user@example.com");
   assert.equal(metrics.recentSignups[0]?.maskedEmail, "p...@example.com");
   assert.equal(metrics.recentSignups[0]?.priorityBase, "LAX");
-  assert.doesNotMatch(JSON.stringify(metrics), /private\.user@example\.com/i);
+  assert.equal(metrics.recentSignups[0]?.statusLabel, "Survey completed");
+  assert.deepEqual(metrics.recentSignups[0]?.desiredFeatures, [
+    "Layover recommendations",
+  ]);
+  assert.equal(
+    metrics.recentSignups[0]?.biggestPain,
+    "Need better crew recommendations that are actually current.",
+  );
+  assert.equal(
+    metrics.recentSignups[0]?.privacyConcern,
+    "Keep my name off public pages.",
+  );
   assert.doesNotMatch(JSON.stringify(metrics), /survey_token|row_id|user_id|uuid/i);
+});
+
+test("waitlist metrics omit raw contact email and richer per-person detail in audit-only mode", () => {
+  const metrics = buildWaitlistDashboardMetrics(
+    [
+      signup({
+        email: null,
+        normalized_email: null,
+        masked_email: "p...@example.com",
+        survey_completed_at: "2026-06-07T12:05:00.000Z",
+        waitlist_survey_responses: [
+          {
+            aviation_connection: "Flight attendant",
+            priority_base: "LAX",
+            useful_first: ["Layover recommendations"],
+            biggest_pain: "Need better crew recommendations that are actually current.",
+            current_tools: ["Coworkers or friends"],
+            verification_comfort: "Not applicable yet",
+            beta_help: ["I only want launch updates for now"],
+            discovery_source: "Friend or coworker",
+            privacy_concern: "Keep my name off public pages.",
+            created_at: "2026-06-07T12:05:00.000Z",
+          },
+        ],
+      }),
+      signup({
+        email: null,
+        normalized_email: null,
+        masked_email: "c...@example.com",
+        created_at: "2026-06-07T12:04:00.000Z",
+      }),
+    ],
+    now,
+    undefined,
+    { includeContactDetails: false },
+  );
+
+  assert.equal(metrics.recentSignups[0]?.maskedEmail, "p...@example.com");
+  assert.equal(metrics.recentSignups[1]?.maskedEmail, "c...@example.com");
+  assert.equal("contactEmail" in (metrics.recentSignups[0] ?? {}), false);
+  assert.equal("biggestPain" in (metrics.recentSignups[0] ?? {}), false);
+  assert.equal("privacyConcern" in (metrics.recentSignups[0] ?? {}), false);
+  assert.equal("currentTools" in (metrics.recentSignups[0] ?? {}), false);
+  assert.equal("betaHelp" in (metrics.recentSignups[0] ?? {}), false);
 });
 
 test("waitlist aggregate metrics stay accurate beyond the recent display cap", () => {
@@ -155,11 +230,13 @@ test("waitlist aggregate metrics stay accurate beyond the recent display cap", (
                 index % 2 === 0 ? "Flight attendant" : "Pilot",
               priority_base: index % 3 === 0 ? "DFW" : "LAX",
               useful_first: ["Verified crew lounges based on role"],
+              biggest_pain: "Need trusted base advice.",
               current_tools: ["Group chats or text threads"],
               verification_comfort:
                 "Comfortable using my company airline email later",
               beta_help: ["I only want launch updates for now"],
               discovery_source: index % 4 === 0 ? "Team outreach" : "Instagram or TikTok",
+              privacy_concern: "Keep verification private.",
               created_at: "2026-06-07T12:05:00.000Z",
             },
           ]
@@ -177,6 +254,7 @@ test("waitlist aggregate metrics stay accurate beyond the recent display cap", (
   assert.equal(metrics.surveyCompletionRate, 50);
   assert.equal(metrics.recentSubmissionsCount, 12);
   assert.equal(metrics.recentSignups.length, 12);
+  assert.equal(metrics.emailOnlyCount, 325);
   assert.ok(
     metrics.topDesiredFeatures.some(
       (feature) =>
@@ -240,7 +318,7 @@ test("waitlist attribution rejects unsafe UTM labels before falling back safely"
   ]);
 });
 
-test("waitlist dashboard source stays operator-only and avoids sensitive display fields", () => {
+test("waitlist dashboard source keeps contact detail behind waitlist-contact access and avoids sensitive ids or tokens", () => {
   const pageSource = readFileSync(
     new URL("../../app/app/admin/waitlist/page.tsx", import.meta.url),
     "utf8",
@@ -254,15 +332,48 @@ test("waitlist dashboard source stays operator-only and avoids sensitive display
     "utf8",
   );
   const combined = `${pageSource}\n${metricsSource}\n${metricsCoreSource}`;
+  const contactColumns = metricsSource.match(
+    /const WAITLIST_RECENT_CONTACT_SELECT_COLUMNS = \[(.*?)\]\.join\(","\);/s,
+  )?.[1];
 
   assert.match(pageSource, /WAITLIST_ADMIN_SCOPE/);
+  assert.match(pageSource, /WAITLIST_CONTACT_SCOPE/);
+  assert.match(pageSource, /canViewWaitlistContacts/);
+  assert.match(pageSource, /includeContactDetails:\s*canViewWaitlistContacts/);
   assert.match(pageSource, /AUTH_ROUTES\.accessRestricted/);
-  assert.match(pageSource, /masked recent submissions/i);
-  assert.match(metricsCoreSource, /maskWaitlistEmail/);
+  assert.match(pageSource, /full waitlist contact emails/i);
+  assert.match(pageSource, /masked recent submission summaries/i);
+  assert.match(pageSource, /Contact details and full per-submission survey context require/i);
+  assert.match(pageSource, /founder\/admin invite prioritization/i);
+  assert.match(pageSource, /signup\.contactEmail/);
+  assert.match(pageSource, /signup\.maskedEmail/);
+  assert.match(pageSource, /Email-only rows still matter/i);
+  assert.match(pageSource, /Biggest problem to solve first/i);
+  assert.match(pageSource, /Private beta willingness/i);
+  assert.match(metricsSource, /WAITLIST_CONTACT_SCOPE/);
+  assert.match(metricsSource, /WAITLIST_AGGREGATE_SELECT_COLUMNS/);
+  assert.match(metricsSource, /recent_waitlist_signup_summaries/);
+  assert.match(metricsSource, /masked_email/);
+  assert.match(metricsSource, /email:\s*null/);
+  assert.match(metricsSource, /normalized_email:\s*null/);
+  assert.match(metricsSource, /WAITLIST_RECENT_CONTACT_SELECT_COLUMNS/);
+  assert.ok(contactColumns);
+  assert.match(contactColumns ?? "", /email/i);
+  assert.match(contactColumns ?? "", /normalized_email/i);
+  assert.match(contactColumns ?? "", /biggest_pain/i);
+  assert.match(contactColumns ?? "", /privacy_concern/i);
+  assert.match(metricsSource, /input\.includeContactDetails/);
+  assert.match(metricsCoreSource, /contactEmail/);
+  assert.match(metricsCoreSource, /maskedEmail/);
+  assert.match(metricsCoreSource, /biggestPain/);
+  assert.match(metricsCoreSource, /privacyConcern/);
   assert.match(metricsSource, /fetchAllWaitlistAggregateRows/);
   assert.match(metricsSource, /\.range\(from, to\)/);
   assert.match(metricsSource, /RECENT_QUERY_LIMIT/);
+  assert.match(metricsSource, /biggest_pain/);
+  assert.match(metricsSource, /privacy_concern/);
+  assert.match(metricsSource, /buildWaitlistDashboardMetrics\([\s\S]*includeContactDetails: input\.includeContactDetails/s);
   assert.doesNotMatch(metricsSource, /\.limit\(500\)/);
   assert.doesNotMatch(combined, /proof upload|badge upload|document upload|portal credential|passenger information/i);
-  assert.doesNotMatch(pageSource, /survey_token|normalized_email|waitlist_signups/i);
+  assert.doesNotMatch(pageSource, /survey_token|normalized_email|waitlist_signups|row_id|uuid/i);
 });

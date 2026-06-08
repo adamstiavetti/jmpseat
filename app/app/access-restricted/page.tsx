@@ -19,14 +19,15 @@ export default async function AccessRestrictedPage() {
   if (!env.enabled) {
     return (
       <AuthCard
-        eyebrow="Epoch 04 Review"
+        eyebrow="Restricted surface"
         title="Restricted access needs Supabase auth"
-        description="This reviewer-only restriction surface depends on the Supabase auth configuration used by the private web app."
-        error="Add NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY to exercise runtime reviewer flows."
+        description="This restricted jmpseat surface depends on the Supabase auth configuration used by the private web app."
+        error="Add NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY to exercise runtime restricted-surface authorization."
       >
         <p className={styles.hint}>
-          Local build and tests can run without those values. Reviewer runtime
-          authorization requires a configured Supabase project.
+          Local build and tests can run without those values. Runtime
+          authorization for restricted reviewer, admin, and operator surfaces
+          requires a configured Supabase project.
         </p>
       </AuthCard>
     );
@@ -60,20 +61,20 @@ export default async function AccessRestrictedPage() {
 
   return (
     <AuthCard
-      eyebrow="Epoch 04 Review"
+      eyebrow="RESTRICTED SURFACE"
       title="Access restricted"
-      description="This surface is limited to authorized verification reviewers. Reviewer authorization remains separate from signup, profile completion, beta access, and ordinary verified-user state."
+      description="This page requires additional jmpseat permissions. Your account may still be active, verified, or in private beta, but this surface is limited to specific reviewer, admin, or operator access."
       footer={
         <p className={styles.hint}>
-          jmpseat does not use employer-system lookup and does not expose broad
-          reviewer tools here.
+          jmpseat keeps normal app access, reviewer permissions, and
+          operator/admin permissions separate.
         </p>
       }
     >
       <p className={styles.hint}>
-        If you need reviewer access for bounded verification testing, reviewer
-        scope rows must be granted manually by a trusted operator. There is no
-        self-serve reviewer enrollment path.
+        If you believe you should have access, ask a trusted jmpseat operator
+        to review your account permissions. There is no public self-service
+        enrollment path for restricted tools.
       </p>
     </AuthCard>
   );

@@ -18,9 +18,15 @@ export const OPERATOR_ACCESS_MANAGEMENT_SCOPE =
   "operator.manage_operator_access" as const satisfies OperatorScope;
 export const OPERATOR_INTERNAL_PRIVATE_APP_ACCESS_SCOPE =
   "operator.internal_private_app_access" as const satisfies OperatorScope;
+export const OPERATOR_WAITLIST_CONTACT_ACCESS_SCOPE =
+  "operator.view_waitlist_contacts" as const satisfies OperatorScope;
 export const OPERATOR_ACCESS_ROUTE = ADMIN_ROUTES.operatorAccess;
 export const OPERATOR_ACCESS_NOT_READY_MESSAGE =
   "Operator grant management is not ready yet. Apply the operator grants foundation and internal access scope migrations before using this route.";
+const POST_BOOTSTRAP_GRANTABLE_OPERATOR_SCOPES = [
+  OPERATOR_INTERNAL_PRIVATE_APP_ACCESS_SCOPE,
+  OPERATOR_WAITLIST_CONTACT_ACCESS_SCOPE,
+] as const;
 
 type OperatorGrantMutationRpcResponse = {
   ok?: boolean;
@@ -28,6 +34,15 @@ type OperatorGrantMutationRpcResponse = {
   message?: string | null;
   operator_grant_id?: string | null;
 };
+
+type PostBootstrapGrantableScope =
+  (typeof POST_BOOTSTRAP_GRANTABLE_OPERATOR_SCOPES)[number];
+
+function isPostBootstrapGrantableScope(
+  scope: OperatorScope,
+): scope is PostBootstrapGrantableScope {
+  return POST_BOOTSTRAP_GRANTABLE_OPERATOR_SCOPES.includes(scope as PostBootstrapGrantableScope);
+}
 
 function getString(formData: FormData, key: string) {
   const value = formData.get(key);
@@ -204,8 +219,21 @@ function getMutationMessage(
   return response?.message?.trim() || fallback;
 }
 
-export async function grantOperatorInternalAccessAction(formData: FormData) {
-  "use server";
+async function grantOperatorAccessByScopeAction(
+  formData: FormData,
+  input: {
+    scope: PostBootstrapGrantableScope;
+    successMessage: string;
+  },
+) {
+  if (!isPostBootstrapGrantableScope(input.scope)) {
+    redirect(
+      buildRedirect(OPERATOR_ACCESS_ROUTE, {
+        error: "This operator scope is not grantable from the post-bootstrap surface.",
+      }),
+    );
+  }
+
   const access = await requireOperatorGrantManagementAccess();
   const targetEmail = normalizeTargetEmail(getString(formData, "target_email"));
   const reason = normalizeOperatorGrantReason(getString(formData, "reason"));
@@ -241,7 +269,7 @@ export async function grantOperatorInternalAccessAction(formData: FormData) {
 
   const rpcResult = await access.supabase.rpc("grant_operator_access", {
     target_user_id: targetUserId,
-    requested_scopes: [OPERATOR_INTERNAL_PRIVATE_APP_ACCESS_SCOPE],
+    requested_scopes: [input.scope],
     reason,
   });
 
@@ -279,7 +307,23 @@ export async function grantOperatorInternalAccessAction(formData: FormData) {
 
   redirect(
     buildRedirect(OPERATOR_ACCESS_ROUTE, {
-      message: "Internal operator access granted.",
+      message: input.successMessage,
     }),
   );
+}
+
+export async function grantOperatorInternalAccessAction(formData: FormData) {
+  "use server";
+  return grantOperatorAccessByScopeAction(formData, {
+    scope: OPERATOR_INTERNAL_PRIVATE_APP_ACCESS_SCOPE,
+    successMessage: "Internal operator access granted.",
+  });
+}
+
+export async function grantOperatorWaitlistContactAccessAction(formData: FormData) {
+  "use server";
+  return grantOperatorAccessByScopeAction(formData, {
+    scope: OPERATOR_WAITLIST_CONTACT_ACCESS_SCOPE,
+    successMessage: "Waitlist contact access granted.",
+  });
 }

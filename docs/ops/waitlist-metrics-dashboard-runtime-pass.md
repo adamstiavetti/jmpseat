@@ -14,6 +14,13 @@ found to be serving an older preview that did not include the dashboard route, s
 a fresh stable-beta preview deployment was created from current `main` and
 aliased to `beta.jmpseat.com` only.
 
+This runtime pass applies to the earlier aggregate-first dashboard shape. The
+later founder-intelligence revision should keep `operator.read_audit` for
+aggregate metrics and add a narrower `operator.view_waitlist_contacts` scope
+before showing raw contact emails or richer per-submission invite workflow
+detail. That richer dashboard will need its own runtime validation after
+review, merge, and deploy.
+
 Root `jmpseat.com` was not deployed, aliased, cut over, or changed.
 
 ## Stable Beta Check
@@ -73,7 +80,7 @@ Runtime and local validation confirmed:
 - the available authenticated browser session did not render the dashboard and
   was redirected by the app gate
 - explicit non-operator admin denial remains covered by automated tests
-- recent submissions remain designed for masked email display only
+- the baseline runtime pass used masked recent submission display only
 - raw emails, row IDs, survey tokens, user IDs, private links, and private
   identifiers were not printed during validation
 - proof upload, badge upload, document upload, schedule, portal, passenger, and
@@ -111,7 +118,6 @@ Recommended next ticket:
 
 - complete one authenticated founder/operator browser check of
   `/app/admin/waitlist`, confirming the admin shell render, summary cards,
-  aggregate lists, masked recent submissions, and no raw email/ID/token display
-  in the live dashboard UI
+  aggregate lists, and no raw email/ID/token display in the live dashboard UI
 
 After that check, the next launch lane can move to public root cutover readiness.

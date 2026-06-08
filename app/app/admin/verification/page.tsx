@@ -42,7 +42,7 @@ export default async function VerificationReviewQueuePage({
   if (!env.enabled) {
     return (
       <AuthCard
-        eyebrow="Epoch 04 Review"
+        eyebrow="Verification Review"
         title="Reviewer queue needs Supabase auth"
         description="This reviewer-only verification queue depends on the Supabase auth configuration used by the private web app."
         error="Add NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY to exercise runtime reviewer flows."
@@ -95,7 +95,7 @@ export default async function VerificationReviewQueuePage({
 
   return (
     <AdminShell
-      eyebrow="Epoch 04 Review"
+      eyebrow="Verification Review"
       title="Verification review queue"
       description="This bounded reviewer surface shows safe verification request metadata only. Reviewers must not use employer systems, internal directories, or other confidential employer resources."
       currentPath={ADMIN_ROUTES.verification}

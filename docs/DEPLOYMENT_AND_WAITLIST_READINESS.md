@@ -159,8 +159,9 @@ Local verification checks:
 - Optional survey can be submitted or skipped.
 - Footer disclaimer is visible.
 - No public Beta Access entry appears.
-- `/app/admin/waitlist` remains operator/admin-only and shows masked/aggregate
-  waitlist metrics only.
+- `/app/admin/waitlist` remains operator/admin-only and, when reviewed by an
+  authorized founder/admin user, may show contact emails plus bounded survey
+  detail while still hiding internal IDs and tokens.
 
 ## 8. Vercel Preview Deployment
 

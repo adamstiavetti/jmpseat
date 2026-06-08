@@ -1,40 +1,44 @@
 .stack {
   display: grid;
-  gap: 20px;
+  gap: 16px;
 }
 
 .section {
   display: grid;
   gap: 12px;
   padding: 18px;
-  border: 1px solid rgba(176, 191, 209, 0.14);
-  border-radius: 18px;
-  background: rgba(8, 13, 22, 0.64);
+  border: 1px solid var(--admin-border);
+  border-radius: var(--admin-radius);
+  background: var(--admin-surface);
+  color: var(--admin-text);
+  box-shadow: var(--admin-shadow);
 }
 
 .sectionTitle {
   margin: 0;
-  color: #eef3f9;
+  color: var(--admin-text);
+  font-size: 1.08rem;
+  line-height: 1.2;
 }
 
 .sectionText {
   margin: 0;
-  color: #b3c0cf;
+  color: var(--admin-text-muted);
   line-height: 1.55;
 }
 
 .toolGrid {
   display: grid;
-  gap: 14px;
+  gap: 10px;
 }
 
 .toolCard {
   display: grid;
   gap: 8px;
-  padding: 14px 16px;
-  border-radius: 16px;
-  border: 1px solid rgba(176, 191, 209, 0.12);
-  background: rgba(5, 9, 16, 0.72);
+  padding: 14px;
+  border: 1px solid var(--admin-border);
+  border-radius: var(--admin-radius);
+  background: var(--admin-surface-soft);
 }
 
 .toolHeader {
@@ -47,19 +51,20 @@
 
 .toolTitle {
   margin: 0;
-  color: #eef3f9;
+  color: var(--admin-text);
 }
 
 .toolStatus {
   display: inline-flex;
   align-items: center;
+  border: 1px solid rgba(255, 176, 46, 0.3);
   border-radius: 999px;
-  padding: 4px 10px;
-  background: rgba(14, 24, 38, 0.88);
-  border: 1px solid rgba(176, 191, 209, 0.14);
-  color: #b3c0cf;
-  font-size: 0.78rem;
-  letter-spacing: 0.04em;
+  padding: 4px 9px;
+  background: rgba(255, 176, 46, 0.12);
+  color: #8a5600;
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
@@ -70,25 +75,26 @@
 }
 
 .toolDescription {
-  color: #d9e3ef;
+  color: var(--admin-text);
 }
 
 .toolReason {
-  color: #96a7ba;
+  color: var(--admin-text-muted);
   font-size: 0.93rem;
 }
 
 .toolLink {
   width: fit-content;
-  color: #d9e7f7;
-  font-weight: 700;
-  text-decoration: none;
+  color: var(--admin-navy-800);
+  font-weight: 800;
+  text-decoration-color: rgba(255, 176, 46, 0.7);
+  text-underline-offset: 3px;
 }
 
 .noteList {
-  margin: 0;
-  padding-left: 18px;
   display: grid;
   gap: 8px;
-  color: #d9e3ef;
+  margin: 0;
+  padding-left: 18px;
+  color: var(--admin-text);
 }

@@ -12,6 +12,7 @@ import {
 } from "../../../../src/lib/admin/access";
 import {
   grantOperatorInternalAccessAction,
+  grantOperatorWaitlistContactAccessAction,
   OPERATOR_ACCESS_MANAGEMENT_SCOPE,
   OPERATOR_ACCESS_ROUTE,
 } from "../../../../src/lib/admin/operatorGrants";
@@ -109,7 +110,7 @@ export default async function OperatorAccessPage({
       <AdminShell
         eyebrow="Epoch 05 Admin"
         title="Operator access"
-        description="This operator-only surface grants the minimal internal private-app access to another existing account after first-operator bootstrap is closed."
+        description="This operator-only surface grants bounded post-bootstrap operator scopes to another existing account after first-operator bootstrap is closed."
         currentPath={ADMIN_ROUTES.operatorAccess}
         navigation={navigation}
         error={operatorContext.loadError}
@@ -128,10 +129,9 @@ export default async function OperatorAccessPage({
           </h2>
           <p className={styles.sectionText}>
             Post-bootstrap operator grant management depends on the operator
-            grants foundation plus the internal private-app access scope
-            migration for this ticket. While either dependency is unavailable,
-            this route stays in a safe setup state and does not resolve target
-            accounts.
+            grants foundation plus the reviewed scope-allowlist migrations for
+            this ticket. While either dependency is unavailable, this route
+            stays in a safe setup state and does not resolve target accounts.
           </p>
         </section>
       </AdminShell>
@@ -160,13 +160,13 @@ export default async function OperatorAccessPage({
     <AdminShell
       eyebrow="Epoch 05 Admin"
       title="Operator access"
-      description="This operator-only surface grants the minimal internal private-app access to another existing account after first-operator bootstrap is closed."
+      description="This operator-only surface grants bounded post-bootstrap operator scopes to another existing account after first-operator bootstrap is closed."
       currentPath={ADMIN_ROUTES.operatorAccess}
       navigation={navigation}
       error={searchError}
       message={
         message ??
-        "Only existing operators with operator.manage_operator_access can grant this internal access path."
+        "Only existing operators with operator.manage_operator_access can grant these bounded post-bootstrap operator scopes."
       }
       footer={
         <p className={authStyles.hint}>
@@ -182,15 +182,19 @@ export default async function OperatorAccessPage({
             Scope and safety
           </h2>
           <p className={styles.sectionText}>
-            Use this only to open the internal private-app path for an existing
-            account after initial bootstrap is closed. The granted scope is
-            explicit and minimal, and it does not unlock approved-domain,
-            reviewer-scope, audit, cleanup, or beta invite tooling by itself.
+            Use these controls only to grant bounded post-bootstrap operator
+            scopes to an existing account after initial bootstrap is closed.
+            Each granted scope is explicit and minimal.
           </p>
           <p className={styles.hint}>
             The target account must already exist. This route does not create
             accounts, does not expose internal account identifiers, and does not create a
             public self-service operator request flow.
+          </p>
+          <p className={styles.hint}>
+            Waitlist contact access is separate from dashboard read access. An
+            account still needs the waitlist dashboard read scope before it can
+            open `/app/admin/waitlist`, even if it also has waitlist contact access.
           </p>
         </section>
 
@@ -198,6 +202,11 @@ export default async function OperatorAccessPage({
           <h2 id="operator-access-form" className={styles.sectionTitle}>
             Grant internal private-app access
           </h2>
+          <p className={styles.sectionText}>
+            This scope allows operator-internal entry into `/app`. It does not
+            unlock approved-domain, reviewer-scope, audit, cleanup, waitlist
+            dashboard, or beta invite tooling by itself.
+          </p>
           <form className={styles.createForm} action={grantOperatorInternalAccessAction}>
             <div className={styles.fieldPair}>
               <div className={styles.field}>
@@ -225,6 +234,54 @@ export default async function OperatorAccessPage({
             <div className={styles.formActions}>
               <button className={styles.buttonPrimary} type="submit">
                 Grant internal access
+              </button>
+            </div>
+          </form>
+        </section>
+
+        <section
+          className={styles.section}
+          aria-labelledby="operator-waitlist-contact-form"
+        >
+          <h2 id="operator-waitlist-contact-form" className={styles.sectionTitle}>
+            Grant waitlist contact access
+          </h2>
+          <p className={styles.sectionText}>
+            This scope allows viewing raw waitlist contact emails and richer
+            per-person survey detail for invite/contact workflow. It does not
+            by itself open `/app/admin/waitlist`; dashboard access still
+            requires the separate waitlist read scope.
+          </p>
+          <form
+            className={styles.createForm}
+            action={grantOperatorWaitlistContactAccessAction}
+          >
+            <div className={styles.fieldPair}>
+              <div className={styles.field}>
+                <label htmlFor="waitlist-contact-target-email">Target login email</label>
+                <input
+                  id="waitlist-contact-target-email"
+                  name="target_email"
+                  type="email"
+                  inputMode="email"
+                  autoComplete="off"
+                  placeholder="existing-account@example.com"
+                  required
+                />
+              </div>
+              <div className={styles.field}>
+                <label htmlFor="waitlist-contact-reason">Reason</label>
+                <input
+                  id="waitlist-contact-reason"
+                  name="reason"
+                  type="text"
+                  placeholder="Optional operator note"
+                />
+              </div>
+            </div>
+            <div className={styles.formActions}>
+              <button className={styles.buttonPrimary} type="submit">
+                Grant waitlist contact access
               </button>
             </div>
           </form>

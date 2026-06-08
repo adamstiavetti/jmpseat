@@ -16,6 +16,7 @@ test("operator scope list stays aligned with E05-T01", () => {
   assert.deepEqual(OPERATOR_SCOPE_VALUES, [
     "operator.internal_private_app_access",
     "operator.read_audit",
+    "operator.view_waitlist_contacts",
     "operator.manage_approved_domains",
     "operator.manage_reviewer_scopes",
     "operator.read_verification_requests",
@@ -239,6 +240,26 @@ test("operator internal private-app scope migration extends allowed scopes witho
   );
 });
 
+test("waitlist contact scope migration extends allowed scopes without widening bootstrap access", () => {
+  const migrationName = readdirSync(
+    new URL("../../supabase/migrations/", import.meta.url),
+  ).find((name) => name.endsWith("_add_waitlist_contact_operator_scope.sql"));
+
+  assert.ok(migrationName, "expected waitlist contact scope migration");
+
+  const sql = readFileSync(
+    new URL(`../../supabase/migrations/${migrationName}`, import.meta.url),
+    "utf8",
+  );
+
+  assert.match(sql, /create or replace function public\.operator_scope_values\(\)/i);
+  assert.match(sql, /'operator\.view_waitlist_contacts'/i);
+  assert.doesNotMatch(
+    sql,
+    /grant execute on function public\.bootstrap_operator_access\(uuid, text\[\], text\) to authenticated/i,
+  );
+});
+
 test("operator grant/revoke expected denials return after auditing instead of raising and rolling back", () => {
   const sql = readFileSync(
     new URL("../../supabase/migrations/20260605113000_create_operator_grants_foundation.sql", import.meta.url),
@@ -312,7 +333,7 @@ test("operator grant audit redaction migration removes target identifiers from g
   );
 });
 
-test("operator grant management source stays server-only, resolves target email privately, and grants only internal access scope", () => {
+test("operator grant management source stays server-only, resolves target email privately, and grants only fixed post-bootstrap scopes", () => {
   const source = readFileSync(
     new URL("../../src/lib/admin/operatorGrants.ts", import.meta.url),
     "utf8",
@@ -325,10 +346,15 @@ test("operator grant management source stays server-only, resolves target email 
   assert.match(source, /import "server-only"/);
   assert.match(source, /operator\.manage_operator_access/);
   assert.match(source, /operator\.internal_private_app_access/);
+  assert.match(source, /operator\.view_waitlist_contacts/);
+  assert.match(source, /POST_BOOTSTRAP_GRANTABLE_OPERATOR_SCOPES/);
+  assert.match(source, /grantOperatorWaitlistContactAccessAction/);
+  assert.match(source, /requested_scopes:\s*\[input\.scope\]/);
   assert.match(source, /grant_operator_access/);
   assert.match(source, /auth\.admin\.listUsers/);
   assert.doesNotMatch(source, /page <= 10|page < 10/);
   assert.match(source, /recordSecurityEvent/);
+  assert.doesNotMatch(source, /requested_scopes:\s*formData|getString\(formData,\s*"scope"/);
   assert.doesNotMatch(
     source,
     /beta_access|verification_claims|airline_email_verified|restricted_board|role_claim|base_claim/i,
@@ -336,6 +362,10 @@ test("operator grant management source stays server-only, resolves target email 
   assert.doesNotMatch(source, /console\.(log|error|warn)/);
   assert.match(pageSource, /type="email"/);
   assert.match(pageSource, /grantOperatorInternalAccessAction/);
+  assert.match(pageSource, /grantOperatorWaitlistContactAccessAction/);
+  assert.match(pageSource, /Grant waitlist contact access/i);
+  assert.match(pageSource, /raw waitlist contact emails/i);
+  assert.match(pageSource, /still needs the waitlist dashboard read scope/i);
   assert.doesNotMatch(pageSource, /target_user_id|auth user uuid|reviewer user id/i);
 });
 
@@ -348,6 +378,7 @@ test("operator grant management page keeps copy separate from airline verificati
   assert.match(pageSource, /existing operators with operator\.manage_operator_access/i);
   assert.match(pageSource, /does not mark internal accounts as airline-email verified/i);
   assert.match(pageSource, /does not grant beta access/i);
+  assert.match(pageSource, /waitlist contact access is separate from dashboard read access/i);
   assert.match(pageSource, /access_source/);
   assert.match(pageSource, /operator_private_app_access/);
   assert.doesNotMatch(pageSource, /@jmpseat\.com|operator_uuid|operator_email/i);

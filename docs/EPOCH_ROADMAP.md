@@ -32,7 +32,13 @@ Future Codex tasks must declare which epoch they belong to. Work that does not m
 - Product direction has pivoted: forward app-level access should use confirmed approved airline employee email control, and restricted role/base board access should be community-admin managed rather than based on jmpseat proof-upload review. Proof upload is frozen as a forward product path, First-Base MVP scope is defined as the first complete base launch package, community-admin responsibilities/disclaimers are defined, the private-testing-to-first-base-launch gate transition is defined, beta invite codes are defined as private-testing capacity control only, and the First-Base MVP implementation ticket pack now defines the forward `FBMVP` sequence. `FBMVP-T01` freezes normal user-facing proof upload surfaces; `FBMVP-T02` adds the airline-email access-state helper/adapter; `FBMVP-T03` adds explicit launch-mode app access gates; `FBMVP-T03A` adds beta invite-code foundation before onboarding/signup work and is runtime-proven on the linked Supabase runtime; `FBMVP-T04` aligns onboarding/signup/access-hold copy with the current access journey; the auth design-system overhaul now makes `/app/access-hold` the canonical airline employee email verification surface and deprecates `/app/verification` as a standalone page; founder/admin internal private-app access now uses explicit operator grants rather than temporary airline-domain abuse; post-bootstrap operator grant management is implemented and runtime-proven through the linked runtime RPC/action path; app-generated work-email verification codes are implemented with inline access-hold entry and legacy confirm-route compatibility; normal account signup confirmation uses a Supabase Auth-native code-first account confirmation UX and the unified stable-beta auth flow is founder-confirmed at runtime; the temporary `jmpseat.com` approved-domain workaround has been soft-disabled; auth email branding/custom SMTP requirements are planned before public-ish Closed Beta Login entry. See `strategy/product-pivot-email-verification-community-boards.md`, `strategy/airline-email-access-gate-decision.md`, `strategy/board-community-access-model-decision.md`, `strategy/proof-system-freeze-deprecation-plan.md`, `strategy/first-base-mvp-scope.md`, `strategy/community-admin-responsibilities-disclaimer-policy.md`, `strategy/launch-readiness-gate-transition-plan.md`, `strategy/beta-invite-code-foundation-decision.md`, `epochs/first-base-mvp-implementation-ticket-pack.md`, `epochs/fbmvp-t01-freeze-user-facing-proof-verification-surfaces.md`, `epochs/fbmvp-t02-airline-email-verification-access-state-design.md`, `epochs/fbmvp-t02-airline-email-verification-access-state-implementation.md`, `epochs/fbmvp-t03-private-testing-versus-first-base-launch-gate-implementation.md`, `epochs/fbmvp-t03a-beta-invite-code-foundation-implementation.md`, `epochs/fbmvp-t04-onboarding-signup-flow-update.md`, `epochs/founder-admin-private-app-access-implementation.md`, `epochs/operator-grant-management-implementation.md`, `epochs/work-email-confirmation-email-flow-implementation.md`, `epochs/account-signup-code-confirmation-implementation.md`, `ops/beta-invite-code-foundation-runtime-pass.md`, `ops/e05-operator-grant-management-runtime-pass.md`, `ops/auth-design-system-style-guide.md`, `ops/auth-design-overhaul-docs-audit.md`, `ops/auth-detour-closeout-runtime-pass.md`, and `ops/auth-email-branding-confirmation-template-plan.md`.
 - No community functionality, AI product feature, payments, or analytics SDK
   exists. First-party waitlist capture exists, and the initial operator/admin
-  waitlist dashboard is implemented with runtime validation pending.
+  waitlist dashboard is implemented with runtime validation pending. Aggregate
+  metrics stay available through `operator.read_audit`, while raw waitlist
+  contact/detail workflow is being narrowed behind
+  `operator.view_waitlist_contacts`. Fresh first-operator bootstrap should
+  include that narrow scope so a new environment still has one usable
+  founder/admin waitlist-contact operator, and post-bootstrap operator grant
+  management should be able to grant that scope through a controlled path.
 - Discovery is desk-researched, not fully user-validated.
 - FA expert interview remains pending.
 - First trusted aviation contact outreach remains pending.
@@ -134,9 +140,10 @@ Current truth:
 - `beta.jmpseat.com` remains the private beta/auth/admin/operator surface.
 - First-party jmpseat capture is now the primary public waitlist path. Tally is
   backup/research-only unless intentionally reintroduced later.
-- `/app/admin/waitlist` is implemented as the operator/admin-only metrics
-  viewer for safe aggregates and masked recent submissions. Runtime validation
-  remains pending.
+- `/app/admin/waitlist` is implemented as the operator/admin-only waitlist
+  intelligence viewer for aggregate demand signals plus narrower
+  `operator.view_waitlist_contacts` contact/detail workflow. Runtime validation
+  remains pending for the richer founder-intelligence revision.
 - The near-term product remains web-first; native mobile is a later client, not a current implementation target.
 
 Complete:

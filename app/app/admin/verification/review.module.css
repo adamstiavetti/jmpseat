@@ -1,41 +1,48 @@
 .stack {
   display: grid;
-  gap: 20px;
+  gap: 16px;
 }
 
 .section {
   display: grid;
   gap: 12px;
-  padding: 16px 18px;
-  border: 1px solid rgba(176, 191, 209, 0.14);
-  border-radius: 18px;
-  background: rgba(8, 13, 22, 0.64);
+  padding: 18px;
+  border: 1px solid var(--admin-border);
+  border-radius: var(--admin-radius);
+  background: var(--admin-surface);
+  color: var(--admin-text);
+  box-shadow: var(--admin-shadow);
 }
 
 .sectionTitle,
 .cardTitle {
   margin: 0;
-  color: #eef3f9;
+  color: var(--admin-text);
+}
+
+.sectionTitle {
+  font-size: 1.08rem;
+  line-height: 1.2;
 }
 
 .sectionText {
   margin: 0;
-  color: #b3c0cf;
+  color: var(--admin-text-muted);
   line-height: 1.55;
 }
 
 .queue {
   display: grid;
-  gap: 14px;
+  gap: 12px;
 }
 
 .card {
   display: grid;
   gap: 10px;
-  padding: 14px 16px;
-  border-radius: 16px;
-  background: rgba(5, 9, 16, 0.72);
-  border: 1px solid rgba(176, 191, 209, 0.12);
+  padding: 14px;
+  border: 1px solid var(--admin-border);
+  border-radius: var(--admin-radius);
+  background: var(--admin-surface-soft);
 }
 
 .evidenceBlock {
@@ -45,16 +52,17 @@
 
 .evidenceTitle {
   margin: 0;
-  color: #d9e7f7;
+  color: var(--admin-text);
   font-size: 0.95rem;
+  font-weight: 800;
 }
 
 .list {
-  margin: 0;
-  padding-left: 18px;
   display: grid;
   gap: 8px;
-  color: #d9e3ef;
+  margin: 0;
+  padding-left: 18px;
+  color: var(--admin-text);
 }
 
 .listItem {
@@ -62,8 +70,9 @@
 }
 
 .meta {
-  color: #96a7ba;
+  color: var(--admin-text-muted);
   font-size: 0.92rem;
+  overflow-wrap: anywhere;
 }
 
 .actions {
@@ -80,7 +89,7 @@
 
 .proofAccessNote {
   margin: 0;
-  color: #96a7ba;
+  color: var(--admin-text-muted);
   font-size: 0.9rem;
   line-height: 1.45;
 }
@@ -89,27 +98,33 @@
 .buttonReject,
 .buttonResubmit,
 .buttonView {
-  border: 0;
-  border-radius: 999px;
-  padding: 11px 16px;
-  color: #071018;
-  font-weight: 700;
+  border-radius: var(--admin-radius);
   cursor: pointer;
+  font-weight: 800;
+  padding: 11px 14px;
 }
 
 .buttonApprove {
-  background: linear-gradient(135deg, #d4f3dc 0%, #83d79d 100%);
+  border: 1px solid var(--admin-success);
+  background: var(--admin-success);
+  color: #ffffff;
 }
 
 .buttonReject {
-  background: linear-gradient(135deg, #ffd7df 0%, #ef91a8 100%);
+  border: 1px solid var(--admin-danger);
+  background: var(--admin-danger);
+  color: #ffffff;
 }
 
 .buttonResubmit {
-  background: linear-gradient(135deg, #d8e8fb 0%, #8db8e1 100%);
+  border: 1px solid var(--admin-navy-950);
+  background: linear-gradient(135deg, var(--admin-navy-900), var(--admin-navy-950));
+  color: var(--admin-amber);
 }
 
 .buttonView {
   width: fit-content;
-  background: linear-gradient(135deg, #f6e6bd 0%, #d7b56e 100%);
+  border: 1px solid rgba(255, 176, 46, 0.5);
+  background: rgba(255, 176, 46, 0.14);
+  color: #8a5600;
 }

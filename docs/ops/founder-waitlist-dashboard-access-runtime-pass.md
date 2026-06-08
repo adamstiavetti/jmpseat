@@ -10,7 +10,7 @@ This runtime pass aligned the founder/admin operator grant with the waitlist
 metrics dashboard requirement. The founder/admin account already had explicit
 operator access for internal private-app entry and operator grant management,
 but it did not yet have `operator.read_audit`, which is the existing scope used
-by `/app/admin/waitlist`.
+by `/app/admin/waitlist` for aggregate waitlist metrics.
 
 The alignment granted only `operator.read_audit` through the existing
 `public.operator_grants` source of truth. No private email, auth user UUID,
@@ -58,12 +58,18 @@ Stable beta checks confirmed:
 - dashboard summary cards render
 - waitlist survey metrics render
 - recent submissions render
-- email-like dashboard values are masked
+- at the time of this runtime pass, email-like dashboard values were masked in
+  the live UI
 - no UUID-like values were rendered in the dashboard text scan
 - no explicit token values were rendered in the dashboard text scan
 
 The dashboard safety copy can mention survey tokens as a category that is not
 rendered; no survey token value was exposed.
+
+If the dashboard later expands authorized founder/admin contact visibility or
+per-person survey detail, that richer view requires the narrower
+`operator.view_waitlist_contacts` scope plus a fresh runtime pass after review,
+merge, and deploy.
 
 ## Boundaries Preserved
 

@@ -51,6 +51,9 @@ test("operator bootstrap route constants stay bounded and server-only", () => {
   );
   assert.equal(OPERATOR_BOOTSTRAP_SECRET_ENV_KEY, "OPERATOR_BOOTSTRAP_SECRET");
   assert.deepEqual(INITIAL_OPERATOR_BOOTSTRAP_SCOPES, OPERATOR_SCOPE_VALUES);
+  assert.ok(
+    INITIAL_OPERATOR_BOOTSTRAP_SCOPES.includes("operator.view_waitlist_contacts"),
+  );
 });
 
 test("operator bootstrap secret is read only from server env", () => {

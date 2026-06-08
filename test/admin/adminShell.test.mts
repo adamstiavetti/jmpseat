@@ -172,7 +172,7 @@ test("admin shell nav links only to implemented operator routes for scoped opera
   assert.match(proofCleanupItem?.reason ?? "", /operator\.monitor_proof_cleanup/i);
 });
 
-test("admin shell nav keeps waitlist metrics restricted to read-audit operators", () => {
+test("admin shell nav keeps waitlist metrics available to read-audit operators without requiring contact scope", () => {
   const unscopedNavigation = buildAdminNavigation({
     reviewerAuthorized: false,
     operatorScopes: ["operator.internal_private_app_access"],
@@ -206,10 +206,14 @@ test("/app/admin/waitlist enforces operator access and avoids raw waitlist ident
   assert.match(source, /getPrivateAppGateResult/);
   assert.match(source, /hasOperatorScope/);
   assert.match(source, /WAITLIST_ADMIN_SCOPE/);
+  assert.match(source, /WAITLIST_CONTACT_SCOPE/);
+  assert.match(source, /canViewWaitlistContacts/);
   assert.match(source, /AUTH_ROUTES\.accessRestricted/);
   assert.match(source, /getWaitlistDashboardForOperator/);
   assert.match(source, /AdminShell/);
-  assert.doesNotMatch(source, /survey_token|normalized_email|email:/i);
+  assert.match(source, /signup\.maskedEmail/);
+  assert.match(source, /Contact details and full per-submission survey context require/i);
+  assert.doesNotMatch(source, /survey_token|normalized_email|waitlist_signups|row_id|uuid/i);
   assert.doesNotMatch(source, /proof upload|badge upload|document upload/i);
 });
 

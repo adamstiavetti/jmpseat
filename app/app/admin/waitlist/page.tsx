@@ -13,6 +13,7 @@ import {
 import {
   WAITLIST_ADMIN_ROUTE,
   WAITLIST_ADMIN_SCOPE,
+  WAITLIST_CONTACT_SCOPE,
   getWaitlistDashboardForOperator,
 } from "../../../../src/lib/admin/waitlistMetrics";
 import { AUTH_ROUTES } from "../../../../src/lib/auth/routes";
@@ -41,6 +42,10 @@ function formatPercent(value: number) {
   return `${value}%`;
 }
 
+function formatList(values: string[]) {
+  return values.length > 0 ? values.join(" | ") : null;
+}
+
 function TopList({
   title,
   values,
@@ -66,6 +71,25 @@ function TopList({
         <p className={styles.emptyState}>{emptyLabel}</p>
       )}
     </article>
+  );
+}
+
+function DetailRow({
+  label,
+  value,
+}: {
+  label: string;
+  value: string | null;
+}) {
+  if (!value) {
+    return null;
+  }
+
+  return (
+    <div className={styles.detailRow}>
+      <dt className={styles.detailLabel}>{label}</dt>
+      <dd className={styles.detailValue}>{value}</dd>
+    </div>
   );
 }
 
@@ -135,8 +159,8 @@ export default async function WaitlistAdminPage() {
     return (
       <AdminShell
         eyebrow="Waitlist Admin"
-        title="Waitlist metrics"
-        description="First-party waitlist signups, survey aggregates, and masked recent submissions."
+        title="Waitlist intelligence"
+        description="Founder/admin waitlist contact detail, demand signals, and survey insight for invite and product decisions."
         currentPath={ADMIN_ROUTES.waitlist}
         navigation={navigation}
         error={operatorContext.loadError}
@@ -174,17 +198,27 @@ export default async function WaitlistAdminPage() {
     redirect(AUTH_ROUTES.accessRestricted);
   }
 
-  const metrics = await getWaitlistDashboardForOperator();
+  const canViewWaitlistContacts = hasOperatorScope({
+    scopes: operatorContext.scopes,
+    scope: WAITLIST_CONTACT_SCOPE,
+  });
+  const metrics = await getWaitlistDashboardForOperator({
+    includeContactDetails: canViewWaitlistContacts,
+  });
 
   return (
     <AdminShell
       eyebrow="Waitlist Admin"
-      title="Waitlist metrics"
-      description="First-party waitlist signups, survey aggregates, and masked recent submissions."
+      title="Waitlist intelligence"
+      description="Founder/admin waitlist contact detail, demand signals, and survey insight for invite and product decisions."
       currentPath={ADMIN_ROUTES.waitlist}
       navigation={navigation}
       error={!metrics.ok ? metrics.message : undefined}
-      message="This dashboard shows aggregate waitlist trends and masked recent rows. It does not expose raw emails, survey tokens, row IDs, or private beta auth data."
+      message={
+        canViewWaitlistContacts
+          ? "This restricted dashboard can show full waitlist contact emails and individual survey responses for invite/contact workflow. It does not expose row IDs, survey tokens, auth identifiers, or private beta grant data."
+          : "This restricted dashboard shows aggregate waitlist metrics plus masked recent submission summaries. Full contact details and detailed per-person invite workflow context require separate waitlist contact access."
+      }
       footer={
         <p className={authStyles.hint}>
           Waitlist metrics are separate from beta access, airline-email
@@ -203,7 +237,7 @@ export default async function WaitlistAdminPage() {
         <div className={styles.stack}>
           <section className={styles.section} aria-labelledby="waitlist-summary">
             <h2 id="waitlist-summary" className={styles.sectionTitle}>
-              Summary
+              Overview
             </h2>
             <div className={styles.metricGrid}>
               <article className={styles.metricCard}>
@@ -236,12 +270,28 @@ export default async function WaitlistAdminPage() {
                 </span>
                 <p className={styles.metricLabel}>Recent submissions shown</p>
               </article>
+              <article className={styles.metricCard}>
+                <span className={styles.metricValue}>{metrics.emailOnlyCount}</span>
+                <p className={styles.metricLabel}>Email-only signups</p>
+              </article>
+              <article className={styles.metricCard}>
+                <span className={styles.metricValue}>
+                  {metrics.topAcquisitionSource ?? "None yet"}
+                </span>
+                <p className={styles.metricLabel}>Top acquisition source</p>
+              </article>
+              <article className={styles.metricCard}>
+                <span className={styles.metricValue}>
+                  {metrics.topDesiredFeature ?? "None yet"}
+                </span>
+                <p className={styles.metricLabel}>Top desired first feature</p>
+              </article>
             </div>
           </section>
 
-          <section className={styles.section} aria-labelledby="waitlist-insights">
-            <h2 id="waitlist-insights" className={styles.sectionTitle}>
-              Survey insights
+          <section className={styles.section} aria-labelledby="waitlist-segments">
+            <h2 id="waitlist-segments" className={styles.sectionTitle}>
+              Segment and demand signals
             </h2>
             <div className={styles.insightGrid}>
               <TopList
@@ -250,12 +300,12 @@ export default async function WaitlistAdminPage() {
                 emptyLabel="No role/category responses yet."
               />
               <TopList
-                title="Desired features"
+                title="Desired first features"
                 values={metrics.topDesiredFeatures}
                 emptyLabel="No feature responses yet."
               />
               <TopList
-                title="Base or airport"
+                title="Base, airport, or city priority"
                 values={metrics.topBaseValues}
                 emptyLabel="No safe base/community values yet."
               />
@@ -269,13 +319,44 @@ export default async function WaitlistAdminPage() {
                 values={metrics.topAttributionSources}
                 emptyLabel="No attribution sources yet."
               />
+              <TopList
+                title="Private beta willingness"
+                values={metrics.topBetaInterest}
+                emptyLabel="No beta-interest responses yet."
+              />
+              <TopList
+                title="Current tools and communities"
+                values={metrics.topCurrentTools}
+                emptyLabel="No current-tool responses yet."
+              />
+              <TopList
+                title="Verification comfort"
+                values={metrics.topVerificationComfort}
+                emptyLabel="No verification comfort responses yet."
+              />
+              <TopList
+                title="Privacy or trust concerns"
+                values={metrics.topPrivacyConcerns}
+                emptyLabel="No repeated privacy/trust concerns yet."
+              />
             </div>
           </section>
 
           <section className={styles.section} aria-labelledby="waitlist-recent">
             <h2 id="waitlist-recent" className={styles.sectionTitle}>
-              Recent signups
+              Recent waitlist submissions
             </h2>
+            <p className={styles.sectionText}>
+              {canViewWaitlistContacts
+                ? "Use this list for founder/admin invite prioritization and direct follow-up. Email-only rows still matter because they show demand even when the optional survey was skipped."
+                : "Use this list to understand near-term demand without exposing raw contact details. Email-only rows still matter because they show demand even when the optional survey was skipped."}
+            </p>
+            {!canViewWaitlistContacts ? (
+              <p className={styles.recordDetail}>
+                Contact details and full per-submission survey context require
+                waitlist contact access.
+              </p>
+            ) : null}
             {metrics.recentSignups.length > 0 ? (
               <div className={styles.recordGrid}>
                 {metrics.recentSignups.map((signup) => (
@@ -284,28 +365,84 @@ export default async function WaitlistAdminPage() {
                     className={styles.recordCard}
                   >
                     <div className={styles.recordHeader}>
-                      <h3 className={styles.recordTitle}>{signup.maskedEmail}</h3>
+                      <div className={styles.recordIdentity}>
+                          <h3 className={styles.recordTitle}>
+                              {canViewWaitlistContacts
+                                ? (signup.contactEmail ?? signup.maskedEmail)
+                                : signup.maskedEmail}
+                            </h3>
+                        <p className={styles.recordMeta}>
+                          Submitted {formatDate(signup.createdAt)}
+                        </p>
+                      </div>
                       <span className={styles.statusBadge}>
-                        {signup.surveyCompleted ? "survey complete" : "email only"}
+                        {signup.statusLabel}
                       </span>
                     </div>
-                    <p className={styles.recordMeta}>
-                      Submitted {formatDate(signup.createdAt)}
-                    </p>
-                    <p className={styles.recordDetail}>
-                      {[
-                        signup.aviationConnection,
-                        signup.priorityBase,
-                        signup.discoverySource,
-                      ]
-                        .filter(Boolean)
-                        .join(" | ") || "No optional survey details yet."}
-                    </p>
+                    <dl className={styles.detailGrid}>
+                      <DetailRow
+                        label="Aviation connection"
+                        value={signup.aviationConnection}
+                      />
+                      <DetailRow
+                        label="Base or airport priority"
+                        value={signup.priorityBase}
+                      />
+                      <DetailRow
+                        label="Discovery source"
+                        value={signup.discoverySource}
+                      />
+                      <DetailRow
+                        label="Acquisition source"
+                        value={signup.attributionSource}
+                      />
+                      <DetailRow
+                        label="Desired first features"
+                        value={formatList(signup.desiredFeatures)}
+                      />
+                      {canViewWaitlistContacts ? (
+                        <>
+                              <DetailRow
+                                label="Current tools"
+                                value={formatList(signup.currentTools ?? [])}
+                              />
+                              <DetailRow
+                                label="Private beta willingness"
+                                value={formatList(signup.betaHelp ?? [])}
+                              />
+                              <DetailRow
+                                label="Verification comfort"
+                                value={signup.verificationComfort ?? null}
+                              />
+                              <DetailRow
+                                label="Biggest problem to solve first"
+                                value={signup.biggestPain ?? null}
+                              />
+                              <DetailRow
+                                label="Privacy or trust concern"
+                                value={signup.privacyConcern ?? null}
+                              />
+                        </>
+                      ) : null}
+                    </dl>
+                    {!signup.surveyCompleted ? (
+                      <p className={styles.recordDetail}>
+                        Email captured. Optional survey was skipped or not yet
+                        completed, so this row is still useful for invite demand
+                        and outreach planning.
+                      </p>
+                    ) : null}
                   </article>
                 ))}
               </div>
             ) : (
-              <p className={styles.emptyState}>No waitlist signups yet.</p>
+              <p className={styles.emptyState}>
+                No waitlist submissions yet. Once public demand arrives, this
+                dashboard will show aggregate signals and{" "}
+                {canViewWaitlistContacts
+                  ? "per-person contact/detail for invite planning."
+                  : "masked recent summaries for audit-safe review."}
+              </p>
             )}
           </section>
         </div>
