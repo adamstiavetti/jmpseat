@@ -171,6 +171,8 @@ Task notes:
 
 - The auth email branding/custom SMTP task is near-term readiness work before
   broader Closed Beta Login exposure.
+- The current readiness package for that task lives in
+  `docs/ops/auth-email-branding-confirmation-template-plan.md`.
 - The proof-upload live mutation task remains important, but it should only run
   when a safe founder-controlled account/workflow and cleanup path exist.
 - The Vercel deployment-model decision is intentionally not a bridge blocker.

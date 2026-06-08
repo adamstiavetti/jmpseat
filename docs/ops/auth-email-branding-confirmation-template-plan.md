@@ -1,6 +1,6 @@
-# Auth Email Branding / Confirmation Template Ops Plan
+# Auth Email Branding / Confirmation Template Readiness
 
-Date: 2026-06-06
+Date: 2026-06-08
 
 Brand note: jmpseat is the canonical product and app name. This document does
 not claim legal or trademark clearance for the name.
@@ -10,116 +10,253 @@ employer unless explicitly obtained and documented.
 
 ## 1. Decision Summary
 
-Auth email branding must be improved before founder/Yuri Vercel testing or a
-public-ish Closed Beta Login entry.
+Auth email branding must be improved before broader non-founder private-beta
+testing.
 
-The current Supabase default-looking confirmation and password emails are not
-ideal for user trust because they can make the signup flow feel third-party,
-unfinished, or confusing.
+The current product state supports:
 
-This plan does not change Supabase dashboard settings. It defines the manual
-configuration, copy, validation, and documentation steps required before the
-auth email experience is treated as launch-ready.
+- Supabase Auth-native account signup confirmation with a six-digit code UI
+- Supabase Auth password reset with callback recovery
+- legacy-safe `/auth/confirm` and `/auth/callback` handling for Supabase auth
+  links/codes
+- app-owned work-email verification email delivery for airline employee email
+  confirmation
 
-## 2. Goals
+This task is a readiness/ops package. It does not change app auth logic,
+Supabase settings, SMTP settings, DNS, Vercel, or runtime data.
 
-- Make confirmation and reset emails feel like jmpseat.
-- Reduce confusion around Supabase/default auth sender branding.
-- Support the private testing invite flow without implying public launch.
-- Explain that access can require approved airline employee email verification
-  and, during private testing, beta access.
-- Avoid any official airline sponsorship, endorsement, or employer-system
-  implication.
-- Avoid proof upload, badge upload, document upload, or employment-document
-  language.
-- Preserve security clarity around confirmation and password reset links.
+## 2. Current Auth Email Surface
 
-## 3. Emails In Scope
+Current relevant auth emails are:
 
-In scope:
+1. Account confirmation / signup code email
+2. Password reset email
+3. Email change confirmation email, if enabled in Supabase Auth
+4. Magic link / login link email, if enabled in Supabase Auth
+5. Work-email verification email for airline employee email confirmation
 
-- signup confirmation email
-- email change confirmation, if enabled
+Currently not active as a branded auth-email requirement:
+
+- invite-code distribution email
+- beta approval / beta access activation email
+- waitlist marketing or research email
+- board/community notifications
+
+There is no repo-owned invite or beta-access email flow that should be branded
+in this task.
+
+## 3. Ownership Split: Supabase Versus Repo
+
+### Supabase dashboard/template owned
+
+These flows are controlled primarily by Supabase Auth configuration and email
+templates:
+
+- account signup confirmation email
 - password reset email
-- magic link email, if enabled
-- invite-related email copy, if a later reviewed implementation adds invite
-  distribution emails
+- email change confirmation email, if enabled
+- magic link / login link email, if enabled
 
-Not in scope:
+Repo evidence:
 
-- marketing or newsletter waitlist emails unless they are intentionally sent
-  through Supabase Auth
-- baseboard launch emails
-- community announcement campaigns
-- transactional email provider finalization if a provider decision is still
-  pending
+- `src/lib/auth/actions.ts`
+  - `signUpAction()` calls `supabase.auth.signUp(...)`
+  - `confirmAccountCodeAction()` calls `supabase.auth.verifyOtp(...)`
+  - `resendAccountCodeAction()` calls `supabase.auth.resend(...)`
+  - `requestPasswordResetAction()` calls
+    `supabase.auth.resetPasswordForEmail(...)`
+- `app/auth/callback/route.ts` exchanges Supabase callback codes and handles
+  password reset recovery routing
+- `app/auth/confirm/route.ts` verifies Supabase `token_hash` flows for:
+  - `signup`
+  - `recovery`
+  - `invite`
+  - `magiclink`
+  - `email_change`
 
-## 4. Sender / SMTP Recommendation
+### Repo-owned
 
-jmpseat should use custom SMTP or a configured sender domain before testing with
-non-founders if practical.
+This flow is app-owned and not Supabase-template owned:
+
+- work-email verification email for airline employee email confirmation
+
+Repo evidence:
+
+- `src/lib/verification/workEmailConfirmation.ts`
+  - reads `RESEND_API_KEY`
+  - reads `RESEND_FROM_EMAIL`
+  - reads `NEXT_PUBLIC_APP_URL` / `VERCEL_URL`
+  - defines `WORK_EMAIL_CONFIRMATION_EMAIL_SUBJECT`
+  - builds the actual work-email verification email copy in
+    `buildWorkEmailConfirmationEmail(...)`
+
+Important nuance:
+
+- The app still has legacy-compatible work-email confirmation link plumbing via
+  `/app/verification/confirm`.
+- The current repo-owned work-email email copy is code-first, not link-first.
+
+## 4. Current Auth Flow Baseline
+
+### Account signup confirmation
+
+- User signs up at `/signup`
+- `signUpAction()` sends `emailRedirectTo = <origin>/auth/callback`
+- User is redirected to the code-first confirm state on `/signup?mode=confirm`
+- User enters the six-digit account code from the Supabase email
+- `confirmAccountCodeAction()` verifies the code with Supabase Auth
+
+This is already runtime-confirmed on stable beta in
+`docs/ops/auth-detour-closeout-runtime-pass.md`.
+
+### Password reset
+
+- User requests reset at `/reset-password`
+- `requestPasswordResetAction()` sends:
+  - `redirectTo = <origin>/auth/callback?next=/reset-password&mode=update`
+- Supabase recovery email is sent
+- Callback route resolves recovery into `/reset-password?mode=update`
+- User sets a new password through the existing app form
+
+### Magic link and email change
+
+- The repo has route support for Supabase `magiclink` and `email_change`
+  confirmation types in `app/auth/confirm/route.ts`
+- The repo does not expose a first-class magic-link login UI today
+- These templates are relevant only if enabled in Supabase Auth
+
+### Work-email verification
+
+- The app sends a repo-owned work-email verification message
+- Current UX is code-first on `/app/access-hold`
+- The email is for airline employee email control only
+- It is explicitly separate from:
+  - account signup confirmation
+  - beta invite code
+  - role/base claims
+  - employer endorsement
+
+## 5. Redirect And Callback URL Matrix
+
+These values must be correct before broader beta testing.
+
+### Stable beta
+
+Primary auth host:
+
+- `https://beta.jmpseat.com`
+
+Required auth callback target:
+
+- `https://beta.jmpseat.com/auth/callback`
+
+Reset recovery callback target:
+
+- `https://beta.jmpseat.com/auth/callback?next=/reset-password&mode=update`
+
+Notes:
+
+- Stable beta is the current private beta/auth/admin surface
+- auth emails should not target `jmpseat.com` or `www.jmpseat.com`
+- public waitlist domains are not auth callback targets
+
+### Preview/testing
+
+If founder/Yuri testing uses a preview deployment, Supabase Auth must allow the
+preview origin used for:
+
+- `/auth/callback`
+- `/auth/confirm`
+- `/reset-password` recovery handoff through `/auth/callback`
+
+Notes:
+
+- preview URLs should be explicitly reviewed before use
+- do not assume arbitrary preview URLs are allowlisted
+- bounded preview-domain strategy is preferable to ad hoc per-link behavior if
+  the ops model allows it
+
+### Local/dev
+
+Local/dev should support:
+
+- `http://localhost:3000/auth/callback`
+- `http://localhost:3000/reset-password`
+
+Notes:
+
+- local auth settings are for development/testing only
+- localhost should never be the live beta target in real tester emails
+
+### Work-email verification app URL
+
+Repo-owned work-email verification depends on:
+
+- `NEXT_PUBLIC_APP_URL`
+  or
+- `VERCEL_URL` fallback
+
+This value must resolve to the intended app origin for the environment sending
+the email.
+
+For broader beta readiness, the intended work-email verification origin should
+be the stable beta host, not the public waitlist root.
+
+## 6. Sender / From Name / Domain Requirements
+
+Before broader beta:
+
+- use a branded sender name such as `jmpseat`
+- use a branded from address on a controlled jmpseat domain
+- do not use generic Supabase-looking sender branding for real tester trust
+- do not use a personal mailbox as the long-term sender identity
 
 Recommended sender examples:
 
-- `no-reply@jmpseat.app`
-- `support@jmpseat.app`
+- `no-reply@jmpseat.com`
+- `support@jmpseat.com`
 
-Do not use a personal Gmail account as the production sender.
-
-The selected sender domain will likely require DNS/authentication records:
+Sender setup likely requires:
 
 - SPF
 - DKIM
 - DMARC
 
-SMTP credentials must live only in the secure email provider and Supabase
-project settings. They must never be committed to the repo, pasted into docs,
-or printed in terminal output.
+This task does not choose or configure the provider. It only defines the
+readiness requirement.
 
-The exact email provider can be decided later. The provider decision should
-include deliverability, sender authentication, cost, support workflow, and
-whether the provider fits early private-testing volume.
+## 7. Content Requirements For Branded Emails
 
-## 5. Supabase Dashboard Configuration Checklist
+All auth emails should:
 
-Manual configuration steps:
+- clearly say `jmpseat`
+- feel operational and trustworthy, not promotional
+- avoid implying public launch or open signup
+- avoid claiming employer endorsement
+- avoid proof/badge/document upload language
+- avoid exposing sensitive profile, verification, or admin data
+- explain the next step in plain language
+- include an ignore-this-email line for unexpected requests
 
-- Open the correct Supabase project.
-- Confirm the project/environment before changing settings.
-- Review Auth settings.
-- Review Email Templates.
-- Review SMTP settings if using custom SMTP.
-- Configure sender/from name and sender/from email.
-- Update the signup confirmation template.
-- Update email change confirmation if enabled.
-- Update the password reset template.
-- Update magic link copy if magic links are enabled.
-- Verify Site URL and redirect URL allowlist values.
-- Test with safe accounts.
-- Record validation results without exposing links, tokens, secrets, or private
-  identifiers.
+All auth emails should avoid:
 
-Do not paste SMTP credentials, API keys, tokens, confirmation links, or raw
-template-secret values into docs.
+- marketing-heavy tone
+- feature promises that are not implemented
+- language implying invite code alone grants access
+- language implying account signup equals airline eligibility
+- public/private-beta overclaim
+- internal implementation detail like tokens, selectors, or storage behavior
 
-## 6. Confirmation Email Copy Requirements
+## 8. Draft Email Templates
 
-Confirmation copy should:
+These drafts are product-copy targets. Do not paste real Supabase template
+placeholders, live links, or secrets into docs.
 
-- clearly identify jmpseat
-- say the email confirms the user's jmpseat account
-- explain that confirmation lets the user continue account setup
-- mention that app access may also require an approved airline employee email
-  and, during private testing, a beta invite code
-- avoid implying invite code alone grants access
-- avoid implying the app is publicly open
-- avoid proof upload, badge upload, screenshot upload, or employment-document
-  upload language
-- avoid any official airline sponsorship or endorsement implication
-- include safe support or help language
-- include a clear "ignore this email" line for unexpected requests
+### 8.1 Account confirmation / signup code email
 
-## 7. Suggested Confirmation Email Template Copy
+Ownership:
+
+- Supabase dashboard template
 
 Subject:
 
@@ -127,30 +264,29 @@ Subject:
 Confirm your jmpseat account
 ```
 
-Body draft:
+Body:
 
 ```text
-Thanks for signing up for jmpseat.
+You are creating a jmpseat account.
 
-Confirm your email to continue setting up your account.
+Enter the six-digit code from this email in jmpseat to finish account setup.
 
-During private testing, app access may also require an approved airline employee
-email and a beta invite code. jmpseat is an independent community platform and
-is not sponsored by any airline, airport, union, or employer.
-
-[Confirm your email]
+Account confirmation is separate from airline employee email verification and
+beta access.
 
 If you did not request this, you can ignore this email.
 ```
 
-Template implementation note:
+Additional note:
 
-- Replace `[Confirm your email]` with the Supabase confirmation-link placeholder
-  verified in the Supabase dashboard for this project.
-- Do not guess or hard-code Supabase template variables in repo docs.
-- Do not paste real confirmation links into docs or issue trackers.
+- if Supabase requires a displayed code placeholder, keep the template code-first
+- do not emphasize a clickable confirmation link if the product UX is code-first
 
-## 8. Password Reset Template Copy
+### 8.2 Password reset email
+
+Ownership:
+
+- Supabase dashboard template
 
 Subject:
 
@@ -158,135 +294,226 @@ Subject:
 Reset your jmpseat password
 ```
 
-Body draft:
+Body:
 
 ```text
 We received a request to reset the password for your jmpseat account.
 
-If you requested this, use the link below to set a new password.
+Use the secure link in this email to choose a new password.
 
-[Reset password]
-
-If you did not request a password reset, you can ignore this email.
+If you did not request this, you can ignore this email.
 ```
 
-Template implementation note:
+Additional note:
 
-- Replace `[Reset password]` with the Supabase password-reset link placeholder
-  verified in the Supabase dashboard for this project.
-- Password reset copy should stay focused on account security.
-- Do not include beta invite-code details unless a later reviewed support flow
-  requires it.
+- password reset is link-driven in the current repo flow
+- the copy should make the expected domain clear if template controls allow it
 
-## 9. Email Link / Redirect Requirements
+### 8.3 Magic link / login link email
 
-Before sending real tester emails:
+Ownership:
 
-- Site URL must point to the correct deployed URL for the environment.
-- Redirect URLs must include production and preview/testing URLs as appropriate.
-- Redirect allowlists must not permit arbitrary open redirects.
-- Founder/Yuri testing URL must be verified before sending test emails.
-- Confirmation and reset links must not be copied into logs, docs, or chat.
+- Supabase dashboard template, if enabled
 
-Post-auth routing should land users in the existing flow:
+Current product status:
 
-- profile completion if profile setup is incomplete
-- airline employee email verification if eligibility is missing
-- access hold / invite code if beta is required and eligibility is verified
-- app entry if all active gates pass
+- route support exists
+- first-class magic-link login UI is not currently exposed
 
-## 10. Testing Checklist
+Subject:
 
-Before founder/Yuri Vercel testing or public-ish Closed Beta Login entry:
+```text
+Sign in to jmpseat
+```
 
-- Send signup confirmation to a founder test account.
-- Send signup confirmation to a Yuri/tester account if appropriate.
-- Inspect sender name and from domain.
-- Inspect subject and body copy.
-- Confirm the email feels like jmpseat rather than generic Supabase.
-- Click confirmation link from a safe test account.
-- Verify redirect target.
-- Verify login works after confirmation.
-- Verify profile completion routing.
-- Verify airline employee email verification routing.
-- Verify access-hold state.
-- Verify invite-code redemption if the environment is in `private_testing` or
-  `internal_test`.
-- Verify password reset email.
-- Verify reset link lands on the intended reset flow.
-- Verify email copy does not mention proof upload, badge upload, document
-  upload, screenshots, or employment documents.
-- Verify email copy does not imply airline sponsorship or employer endorsement.
-- Verify mobile rendering.
-- Record results without exposing tokens, secrets, full private identifiers, or
-  confirmation/reset links.
+Body:
 
-## 11. Security / Privacy Requirements
+```text
+Use the secure sign-in link in this email to continue to jmpseat.
 
-- No SMTP credentials in repo.
-- No secrets in docs.
-- No confirmation/reset tokens in docs, logs, or screenshots.
-- No user session data in docs.
-- No plaintext invite codes in auth emails unless a later reviewed invite
-  distribution flow explicitly and safely supports it.
-- No proof upload language.
-- No airline sponsorship implication.
-- No sensitive user data in subject lines.
-- Avoid exposing full airline employee email addresses unless necessary for a
-  specific reviewed support flow.
-- Keep password reset copy generic and security-focused.
+This link is for account access only. Airline employee email verification and
+beta access requirements may still apply after sign-in.
 
-## 12. Environment Separation
+If you did not request this, you can ignore this email.
+```
 
-Local, dev, staging, preview, and production environments may need different
-Site URL and redirect URL settings.
+### 8.4 Email change confirmation
 
-Preview deployments should be tested carefully because auth links may fail if
-the preview URL is not on the Supabase redirect allowlist.
+Ownership:
 
-The production sender/domain should not be used casually before DNS records are
-configured and verified.
+- Supabase dashboard template, if enabled
 
-If Vercel preview URLs are used for founder/Yuri testing, confirm whether the
-Supabase redirect allowlist supports the exact preview URL pattern or a bounded
-preview-domain strategy.
+Subject:
 
-## 13. What Stays Deferred
+```text
+Confirm your new jmpseat email address
+```
 
-Deferred:
+Body:
 
-- Closed Beta Login landing button
-- marketing or waitlist email automation
-- invite-code distribution emails
-- final transactional email provider choice if not yet selected
-- final legal/privacy language review
-- baseboard/community launch emails
-- community-admin or restricted-board notification emails
+```text
+Confirm this email change to continue using your jmpseat account.
 
-## 14. Implementation / Runbook Implications
+Changing your account email does not by itself verify airline employee
+eligibility or change beta access status.
 
-Future manual ops or implementation tasks should:
+If you did not request this, you can ignore this email.
+```
 
-- choose the email sending domain/provider
-- configure sender DNS records
-- configure Supabase SMTP if custom SMTP is selected
-- update Supabase confirmation email template
-- update Supabase password reset template
-- update email change and magic link templates if enabled
-- verify Site URL and redirect URL allowlist settings
-- send test emails
-- validate redirect and post-auth flow
-- document screenshots/results without exposing tokens, secrets, or private
-  identifiers
-- only then add the Closed Beta Login landing entry
+### 8.5 Work-email verification email
 
-## 15. Source-Of-Truth Statement
+Ownership:
 
-This plan defines auth email branding requirements before founder/Yuri testing
-or public-ish Closed Beta Login entry.
+- repo-owned app email copy
+
+Current relevance:
+
+- active and current
+- used for airline employee email control verification
+
+Recommended subject:
+
+```text
+Verify your airline employee email for jmpseat
+```
+
+Recommended body:
+
+```text
+Enter this six-digit code in jmpseat to confirm control of this airline
+employee email address.
+
+This verifies control of the email address only.
+It does not verify role, base, seniority, or employer endorsement.
+
+jmpseat is independent and is not sponsored by any airline, airport, union, or
+employer.
+
+If you did not request this, you can ignore this email.
+```
+
+Repo note:
+
+- this already broadly matches the current app-owned copy in
+  `src/lib/verification/workEmailConfirmation.ts`
+
+## 9. Manual Supabase Dashboard Steps
+
+Likely required manual steps:
+
+1. Open the correct Supabase project/environment
+2. Confirm whether the target is stable beta, preview testing, or local/dev
+3. Review Auth Site URL
+4. Review Auth redirect allowlist
+5. Review Confirm Signup template
+6. Review Password Reset / Recovery template
+7. Review Email Change template, if enabled
+8. Review Magic Link template, if enabled
+9. Review sender/from name and from address
+10. Review custom SMTP configuration if moving off default sender behavior
+11. Record the resulting settings at a boolean/checklist level only
+
+Do not paste:
+
+- SMTP credentials
+- provider API keys
+- live template variables copied from the dashboard
+- real confirmation links
+- real recovery links
+- magic links
+- user email addresses
+
+## 10. Manual Provider / Sender Steps
+
+Before broader beta:
+
+1. Decide the sender domain and mailbox
+2. Configure SPF, DKIM, and DMARC
+3. Configure custom SMTP/provider if Supabase should stop sending from
+   default-looking branding
+4. Confirm the sender name and from address match jmpseat branding
+5. Confirm reply-handling expectations for support mailboxes
+
+## 11. Runtime Validation Checklist After Settings Change
+
+Do this only in a later approved runtime task.
+
+### Signup confirmation
+
+- create a safe founder-controlled account signup
+- confirm the email arrives
+- confirm the sender is branded as jmpseat
+- confirm the message is code-first and not confusingly link-first
+- confirm the code is six digits
+- confirm the callback target is the intended beta/preview host
+- confirm account confirmation lands in the existing post-auth flow
+
+### Password reset
+
+- request a reset for a safe founder-controlled account
+- confirm the email arrives
+- confirm sender/from branding
+- confirm the reset flow lands in `/reset-password?mode=update` through the
+  bounded callback path
+- confirm updated-password flow returns the user to login safely
+
+### Magic link / email change
+
+- validate only if these flows are actually enabled
+- confirm callback/confirm routes land on the expected host
+- confirm the emails do not overpromise access or eligibility
+
+### Work-email verification
+
+- confirm sender/from branding for the app-owned work-email message
+- confirm the message stays code-first
+- confirm no proof-upload or invite-code language appears
+- confirm the message does not expose internal link/query details
+- confirm access-hold code entry still matches the email copy
+
+### General checks
+
+- mobile rendering looks credible
+- no localhost target in live tester emails
+- no public waitlist/root-domain auth targeting
+- no secrets, tokens, or private identifiers captured in notes/screenshots
+
+## 12. What Is Not Done Yet
+
+Not done by this task:
+
+- no Supabase dashboard changes
+- no SMTP/provider change
+- no DNS change
+- no Vercel change
+- no auth-behavior change
+- no test emails sent
+- no runtime validation performed
+- no Closed Beta Login widening
+- no invite or beta-access email implementation
+
+## 13. Open Decisions / Blockers
+
+User or operator decisions still required:
+
+1. Which sender domain/address should be used for broader beta
+2. Whether custom SMTP is required before any non-founder testing
+3. Whether preview testing should be supported for auth emails, or whether all
+   real auth-email validation should be pinned to `beta.jmpseat.com`
+4. Whether magic-link and email-change templates need active branding work now
+   or can stay as conditional follow-ups if those flows remain disabled
+
+## 14. Source Of Truth Statement
+
+This doc is the current readiness package for branded jmpseat auth emails.
+
+It defines:
+
+- current auth-email ownership
+- required copy shape
+- required callback/redirect expectations
+- likely manual dashboard/provider steps
+- runtime validation requirements
 
 It does not change app code, migrations, Supabase dashboard settings, SMTP
-settings, DNS records, launch modes, beta gates, or invite-code behavior.
-
-Future implementation/manual ops should follow this plan unless a later
-reviewed source-of-truth document supersedes it.
+settings, DNS, launch mode, beta gates, or invite behavior.
