@@ -31,10 +31,13 @@ Current post-E05 update:
 - Use `ops/public-waitlist-launch-readiness-check.md` as the current W05
   cutover-readiness source of truth before moving the public waitlist to
   `jmpseat.com`.
-- W05A addresses the prior metadata/legal blockers in code, but root cutover
-  still needs a fresh readiness rerun after review and merge.
-- W05A also adds a dedicated `1200 x 630` social preview image so Open Graph and
-  Twitter metadata match the actual asset dimensions.
+- W05A addressed the prior metadata/legal blockers in code.
+- The merged public-waitlist copy polish now also aligns the homepage, Privacy,
+  and Terms copy with the actual public waitlist and optional survey behavior.
+- A fresh readiness rerun now moves the launch lane to ready with final manual
+  visual QA before any root cutover decision.
+- W05A also adds a dedicated `1200 x 630` social preview image so Open Graph
+  and Twitter metadata match the actual asset dimensions.
 
 ## 2. Current App Scope
 
@@ -105,7 +108,7 @@ Form title:
 
 Description:
 
-> jmpseat is the off-duty network for airline life. Join the waitlist for trusted base intel, layover knowledge, and verified discussion.
+> A private hub for airline workers, bringing base questions, layover recommendations, crew conversations, and everyday resources into one place.
 
 Privacy/safety note:
 
