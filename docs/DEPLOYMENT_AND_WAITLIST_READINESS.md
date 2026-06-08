@@ -40,11 +40,12 @@ Current post-E05 update:
   waitlist deployment as apex.
 - Root `jmpseat.com` serves the public waitlist/marketing page only, while
   `beta.jmpseat.com` remains the private beta/auth/admin/operator surface.
-- A pending Epoch 5 access-control patch narrows private-app operator override
-  to the dedicated `operator.internal_private_app_access` scope only. Unrelated
-  operator/admin tooling scopes no longer grant app-entry override after that
-  patch is reviewed, merged, and deployed; no beta grants or runtime operator
-  grants are changed by the code patch itself.
+- The Epoch 5 private-app operator override hardening is now merged, pushed,
+  beta-deployed, and runtime-proven at `03d7455`: only the dedicated
+  `operator.internal_private_app_access` scope grants internal private-app
+  override. Unrelated operator/admin tooling scopes no longer grant app-entry
+  override, and no beta grants or runtime operator grants were changed by this
+  fix.
 - Duplicate-survey-token hardening is migrated, deployed, and runtime-proven on
   apex and `www`: duplicate waitlist submissions no longer receive existing
   survey tokens or edit another signup's optional survey answers. The app still
