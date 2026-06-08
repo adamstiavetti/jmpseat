@@ -109,3 +109,43 @@ Vercel alias failure.
 Passed:
 
 - `git diff --check`
+
+## Initial Top Anchor Hotfix Follow-Up
+
+Run time: 2026-06-08 CDT
+
+Hotfix commit deployed to public apex/www:
+
+- `061fd3a fix: anchor public waitlist top link to page top`
+
+The public landing page had a narrow initial-render bug where browser hash
+restoration or `/#top` could place the viewport just below the top jmpseat
+wordmark. Root cause was that the wordmark linked to `#top`, while `id="top"`
+was on the hero content block below the header/brand. The hotfix moved
+`id="top"` to the root public page container.
+
+Runtime verification after deploy:
+
+- `https://jmpseat.com/` loaded at `scrollY: 0`.
+- `https://jmpseat.com/#top` loaded at `scrollY: 0`.
+- `https://www.jmpseat.com/` loaded at `scrollY: 0`.
+- `https://www.jmpseat.com/#top` loaded at `scrollY: 0`.
+- Desktop and mobile viewport checks loaded at `scrollY: 0`.
+- Query-state URLs checked without unintended initial scroll:
+  `/?joined=1`, `/?waitlist=joined`, `/?survey=unavailable`,
+  `/?survey=skipped`, and `/?survey=error`.
+- Public root still had no `Beta Access`, no `/login?next=/app` CTA, and no
+  proof/badge/document/manual-review upload copy.
+
+During the Vercel production deploy, Vercel output indicated that
+`beta.jmpseat.com` was aliased to the fresh public deployment. The alias was
+immediately restored to the documented stable beta deployment:
+
+- `beta.jmpseat.com` -> `jmpseat-agm8yl7ta-adam-stiavetti-s-projects.vercel.app`
+
+Post-restore beta smoke tests confirmed `/login` rendered the private beta auth
+surface and signed-out `/app` plus `/app/admin/waitlist` redirected to login.
+
+No waitlist test rows were created. No migrations, Supabase db push, DNS
+changes, Supabase settings changes, runtime data mutation, beta grants,
+role/base claims, private beta auth changes, or proof-upload changes were made.
