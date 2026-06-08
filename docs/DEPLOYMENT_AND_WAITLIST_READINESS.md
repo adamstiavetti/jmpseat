@@ -68,6 +68,13 @@ Current post-E05 update:
   Vercel-provided HSTS remains present, with no app-managed preload or
   includeSubDomains change. No CSP report endpoint is configured yet. Public
   apex/`www` behavior and beta auth redirects were preserved.
+- Beta Vercel env scoping is now documented and runtime-verified in
+  `ops/beta-vercel-env-scoping.md`: the beta surface is a Preview deployment
+  while apex/`www` use Production, and the required Supabase env names now exist
+  persistently in Preview. A normal beta Preview deploy without deployment-scoped
+  Supabase env injection returned healthy beta auth redirects, with apex/`www`
+  preserved. No DNS, Supabase settings, runtime data, beta grants, or app code
+  were changed.
 - Duplicate-survey-token hardening is migrated, deployed, and runtime-proven on
   apex and `www`: duplicate waitlist submissions no longer receive existing
   survey tokens or edit another signup's optional survey answers. The app still
