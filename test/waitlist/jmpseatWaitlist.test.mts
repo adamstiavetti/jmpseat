@@ -95,6 +95,15 @@ test("public waitlist email input is described by its helper text", async () => 
   assert.match(pageSource, /id={`\$\{formId\}-helper`}/);
 });
 
+test("public waitlist top anchor does not skip past the brand header", async () => {
+  const pageSource = await readFile(path.join(rootDir, "app/page.tsx"), "utf8");
+
+  assert.match(pageSource, /<main id="top" className=\{styles\.page\}>/);
+  assert.match(pageSource, /href="#top"/);
+  assert.doesNotMatch(pageSource, /<div id="top" className=\{styles\.heroContent\}>/);
+  assert.doesNotMatch(pageSource, /autoFocus|scrollIntoView|window\.scrollTo/);
+});
+
 test("public legal pages use concrete launch-intent effective dates", async () => {
   const privacySource = await readFile(path.join(rootDir, "app/privacy/page.tsx"), "utf8");
   const termsSource = await readFile(path.join(rootDir, "app/terms/page.tsx"), "utf8");

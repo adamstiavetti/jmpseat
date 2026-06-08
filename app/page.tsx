@@ -336,7 +336,7 @@ export default async function Home({ searchParams }: HomeProps) {
   const surveyStatus = getValue(params.survey);
 
   return (
-    <main className={styles.page}>
+    <main id="top" className={styles.page}>
       <section className={styles.hero} aria-labelledby="hero-title">
         <Image
           src="/jmpseat/hero-runway.png"
@@ -354,7 +354,7 @@ export default async function Home({ searchParams }: HomeProps) {
             </a>
           </header>
 
-          <div id="top" className={styles.heroContent}>
+          <div className={styles.heroContent}>
             <div className={styles.copyColumn}>
               <h1 id="hero-title" className={styles.headline}>
                 <span>the off-duty</span>
