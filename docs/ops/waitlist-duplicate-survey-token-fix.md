@@ -4,8 +4,9 @@ Date: 2026-06-08
 
 Branch: `fix/waitlist-duplicate-survey-token`
 
-Status: implementation ready for review; runtime migration apply and deployment
-validation remain pending.
+Status: runtime-proven on apex and www after migration-first rollout.
+
+Runtime pass: 2026-06-08 19:21 UTC.
 
 ## Summary
 
@@ -17,9 +18,10 @@ The public waitlist still returns a friendly success state for duplicate email
 submissions, but duplicates no longer receive the existing signup's survey token
 and no longer get an editable optional survey tied to that existing row.
 
-No root rollback occurred. `https://jmpseat.com` should stay live while this
-patch is reviewed, merged, migrated, deployed, and runtime-tested through the
-normal launch hotfix lane.
+No root rollback occurred. `https://jmpseat.com` and
+`https://www.jmpseat.com` stayed live on the public waitlist deployment, and
+`https://beta.jmpseat.com` remained on the separate private beta/auth/admin
+deployment.
 
 ## Security Issue
 
@@ -110,25 +112,55 @@ Expected public UX after this patch:
 Future survey editing, if desired, should require email ownership proof or an
 authenticated account flow. It should not be anonymous-by-email.
 
-## Runtime Follow-Up
+## Runtime Pass
 
-After review and merge:
+The rollout was completed migration-first:
 
-1. Apply the new migration through the normal reviewed runtime path before
-   deploying the app commit.
-2. Deploy the current reviewed commit after the migration is applied.
-3. Runtime-test a new waitlist signup and optional survey.
-4. Runtime-test a duplicate signup and confirm no survey form/token is issued.
-5. Runtime-test token reuse after survey save and confirm it cannot overwrite
-   the saved response.
-6. Runtime-test a transient survey save failure and confirm the same current
-   signup session can retry without losing the survey cookie.
-7. Runtime-test a recoverable survey validation error and confirm the same
-   current signup session can correct and resubmit.
-8. Runtime-test skip and confirm it invalidates the current survey path.
-9. Confirm pre-fix survey tokens are invalidated after migration apply.
-10. Confirm apex `jmpseat.com`, `www.jmpseat.com`, and beta preservation.
+1. Applied only `20260608131000_harden_waitlist_survey_tokens.sql` to the
+   linked Supabase runtime.
+2. Marked only migration version `20260608131000` as applied in migration
+   history because remote migration history has known drift and a broad
+   `db push` would have attempted unrelated local-only versions.
+3. Verified the hardened RPC shape before app deployment using generated,
+   redacted test rows:
+   - new signup returned `survey_allowed: true` with a token
+   - duplicate signup returned `survey_allowed: false` with no token
+   - survey save consumed/rotated the token
+   - token reuse was rejected
+4. Merged and pushed app commit `c430748`.
+5. Deployed the app with automatic domain promotion skipped, then explicitly
+   aliased only `https://jmpseat.com` and `https://www.jmpseat.com` to the new
+   public deployment.
 
-No broad Supabase db push, deploy, DNS change, Vercel setting change, Supabase
-setting change, runtime mutation, beta grant, role/base claim, or private beta
-auth change was performed as part of this implementation pass.
+Runtime browser verification passed:
+
+- Apex `/` and `/#top` load at scrollY 0 with `id="top"` on the root `main`.
+- `www` `/` and `/#top` load at scrollY 0 with the same public waitlist
+  experience.
+- Public root has no Beta Access CTA, no `/login?next=/app` CTA, and no
+  proof/badge/document/manual-review upload copy.
+- Privacy and Terms links render with concrete effective dates.
+- New waitlist signup succeeds, shows the optional survey, keeps raw email and
+  survey token out of the URL, and sets the survey cookie as HTTP-only.
+- Optional survey save succeeds and clears the survey cookie.
+- Duplicate signup returns friendly success, does not receive a survey cookie,
+  lands in the survey-unavailable state, and does not overwrite original
+  attribution or survey data.
+- Recoverable sensitive-content validation keeps the survey form available,
+  preserves the current session cookie, and allows corrected safe answers to
+  submit successfully.
+- Skip invalidates/clears the current survey path, uses final skip copy, and
+  does not promise finish-later.
+- Duplicate submit after skip cannot recover the old survey token.
+- `https://beta.jmpseat.com` still loads separately; `/login` renders, signed
+  out `/app` redirects to login, and signed-out `/app/admin/waitlist` redirects
+  to login.
+
+Generated founder-controlled test rows used for this runtime pass were cleaned
+up after verification. No raw emails, survey tokens, private identifiers, or
+secret values were recorded.
+
+No broad Supabase db push, DNS change, Vercel setting change, Supabase setting
+change, beta grant, role/base claim, private beta auth change, proof upload
+change, or root rollback was performed. The migration intentionally rotated
+existing waitlist survey tokens as part of the approved hardening behavior.

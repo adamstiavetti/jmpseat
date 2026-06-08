@@ -40,12 +40,12 @@ Current post-E05 update:
   waitlist deployment as apex.
 - Root `jmpseat.com` serves the public waitlist/marketing page only, while
   `beta.jmpseat.com` remains the private beta/auth/admin/operator surface.
-- A duplicate-survey-token hardening patch is ready for review. After it is
-  merged and migrated, duplicate waitlist submissions should no longer receive
-  existing survey tokens or edit another signup's optional survey answers. The
-  rollout order is migration-first, app deploy second; app-first deployment is
-  intentionally fail-closed and may temporarily hide the optional survey rather
-  than trust legacy token-only RPC responses.
+- Duplicate-survey-token hardening is migrated, deployed, and runtime-proven on
+  apex and `www`: duplicate waitlist submissions no longer receive existing
+  survey tokens or edit another signup's optional survey answers. The app still
+  intentionally fails closed for any legacy token-only signup RPC response
+  rather than trusting a shape that cannot distinguish new signups from
+  duplicates.
 - W05A also adds a dedicated `1200 x 630` social preview image so Open Graph
   and Twitter metadata match the actual asset dimensions.
 
@@ -58,11 +58,10 @@ Implemented:
 - First-party public waitlist email capture.
 - Post-submit optional product-shaping follow-up questions.
 - Safe duplicate submission behavior.
-- Duplicate submissions do not receive another signup's optional survey token
-  after the hardening migration is applied.
-- The duplicate survey-token hardening rollout must apply the migration before
-  deploying app code; accepting legacy token-only RPC responses was rejected
-  because the legacy RPC cannot distinguish new signups from duplicates.
+- Duplicate submissions do not receive another signup's optional survey token.
+- The duplicate survey-token hardening rollout was completed migration-first;
+  accepting legacy token-only RPC responses remains rejected because the legacy
+  RPC cannot distinguish new signups from duplicates.
 - Transient optional-survey save failures preserve the current session token for
   retry, while definitive invalid/consumed token states clear the cookie.
 - Operator/admin-only waitlist dashboard at `/app/admin/waitlist`.
