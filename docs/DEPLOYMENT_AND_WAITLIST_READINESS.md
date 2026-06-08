@@ -46,6 +46,11 @@ Current post-E05 update:
   override. Unrelated operator/admin tooling scopes no longer grant app-entry
   override, and no beta grants or runtime operator grants were changed by this
   fix.
+- A pending Epoch 5 security-events trust-boundary patch removes direct
+  authenticated inserts into the trusted audit table, marks legacy audit rows as
+  unverified, and filters operator/admin audit views to trusted server-produced
+  rows. Migration apply, deploy, and runtime validation remain pending after
+  review/merge.
 - Duplicate-survey-token hardening is migrated, deployed, and runtime-proven on
   apex and `www`: duplicate waitlist submissions no longer receive existing
   survey tokens or edit another signup's optional survey answers. The app still
