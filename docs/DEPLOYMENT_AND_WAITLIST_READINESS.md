@@ -46,11 +46,13 @@ Current post-E05 update:
   override. Unrelated operator/admin tooling scopes no longer grant app-entry
   override, and no beta grants or runtime operator grants were changed by this
   fix.
-- A pending Epoch 5 security-events trust-boundary patch removes direct
-  authenticated inserts into the trusted audit table, marks legacy audit rows as
-  unverified, and filters operator/admin audit views to trusted server-produced
-  rows. Migration apply, deploy, and runtime validation remain pending after
-  review/merge.
+- The Epoch 5 security-events trust-boundary fix is now merged, singly migrated,
+  deployed, and runtime-proven at `ba74e02`: direct authenticated/anon inserts
+  into trusted `security_events` are removed, legacy rows are marked
+  `legacy_unverified`, future server rows default to `trusted_server`, and
+  operator/admin audit readers filter to trusted server-produced rows. No broad
+  Supabase `db push`, runtime grants, DNS changes, Supabase setting changes, or
+  beta alias disruption occurred.
 - Duplicate-survey-token hardening is migrated, deployed, and runtime-proven on
   apex and `www`: duplicate waitlist submissions no longer receive existing
   survey tokens or edit another signup's optional survey answers. The app still

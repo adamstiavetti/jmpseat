@@ -91,8 +91,83 @@ Regression coverage now proves:
 - existing security-event taxonomy, sanitization, audit inspection, proof
   cleanup monitoring, and manual cleanup tests still pass
 
-Migration apply, runtime verification, and deployment remain pending after
-review/merge. Do not run broad Supabase `db push`; apply this migration through
-the established narrow migration workflow.
+## Runtime Pass
+
+Runtime validation completed on 2026-06-08.
+
+Security fix commit:
+
+- `ba74e02 fix: harden security event trust boundary`
+
+Migration apply:
+
+- Applied only
+  `supabase/migrations/20260608201541_harden_security_events_trust_boundary.sql`
+  through the established single-migration SQL apply path.
+- Marked only migration version `20260608201541` applied.
+- Did not run broad Supabase `db push`.
+- Existing remote migration-history drift remains acknowledged and was not
+  widened by this pass.
+
+Runtime database checks confirmed:
+
+- `anon` cannot insert into trusted `security_events`.
+- `authenticated` cannot insert into trusted `security_events`.
+- `service_role` can insert trusted `security_events`.
+- the table has no direct insert policy.
+- `event_producer` defaults to `trusted_server` and is not nullable.
+- existing rows are present as `legacy_unverified`.
+- no rows use an unexpected producer marker.
+- operator-facing audit/proof-cleanup readers filter on
+  `event_producer = 'trusted_server'`.
+
+Forgery checks confirmed normal authenticated clients cannot insert
+privileged-looking rows for:
+
+- `operator_access.granted`
+- `operator_access.revoked`
+- verification review/admin-looking events
+- proof-view/proof-cleanup-looking events
+
+The deployed server recorder path was verified with a benign malformed auth
+callback on `https://beta.jmpseat.com/auth/callback`. The request redirected to
+login as expected and created one trusted `auth.callback_resolved` audit row via
+the server-side recorder path. No beta grants, operator grants, role claims,
+base claims, restricted-board claims, or runtime user records were changed.
+
+Deployment:
+
+- Public production deployment:
+  `jmpseat-enz7f7qv3-adam-stiavetti-s-projects.vercel.app`
+- Public aliases explicitly assigned:
+  `https://jmpseat.com`, `https://www.jmpseat.com`
+- Beta preview deployment:
+  `jmpseat-bufolvzub-adam-stiavetti-s-projects.vercel.app`
+- Beta alias explicitly assigned:
+  `https://beta.jmpseat.com`
+
+Vercel deploys used deployment-scoped environment injection from the ignored
+local env file without printing values. No DNS changes, Vercel project setting
+changes, Supabase setting changes, or Supabase Auth setting changes were made.
+
+Beta preservation checks confirmed:
+
+- `https://beta.jmpseat.com/login` renders.
+- signed-out `/app` redirects to login.
+- signed-out `/app/admin/waitlist` redirects to login.
+- `beta.jmpseat.com` remains the private beta/auth/admin surface.
+
+Public preservation checks confirmed:
+
+- `https://jmpseat.com` and `https://www.jmpseat.com` load over HTTPS.
+- `/` and `/#top` load at `scrollY: 0` on both apex and `www`.
+- public waitlist forms still render.
+- Privacy and Terms pages return 200.
+- no Beta Access entry is present.
+- no `/login?next=/app` CTA is present.
+- no proof/badge/document/manual-review upload copy is present.
+- no raw email or token appears in the checked public URLs.
 
 This finding is part of the Epoch 5 security/access-control closeout.
+
+Status: closed.
