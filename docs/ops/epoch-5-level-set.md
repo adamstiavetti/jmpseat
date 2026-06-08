@@ -11,7 +11,8 @@ Epoch 5 is closed with explicit carry-forward items as of
 
 This level-set remains useful as the capability matrix. The final closeout doc
 is now the controlling handoff for what is closed, what is conditionally closed,
-and what carries forward.
+and what carries forward. The immediate post-Epoch-5 planning bridge is now
+captured in `docs/ops/private-beta-readiness-bridge.md`.
 
 ## Summary
 
@@ -44,6 +45,7 @@ approval.
 | Security headers hardening | runtime-proven | `docs/ops/security-headers-hardening.md`, `next.config.ts`, `test/security-headers/securityHeaders.test.mts` | Adds app-owned `nosniff`, strict-origin referrer policy, restrictive permissions policy, enforced anti-framing, and report-only broad CSP. Vercel-provided HSTS is left unchanged. Runtime validation passed on apex, `www`, and beta at `8558d2d`; no CSP report endpoint is configured yet. |
 | Beta Vercel env scoping | runtime-verified | `docs/ops/beta-vercel-env-scoping.md` | `beta.jmpseat.com` is a Preview deployment while apex/`www` use Production. The required Supabase env names now exist persistently in Preview, and a normal beta Preview deploy without deployment-scoped Supabase env injection returned healthy beta auth redirects with apex/`www` preserved. |
 | Epoch 5 final closeout | closed with carry-forward items | `docs/ops/epoch-5-final-closeout.md` | Closes the bounded operator/admin/security hardening lane while carrying forward the safe live proof-upload mutation test, CSP reporting/enforcement planning, Vercel deployment-model maturity, Supabase migration drift handling, auth email branding/custom SMTP, and community-access/moderation bridge. |
+| Private beta readiness bridge | planned / docs-ready | `docs/ops/private-beta-readiness-bridge.md`, `docs/ops/epoch-5-final-closeout.md`, `docs/ops/auth-email-branding-confirmation-template-plan.md` | Reconciles the current post-Epoch-5 runtime baseline with the broader private-beta docs, keeps live proof-upload mutation as an explicit carry-forward item, and defines the narrow lane before 05B / community-access implementation. |
 | Proof cleanup monitoring | runtime-proven | `docs/epochs/e05-proof-cleanup-monitoring.md`, `docs/ops/proof-cleanup-monitoring-runtime-pass.md`, `app/app/admin/proof-cleanup/page.tsx`, `src/lib/admin/proofCleanupMonitoring.ts`, `supabase/migrations/20260605233000_add_operator_proof_cleanup_monitoring.sql`, `test/admin/proofCleanupMonitoring.test.mts` | Read-only cleanup health, failures, and bounded cleanup audit visibility are runtime-proven. |
 | Protected manual proof cleanup controls | runtime-proven | `docs/epochs/e05-protected-manual-proof-cleanup-controls.md`, `docs/ops/protected-manual-proof-cleanup-controls-runtime-pass.md`, `src/lib/admin/proofCleanupControls.ts`, `src/lib/admin/proofCleanupControlsCore.ts`, `supabase/migrations/20260605234500_add_operator_manual_proof_cleanup_controls.sql`, `test/admin/proofCleanupControls.test.mts` | Manual cleanup runs only through the existing helper with bounded controls and summary-only audit. Runtime proof did not force a destructive delete because there were zero eligible expired proof rows. |
 | Proof upload/review forward product state | deferred | `docs/strategy/proof-system-freeze-deprecation-plan.md`, `docs/epochs/fbmvp-t01-freeze-user-facing-proof-verification-surfaces.md`, `docs/EPOCH_ROADMAP.md`, `docs/BUILD_TICKETS.md` | Proof upload/review infrastructure remains historical and safety-preserved. Forward user-facing proof expansion is frozen unless explicitly reopened. |
@@ -105,18 +107,18 @@ Current carry-forward items are:
 
 Recommended next single ticket:
 
-`Private Beta Readiness Bridge`
+`Auth Email Branding / Confirmation Template Readiness`
 
 Goal:
 
-Move from Epoch 5 closeout into narrow private beta readiness work without
+Finish the next narrow private-beta-readiness task after the bridge without
 reopening proof-upload, broad operator/admin tooling, or community boards.
 
 Scope:
 
+- Continue the manual auth email branding/custom SMTP plan.
 - If final security signoff requires it first, run the safe live authenticated
   proof-upload mutation test with founder-controlled data and cleanup.
-- Continue the manual auth email branding/custom SMTP plan.
 - Keep E05-T08 paused unless explicitly reactivated.
 - Bridge to the next community-access/moderation planning lane.
 
@@ -124,9 +126,10 @@ Why this is the highest-leverage next ticket:
 
 The original Epoch 5 operator/admin tools, security closeout items, and
 post-bootstrap operator grant management path are now documented and
-runtime-proven or explicitly carried forward. The highest-leverage next step is
-to move into private beta readiness without reopening broad operator/admin,
-proof-upload, or auth detours.
+runtime-proven or explicitly carried forward. The bridge is now documented, so
+the highest-leverage next step is the first concrete readiness task inside that
+bridge: auth email branding/custom SMTP, unless the pending live proof-upload
+mutation validation is required first for final security signoff.
 
 Optional follow-ups after that ticket:
 
@@ -187,5 +190,6 @@ Optional follow-ups after that ticket:
    and `jmpseat.com` cleanup documentation.
 7. `jmpseat.com` temporary approved-domain cleanup is documented as closed in
    `docs/ops/auth-detour-closeout-runtime-pass.md`.
-8. Highest-leverage next ticket is a final Epoch 5 handoff index plus an Epoch 6
-   bridge to community-access/moderation planning.
+8. Highest-leverage next step is the documented private-beta-readiness bridge,
+   followed by auth email branding/custom SMTP unless the safe live
+   proof-upload mutation test is required first.

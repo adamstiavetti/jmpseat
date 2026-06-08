@@ -8,6 +8,14 @@ Identity principle: Verified privately. Anonymous publicly. Accountable internal
 
 This checklist translates the current planning docs into concrete pre-beta gates. It is documentation-only and does not create or require app code in this repository.
 
+Current scope note:
+
+- This checklist remains the broader/full private-beta target reference.
+- It should not be read as the immediate post-Epoch-5 implementation lane.
+- Use `docs/ops/private-beta-readiness-bridge.md` for the current narrow bridge
+  between the closed Epoch 5 baseline and broader `05B / Community Access
+  Architecture` work.
+
 ## How to Use This Checklist
 
 - Private beta means a small, controlled group of real users with admin coverage and manual operations.

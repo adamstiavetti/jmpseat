@@ -8,6 +8,14 @@ Identity principle: Verified privately. Anonymous publicly. Accountable internal
 
 This is a documentation-only operating plan. It does not scaffold app code or expand V1 scope.
 
+Current scope note:
+
+- This operating plan remains a broader/full private-beta target reference.
+- It should not be read as meaning the current product is already ready for
+  real private beta users.
+- Use `docs/ops/private-beta-readiness-bridge.md` for the immediate narrow
+  post-Epoch-5 readiness lane.
+
 ## 1. Purpose
 
 The private beta exists to validate whether a small, verified aviation-worker community can create useful base intel, layover knowledge, anonymous but accountable crew discussion, and crew-friendly recommendations in a safe environment.

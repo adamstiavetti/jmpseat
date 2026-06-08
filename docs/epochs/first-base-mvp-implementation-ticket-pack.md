@@ -50,8 +50,8 @@ Recommended order:
 3. `FBMVP-T03` Private-testing versus first-base-launch gate implementation. Implemented and merged; see `docs/epochs/fbmvp-t03-private-testing-versus-first-base-launch-gate-implementation.md`.
 4. `FBMVP-T03A` Beta invite-code foundation. Implemented and runtime-proven on the linked Supabase runtime; see `docs/strategy/beta-invite-code-foundation-decision.md`, `docs/epochs/fbmvp-t03a-beta-invite-code-foundation-implementation.md`, and `docs/ops/beta-invite-code-foundation-runtime-pass.md`.
 5. `FBMVP-T04` Onboarding/signup flow update. Implemented and merged; see `docs/epochs/fbmvp-t04-onboarding-signup-flow-update.md`.
-6. App-generated work-email confirmation email flow. Implemented pending review, merge, migration apply, and runtime validation; see `docs/epochs/work-email-confirmation-email-flow-implementation.md`.
-7. Auth email branding / confirmation template manual ops. Planned; see `docs/ops/auth-email-branding-confirmation-template-plan.md`. This should be completed before public-ish Closed Beta Login entry.
+6. App-generated work-email confirmation email flow. Historical implementation doc remains at `docs/epochs/work-email-confirmation-email-flow-implementation.md`, but newer roadmap/auth-closeout docs now treat the current work-email/auth flow as implemented and founder-confirmed on beta. Treat this ticket-pack item as historical context, not the immediate next lane.
+7. Auth email branding / confirmation template manual ops. Planned; see `docs/ops/auth-email-branding-confirmation-template-plan.md`. This remains the next recommended auth-readiness task before public-ish Closed Beta Login entry, but the immediate post-Epoch-5 lane is first reconciled in `docs/ops/private-beta-readiness-bridge.md`.
 8. `FBMVP-T05` Base and board data model design.
 9. `FBMVP-T06` Board membership and access request model.
 10. `FBMVP-T07` Community-admin role model.
