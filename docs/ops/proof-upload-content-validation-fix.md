@@ -118,6 +118,65 @@ Regression coverage proves:
 - existing redaction acknowledgement, file size, storage path, metadata,
   rollback, and reviewer signed-URL authorization tests still pass
 
-Runtime deploy validation remains pending after review/merge.
+## Runtime Pass
 
-This finding is part of security closeout before final Epoch 5 close.
+Runtime deployment validation was completed on 2026-06-08 after merge to
+`main`.
+
+Deployed commit:
+
+- `329d238 fix: validate proof upload image content`
+
+Deployment and domain behavior:
+
+- `https://jmpseat.com` was explicitly aliased to the new production deployment.
+- `https://www.jmpseat.com` was explicitly aliased to the same production
+  deployment.
+- `https://beta.jmpseat.com` was explicitly aliased to a separate preview
+  deployment for the private beta/auth/admin surface.
+- No DNS changes were made.
+- No Supabase settings were changed.
+- No migration was created or applied.
+- No proof bucket policy, privacy, reviewer authorization, signed URL TTL,
+  self-review block, reviewable status check, or proof audit logging behavior
+  was weakened.
+
+Beta/private runtime smoke:
+
+- `https://beta.jmpseat.com/login` rendered successfully.
+- Signed-out `https://beta.jmpseat.com/app` redirected to beta login.
+- Signed-out `https://beta.jmpseat.com/app/admin/waitlist` redirected to beta
+  login.
+- No beta grants, operator grants, role claims, base claims, restricted-board
+  claims, or private beta auth settings were changed.
+
+Public preservation smoke:
+
+- `https://jmpseat.com/` and `https://jmpseat.com/#top` loaded at `scrollY: 0`.
+- `https://www.jmpseat.com/` and `https://www.jmpseat.com/#top` loaded at
+  `scrollY: 0`.
+- Apex and `www` still render the public waitlist form.
+- Public pages still do not expose Beta Access, `/login?next=/app`, proof
+  upload, badge upload, document upload, or manual-review upload copy.
+- Privacy and Terms pages returned successfully on apex and `www`.
+- No raw email or token appeared in the checked public URLs.
+
+Live proof-upload mutation:
+
+- Not performed in this pass.
+- Reason: no safe authenticated proof-upload test workflow/account was
+  available in this run, and forcing a live mutation would risk creating proof
+  rows or private Storage objects without a controlled cleanup path.
+- No proof files, proof rows, or proof Storage objects were accessed, created,
+  viewed, or deleted.
+
+Closure status:
+
+- Code-level and deployed-route validation are complete.
+- The metadata-spoof finding is conditionally closed pending one future live
+  authenticated proof-upload mutation test with founder-controlled test data.
+- That future live test should verify valid PNG/JPEG acceptance, fake-image
+  rejection before Storage upload, safe generic error copy, and cleanup of any
+  founder-controlled test artifacts with sensitive details redacted.
+
+This finding remains part of the security closeout before final Epoch 5 close.
