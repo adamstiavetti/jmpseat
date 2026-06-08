@@ -86,9 +86,8 @@ This patch does not change:
 - restricted-board claims
 - private beta auth settings
 
-No migrations were created. No Supabase `db push` was run. No deploy, DNS
-change, Supabase setting change, Vercel alias change, or runtime data mutation
-is part of this pre-review patch.
+No migrations were created. No Supabase `db push` was run. No DNS change,
+Supabase setting change, or runtime data mutation was part of this patch.
 
 ## Validation Status
 
@@ -101,11 +100,79 @@ Code/test validation covers:
 - public waitlist tests still pass
 - auth/private-app/security-events/proof validation tests still pass
 
-Runtime validation remains pending after review/merge/deploy:
+## Runtime Pass
 
-- confirm headers on `https://jmpseat.com`
-- confirm headers on `https://www.jmpseat.com`
-- confirm headers on `https://beta.jmpseat.com/login`
-- confirm public waitlist and beta auth behavior remain unchanged
+Runtime deployment validation was completed on 2026-06-08 after merge to
+`main`.
 
-This is part of security hardening before final Epoch 5 closeout.
+Deployed commit:
+
+- `8558d2d fix: add security response headers`
+
+Deployment and domain behavior:
+
+- `https://jmpseat.com` was explicitly aliased to the new production deployment.
+- `https://www.jmpseat.com` was explicitly aliased to the same production
+  deployment.
+- `https://beta.jmpseat.com` was explicitly aliased to a separate preview
+  deployment for the private beta/auth/admin surface.
+- No DNS changes were made.
+- No Supabase settings were changed.
+- No database migrations were created or applied.
+- No runtime data was mutated.
+
+Header validation passed on:
+
+- `https://jmpseat.com/`
+- `https://www.jmpseat.com/`
+- `https://jmpseat.com/privacy`
+- `https://jmpseat.com/terms`
+- `https://beta.jmpseat.com/login`
+- `https://beta.jmpseat.com/app`
+
+Each checked response included:
+
+- `X-Content-Type-Options: nosniff`
+- `Referrer-Policy: strict-origin-when-cross-origin`
+- restrictive `Permissions-Policy`
+- `X-Frame-Options: DENY`
+- enforcing `Content-Security-Policy` containing `frame-ancestors 'none'`
+- `Content-Security-Policy-Report-Only`
+- Vercel-provided `Strict-Transport-Security`
+
+Each checked response also confirmed:
+
+- `X-Powered-By` was absent.
+- HSTS did not include app-added `includeSubDomains` or `preload`.
+
+Public behavior preservation:
+
+- `https://jmpseat.com/`, `https://jmpseat.com/#top`,
+  `https://www.jmpseat.com/`, and `https://www.jmpseat.com/#top` loaded at
+  `scrollY: 0`.
+- The public waitlist form still rendered on apex and `www`.
+- Public pages still did not expose Beta Access, `/login?next=/app`, proof
+  upload, badge upload, document upload, or manual-review upload copy.
+- Privacy and Terms pages returned successfully.
+- The metadata-defined social preview image
+  `/jmpseat/social-preview.png` returned successfully on apex and `www`.
+- No raw email or token appeared in the checked public URLs.
+
+Beta behavior preservation:
+
+- `https://beta.jmpseat.com/login` rendered successfully.
+- Signed-out `https://beta.jmpseat.com/app` redirected to beta login.
+- Signed-out `https://beta.jmpseat.com/app/admin/waitlist` redirected to beta
+  login.
+- No beta grants, role claims, base claims, restricted-board claims, or private
+  beta auth settings were changed.
+
+CSP remains split:
+
+- Anti-framing is enforced with `frame-ancestors 'none'`.
+- The broader baseline CSP remains report-only.
+- No CSP `report-uri` or `report-to` endpoint is configured yet; future CSP
+  enforcement work should add a supported report endpoint before relying on
+  centralized report collection.
+
+This security hardening item is closed.

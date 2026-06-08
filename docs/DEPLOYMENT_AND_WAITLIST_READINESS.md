@@ -61,12 +61,13 @@ Current post-E05 update:
   security-events trust-boundary behavior remain unchanged. No migration or
   Supabase setting change was required. Live authenticated proof-upload mutation
   remains pending until a safe founder-controlled test workflow is available.
-- A pending security-headers hardening patch adds app-owned browser hardening
-  headers for public and beta routes: `nosniff`, strict-origin referrer policy,
-  restrictive permissions policy, enforced anti-framing, and report-only broad
-  CSP. Vercel-provided HSTS is left unchanged, with no app-managed preload or
-  includeSubDomains change. Runtime validation on apex, `www`, and beta remains
-  pending after review/merge/deploy.
+- Security-headers hardening is merged, deployed, and runtime-proven at
+  `8558d2d`: public and beta routes now receive app-owned `nosniff`,
+  strict-origin referrer policy, restrictive permissions policy, enforced
+  anti-framing, and report-only broad CSP headers. `X-Powered-By` is absent.
+  Vercel-provided HSTS remains present, with no app-managed preload or
+  includeSubDomains change. No CSP report endpoint is configured yet. Public
+  apex/`www` behavior and beta auth redirects were preserved.
 - Duplicate-survey-token hardening is migrated, deployed, and runtime-proven on
   apex and `www`: duplicate waitlist submissions no longer receive existing
   survey tokens or edit another signup's optional survey answers. The app still
