@@ -23,12 +23,27 @@ type WaitlistSignupRpcResponse = {
   ok?: boolean;
   code?: string;
   survey_token?: string | null;
+  survey_allowed?: boolean;
 };
 
 type WaitlistSurveyRpcResponse = {
   ok?: boolean;
   code?: string;
 };
+
+type WaitlistSurveyTokenRpcResponse = {
+  ok?: boolean;
+  code?: string;
+};
+
+const RECOVERABLE_WAITLIST_SURVEY_CODES = new Set([
+  "invalid_survey_value",
+  "sensitive_content_not_allowed",
+]);
+
+const DEFINITIVE_WAITLIST_SURVEY_TOKEN_FAILURE_CODES = new Set([
+  "waitlist_signup_not_found",
+]);
 
 function getString(formData: FormData, key: string) {
   const value = formData.get(key);
@@ -137,7 +152,7 @@ export async function submitWaitlistEmailAction(formData: FormData) {
   if (
     response.error ||
     data?.ok !== true ||
-    !isUuid(data.survey_token ?? null)
+    (data.survey_allowed === true && !isUuid(data.survey_token ?? null))
   ) {
     redirect(
       buildHomeRedirect({
@@ -146,14 +161,24 @@ export async function submitWaitlistEmailAction(formData: FormData) {
     );
   }
 
-  await setSurveyTokenCookie(data.survey_token as string);
-  redirect(buildHomeRedirect({ waitlist: "joined" }));
+  // Rollout safety: legacy token-only RPC responses are intentionally not
+  // accepted. Apply the hardened migration before deploying this app code;
+  // trusting a token without survey_allowed would preserve duplicate-token
+  // takeover during an app-first rollout.
+  if (data.survey_allowed === true) {
+    await setSurveyTokenCookie(data.survey_token as string);
+    redirect(buildHomeRedirect({ waitlist: "joined" }));
+  }
+
+  await clearSurveyTokenCookie();
+  redirect(buildHomeRedirect({ waitlist: "joined", survey: "unavailable" }));
 }
 
 export async function submitWaitlistSurveyAction(formData: FormData) {
   const surveyToken = await getSurveyTokenCookie();
 
   if (!isUuid(surveyToken)) {
+    await clearSurveyTokenCookie();
     redirect(buildHomeRedirect({ waitlist: "joined", survey: "missing" }));
   }
 
@@ -168,38 +193,58 @@ export async function submitWaitlistSurveyAction(formData: FormData) {
   const privacyConcernQuestion = getQuestionByName("privacy_concern");
 
   const supabase = createStorageAdminClient();
-  const response = await supabase.rpc("submit_waitlist_survey_response", {
-    requested_survey_token: surveyToken,
-    requested_aviation_connection: getOptionalSingle(
-      formData,
-      "aviation_connection",
-    ),
-    requested_priority_base: trimWaitlistText(
-      formData.get("priority_base"),
-      priorityBaseQuestion?.type === "short" ? priorityBaseQuestion.maxLength : 120,
-    ),
-    requested_useful_first: getOptionalMulti(formData, "useful_first"),
-    requested_biggest_pain: trimWaitlistText(
-      formData.get("biggest_pain"),
-      biggestPainQuestion?.type === "short" ? biggestPainQuestion.maxLength : 500,
-    ),
-    requested_current_tools: getOptionalMulti(formData, "current_tools"),
-    requested_verification_comfort: getOptionalSingle(
-      formData,
-      "verification_comfort",
-    ),
-    requested_beta_help: getOptionalMulti(formData, "beta_help"),
-    requested_discovery_source: getOptionalSingle(formData, "discovery_source"),
-    requested_privacy_concern: trimWaitlistText(
-      formData.get("privacy_concern"),
-      privacyConcernQuestion?.type === "short"
-        ? privacyConcernQuestion.maxLength
-        : 500,
-    ),
-  });
+  let response;
+
+  try {
+    response = await supabase.rpc("submit_waitlist_survey_response", {
+      requested_survey_token: surveyToken,
+      requested_aviation_connection: getOptionalSingle(
+        formData,
+        "aviation_connection",
+      ),
+      requested_priority_base: trimWaitlistText(
+        formData.get("priority_base"),
+        priorityBaseQuestion?.type === "short" ? priorityBaseQuestion.maxLength : 120,
+      ),
+      requested_useful_first: getOptionalMulti(formData, "useful_first"),
+      requested_biggest_pain: trimWaitlistText(
+        formData.get("biggest_pain"),
+        biggestPainQuestion?.type === "short" ? biggestPainQuestion.maxLength : 500,
+      ),
+      requested_current_tools: getOptionalMulti(formData, "current_tools"),
+      requested_verification_comfort: getOptionalSingle(
+        formData,
+        "verification_comfort",
+      ),
+      requested_beta_help: getOptionalMulti(formData, "beta_help"),
+      requested_discovery_source: getOptionalSingle(formData, "discovery_source"),
+      requested_privacy_concern: trimWaitlistText(
+        formData.get("privacy_concern"),
+        privacyConcernQuestion?.type === "short"
+          ? privacyConcernQuestion.maxLength
+          : 500,
+      ),
+    });
+  } catch {
+    redirect(buildHomeRedirect({ waitlist: "joined", survey: "error" }));
+  }
+
   const data = (response.data as WaitlistSurveyRpcResponse | null) ?? null;
 
-  if (response.error || data?.ok !== true) {
+  if (response.error || !data) {
+    redirect(buildHomeRedirect({ waitlist: "joined", survey: "error" }));
+  }
+
+  if (data.ok !== true) {
+    if (RECOVERABLE_WAITLIST_SURVEY_CODES.has(data.code ?? "")) {
+      redirect(buildHomeRedirect({ waitlist: "joined", survey: "invalid" }));
+    }
+
+    if (DEFINITIVE_WAITLIST_SURVEY_TOKEN_FAILURE_CODES.has(data.code ?? "")) {
+      await clearSurveyTokenCookie();
+      redirect(buildHomeRedirect({ waitlist: "joined", survey: "missing" }));
+    }
+
     redirect(buildHomeRedirect({ waitlist: "joined", survey: "error" }));
   }
 
@@ -208,6 +253,25 @@ export async function submitWaitlistSurveyAction(formData: FormData) {
 }
 
 export async function skipWaitlistSurveyAction() {
+  const surveyToken = await getSurveyTokenCookie();
+
+  if (
+    isUuid(surveyToken) &&
+    getSupabaseBrowserEnv().enabled &&
+    isStorageAdminConfigured()
+  ) {
+    const supabase = createStorageAdminClient();
+    const response = await supabase.rpc("invalidate_waitlist_survey_token", {
+      requested_survey_token: surveyToken,
+    });
+    const data = (response.data as WaitlistSurveyTokenRpcResponse | null) ?? null;
+
+    if (response.error || data?.ok !== true) {
+      await clearSurveyTokenCookie();
+      redirect(buildHomeRedirect({ waitlist: "joined", survey: "missing" }));
+    }
+  }
+
   await clearSurveyTokenCookie();
   redirect(buildHomeRedirect({ waitlist: "joined", survey: "skipped" }));
 }

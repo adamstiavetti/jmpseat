@@ -240,7 +240,7 @@ function WaitlistSurveyForm() {
 
       <form action={skipWaitlistSurveyAction}>
         <button className={styles.skipButton} type="submit">
-          Skip for now
+          Skip survey
         </button>
       </form>
     </div>
@@ -261,7 +261,11 @@ function WaitlistPanel({
   surveyStatus: string | undefined;
 }) {
   const hasJoined = waitlistStatus === "joined";
-  const surveyFinished = surveyStatus === "saved" || surveyStatus === "skipped";
+  const surveyFinished =
+    surveyStatus === "saved" ||
+    surveyStatus === "skipped" ||
+    surveyStatus === "missing" ||
+    surveyStatus === "unavailable";
 
   if (hasJoined) {
     return (
@@ -278,18 +282,31 @@ function WaitlistPanel({
             <p className={styles.successNote}>Thanks, your optional answers were saved.</p>
           ) : null}
           {surveyStatus === "skipped" ? (
-            <p className={styles.successNote}>No problem. You can finish later.</p>
+            <p className={styles.successNote}>
+              Survey skipped. Your waitlist spot is saved.
+            </p>
           ) : null}
           {surveyStatus === "error" ? (
             <p className={styles.errorText}>
-              We could not save those optional answers. Your waitlist signup is
-              still captured.
+              We couldn&apos;t save those answers. Please try again.
+            </p>
+          ) : null}
+          {surveyStatus === "invalid" ? (
+            <p className={styles.errorText}>
+              We could not save those optional answers. Check your selections
+              and keep free-text answers general.
             </p>
           ) : null}
           {surveyStatus === "missing" ? (
             <p className={styles.errorText}>
               Your waitlist signup is captured, but this browser session can no
               longer attach optional answers.
+            </p>
+          ) : null}
+          {surveyStatus === "unavailable" ? (
+            <p className={styles.successNote}>
+              Your waitlist spot is saved. Optional answers can only be added
+              from the original signup session.
             </p>
           ) : null}
         </div>

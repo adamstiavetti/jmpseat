@@ -37,7 +37,8 @@ test("public waitlist page uses restored editorial card imagery and airline life
   assert.match(pageSource, /join waitlist/i);
   assert.match(pageSource, /You&apos;re on the waitlist\./);
   assert.match(pageSource, /Help us prioritize your invite and shape jmpseat\./);
-  assert.match(pageSource, /Skip for now/);
+  assert.match(pageSource, /Skip survey/);
+  assert.doesNotMatch(pageSource, /finish later/i);
   assert.match(pageSource, /not sponsored by or affiliated with\s+any airline/i);
   assert.doesNotMatch(pageSource, /invite-only/);
   assert.doesNotMatch(pageSource, /proof upload|badge upload|document upload/i);
@@ -171,6 +172,32 @@ test("waitlist server actions keep raw email out of redirect URLs and expose saf
   assert.match(actionsSource, /isStorageAdminConfigured/);
   assert.match(actionsSource, /waitlist:\s*"joined"/);
   assert.match(actionsSource, /waitlist:\s*"invalid_email"/);
+  assert.match(actionsSource, /survey_allowed\?: boolean/);
+  assert.match(actionsSource, /RECOVERABLE_WAITLIST_SURVEY_CODES/);
+  assert.match(actionsSource, /DEFINITIVE_WAITLIST_SURVEY_TOKEN_FAILURE_CODES/);
+  assert.match(actionsSource, /"invalid_survey_value"/);
+  assert.match(actionsSource, /"sensitive_content_not_allowed"/);
+  assert.match(actionsSource, /"waitlist_signup_not_found"/);
+  assert.match(actionsSource, /if \(data\.survey_allowed === true\) \{/);
+  assert.match(actionsSource, /await setSurveyTokenCookie\(data\.survey_token as string\)/);
+  assert.match(
+    actionsSource,
+    /await clearSurveyTokenCookie\(\);\s*redirect\(buildHomeRedirect\(\{ waitlist: "joined", survey: "unavailable" \}\)\)/s,
+  );
+  assert.match(actionsSource, /invalidate_waitlist_survey_token/);
+  assert.match(
+    actionsSource,
+    /RECOVERABLE_WAITLIST_SURVEY_CODES\.has\(data\.code \?\? ""\)[\s\S]*redirect\(buildHomeRedirect\(\{ waitlist: "joined", survey: "invalid" \}\)\)/,
+  );
+  assert.match(
+    actionsSource,
+    /response\.error \|\| !data[\s\S]*redirect\(buildHomeRedirect\(\{ waitlist: "joined", survey: "error" \}\)\)/,
+  );
+  assert.match(
+    actionsSource,
+    /await clearSurveyTokenCookie\(\);\s*redirect\(buildHomeRedirect\(\{ waitlist: "joined", survey: "missing" \}\)\)/s,
+  );
+  assert.match(actionsSource, /survey:\s*"missing"/);
   assert.doesNotMatch(
     actionsSource,
     /search\.set\([^)]*email|redirect\([^)]*normalizedEmail|\bemail\s*:\s*normalizedEmail/s,
@@ -178,6 +205,140 @@ test("waitlist server actions keep raw email out of redirect URLs and expose saf
   assert.match(sharedSource, /normalizeWaitlistEmail/);
   assert.match(sharedSource, /WAITLIST_SURVEY_QUESTIONS/);
   assert.doesNotMatch(sharedSource, /employee id|badge|proof upload|document upload/i);
+});
+
+test("public waitlist duplicate success state does not expose an editable survey", async () => {
+  const pageSource = await readFile(path.join(rootDir, "app/page.tsx"), "utf8");
+
+  assert.match(pageSource, /surveyStatus === "unavailable"/);
+  assert.match(pageSource, /Your waitlist spot is saved\./);
+  assert.match(
+    pageSource,
+    /Optional answers can only be added\s*from the original signup session\./,
+  );
+  assert.match(
+    pageSource,
+    /surveyStatus === "missing"[\s\S]*surveyStatus === "unavailable"/,
+  );
+  assert.match(pageSource, /surveyFinished \? null : <WaitlistSurveyForm \/>/);
+});
+
+test("waitlist signup rollout fails closed for legacy token-only RPC responses", async () => {
+  const actionsSource = await readFile(
+    path.join(rootDir, "src/lib/waitlist/actions.ts"),
+    "utf8",
+  );
+  const migrationsDir = path.join(rootDir, "supabase/migrations");
+  const migrationNames = await readdir(migrationsDir);
+  const hardeningMigrationName = migrationNames.find((name) =>
+    name.includes("harden_waitlist_survey_tokens"),
+  );
+
+  assert.ok(hardeningMigrationName, "missing waitlist survey token hardening migration");
+
+  const sql = await readFile(path.join(migrationsDir, hardeningMigrationName), "utf8");
+
+  assert.match(
+    actionsSource,
+    /legacy token-only RPC responses are intentionally not[\s\S]*accepted/,
+  );
+  assert.match(actionsSource, /Apply the hardened migration before deploying this app code/);
+  assert.match(
+    actionsSource,
+    /trusting a token without survey_allowed would preserve duplicate-token[\s\S]*takeover/,
+  );
+  assert.match(
+    actionsSource,
+    /if \(data\.survey_allowed === true\) \{\s*await setSurveyTokenCookie\(data\.survey_token as string\);\s*redirect\(buildHomeRedirect\(\{ waitlist: "joined" \}\)\);\s*\}\s*await clearSurveyTokenCookie\(\);\s*redirect\(buildHomeRedirect\(\{ waitlist: "joined", survey: "unavailable" \}\)\);/s,
+  );
+  assert.doesNotMatch(
+    actionsSource,
+    /if \(\s*(?:isUuid\(data\.survey_token|data\.survey_token)[\s\S]*setSurveyTokenCookie/,
+  );
+  assert.match(sql, /'survey_allowed', true,\s*'survey_token', v_survey_token/s);
+  assert.match(sql, /'survey_allowed', false,\s*'survey_token', null/s);
+});
+
+test("recoverable survey errors keep the current signup session editable", async () => {
+  const pageSource = await readFile(path.join(rootDir, "app/page.tsx"), "utf8");
+  const actionsSource = await readFile(
+    path.join(rootDir, "src/lib/waitlist/actions.ts"),
+    "utf8",
+  );
+
+  assert.match(pageSource, /surveyStatus === "invalid"/);
+  assert.match(pageSource, /Check your selections\s*and keep free-text answers general\./);
+  const surveyFinishedBlock = pageSource.match(
+    /const surveyFinished =[\s\S]*?surveyStatus === "unavailable";/,
+  )?.[0] ?? "";
+  assert.doesNotMatch(surveyFinishedBlock, /surveyStatus === "invalid"/);
+  assert.match(
+    actionsSource,
+    /RECOVERABLE_WAITLIST_SURVEY_CODES\.has\(data\.code \?\? ""\)[\s\S]*survey: "invalid"/,
+  );
+  assert.doesNotMatch(
+    actionsSource,
+    /RECOVERABLE_WAITLIST_SURVEY_CODES\.has\(data\.code \?\? ""\)[\s\S]*clearSurveyTokenCookie\(\)[\s\S]*survey: "invalid"/,
+  );
+});
+
+test("transient survey RPC failures keep the current signup session editable", async () => {
+  const pageSource = await readFile(path.join(rootDir, "app/page.tsx"), "utf8");
+  const actionsSource = await readFile(
+    path.join(rootDir, "src/lib/waitlist/actions.ts"),
+    "utf8",
+  );
+
+  assert.match(pageSource, /surveyStatus === "error"/);
+  assert.match(pageSource, /We couldn&apos;t save those answers\. Please try again\./);
+  const surveyFinishedBlock = pageSource.match(
+    /const surveyFinished =[\s\S]*?surveyStatus === "unavailable";/,
+  )?.[0] ?? "";
+  assert.doesNotMatch(surveyFinishedBlock, /surveyStatus === "error"/);
+  assert.match(
+    actionsSource,
+    /catch \{\s*redirect\(buildHomeRedirect\(\{ waitlist: "joined", survey: "error" \}\)\);\s*\}/,
+  );
+  assert.match(
+    actionsSource,
+    /if \(response\.error \|\| !data\) \{\s*redirect\(buildHomeRedirect\(\{ waitlist: "joined", survey: "error" \}\)\);\s*\}/,
+  );
+  const transientFailureBlock = actionsSource.match(
+    /if \(response\.error \|\| !data\) \{[\s\S]*?\n  \}/,
+  )?.[0] ?? "";
+  assert.doesNotMatch(transientFailureBlock, /clearSurveyTokenCookie\(\)/);
+  assert.doesNotMatch(pageSource, /database error|service-role|survey_token|normalized_email/i);
+});
+
+test("definitive survey token failures clear the current session token", async () => {
+  const actionsSource = await readFile(
+    path.join(rootDir, "src/lib/waitlist/actions.ts"),
+    "utf8",
+  );
+
+  assert.match(actionsSource, /DEFINITIVE_WAITLIST_SURVEY_TOKEN_FAILURE_CODES/);
+  assert.match(actionsSource, /"waitlist_signup_not_found"/);
+  assert.match(
+    actionsSource,
+    /DEFINITIVE_WAITLIST_SURVEY_TOKEN_FAILURE_CODES\.has\(data\.code \?\? ""\)[\s\S]*await clearSurveyTokenCookie\(\);[\s\S]*survey: "missing"/,
+  );
+});
+
+test("skip survey copy is final and invalidates the current token", async () => {
+  const pageSource = await readFile(path.join(rootDir, "app/page.tsx"), "utf8");
+  const actionsSource = await readFile(
+    path.join(rootDir, "src/lib/waitlist/actions.ts"),
+    "utf8",
+  );
+
+  assert.match(pageSource, /Skip survey/);
+  assert.match(pageSource, /Survey skipped\. Your waitlist spot is saved\./);
+  assert.doesNotMatch(pageSource, /Skip for now|finish later/i);
+  assert.match(actionsSource, /invalidate_waitlist_survey_token/);
+  assert.match(
+    actionsSource,
+    /invalidate_waitlist_survey_token[\s\S]*await clearSurveyTokenCookie\(\);[\s\S]*survey: "skipped"/,
+  );
 });
 
 test("first-party waitlist migration creates RLS-protected signup and survey persistence", async () => {
@@ -247,4 +408,42 @@ test("waitlist survey copy polish migration keeps runtime allowlists aligned", a
   assert.doesNotMatch(sql, /—/);
   assert.match(sql, /grant execute on function public\.submit_waitlist_survey_response[\s\S]*to service_role/i);
   assert.doesNotMatch(sql, /grant execute on function public\.submit_waitlist_survey_response[\s\S]*to anon, authenticated/i);
+});
+
+test("waitlist duplicate hardening migration withholds duplicate survey tokens", async () => {
+  const migrationsDir = path.join(rootDir, "supabase/migrations");
+  const migrationNames = await readdir(migrationsDir);
+  const hardeningMigrationName = migrationNames.find((name) =>
+    name.includes("harden_waitlist_survey_tokens"),
+  );
+
+  assert.ok(hardeningMigrationName, "missing waitlist survey token hardening migration");
+
+  const sql = await readFile(path.join(migrationsDir, hardeningMigrationName), "utf8");
+
+  assert.match(sql, /update public\.waitlist_signups\s*set survey_token = gen_random_uuid\(\);/i);
+  assert.match(sql, /create or replace function public\.submit_waitlist_signup/i);
+  assert.match(sql, /on conflict \(normalized_email\) do nothing/i);
+  assert.match(sql, /'survey_allowed', false,\s*'survey_token', null/s);
+  assert.match(sql, /'survey_allowed', true,\s*'survey_token', v_survey_token/s);
+  assert.doesNotMatch(sql, /on conflict \(normalized_email\) do update/i);
+  assert.doesNotMatch(sql, /returning id, survey_token/i);
+  assert.match(sql, /create or replace function public\.submit_waitlist_survey_response/i);
+  assert.match(
+    sql,
+    /set\s+survey_token = gen_random_uuid\(\),\s*survey_completed_at = now\(\)\s*where survey_token = requested_survey_token\s*returning id into v_signup_id/is,
+  );
+  assert.match(sql, /create or replace function public\.invalidate_waitlist_survey_token/i);
+  assert.match(
+    sql,
+    /set survey_token = gen_random_uuid\(\)\s*where survey_token = requested_survey_token/is,
+  );
+  assert.match(sql, /grant execute on function public\.submit_waitlist_signup[\s\S]*to anon, authenticated/i);
+  assert.match(sql, /grant execute on function public\.submit_waitlist_survey_response[\s\S]*to service_role/i);
+  assert.match(
+    sql,
+    /grant execute on function public\.invalidate_waitlist_survey_token\(uuid\)\s*to service_role/i,
+  );
+  assert.doesNotMatch(sql, /grant execute on function public\.submit_waitlist_survey_response[\s\S]*to anon, authenticated/i);
+  assert.doesNotMatch(sql, /grant execute on function public\.invalidate_waitlist_survey_token[\s\S]*to anon, authenticated/i);
 });
