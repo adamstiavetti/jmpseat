@@ -26,9 +26,9 @@ resolved the issue, and the apex root then loaded normally. This indicates the
 observed founder issue was local browser/cache state rather than a failed apex
 cutover or broken root deployment.
 
-No root cutover was performed for `www.jmpseat.com` because `www` DNS is not
-configured yet. Vercel reports the additional record required for `www` is
-`A www.jmpseat.com 76.76.21.21`.
+Follow-up note: `www.jmpseat.com` was intentionally excluded during the apex
+cutover because DNS was not ready at that time. It has since been configured and
+smoke-tested in `public-waitlist-www-runtime-pass.md`.
 
 ## DNS And Vercel Readiness
 
@@ -36,7 +36,8 @@ Preflight confirmed:
 
 - `jmpseat.com` public DNS resolves to Vercel at `76.76.21.21`
 - Vercel no longer reports the apex root domain as misconfigured
-- `www.jmpseat.com` does not resolve and was not included in this cutover
+- `www.jmpseat.com` did not resolve at apex cutover time and was not included in
+  this cutover
 - root production env names are present in Vercel, names only:
   - `NEXT_PUBLIC_SUPABASE_URL`
   - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
@@ -59,7 +60,8 @@ Preserved:
 - `https://beta.jmpseat.com` remains aliased to the stable beta deployment
   `https://jmpseat-agm8yl7ta-adam-stiavetti-s-projects.vercel.app`
 
-No alias was created for `https://www.jmpseat.com`.
+No alias was created for `https://www.jmpseat.com` during the apex cutover. The
+`www` alias was added later after DNS readiness was confirmed.
 
 ## Root Smoke Test
 

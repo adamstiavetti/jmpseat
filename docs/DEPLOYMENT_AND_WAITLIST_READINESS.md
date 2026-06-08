@@ -36,6 +36,8 @@ Current post-E05 update:
   and Terms copy with the actual public waitlist and optional survey behavior.
 - Founder manual visual QA passed, and the public root cutover is now
   runtime-proven on `https://jmpseat.com`.
+- `www.jmpseat.com` is now configured and smoke-tested against the same public
+  waitlist deployment as apex.
 - Root `jmpseat.com` serves the public waitlist/marketing page only, while
   `beta.jmpseat.com` remains the private beta/auth/admin/operator surface.
 - W05A also adds a dedicated `1200 x 630` social preview image so Open Graph
@@ -227,8 +229,8 @@ Production checks:
 - Verify no new features or data collection paths are present.
 
 Root production cutover has been completed and runtime-proven for the apex
-`https://jmpseat.com`. `www.jmpseat.com` remains outside the cutover until its
-DNS is configured and Vercel reports it ready.
+`https://jmpseat.com`. `www.jmpseat.com` is also configured and smoke-tested as
+the same public waitlist experience.
 
 ## 10. Deployment Acceptance Checklist
 
