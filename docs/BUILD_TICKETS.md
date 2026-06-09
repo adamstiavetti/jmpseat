@@ -154,6 +154,8 @@ Current T05 implementation status:
 - Adds `bases`, `board_types`, and `boards`.
 - Seeds DFW as the first launch base and DFW Base Board as the first available
   board.
+- Initial rollout remains DFW-only; T06 should use a DFW-start confirmation
+  step instead of a fake one-option Home Base picker.
 - Seeds board types `base_board`, `layover_board`, and `verified_lounge`.
 - Does not implement follows, home-base preferences, memberships, access
   requests, posts, comments, saves, reactions, search, reports, or moderation.
@@ -167,8 +169,8 @@ posts/comments/saves/reactions/search from the start.
 Current sequence:
 
 1. `FBMVP-T05` base, board, and board-type data model
-2. `FBMVP-T06` board follow/home-base preference foundation, governed by the
-   Home Base and Board Follow decision note
+2. `FBMVP-T06` Home Base preference and board-follow foundation, governed by
+   the Home Base and Board Follow decision note
 3. `FBMVP-T07` restricted lounge membership/access request/community-admin model
 4. `FBMVP-T08` DFW Base Board read-only dashboard shell
 5. `FBMVP-T09` board/layover discovery and follow UI shell

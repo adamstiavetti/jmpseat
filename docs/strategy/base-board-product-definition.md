@@ -17,8 +17,9 @@ it when allowed, save useful content, and use it as the starting point for
 base-specific aviation knowledge.
 
 DFW is the first seeded base and DFW Base Board is the first active base board.
-DFW is not the whole jmpseat product concept. The product model supports many
-bases and many boards over time.
+DFW is the first live Base Board in the rollout, not proof that a user works at
+DFW. DFW is not the whole jmpseat product concept. The product model supports
+many bases and many boards over time.
 
 ## 2. What A Base Board Is
 
@@ -99,6 +100,11 @@ Search inside a base should eventually search:
 The personalized app experience should eventually use home base, followed
 Base Boards, followed Layover Boards, saved/useful content, followed users, and
 Verified Lounge memberships to shape what a user sees first.
+
+For the initial DFW-only rollout, the app should use a DFW-start confirmation
+step after work-email verification rather than a fake one-option Home Base
+picker. Future multi-base rollout can introduce real active-base selection and
+switching behavior.
 
 ## 7. AI-Assisted Intel Boundary
 

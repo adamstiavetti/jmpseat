@@ -108,8 +108,9 @@ Airline-email verified user:
 
 Launch with one base first, not every base.
 
-DFW can be used as the working planning example until a base is formally
-selected. This document does not formally select DFW by itself.
+DFW is the selected first live base for the current rollout and planning lane.
+That does not make DFW the whole jmpseat product concept; it is the first live
+base used to validate the model before broader multi-base expansion.
 
 The first-base launch should validate:
 
@@ -144,7 +145,7 @@ boundaries are unclear.
 
 Recommended launch structure:
 
-- One general baseboard, such as DFW General if DFW is selected.
+- One general baseboard: DFW General in the initial rollout.
 - A limited set of restricted boards, such as DFW FA and DFW Pilot.
 - Optionally one more operational group only if product validation shows a
   clear need and moderation/admin capacity exists.

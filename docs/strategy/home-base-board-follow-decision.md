@@ -11,12 +11,18 @@ employer unless explicitly obtained and documented.
 Home Base is required for the current MVP onboarding/profile-completion path.
 It is a personalization preference, not authorization truth.
 
+The initial rollout is DFW-only.
+
 Setting Home Base should automatically follow that base's main Base Board.
 Users may follow many boards over time, including Base Boards, Layover Boards,
 and Verified Lounges when access or membership permits.
 
 Following a board does not grant restricted access. Restricted Verified Lounges
 require separate board membership or access approval.
+
+Because DFW is the only live base at first, onboarding should not present a
+fake one-option "choose your Home Base" selector. The initial rollout should
+use a DFW-start confirmation step instead.
 
 ## 2. Home Base Meaning
 
@@ -44,6 +50,11 @@ Self-declared profile fields such as `claimed_base`, `claimed_airline`, and
 experience, routing, and later community access review context, but they do not
 grant protected access by themselves.
 
+Airline may be selected or edited in profile, but self-declared airline text
+must not grant restricted access. Future airline-specific boards or lounges
+should rely on verified airline or approved-domain logic, not self-declared
+airline text.
+
 ## 3. Required But Not Authoritative
 
 For the current MVP path, Home Base should be treated as required profile or
@@ -59,11 +70,63 @@ That requirement must remain separate from app and board authorization:
 - Restricted Verified Lounge access still depends on board membership or access
   approval.
 - Operator, admin, and community-admin permissions remain separate grants.
+- Work-email verification remains the aviation-worker eligibility gate.
 
 Home Base is not proof that the user works at that base or should be allowed
 into any restricted board under that base.
 
-## 4. Board Follow Meaning
+## 4. Initial DFW-Only Rollout
+
+DFW is the first live Base Board in the rollout.
+
+That means:
+
+- DFW is the first active Home Base destination
+- DFW is not proof that the user works at DFW
+- the app should not pretend multi-base choice exists before it actually does
+
+After work-email verification in the initial DFW-only rollout, the user should
+see a DFW-start step that clearly says jmpseat is opening with DFW first.
+
+That step should:
+
+- let the user confirm or start with DFW
+- set Home Base to DFW
+- auto-follow the DFW Base Board
+- route the user into the personalized jmpseat Home dashboard
+
+Canonical onboarding order for the initial DFW-only rollout:
+
+1. Create account
+2. Confirm account
+3. Complete basic profile
+4. Verify work email
+5. Confirm or start with DFW as the initial Home Base
+6. Enter the jmpseat Home dashboard
+
+## 5. Future Multi-Base Rollout
+
+Once multiple active bases exist, users should be able to select or switch Home
+Base from active bases.
+
+Future multi-base behavior should be:
+
+- users can select Home Base from active bases during onboarding
+- users can switch Home Base later
+- switching Home Base updates personalization
+- switching Home Base auto-follows the new base's main Base Board
+- the previous base-board follow is kept unless the user manually unfollows it
+
+Canonical onboarding order for a future multi-base rollout:
+
+1. Create account
+2. Confirm account
+3. Complete basic profile
+4. Verify work email
+5. Select Home Base from active bases
+6. Enter the jmpseat Home dashboard
+
+## 6. Board Follow Meaning
 
 A board follow is a personalization signal. It means the user wants a board to
 influence their app home, discovery, notifications if later approved, search
@@ -78,7 +141,7 @@ Users may follow:
 Following a board must not bypass visibility, posting, membership, moderation,
 or launch gates.
 
-## 5. Home Base Auto-Follow Behavior
+## 7. Home Base Auto-Follow Behavior
 
 When a user sets Home Base, jmpseat should automatically ensure that the home
 base's main Base Board is followed.
@@ -93,7 +156,7 @@ The old follow should remain unless the user manually unfollows it. This keeps
 the behavior predictable for commuters, transfers, multi-base workers, frequent
 layover users, and users who still care about a previous base.
 
-## 6. Restricted Board Boundary
+## 8. Restricted Board Boundary
 
 Verified Lounges are restricted board-like spaces under or associated with a
 base. They are not opened by Home Base alone and they are not opened by a board
@@ -103,7 +166,7 @@ Restricted lounge access requires a separate access model, such as approved
 board membership or community-admin approval. That model belongs to a later
 ticket and must stay separate from Home Base and follows.
 
-## 7. Personalized Home Direction
+## 9. Personalized Home Direction
 
 The home dashboard should eventually use:
 
@@ -117,7 +180,7 @@ The home dashboard should eventually use:
 These signals should shape what the user sees first without exposing restricted
 content the user is not allowed to access.
 
-## 8. Reaction Terminology Boundary
+## 10. Reaction Terminology Boundary
 
 User-facing reaction, upvote, like, and useful-mark language is undecided.
 
@@ -131,12 +194,14 @@ early. Prefer neutral internal naming such as:
 
 Final user-facing copy can choose jmpseat terminology later.
 
-## 9. T06 Implementation Implication
+## 11. T06 Implementation Implication
 
 `FBMVP-T06` should likely introduce:
 
 - a Home Base preference model
 - a board-follow model
+- initial DFW-start behavior for the single-base rollout
+- future switchable Home Base support across active bases
 - auto-follow behavior when Home Base is set
 - tests proving Home Base and follows are not authorization grants
 - conservative handling for restricted boards
@@ -150,7 +215,7 @@ This document does not prescribe the exact SQL shape. The implementation should
 inspect the current T05 schema and choose the smallest model that preserves the
 decisions above.
 
-## 10. Product Boundaries
+## 12. Product Boundaries
 
 This decision does not introduce:
 

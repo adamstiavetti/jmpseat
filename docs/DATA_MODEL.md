@@ -53,6 +53,9 @@ Current 05B note:
   preference for the MVP path, not authorization truth.
 - Home Base should not verify employment, airline, role, base assignment, or
   restricted-board eligibility.
+- Self-declared airline text may be editable in profile, but future
+  airline-specific boards or lounges must rely on verified airline or
+  approved-domain logic rather than self-declared airline text.
 
 Important fields:
 
@@ -160,8 +163,8 @@ Current T05 implementation note:
   table.
 - The T05 runtime apply pass is recorded in
   `docs/ops/fbmvp-t05-base-board-runtime-pass.md`.
-- DFW is seeded as the first launch base, but the table is designed for many
-  bases from the start.
+- DFW is seeded as the first launch and only live base in the initial rollout,
+  but the table is designed for many bases from the start.
 - Self-declared profile base text remains separate and must not become
   authorization truth.
 
@@ -277,7 +280,13 @@ role, base assignment, or restricted-board eligibility.
 Expected behavior:
 
 - A user has one current Home Base preference.
+- In the initial DFW-only rollout, onboarding should use a DFW-start
+  confirmation step rather than a fake one-option Home Base picker.
+- In that first rollout, confirming or starting with DFW should set Home Base
+  to DFW and ensure the DFW Base Board is followed.
 - Setting Home Base should ensure the base's main Base Board is followed.
+- Future multi-base rollout should allow selection from active bases and later
+  Home Base switching.
 - Changing Home Base should keep the old board follow by default unless the
   user manually unfollows it.
 - Home Base must not grant Verified Lounge or restricted-board access.

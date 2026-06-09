@@ -33,6 +33,10 @@ product decision: Home Base is required personalization state, setting it should
 auto-follow the base's main Base Board, and neither Home Base nor board follows
 grant restricted access.
 
+The initial T06 rollout should use a DFW-start confirmation step after
+work-email verification rather than a fake one-option Home Base picker. Future
+multi-base selection and switching can follow once more active bases exist.
+
 ## 2. Implemented Scope
 
 T05 adds:
@@ -92,6 +96,9 @@ community read helpers or route surfaces are implemented.
 Self-declared `claimed_airline`, `claimed_role`, and `claimed_base` profile
 fields must not become authorization truth. Airline-email verification grants
 broad app eligibility only, not restricted-board membership.
+Self-declared airline text may help profile or request context later, but it
+must not grant airline-specific board or lounge access without separate
+verified-airline or approved-domain logic.
 
 ## 5. Safety Notes
 

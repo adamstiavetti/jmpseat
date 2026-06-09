@@ -53,15 +53,16 @@ Recommended order:
 6. App-generated work-email confirmation email flow. Historical implementation doc remains at `docs/epochs/work-email-confirmation-email-flow-implementation.md`, but newer roadmap/auth-closeout docs now treat the current work-email/auth flow as implemented and founder-confirmed on beta. Treat this ticket-pack item as historical context, not the immediate next lane.
 7. Auth email branding / confirmation template manual ops. Deferred TODO; see `docs/ops/auth-email-branding-confirmation-template-plan.md`. This is trust/deliverability/polish work for already-working auth email flows, not the active next auth-flow implementation task.
 8. `FBMVP-T05` Base and board data model design.
-9. `FBMVP-T06` Board membership and access request model.
-10. `FBMVP-T07` Community-admin role model.
-11. `FBMVP-T08` General baseboard route foundation.
-12. `FBMVP-T09` Restricted board request-access flow.
-13. `FBMVP-T10` Community-admin request review UI.
-14. `FBMVP-T11` Text-only posts and replies MVP.
-15. `FBMVP-T12` Basic moderation/reporting MVP.
-16. `FBMVP-T13` Trust/disclaimer copy placement.
-17. `FBMVP-T14` First-base launch readiness validation.
+9. `FBMVP-T06` Home Base preference and board-follow foundation.
+10. `FBMVP-T07` Restricted lounge membership and access request model.
+11. `FBMVP-T08` Community-admin role model.
+12. `FBMVP-T09` General baseboard route foundation.
+13. `FBMVP-T10` Restricted board request-access flow.
+14. `FBMVP-T11` Community-admin request review UI.
+15. `FBMVP-T12` Text-only posts and replies MVP.
+16. `FBMVP-T13` Basic moderation/reporting MVP.
+17. `FBMVP-T14` Trust/disclaimer copy placement.
+18. `FBMVP-T15` First-base launch readiness validation.
 
 ## 5. Per-Ticket Detail
 
@@ -435,14 +436,76 @@ Stop-before-commit/review requirements:
 - Stop before commit after implementation and local validation.
 - Keep migration unapplied until explicit migration-apply task.
 
-### FBMVP-T06 Board Membership And Access Request Model
+### FBMVP-T06 Home Base Preference And Board-Follow Foundation
 
-Goal: Define board-scoped membership and request records for restricted boards.
+Goal: define the first Home Base preference and board-follow foundation without
+turning Home Base or follows into authorization grants.
+
+Scope:
+
+- Create the Home Base preference model.
+- Create the board-follow model.
+- For the initial DFW-only rollout, use a DFW-start confirmation step after
+  work-email verification instead of a fake one-option Home Base picker.
+- Setting Home Base should auto-follow the corresponding main Base Board.
+- Changing Home Base later should keep the old board follow by default unless
+  manually unfollowed.
+- Preserve future multi-base selection and switching support once more active
+  bases exist.
+
+Out of scope:
+
+- Restricted board memberships or access requests.
+- Community-admin tooling.
+- Posts/replies.
+- General launch-mode rewrites.
+
+Likely files/areas:
+
+- `supabase/migrations`
+- future profile/community personalization helpers
+- RLS/source tests
+- auth/profile/onboarding docs and tests
+
+Migration likely needed: yes.
+
+Authorization/security boundaries:
+
+- Home Base must remain personalization state, not authorization truth.
+- Home Base must not prove employment, airline, role, or base assignment.
+- Following a board must not grant restricted-board access.
+- Airline-email verification remains the broad app-eligibility gate.
+- Self-declared airline/base/role fields must not grant restricted-board
+  access.
+
+Tests expected:
+
+- Source and migration tests for the Home Base and follow foundations.
+- Tests proving the initial DFW-start flow sets Home Base to DFW and
+  auto-follows the DFW Base Board.
+- Tests proving future Home Base switching keeps the old board follow by
+  default unless manually unfollowed.
+- Tests proving Home Base and follows are not authorization grants.
+
+Runtime validation expected:
+
+- Runtime-prove DFW-start behavior, Home Base persistence, and auto-follow
+  behavior after migration apply without granting restricted access.
+
+Stop-before-commit/review requirements:
+
+- Stop before commit after implementation and local validation.
+- Do not combine with restricted-board membership or posting implementation.
+
+### FBMVP-T07 Restricted Lounge Membership And Access Request Model
+
+Goal: define board-scoped membership and request records for restricted boards.
 
 Scope:
 
 - Create `board_memberships` and `board_access_requests`.
-- Support statuses: `requested`, `approved`, `denied`, `revoked`; `expired` optional later.
+- Support statuses: `requested`, `approved`, `denied`, `revoked`; `expired`
+  optional later.
 - Enforce board-scoped access only.
 - Add audit/security event plan.
 
@@ -466,6 +529,7 @@ Authorization/security boundaries:
 - Membership in one board must not grant another board.
 - General baseboard access must not grant restricted-board content.
 - Airline-email verification alone must not grant restricted-board access.
+- Self-declared airline text must not grant airline-specific lounge access.
 
 Tests expected:
 
@@ -475,14 +539,15 @@ Tests expected:
 
 Runtime validation expected:
 
-- Runtime-prove request creation and membership-gated reads after migration apply.
+- Runtime-prove request creation and membership-gated reads after migration
+  apply.
 
 Stop-before-commit/review requirements:
 
 - Stop before commit after implementation and local validation.
 - Do not combine with posting implementation.
 
-### FBMVP-T07 Community-Admin Role Model
+### FBMVP-T08 Community-Admin Role Model
 
 Goal: Define board-scoped community admin grants and the explicit first-admin appointment model.
 

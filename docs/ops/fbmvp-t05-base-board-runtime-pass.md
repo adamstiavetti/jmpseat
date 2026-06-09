@@ -102,3 +102,12 @@ Use these controlling docs before starting T06:
 - `docs/strategy/home-base-board-follow-decision.md`
 - `docs/strategy/base-board-product-definition.md`
 - `docs/ops/05b-first-base-mvp-planning.md`
+
+Initial rollout note:
+
+- T06 should start with DFW-only Home Base onboarding behavior
+- the user confirms or starts with DFW after work-email verification
+- Home Base is set to DFW
+- the system auto-follows the DFW Base Board
+- future multi-base Home Base selection and switching remains part of the same
+  T06 lane without making Home Base an authorization grant

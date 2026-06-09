@@ -27,6 +27,7 @@ Current DFW framing:
 
 - first launch base: DFW
 - first available base board: DFW Base Board
+- DFW is the only live base in the initial rollout
 - the data model should support many bases and boards from the start
 
 The current MVP direction includes:
@@ -67,7 +68,11 @@ The MVP user experience is personalized:
 
 - users must set a Home Base for the current MVP onboarding/profile-completion
   path, but Home Base is personalization state, not authorization truth
-- setting Home Base should automatically follow that base's main Base Board
+- the initial rollout should not show a fake one-option Home Base picker
+- after work-email verification in the DFW-only rollout, users should confirm
+  or start with DFW
+- that DFW-start step should set Home Base to DFW and automatically follow the
+  DFW Base Board
 - users can follow other base boards
 - users can follow layover boards
 - users can follow Verified Lounges only when access/membership permits
@@ -78,6 +83,24 @@ The MVP user experience is personalized:
 Following a board does not grant restricted access. Self-declared profile
 fields such as `claimed_base`, `claimed_airline`, and `claimed_role` must not
 become authorization truth.
+
+Canonical onboarding order for the initial DFW-only rollout:
+
+1. Create account
+2. Confirm account
+3. Complete basic profile
+4. Verify work email
+5. Confirm or start with DFW as the initial Home Base
+6. Enter the jmpseat Home dashboard
+
+Canonical onboarding order for a future multi-base rollout:
+
+1. Create account
+2. Confirm account
+3. Complete basic profile
+4. Verify work email
+5. Select Home Base from active bases
+6. Enter the jmpseat Home dashboard
 
 ## 4. Utility Layer / Board Intel
 
@@ -167,6 +190,8 @@ Current implementation note:
 - T06 should follow the Home Base / Board Follow decision note, including the
   rule that Home Base auto-follows the matching Base Board while neither Home
   Base nor board follows grant restricted access.
+- T06 should implement the initial DFW-start behavior first and leave real
+  multi-base selection/switching support ready for later active-base rollout.
 
 Rationale:
 
@@ -185,7 +210,7 @@ Rationale:
 The current implementation sequence is:
 
 1. `FBMVP-T05` base, board, and board-type data model, merged and runtime-applied
-2. `FBMVP-T06` board follow/home-base preference foundation
+2. `FBMVP-T06` Home Base preference and board-follow foundation
 3. `FBMVP-T07` restricted lounge membership/access request/community-admin model
 4. `FBMVP-T08` DFW Base Board read-only dashboard shell
 5. `FBMVP-T09` board/layover discovery and follow UI shell
