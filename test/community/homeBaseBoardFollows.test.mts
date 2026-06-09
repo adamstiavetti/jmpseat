@@ -20,6 +20,23 @@ function readHomeBaseBoardFollowsMigration() {
   return readFileSync(path.join(migrationsDir.pathname, migrationNames[0]), "utf8");
 }
 
+function readHomeBaseRpcGrantHardeningMigration() {
+  const migrationsDir = new URL("../../supabase/migrations", import.meta.url);
+  const migrationNames = existsSync(migrationsDir)
+    ? readdirSync(migrationsDir).filter((name) =>
+        name.endsWith("_harden_home_base_rpc_execute_grants.sql"),
+      )
+    : [];
+
+  assert.equal(
+    migrationNames.length,
+    1,
+    "expected one T06 home-base RPC execute-grant hardening migration",
+  );
+
+  return readFileSync(path.join(migrationsDir.pathname, migrationNames[0]), "utf8");
+}
+
 test("T06 migration creates home-base preferences and board follows with conservative RLS", () => {
   const sql = readHomeBaseBoardFollowsMigration();
 
@@ -80,6 +97,39 @@ test("T06 set-home-base RPC uses authenticated user state and auto-follows the b
   assert.match(sql, /grant execute on function public\.get_current_user_home_base\(\) to authenticated/i);
   assert.match(sql, /grant execute on function public\.list_current_user_board_follows\(\) to authenticated/i);
   assert.doesNotMatch(sql, /grant execute on function public\.set_user_home_base\(text\) to anon/i);
+});
+
+test("T06 RPC execute-grant hardening removes anon execution while preserving authenticated execution", () => {
+  const t06Sql = readHomeBaseBoardFollowsMigration();
+  const hardeningSql = readHomeBaseRpcGrantHardeningMigration();
+  const grantLines = hardeningSql
+    .split("\n")
+    .filter((line) => /^\s*grant\s+execute\s+on\s+function/i.test(line))
+    .join("\n");
+
+  assert.match(t06Sql, /v_user_id uuid := auth\.uid\(\)/i);
+  assert.match(t06Sql, /if v_user_id is null/i);
+  assert.match(t06Sql, /This is not authorization truth/i);
+  assert.match(t06Sql, /Following a board does not grant restricted-board access/i);
+
+  assert.match(hardeningSql, /revoke execute on function public\.set_user_home_base\(text\) from anon/i);
+  assert.match(hardeningSql, /revoke execute on function public\.get_current_user_home_base\(\) from anon/i);
+  assert.match(hardeningSql, /revoke execute on function public\.list_current_user_board_follows\(\) from anon/i);
+  assert.match(hardeningSql, /revoke execute on function public\.set_user_home_base\(text\) from public/i);
+  assert.match(hardeningSql, /revoke execute on function public\.get_current_user_home_base\(\) from public/i);
+  assert.match(hardeningSql, /revoke execute on function public\.list_current_user_board_follows\(\) from public/i);
+  assert.match(hardeningSql, /grant execute on function public\.set_user_home_base\(text\) to authenticated/i);
+  assert.match(hardeningSql, /grant execute on function public\.get_current_user_home_base\(\) to authenticated/i);
+  assert.match(hardeningSql, /grant execute on function public\.list_current_user_board_follows\(\) to authenticated/i);
+  assert.match(hardeningSql, /grant execute on function public\.set_user_home_base\(text\) to service_role/i);
+  assert.match(hardeningSql, /grant execute on function public\.get_current_user_home_base\(\) to service_role/i);
+  assert.match(hardeningSql, /grant execute on function public\.list_current_user_board_follows\(\) to service_role/i);
+  assert.match(hardeningSql, /auth\.uid\(\) internally/i);
+  assert.match(hardeningSql, /anon execute is revoked for least privilege/i);
+  assert.doesNotMatch(grantLines, /to anon/i);
+  assert.doesNotMatch(hardeningSql, /using\s*\(\s*true\s*\)/i);
+  assert.doesNotMatch(hardeningSql, /with check\s*\(\s*true\s*\)/i);
+  assert.doesNotMatch(hardeningSql, /verification_proofs|storage\.objects|storage_path|signed_url|proof upload|badge upload/i);
 });
 
 test("T06 does not turn profile text, follows, or restricted lounges into authorization truth", () => {

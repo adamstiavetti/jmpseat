@@ -99,9 +99,15 @@ The next implementation lane after the T05 runtime pass is:
 
 Current T06 note:
 
-- T06 is implemented locally/review-ready in
+- T06 is implemented and merged in
   `docs/ops/fbmvp-t06-home-base-board-follows.md`.
-- Runtime migration apply remains pending review.
+- The intended Supabase runtime already has the base T06 schema/functions
+  recorded as remote migration
+  `20260609194858 create_home_base_board_follows`; the local repo file remains
+  `20260609130534_create_home_base_board_follows.sql` and must not be
+  re-applied or retroactively marked applied.
+- Follow-up RPC execute-grant hardening should be applied through the targeted
+  `20260609200310_harden_home_base_rpc_execute_grants.sql` migration.
 - The T06 foundation keeps Home Base and board follows as personalization
   state only and does not grant restricted access.
 - No Home Base is a valid initial DFW-only rollout state. Skipping the

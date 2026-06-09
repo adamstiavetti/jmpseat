@@ -273,8 +273,15 @@ Relationships:
 
 Current T06 implementation note:
 
-`user_home_base_preferences` is added by the local T06 migration. Runtime apply
-is pending review.
+`user_home_base_preferences` is added by the T06 migration. The intended
+Supabase runtime already has the T06 schema/functions, recorded remotely as
+`20260609194858 create_home_base_board_follows`, while the local repo file
+remains `20260609130534_create_home_base_board_follows.sql`. Do not re-apply
+or retroactively mark the local T06 file; use targeted follow-up migrations for
+runtime hardening. The first follow-up is
+`20260609200310_harden_home_base_rpc_execute_grants.sql`, which removes `anon`
+EXECUTE from the T06 RPCs while preserving authenticated/service-role
+execution.
 
 Home Base is the user's primary base preference for personalization when the
 user chooses one. It is optional in the initial DFW-only rollout and is not
@@ -319,8 +326,11 @@ Expected behavior:
 
 Current T06 implementation note:
 
-`board_follows` is added by the local T06 migration. Runtime apply is pending
-review.
+`board_follows` is added by the T06 migration already present in the intended
+Supabase runtime under the remote migration ledger version
+`20260609194858 create_home_base_board_follows`. The local repo file remains
+`20260609130534_create_home_base_board_follows.sql` and should not be
+re-applied or retroactively marked applied.
 
 A board follow is a personalization signal, not an access grant.
 

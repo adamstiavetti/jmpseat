@@ -211,7 +211,7 @@ Final user-facing copy can choose jmpseat terminology later.
 
 ## 11. T06 Implementation Implication
 
-`FBMVP-T06` introduces the local/review-ready data foundation for:
+`FBMVP-T06` introduces the data foundation for:
 
 - a Home Base preference model
 - a board-follow model
@@ -240,7 +240,13 @@ T06 does not implement posts, comments, lounge access requests, memberships,
 community-admin tools, saves, reactions, search, reports, moderation, dashboard
 UI, onboarding UI, or broad member-generated content exposure.
 
-Runtime migration apply remains pending review.
+Runtime note: the intended Supabase runtime already has the base T06
+schema/functions recorded as remote migration
+`20260609194858 create_home_base_board_follows`, while the local repo file
+remains `20260609130534_create_home_base_board_follows.sql`. Do not re-apply
+or retroactively mark the local T06 migration. Follow-up runtime hardening
+should use targeted migrations, including the RPC execute-grant hardening that
+removes explicit `anon` EXECUTE from the T06 functions.
 
 The current T06 migration is the first SQL shape for these decisions. Later
 tickets should extend it narrowly rather than treating follows, Home Base, or

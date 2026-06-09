@@ -42,7 +42,7 @@ Supplemental epoch-specific ticket packs:
 - [Beta Invite-Code Foundation Decision](strategy/beta-invite-code-foundation-decision.md) - defines batch-generated, single-use beta invite codes as private-testing capacity control that must not bypass airline-email verification or become a first-base launch requirement.
 - [05B First-Base MVP Planning](ops/05b-first-base-mvp-planning.md) - controlling narrow-lane planning note for the current 05B implementation start; use this doc so older broad beta/V1 planning does not pull the first slice too wide.
 - [FBMVP-T05 Base Board Runtime Pass](ops/fbmvp-t05-base-board-runtime-pass.md) - records targeted runtime application of `20260609020355 create_base_board_model` to the intended `jmpseat` Supabase project, confirms only T05 was recorded in migration history, preserves known migration drift handling, and verifies DFW/base-board seed state plus RLS on the new metadata tables.
-- [FBMVP-T06 Home Base And Board Follows](ops/fbmvp-t06-home-base-board-follows.md) - local/review-ready foundation for optional Home Base preference state, board follows as personalization state, and the authenticated `set_user_home_base` RPC that auto-follows the matching active Base Board without granting restricted access.
+- [FBMVP-T06 Home Base And Board Follows](ops/fbmvp-t06-home-base-board-follows.md) - foundation for optional Home Base preference state, board follows as personalization state, and the authenticated `set_user_home_base` RPC that auto-follows the matching active Base Board without granting restricted access; the intended runtime has the base T06 schema/functions recorded as remote migration `20260609194858`, while the local repo file remains `20260609130534`, so follow-up hardening must use targeted migrations rather than re-applying or retro-marking local T06.
 - [First-Base MVP Implementation Ticket Pack](epochs/first-base-mvp-implementation-ticket-pack.md) - translates the pivot strategy docs into the ordered `FBMVP` implementation sequence; the immediate post-Epoch-5 narrow lane is first reconciled in `ops/private-beta-readiness-bridge.md`, and auth email branding/custom SMTP is now tracked as a deferred beta-readiness polish TODO rather than the active next auth-flow implementation task.
 - [FBMVP-T01: Freeze User-Facing Proof Verification Surfaces](epochs/fbmvp-t01-freeze-user-facing-proof-verification-surfaces.md) - freezes normal proof-upload UX while preserving historical proof infrastructure, cleanup, audit, and admin/operator safety.
 - [FBMVP-T02: Airline Email Verification Access State Design](epochs/fbmvp-t02-airline-email-verification-access-state-design.md) - defines the forward `airline_email_verified` app-level eligibility state and how it maps from existing work-email verification foundations.
@@ -163,10 +163,19 @@ Current T05 implementation status:
 
 Current T06 implementation status:
 
-- Local/review-ready on the active T06 branch.
+- Merged on `main` at `a4cb0b1`.
+- The intended Supabase runtime already has the T06 schema/functions recorded
+  as remote migration `20260609194858 create_home_base_board_follows`.
+- The local repo T06 file remains
+  `20260609130534_create_home_base_board_follows.sql`; do not re-apply it and
+  do not mark `20260609130534` applied retroactively.
 - Adds `user_home_base_preferences` and `board_follows`.
 - Adds an authenticated `set_user_home_base(p_base_code text)` RPC to set the
   current user's Home Base and auto-follow the matching active Base Board.
+- Follow-up migration
+  `20260609200310_harden_home_base_rpc_execute_grants.sql` removes explicit
+  `anon` EXECUTE from the three T06 RPCs and preserves authenticated/service
+  role execution.
 - Adds server-side helper functions for reading Home Base/follows and setting
   Home Base through the RPC.
 - Keeps missing Home Base as a valid initial DFW-only rollout state that does
@@ -175,8 +184,8 @@ Current T06 implementation status:
 - Does not grant restricted access, create lounge memberships, create access
   requests, or rely on self-declared `claimed_base`, `claimed_airline`, or
   `claimed_role`.
-- Runtime migration apply remains pending review and must be targeted because
-  known Supabase migration-history drift remains.
+- Any remaining runtime hardening apply must be targeted because known
+  Supabase migration-history drift remains.
 
 DFW is the first launch base and the DFW Base Board is the first available base
 board. DFW is not the whole product concept. The data model should support many

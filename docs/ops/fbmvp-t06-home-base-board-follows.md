@@ -27,10 +27,19 @@ moderation.
 
 Runtime apply status:
 
-- T06 is local/review-ready only.
-- The migration has not been applied to the remote Supabase runtime.
-- Use targeted migration apply only after review because remote migration
-  history has documented drift.
+- The T06 schema/functions already exist in the intended Supabase runtime.
+- The remote migration ledger recorded that runtime apply as
+  `20260609194858 create_home_base_board_follows`.
+- The local repo migration remains
+  `20260609130534_create_home_base_board_follows.sql`.
+- Do not re-apply the local T06 migration.
+- Do not mark local `20260609130534` applied retroactively.
+- Use targeted follow-up migrations only because remote migration history has
+  documented drift.
+- A follow-up least-privilege migration,
+  `20260609200310_harden_home_base_rpc_execute_grants.sql`, removes explicit
+  `anon` EXECUTE grants from the T06 RPCs while preserving authenticated and
+  service-role execution.
 
 ## 2. Implemented Scope
 
@@ -65,10 +74,16 @@ The `set_user_home_base` RPC:
 - preserves old board follows
 - does not touch profile claim fields
 - does not grant restricted-board access
+- is restricted by a follow-up execute-grant hardening migration so `anon`
+  cannot execute it, even though the function still enforces `auth.uid()`
+  internally
 
 The read RPCs return only the authenticated user's own Home Base preference and
 board follows with the minimum base/board metadata needed by later app
 surfaces. They avoid opening broad direct reads on the T05 metadata tables.
+The follow-up execute-grant hardening migration also removes `anon` EXECUTE
+from those read RPCs and keeps them available to `authenticated` and
+`service_role`.
 
 ## 3. Initial DFW-Only Behavior
 
@@ -181,7 +196,10 @@ Local validation for this branch should include:
 - `npm run build`
 
 Runtime validation is pending until the T06 migration is approved for targeted
-apply.
+follow-up apply of the RPC execute-grant hardening migration. The base T06
+schema/functions are already present remotely under migration ledger version
+`20260609194858`; the local `20260609130534` migration must not be re-applied
+or retroactively marked applied.
 
 ## 9. Next Lane
 
