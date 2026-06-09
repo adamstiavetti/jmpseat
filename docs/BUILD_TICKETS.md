@@ -35,6 +35,7 @@ Supplemental epoch-specific ticket packs:
 - [Board / Community Access Model Decision](strategy/board-community-access-model-decision.md) - defines general baseboards, restricted boards, board memberships, access requests, and community-admin authority.
 - [Proof-System Freeze / Deprecation Plan](strategy/proof-system-freeze-deprecation-plan.md) - freezes proof upload as a forward product path while preserving legacy cleanup, audit, and data-retirement safety.
 - [First-Base MVP Scope](strategy/first-base-mvp-scope.md) - defines the first complete base launch package, including airline-email access, boards, posting/Q&A, moderation expectations, trust copy, and launch boundaries.
+- [Base Board Product Definition](strategy/base-board-product-definition.md) - canonical definition of a Base Board as the main verified hub/container for an aviation base, combining structured base intel, posts/comments, useful/trending knowledge, related Layover Boards, and restricted Verified Lounges while preserving safety boundaries and T05 model validity.
 - [Community Admin Responsibilities / Disclaimer Policy](strategy/community-admin-responsibilities-disclaimer-policy.md) - defines board-scoped community-admin responsibilities, limits, privacy boundaries, non-sponsorship disclaimers, abuse controls, and escalation expectations.
 - [Launch-Readiness Gate Transition Plan](strategy/launch-readiness-gate-transition-plan.md) - defines the explicit transition from private-testing beta gates to first-base launch gates without removing beta too early, requiring one-by-one beta grants, or bypassing airline-email verification.
 - [Beta Invite-Code Foundation Decision](strategy/beta-invite-code-foundation-decision.md) - defines batch-generated, single-use beta invite codes as private-testing capacity control that must not bypass airline-email verification or become a first-base launch requirement.
@@ -131,6 +132,10 @@ Client-scope rule:
 
 Use `ops/05b-first-base-mvp-planning.md` as the controlling note for the
 current 05B implementation start.
+
+Use `strategy/base-board-product-definition.md` as the canonical product
+definition for what a Base Board is before applying the T05 migration or
+starting T06.
 
 Current first code ticket:
 

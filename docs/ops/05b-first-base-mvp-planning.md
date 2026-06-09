@@ -50,6 +50,13 @@ The current MVP direction includes:
 The first implementation steps should build toward that model without trying to
 ship every surface in the first code ticket.
 
+Use `docs/strategy/base-board-product-definition.md` as the canonical product
+definition for what a Base Board is. In short, a Base Board is the main
+verified hub/container for an aviation base. It combines structured base intel,
+searchable community posts, useful/trending knowledge, related Layover Boards,
+and restricted Verified Lounges; it is not one thread, not a generic social
+feed, and not only a static wiki.
+
 ## 3. Personalized App Experience
 
 The MVP user experience is personalized:
@@ -63,6 +70,9 @@ The MVP user experience is personalized:
 ## 4. Utility Layer / Board Intel
 
 Base boards should support structured base intel/wiki sections.
+
+Board intel/wiki is structured content attached to a board. It is not a board
+type.
 
 Examples:
 

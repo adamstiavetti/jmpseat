@@ -16,6 +16,12 @@ And Board-Type Data Model Design`.
 T05 creates the database/model foundation for the First-Base MVP. It does not
 build the app UI or later community interaction features.
 
+Use `docs/strategy/base-board-product-definition.md` for the canonical product
+definition of a Base Board. T05 supports that definition by modeling bases,
+boards, and board types, but it does not implement the Base Board UI,
+posts/comments, follows, search, Verified Lounge access flows, or board
+intel/wiki content.
+
 ## 2. Implemented Scope
 
 T05 adds:

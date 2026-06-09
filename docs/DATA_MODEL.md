@@ -210,6 +210,10 @@ Current T05 implementation note:
 - DFW Base Board is seeded as the first available board.
 - The table is designed for many base boards, layover boards, and restricted
   lounge boards over time.
+- The canonical Base Board product definition is in
+  `strategy/base-board-product-definition.md`: a Base Board is a hub/container
+  for structured base intel, posts, useful/trending knowledge, related Layover
+  Boards, and restricted Verified Lounges.
 - Posting, comments, follows, memberships, access requests, saves, reactions,
   search, reports, and moderation remain later tickets.
 
@@ -238,6 +242,8 @@ Relationships:
 - May have a parent Board.
 - Later has follows, memberships, posts, comments, saves, reactions, reports,
   moderation actions, and search indexing.
+- Later has board intel/wiki structured content attached to the board. Board
+  intel/wiki is not a board type.
 
 ## Airport
 
