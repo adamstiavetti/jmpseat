@@ -38,6 +38,7 @@ Supplemental epoch-specific ticket packs:
 - [Community Admin Responsibilities / Disclaimer Policy](strategy/community-admin-responsibilities-disclaimer-policy.md) - defines board-scoped community-admin responsibilities, limits, privacy boundaries, non-sponsorship disclaimers, abuse controls, and escalation expectations.
 - [Launch-Readiness Gate Transition Plan](strategy/launch-readiness-gate-transition-plan.md) - defines the explicit transition from private-testing beta gates to first-base launch gates without removing beta too early, requiring one-by-one beta grants, or bypassing airline-email verification.
 - [Beta Invite-Code Foundation Decision](strategy/beta-invite-code-foundation-decision.md) - defines batch-generated, single-use beta invite codes as private-testing capacity control that must not bypass airline-email verification or become a first-base launch requirement.
+- [05B First-Base MVP Planning](ops/05b-first-base-mvp-planning.md) - controlling narrow-lane planning note for the current 05B implementation start; use this doc so older broad beta/V1 planning does not pull the first slice too wide.
 - [First-Base MVP Implementation Ticket Pack](epochs/first-base-mvp-implementation-ticket-pack.md) - translates the pivot strategy docs into the ordered `FBMVP` implementation sequence; the immediate post-Epoch-5 narrow lane is first reconciled in `ops/private-beta-readiness-bridge.md`, and auth email branding/custom SMTP is now tracked as a deferred beta-readiness polish TODO rather than the active next auth-flow implementation task.
 - [FBMVP-T01: Freeze User-Facing Proof Verification Surfaces](epochs/fbmvp-t01-freeze-user-facing-proof-verification-surfaces.md) - freezes normal proof-upload UX while preserving historical proof infrastructure, cleanup, audit, and admin/operator safety.
 - [FBMVP-T02: Airline Email Verification Access State Design](epochs/fbmvp-t02-airline-email-verification-access-state-design.md) - defines the forward `airline_email_verified` app-level eligibility state and how it maps from existing work-email verification foundations.
@@ -126,6 +127,40 @@ Client-scope rule:
 - Future implementation tickets must identify whether the work is `web-only`, `mobile-ready`, or `shared-core`.
 - If a ticket is `shared-core` or `mobile-ready`, it must describe how the logic, data access, and authorization rules can be reused by a future mobile client.
 
+## Current 05B Lane
+
+Use `ops/05b-first-base-mvp-planning.md` as the controlling note for the
+current 05B implementation start.
+
+Current first code ticket:
+
+- `FBMVP-T05: Base, Board, And Board-Type Data Model Design`
+
+DFW is the first launch base and the DFW Base Board is the first available base
+board. DFW is not the whole product concept. The data model should support many
+bases, base boards, layover boards, Verified Lounges / restricted role-based
+spaces, follows/subscriptions, memberships, community-admin grants, and future
+posts/comments/saves/reactions/search from the start.
+
+Current sequence:
+
+1. `FBMVP-T05` base, board, and board-type data model
+2. `FBMVP-T06` board follow/home-base preference foundation
+3. `FBMVP-T07` restricted lounge membership/access request/community-admin model
+4. `FBMVP-T08` DFW Base Board read-only dashboard shell
+5. `FBMVP-T09` board/layover discovery and follow UI shell
+6. `FBMVP-T10` text posts/comments foundation
+7. `FBMVP-T11` saves/reactions/useful/trending foundation
+8. `FBMVP-T12` search foundation with access-aware boundaries
+9. `FBMVP-T13` reporting/moderation/admin controls
+10. `FBMVP-T14` seeded DFW content, safety copy, and launch validation
+
+Do not let older broad V1/backlog sections below turn this into an unsequenced
+social feed or marketplace build. For the current lane, keep proof uploads,
+manual proof/document uploads, generic global Crew Rooms expansion,
+media/upload posting, AI auto-publishing, deals, full mobile scope, and
+anonymous posting unless separately approved out of scope.
+
 ## Required First Implementation Sequence
 
 Use this order when implementation begins:
@@ -140,6 +175,13 @@ Use this order when implementation begins:
 8. Moderation/reporting.
 9. Jumpseat Brief MVP.
 10. Admin dashboard.
+
+Current-status note:
+
+- The sequence above remains a broad historical backlog reference.
+- It is not the controlling first 05B implementation lane.
+- For the current start point, use `ops/05b-first-base-mvp-planning.md` and
+  begin with `FBMVP-T05`.
 
 The detailed backlog below includes supporting storage, authorization, and policy tickets around that sequence, but the sequence above should guide the first build pass.
 

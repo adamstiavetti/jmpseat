@@ -2,6 +2,26 @@
 
 Brand note: jmpseat is the canonical product and app name. This document does not claim legal or trademark clearance for the name.
 
+Current implementation-lane note:
+
+- This doc describes the broader V1 envelope, not the immediate narrow 05B
+  implementation start.
+- Use `docs/ops/05b-first-base-mvp-planning.md` for the current controlling
+  First-Base MVP sequence.
+- DFW is the first launch base and DFW Base Board is the first available base
+  board. DFW is not the whole product concept; the model should support many
+  bases, base boards, layover boards, Verified Lounges / restricted role-based
+  spaces, user profiles, follows, posting, comments, sharing, saves,
+  reactions/useful marks, searchable base intel/wiki content, and access-aware
+  search over time.
+- For the first implementation sequence, keep proof uploads, manual
+  proof/document uploads, generic social-feed work, generic global Crew Rooms
+  expansion, media/upload posting, AI auto-publishing, deals/perks marketplace,
+  full mobile scope, and anonymous posting unless separately approved out of
+  scope.
+- Self-declared profile fields must not become authorization truth. Airline
+  email grants broad app eligibility only, not restricted-board membership.
+
 ## MVP Goal
 
 The MVP should prove that verified airline people will use jmpseat as a practical utility community for base intel, layover planning, anonymous crew discussion, and crew-friendly perks.

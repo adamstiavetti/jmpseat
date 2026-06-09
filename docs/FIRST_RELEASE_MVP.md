@@ -6,6 +6,24 @@ Product principle: Utility first. Community second. Social feed last.
 
 Identity principle: Verified privately. Anonymous publicly. Accountable internally.
 
+Current implementation-lane note:
+
+- This doc remains the first-release product-shape reference, but it is not the
+  controlling first-code sequence for the current 05B start.
+- Use `docs/ops/05b-first-base-mvp-planning.md` for the immediate narrow
+  implementation lane.
+- The first code ticket is `FBMVP-T05: Base, Board, And Board-Type Data Model
+  Design`.
+- DFW is the first launch base and DFW Base Board is the first available base
+  board. DFW is not the whole product concept; the model should support many
+  bases, base boards, layover boards, Verified Lounges / restricted role-based
+  spaces, follows, posts, comments, saves, reactions/useful marks, and
+  access-aware search over time.
+- For the first implementation sequence, keep proof uploads, manual
+  proof/document uploads, generic social-feed work, generic global Crew Rooms
+  expansion, media/upload posting, AI auto-publishing, deals, full mobile scope,
+  and anonymous posting unless separately approved out of scope.
+
 ## 1. Purpose
 
 This document defines the practical first release MVP for jmpseat based on the current blueprint, MVP scope, research, interviews, operating model, build sequencing, trust and safety rules, and beta-readiness constraints.

@@ -15,10 +15,21 @@ Current scope note:
   real private beta users.
 - Use `docs/ops/private-beta-readiness-bridge.md` for the immediate narrow
   post-Epoch-5 readiness lane.
+- Use `docs/ops/05b-first-base-mvp-planning.md` for the controlling first-05B
+  implementation sequence.
 - Current private beta / 05B direction does not use proof uploads. Work-email
   verification and private beta access gates are the active verification path.
   Manual-proof, badge-upload, or document-upload workflows would require a fresh
   scope decision plus privacy/security review before activation.
+- DFW is the first launch base and DFW Base Board is the first available base
+  board. DFW is not the whole product concept; the model should support many
+  bases, base boards, layover boards, Verified Lounges / restricted role-based
+  spaces, follows, posts, comments, saves, reactions/useful marks, and
+  access-aware search over time.
+- For the first implementation sequence, keep proof uploads, manual
+  proof/document uploads, generic social-feed work, generic global Crew Rooms
+  expansion, media/upload posting, AI auto-publishing, deals, full mobile scope,
+  and anonymous posting unless separately approved out of scope.
 
 ## 1. Purpose
 
