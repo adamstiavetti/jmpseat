@@ -58,6 +58,13 @@ export default function PrivacyPage() {
               access features, prioritize early product direction, and decide
               which communities to support first.
             </p>
+            <p>
+              jmpseat also uses Vercel Web Analytics for public-site analytics
+              on the public waitlist, Privacy, and Terms pages. This helps us
+              understand basic page traffic and performance for the public
+              marketing surface. It is not enabled on private beta, auth, admin,
+              app, or lab routes.
+            </p>
           </section>
 
           <section className={styles.section}>
@@ -75,9 +82,13 @@ export default function PrivacyPage() {
             <h2>Service providers</h2>
             <p>
               jmpseat may use service providers for hosting, database storage,
-              email delivery, security, and similar operations needed to run the
-              waitlist. Those providers are used to operate jmpseat, not to sell
-              waitlist information.
+              email delivery, security, public-site analytics, and similar
+              operations needed to run the waitlist. Those providers are used to
+              operate jmpseat, not to sell waitlist information.
+            </p>
+            <p>
+              Google Analytics is not enabled on the public jmpseat waitlist in
+              this implementation.
             </p>
             <p>
               jmpseat may also disclose information if required by law, to

@@ -9,13 +9,14 @@ Identity principle: Verified privately. Anonymous publicly. Accountable internal
 ## 1. Purpose
 
 This guide prepares the current public waitlist app for preview or production
-deployment and first-party waitlist capture.
+deployment, first-party waitlist capture, and public-only Vercel Web Analytics.
 
 The public page is a validation surface, not the full jmpseat product.
 Deployment should help review the landing page, validate first-party email
-capture, and support controlled first outreach. It should not add user accounts,
-verification, community features, AI, payments, analytics SDKs, or airline
-integrations.
+capture, measure basic public-page traffic/performance through Vercel Web
+Analytics, and support controlled first outreach. It should not add user
+accounts, verification, community features, AI, payments, Google Analytics,
+Speed Insights, private-app analytics, or airline integrations.
 
 Current post-E05 update:
 
@@ -82,6 +83,13 @@ Current post-E05 update:
   env scoping are recorded there. The main conditional carry-forward is a safe
   live authenticated proof-upload mutation test when a founder-controlled
   account/workflow and cleanup path are available.
+- Public Vercel Analytics instrumentation is prepared in
+  `ops/public-vercel-analytics-readiness.md`: the app mounts
+  `@vercel/analytics` only through a public host/path allowlist for apex/`www`
+  `/`, `/privacy`, and `/terms`, and the Privacy page discloses the public-site
+  analytics before deploy. Google Analytics, Speed Insights, beta/auth/admin/app
+  analytics, Vercel settings changes, DNS changes, Supabase changes, and runtime
+  data mutations are not part of this pass.
 - The immediate post-Epoch-5 planning lane is now captured in
   `ops/private-beta-readiness-bridge.md`. That bridge keeps the next scope
   narrow, treats the broader private-beta docs as fuller later targets rather
@@ -105,6 +113,8 @@ Implemented:
 - Private beta placeholder at `/app`.
 - First-party public waitlist email capture.
 - Post-submit optional product-shaping follow-up questions.
+- Public-only Vercel Web Analytics on apex/`www` waitlist, Privacy, and Terms
+  pages after deployment.
 - Safe duplicate submission behavior.
 - Duplicate submissions do not receive another signup's optional survey token.
 - The duplicate survey-token hardening rollout was completed migration-first;
@@ -120,9 +130,9 @@ Intentionally not implemented:
 - Verification uploads or storage.
 - Crew Rooms, Base Boards, Layover Boards, posts, comments, search, moderation,
   or public/admin community workflows.
-- AI, payments, marketplace, third-party analytics SDK, schedule integrations,
-  airline portal login, flight-load requests, nearby crew tracking, or
-  dating/swiping.
+- AI, payments, marketplace, Google Analytics, Speed Insights, private-app
+  analytics, schedule integrations, airline portal login, flight-load requests,
+  nearby crew tracking, or dating/swiping.
 
 ## 3. First-Party Waitlist Capture Requirements
 
@@ -284,6 +294,8 @@ Production checks:
 - Verify launch metadata and social preview posture are correct for
   `https://jmpseat.com`.
 - Verify `/privacy` and `/terms` render concrete effective dates.
+- Verify `/privacy` discloses public-only Vercel Web Analytics before
+  production analytics is treated as live.
 - Verify `/app` remains the private beta app surface and is not exposed from the
   public waitlist page.
 - Verify no new features or data collection paths are present.
@@ -310,9 +322,9 @@ the same public waitlist experience.
 - [x] `/app` remains the private beta app surface and is not exposed from the
       public waitlist page.
 - [x] No public auth entry, verification uploads, community features, AI,
-      payments, third-party analytics SDK, airline integrations, schedule
-      scraping, flight-load requests, nearby crew tracking, or dating/swiping
-      were added.
+      payments, Google Analytics, Speed Insights, private-app analytics, airline
+      integrations, schedule scraping, flight-load requests, nearby crew
+      tracking, or dating/swiping were added.
 
 ## 11. First Outreach Readiness
 
@@ -344,7 +356,7 @@ This readiness pass does not create or approve:
 - AI features.
 - Payments.
 - Marketplace.
-- Third-party analytics SDK.
+- Google Analytics, Speed Insights, or private-app analytics.
 - Production legal documents.
 - Official airline affiliation claims.
 - Legal/trademark clearance claims.

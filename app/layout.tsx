@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { PublicVercelAnalytics } from "@/src/components/analytics/PublicVercelAnalytics";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -19,7 +20,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        {children}
+        <PublicVercelAnalytics />
+      </body>
     </html>
   );
 }
