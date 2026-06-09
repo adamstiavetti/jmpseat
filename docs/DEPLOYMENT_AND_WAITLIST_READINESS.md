@@ -90,6 +90,12 @@ Current post-E05 update:
   analytics before deploy. Google Analytics, Speed Insights, beta/auth/admin/app
   analytics, Vercel settings changes, DNS changes, Supabase changes, and runtime
   data mutations are not part of this pass.
+- Public Vercel Analytics is deployed and runtime-verified in
+  `ops/public-vercel-analytics-runtime-pass.md`: apex and `www` public routes
+  show the analytics script only on `/`, `/privacy`, and `/terms`, while
+  beta/auth/app/admin/lab routes remain excluded. `beta.jmpseat.com` remains on
+  its Preview deployment, and no GA4, Google Tag Manager, Speed Insights, DNS,
+  Supabase, Vercel project setting, or runtime data changes were made.
 - The immediate post-Epoch-5 planning lane is now captured in
   `ops/private-beta-readiness-bridge.md`. That bridge keeps the next scope
   narrow, treats the broader private-beta docs as fuller later targets rather
