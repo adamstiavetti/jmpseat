@@ -57,15 +57,27 @@ searchable community posts, useful/trending knowledge, related Layover Boards,
 and restricted Verified Lounges; it is not one thread, not a generic social
 feed, and not only a static wiki.
 
+Use `docs/strategy/home-base-board-follow-decision.md` as the canonical
+decision note for Home Base and Board Follow behavior before implementing
+`FBMVP-T06`.
+
 ## 3. Personalized App Experience
 
 The MVP user experience is personalized:
 
-- users can set a home base or follow boards
+- users must set a Home Base for the current MVP onboarding/profile-completion
+  path, but Home Base is personalization state, not authorization truth
+- setting Home Base should automatically follow that base's main Base Board
 - users can follow other base boards
 - users can follow layover boards
+- users can follow Verified Lounges only when access/membership permits
 - the app home should eventually reflect followed boards, home base,
-  saved/useful content, and relevant updates
+  saved/useful content, followed users, Verified Lounge memberships, and
+  relevant updates
+
+Following a board does not grant restricted access. Self-declared profile
+fields such as `claimed_base`, `claimed_airline`, and `claimed_role` must not
+become authorization truth.
 
 ## 4. Utility Layer / Board Intel
 
@@ -150,6 +162,9 @@ Current implementation note:
 - T05 does not add board follows, home-base preferences, lounge memberships,
   access requests, posts, comments, saves, reactions, search, reports, or
   moderation.
+- T06 should follow the Home Base / Board Follow decision note, including the
+  rule that Home Base auto-follows the matching Base Board while neither Home
+  Base nor board follows grant restricted access.
 
 Rationale:
 

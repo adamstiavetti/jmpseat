@@ -22,6 +22,11 @@ boards, and board types, but it does not implement the Base Board UI,
 posts/comments, follows, search, Verified Lounge access flows, or board
 intel/wiki content.
 
+Use `docs/strategy/home-base-board-follow-decision.md` for the follow-on T06
+product decision: Home Base is required personalization state, setting it should
+auto-follow the base's main Base Board, and neither Home Base nor board follows
+grant restricted access.
+
 ## 2. Implemented Scope
 
 T05 adds:

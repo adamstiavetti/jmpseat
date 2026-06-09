@@ -36,6 +36,7 @@ Supplemental epoch-specific ticket packs:
 - [Proof-System Freeze / Deprecation Plan](strategy/proof-system-freeze-deprecation-plan.md) - freezes proof upload as a forward product path while preserving legacy cleanup, audit, and data-retirement safety.
 - [First-Base MVP Scope](strategy/first-base-mvp-scope.md) - defines the first complete base launch package, including airline-email access, boards, posting/Q&A, moderation expectations, trust copy, and launch boundaries.
 - [Base Board Product Definition](strategy/base-board-product-definition.md) - canonical definition of a Base Board as the main verified hub/container for an aviation base, combining structured base intel, posts/comments, useful/trending knowledge, related Layover Boards, and restricted Verified Lounges while preserving safety boundaries and T05 model validity.
+- [Home Base And Board Follow Decision](strategy/home-base-board-follow-decision.md) - canonical T06 product decision that Home Base is required personalization state, not authorization truth; setting Home Base auto-follows the matching Base Board; users may follow many boards; follows and self-declared profile fields do not grant restricted-board access.
 - [Community Admin Responsibilities / Disclaimer Policy](strategy/community-admin-responsibilities-disclaimer-policy.md) - defines board-scoped community-admin responsibilities, limits, privacy boundaries, non-sponsorship disclaimers, abuse controls, and escalation expectations.
 - [Launch-Readiness Gate Transition Plan](strategy/launch-readiness-gate-transition-plan.md) - defines the explicit transition from private-testing beta gates to first-base launch gates without removing beta too early, requiring one-by-one beta grants, or bypassing airline-email verification.
 - [Beta Invite-Code Foundation Decision](strategy/beta-invite-code-foundation-decision.md) - defines batch-generated, single-use beta invite codes as private-testing capacity control that must not bypass airline-email verification or become a first-base launch requirement.
@@ -137,13 +138,16 @@ Use `strategy/base-board-product-definition.md` as the canonical product
 definition for what a Base Board is before applying the T05 migration or
 starting T06.
 
+Use `strategy/home-base-board-follow-decision.md` as the canonical product
+decision for Home Base and Board Follow behavior before implementing T06.
+
 Current first code ticket:
 
 - `FBMVP-T05: Base, Board, And Board-Type Data Model Design`
 
 Current T05 implementation status:
 
-- In progress on `feat/fbmvp-t05-base-board-model`.
+- Merged on `main` at `87b7693`.
 - Adds `bases`, `board_types`, and `boards`.
 - Seeds DFW as the first launch base and DFW Base Board as the first available
   board.
@@ -160,7 +164,8 @@ posts/comments/saves/reactions/search from the start.
 Current sequence:
 
 1. `FBMVP-T05` base, board, and board-type data model
-2. `FBMVP-T06` board follow/home-base preference foundation
+2. `FBMVP-T06` board follow/home-base preference foundation, governed by the
+   Home Base and Board Follow decision note
 3. `FBMVP-T07` restricted lounge membership/access request/community-admin model
 4. `FBMVP-T08` DFW Base Board read-only dashboard shell
 5. `FBMVP-T09` board/layover discovery and follow UI shell

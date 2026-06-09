@@ -45,6 +45,15 @@ Relationships:
 
 Aviation identity and public display settings.
 
+Current 05B note:
+
+- `claimed_airline`, `claimed_role`, and `claimed_base` remain self-declared
+  onboarding/profile fields only.
+- Future Home Base state should be treated as required personalization
+  preference for the MVP path, not authorization truth.
+- Home Base should not verify employment, airline, role, base assignment, or
+  restricted-board eligibility.
+
 Important fields:
 
 - id
@@ -64,6 +73,8 @@ Important fields:
 Relationships:
 
 - Belongs to User, Airline, Role, and Base.
+- Later may have a Home Base preference and board follows used for
+  personalization, not authorization.
 
 ## Verification
 
@@ -216,6 +227,10 @@ Current T05 implementation note:
   Boards, and restricted Verified Lounges.
 - Posting, comments, follows, memberships, access requests, saves, reactions,
   search, reports, and moderation remain later tickets.
+- `strategy/home-base-board-follow-decision.md` defines the T06 product
+  boundary: setting Home Base should auto-follow the corresponding main Base
+  Board, users may follow many boards, and follows must not grant restricted
+  access.
 
 Important fields:
 
@@ -244,6 +259,32 @@ Relationships:
   moderation actions, and search indexing.
 - Later has board intel/wiki structured content attached to the board. Board
   intel/wiki is not a board type.
+
+## HomeBasePreference
+
+Planned 05B/T06 concept.
+
+Home Base is the user's primary base preference for personalization and MVP
+profile completion. It should not be treated as proof of employment, airline,
+role, base assignment, or restricted-board eligibility.
+
+Expected behavior:
+
+- A user has one current Home Base preference.
+- Setting Home Base should ensure the base's main Base Board is followed.
+- Changing Home Base should keep the old board follow by default unless the
+  user manually unfollows it.
+- Home Base must not grant Verified Lounge or restricted-board access.
+
+## BoardFollow
+
+Planned 05B/T06 concept.
+
+A board follow is a personalization signal, not an access grant.
+
+Users may follow Base Boards, Layover Boards, and Verified Lounges where access
+or membership permits. Following a restricted board must not bypass membership,
+visibility, posting, moderation, or launch gates.
 
 ## Airport
 
