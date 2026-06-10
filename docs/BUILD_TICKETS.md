@@ -40,6 +40,7 @@ Supplemental epoch-specific ticket packs:
 - [Home Dashboard Product Definition](strategy/home-dashboard-product-definition.md) - canonical definition of the first private-app Home Dashboard as a utility dashboard, not a generic feed, with persistent search followed by Home Base, Crew Picks, Following, Your Lounges, and Saved.
 - [Verified Lounge Access Model](strategy/verified-lounge-access-model.md) - canonical definition for restricted lounge access before `FBMVP-T07`, including request lifecycle, Crew Lead scope, request-thread limits, privacy boundaries, and the rule that Home Base, board follows, and self-declared profile fields do not grant lounge access.
 - [Hub / Board Taxonomy](strategy/hub-board-taxonomy.md) - canonical product taxonomy that defines Hubs as top-level airport/location containers and defines product-facing Baseboard, Layovers, Lounges, and Crew Picks surfaces, including the MVP seeded Layovers strategy for common DFW crew destinations.
+- [Seeded Layovers Editorial Model](strategy/seeded-layovers-editorial-model.md) - canonical editorial and product definition for Seeded Layovers as utility-first bridge content, including Featured Picks/Categories/Crew Notes/Questions structure, AI-review boundaries, Tier 1 destinations, safety rules, and graduation path to future full Hubs.
 - [Community Admin Responsibilities / Disclaimer Policy](strategy/community-admin-responsibilities-disclaimer-policy.md) - defines board-scoped community-admin responsibilities, limits, privacy boundaries, non-sponsorship disclaimers, abuse controls, and escalation expectations.
 - [Launch-Readiness Gate Transition Plan](strategy/launch-readiness-gate-transition-plan.md) - defines the explicit transition from private-testing beta gates to first-base launch gates without removing beta too early, requiring one-by-one beta grants, or bypassing airline-email verification.
 - [Beta Invite-Code Foundation Decision](strategy/beta-invite-code-foundation-decision.md) - defines batch-generated, single-use beta invite codes as private-testing capacity control that must not bypass airline-email verification or become a first-base launch requirement.
@@ -52,6 +53,7 @@ Supplemental epoch-specific ticket packs:
 - [FBMVP-T08 Home Dashboard And DFW Hub Shell](ops/fbmvp-t08-home-hub-shell.md) - read-only private-app Home Dashboard and DFW Hub shell using product-facing Hub, Baseboard, Layovers, Lounges, and Crew Picks labels while preserving existing app gates and avoiding migrations, dashboard mutations, posting, saves, search backend, lounge request/review flows, AI, seed content, and proof-upload scope.
 - [FBMVP-T09 Start With DFW Home Base Action](ops/fbmvp-t09-start-with-dfw.md) - authenticated server-action path that lets app-eligible users in the no-Home-Base state start with DFW, using the existing T06 Home Base RPC/helper to set DFW and auto-follow the DFW Baseboard without granting restricted access or adding posting/search/lounge/proof scope.
 - [FBMVP-T10 DFW Hub Section Route Shells](ops/fbmvp-t10-dfw-hub-section-shells.md) - read-only private-app route shells for DFW Baseboard, Layovers, Lounges, and Crew Picks, linked from the DFW Hub while preserving private gates and avoiding posting, search backend, saves/reactions, lounge request/review flows, Crew Lead tooling, AI, seed content, migrations, and proof-upload scope.
+- [FBMVP-T11 Seeded Layovers Strategy And Editorial Model](ops/fbmvp-t11-seeded-layovers-model.md) - docs-only product/editorial lock for Seeded Layovers before schema or content work, defining utility-first structure, safety rules, AI review boundaries, user-provided Tier 1 destinations, and the recommendation to reuse shared post/thread foundations before layover-specific content modeling.
 - [First-Base MVP Implementation Ticket Pack](epochs/first-base-mvp-implementation-ticket-pack.md) - translates the pivot strategy docs into the ordered `FBMVP` implementation sequence; the immediate post-Epoch-5 narrow lane is first reconciled in `ops/private-beta-readiness-bridge.md`, and auth email branding/custom SMTP is now tracked as a deferred beta-readiness polish TODO rather than the active next auth-flow implementation task.
 - [FBMVP-T01: Freeze User-Facing Proof Verification Surfaces](epochs/fbmvp-t01-freeze-user-facing-proof-verification-surfaces.md) - freezes normal proof-upload UX while preserving historical proof infrastructure, cleanup, audit, and admin/operator safety.
 - [FBMVP-T02: Airline Email Verification Access State Design](epochs/fbmvp-t02-airline-email-verification-access-state-design.md) - defines the forward `airline_email_verified` app-level eligibility state and how it maps from existing work-email verification foundations.
@@ -244,12 +246,18 @@ Current sequence:
 6. `FBMVP-T08` Home Dashboard and DFW Hub read-only shell
 7. `FBMVP-T09` Start with DFW Home Base action
 8. `FBMVP-T10` DFW Hub section read-only route shells
-9. `FBMVP-T11` board/layover discovery and follow UI shell
-10. `FBMVP-T12` text posts/comments foundation
-11. `FBMVP-T13` saves/reactions/useful/trending foundation
-12. `FBMVP-T14` search foundation with access-aware boundaries
-13. `FBMVP-T15` reporting/moderation/admin controls
-14. `FBMVP-T16` seeded DFW content, safety copy, and launch validation
+9. `FBMVP-T11` Seeded Layovers strategy and editorial model
+
+Post-T11 implementation sequencing remains under review.
+
+The next implementation lane should be selected after deciding whether to
+prioritize shared post/thread foundation or seeded Layovers implementation.
+
+Recommended direction:
+
+- shared Baseboard post/thread foundation likely comes before seeded
+  Layover-specific implementation, because Layovers can reuse post/thread
+  primitives with content types and categories.
 
 Do not let older broad V1/backlog sections below turn this into an unsequenced
 social feed or marketplace build. For the current lane, keep proof uploads,

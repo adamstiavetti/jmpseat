@@ -135,6 +135,9 @@ Rules:
 - Seeded Layovers are bridge content, not throwaway content.
 - Seeded Layovers can later become part of a full Hub when demand justifies
   launching that Hub.
+- Use `seeded-layovers-editorial-model.md` as the controlling note for how
+  seeded Layovers should be structured, reviewed, and refreshed before content
+  implementation begins.
 - AI may assist drafting or researching layover recommendations later, but only
   as admin-reviewed content. AI must not auto-publish, become source of truth,
   or recommend unsafe/sensitive content without review.
@@ -199,6 +202,9 @@ This task does not create seeded layover content.
 `/app/hubs/dfw`. That shell demonstrates the taxonomy labels but does not
 create seeded Layovers content, board discovery, posting, saves, search, lounge
 request/review flows, or Crew Picks ranking.
+
+`FBMVP-T11` adds the canonical seeded Layovers editorial model without creating
+schema or content.
 
 ## 8. Lounges
 

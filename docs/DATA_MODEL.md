@@ -60,6 +60,10 @@ Home Dashboard note:
   for DFW Baseboard, Layovers, Lounges, and Crew Picks. It does not add schema,
   posting/comments, search backend, saves/reactions, lounge requests, Crew Lead
   tooling, AI, seed content, or proof-upload scope.
+- `strategy/seeded-layovers-editorial-model.md` is the controlling product and
+  editorial definition for Seeded Layovers before schema or content work. It
+  keeps Layovers utility-first and documents future content-type/category
+  direction without creating schema in the current lane.
 
 ## Profile
 

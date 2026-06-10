@@ -74,6 +74,11 @@ Use `docs/strategy/hub-board-taxonomy.md` as the canonical product taxonomy for
 Hubs, Baseboard, Layovers, Lounges, and Crew Picks before implementing board
 discovery, dashboard destinations, or posting surfaces.
 
+Use `docs/strategy/seeded-layovers-editorial-model.md` as the canonical
+editorial/product definition for Seeded Layovers before creating seeded layover
+content, content schema, or destination utility surfaces beyond placeholder
+routes.
+
 ## 3. Personalized App Experience
 
 The MVP user experience is personalized:
@@ -360,12 +365,18 @@ The current implementation sequence is:
 5. `FBMVP-T08` Home Dashboard and DFW Hub read-only shell
 6. `FBMVP-T09` Start with DFW Home Base action
 7. `FBMVP-T10` DFW Hub section read-only route shells
-8. `FBMVP-T11` board/layover discovery and follow UI shell
-9. `FBMVP-T12` text posts/comments foundation
-10. `FBMVP-T13` saves/reactions/useful/trending foundation
-11. `FBMVP-T14` search foundation with access-aware boundaries
-12. `FBMVP-T15` reporting/moderation/admin controls
-13. `FBMVP-T16` seeded DFW content, safety copy, and launch validation
+8. `FBMVP-T11` Seeded Layovers strategy and editorial model
+
+Post-T11 implementation sequencing remains under review.
+
+The next implementation lane should be selected after deciding whether to
+prioritize shared post/thread foundation or seeded Layovers implementation.
+
+Recommended direction:
+
+- shared Baseboard post/thread foundation likely comes before seeded
+  Layover-specific implementation, because Layovers can reuse post/thread
+  primitives with content types and categories.
 
 ## 10. Authorization Rules To Preserve
 

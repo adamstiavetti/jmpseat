@@ -75,6 +75,9 @@ Placeholder boundaries:
 - Layover Q&A is coming later.
 - Seeded destination strategy remains future work and is not implemented here.
 
+The product/editorial definition for that future work is now locked in
+`docs/strategy/seeded-layovers-editorial-model.md`.
+
 ### DFW Lounges
 
 Purpose:

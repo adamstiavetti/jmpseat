@@ -22,6 +22,10 @@ Use `docs/strategy/hub-board-taxonomy.md` as the canonical taxonomy for Hubs,
 Baseboards, Layovers, Lounges, and Crew Picks when deciding what Home cards or
 Board destinations should open.
 
+Use `docs/strategy/seeded-layovers-editorial-model.md` as the canonical
+definition for how seeded Layovers destinations should be structured once
+layover utility expands beyond the DFW Hub shell.
+
 The first implementation slice is documented in
 `docs/ops/fbmvp-t08-home-hub-shell.md`: a read-only `/app` Home Dashboard shell
 and `/app/hubs/dfw` DFW Hub shell. That slice does not implement dashboard
@@ -53,6 +57,7 @@ Search should eventually cover:
 
 - Base Boards
 - Layover Boards
+- seeded Layovers destinations
 - board intel/wiki entries
 - posts
 - comments/replies
