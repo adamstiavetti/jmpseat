@@ -195,6 +195,11 @@ every useful layover destination is already a full launched Hub.
 
 This task does not create seeded layover content.
 
+`FBMVP-T08` adds the first read-only DFW Hub destination shell at
+`/app/hubs/dfw`. That shell demonstrates the taxonomy labels but does not
+create seeded Layovers content, board discovery, posting, saves, search, lounge
+request/review flows, or Crew Picks ranking.
+
 ## 8. Lounges
 
 Purpose:

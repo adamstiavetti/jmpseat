@@ -48,6 +48,10 @@ Home Dashboard note:
 - The dashboard should eventually use Home Base, followed boards, Crew Picks,
   lounges, saved items, and access-aware search without making any
   personalization signal authorization truth.
+- `ops/fbmvp-t08-home-hub-shell.md` records the first read-only `/app` and
+  `/app/hubs/dfw` shell. It reads optional Home Base state but does not add
+  schema, mutations, posts/comments, saves, search backend, lounge
+  request/review flows, seed content, or proof-upload scope.
 
 ## Profile
 
@@ -508,6 +512,9 @@ Home Dashboard note:
 - `board_follows` initially supports the Following section as followed boards.
 - It does not currently represent followed users.
 - It does not grant restricted-board access.
+- The T08 read-only shell may display a followed-board placeholder for a user
+  who has explicitly started with DFW, but the shell does not implement manual
+  follow/unfollow behavior.
 
 ## Airport
 

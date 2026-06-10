@@ -22,6 +22,12 @@ Use `docs/strategy/hub-board-taxonomy.md` as the canonical taxonomy for Hubs,
 Baseboards, Layovers, Lounges, and Crew Picks when deciding what Home cards or
 Board destinations should open.
 
+The first implementation slice is documented in
+`docs/ops/fbmvp-t08-home-hub-shell.md`: a read-only `/app` Home Dashboard shell
+and `/app/hubs/dfw` DFW Hub shell. That slice does not implement dashboard
+mutations, Start with DFW mutations, posting, saves, search backend, lounge
+request/review flows, Crew Lead tooling, seed content, or AI.
+
 ## 2. Dashboard Hierarchy
 
 Canonical dashboard hierarchy:

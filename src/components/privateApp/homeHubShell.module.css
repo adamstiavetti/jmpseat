@@ -1,0 +1,280 @@
+.shell {
+  min-height: 100dvh;
+  color: #172033;
+  background:
+    linear-gradient(180deg, rgba(234, 238, 244, 0.94), rgba(247, 248, 250, 1)),
+    #f7f8fa;
+}
+
+.frame {
+  width: min(1120px, calc(100% - 2rem));
+  margin: 0 auto;
+  padding: 1rem 0 2.5rem;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.9rem 0 1.1rem;
+}
+
+.brand {
+  margin: 0;
+  color: #101827;
+  font-size: 1.15rem;
+  font-weight: 750;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.topbar span {
+  color: #59657a;
+  font-size: 0.88rem;
+}
+
+.topnav {
+  display: none;
+  align-items: center;
+  gap: 0.35rem;
+  border: 1px solid #d9dee8;
+  border-radius: 999px;
+  padding: 0.28rem;
+  background: rgba(255, 255, 255, 0.75);
+}
+
+.topnav span {
+  border-radius: 999px;
+  padding: 0.45rem 0.68rem;
+  color: #344054;
+  font-size: 0.78rem;
+  font-weight: 650;
+}
+
+.searchBand,
+.hubHero,
+.section,
+.safetyBand {
+  border: 1px solid #dfe4ee;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 16px 36px rgba(22, 34, 51, 0.08);
+}
+
+.searchBand {
+  display: grid;
+  gap: 1rem;
+  padding: 1.15rem;
+}
+
+.searchBand h1,
+.hubHero h1,
+.sectionHeader h2,
+.safetyBand h2 {
+  margin: 0.25rem 0 0;
+  color: #111827;
+  letter-spacing: 0;
+}
+
+.searchBand h1 {
+  font-size: 1.8rem;
+  line-height: 1.1;
+}
+
+.searchMock {
+  border: 1px solid #cbd5e1;
+  border-radius: 999px;
+  padding: 0.82rem 1rem;
+  color: #667085;
+  background: #f8fafc;
+  font-size: 0.92rem;
+}
+
+.hubHero {
+  margin-top: 1rem;
+  padding: 1.2rem;
+}
+
+.hubHero h1 {
+  font-size: 2rem;
+}
+
+.hubHero p,
+.safetyBand p {
+  max-width: 52rem;
+  margin: 0.65rem 0 0;
+  color: #4b5565;
+  line-height: 1.6;
+}
+
+.section {
+  margin-top: 1rem;
+  padding: 1rem;
+}
+
+.sectionHeader {
+  display: grid;
+  gap: 0.25rem;
+  margin-bottom: 0.9rem;
+}
+
+.sectionHeader h2 {
+  font-size: 1.35rem;
+}
+
+.sectionHeader p {
+  max-width: 50rem;
+  margin: 0;
+  color: #4b5565;
+  line-height: 1.55;
+}
+
+.eyebrow {
+  margin: 0;
+  color: #0f766e;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.cardGrid,
+.splitCards {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.card {
+  border: 1px solid #e3e8f0;
+  border-radius: 8px;
+  padding: 0.95rem;
+  background: #ffffff;
+}
+
+.card h3 {
+  margin: 0.35rem 0 0;
+  color: #172033;
+  font-size: 1.02rem;
+  letter-spacing: 0;
+}
+
+.card p {
+  margin: 0.45rem 0 0;
+  color: #536174;
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+.cardMeta {
+  color: #8a4b08;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.primaryCardLink,
+.secondaryLink {
+  display: inline-flex;
+  text-decoration: none;
+}
+
+.primaryCardLink {
+  width: 100%;
+  flex-direction: column;
+  gap: 0.35rem;
+  border: 1px solid #bcc8da;
+  border-radius: 8px;
+  padding: 1rem;
+  color: #172033;
+  background: #f7fbff;
+}
+
+.primaryCardLink span {
+  color: #0f766e;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.primaryCardLink strong {
+  font-size: 1rem;
+}
+
+.secondaryLink {
+  align-items: center;
+  border: 1px solid #cbd5e1;
+  border-radius: 999px;
+  padding: 0.55rem 0.8rem;
+  color: #172033;
+  background: #ffffff;
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+.disabledButton {
+  margin-top: 0.75rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 999px;
+  padding: 0.62rem 0.9rem;
+  color: #64748b;
+  background: #f1f5f9;
+  font-weight: 750;
+  cursor: not-allowed;
+}
+
+.mutedNote,
+.stateNote {
+  color: #64748b;
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.stateNote {
+  margin: 0.75rem 0 0;
+}
+
+.safetyBand {
+  margin-top: 1rem;
+  border-color: #f0d9a4;
+  padding: 1rem;
+  background: #fffaf0;
+}
+
+@media (min-width: 760px) {
+  .frame {
+    width: min(1180px, calc(100% - 3rem));
+    padding-top: 1.25rem;
+  }
+
+  .topnav {
+    display: inline-flex;
+  }
+
+  .searchBand {
+    grid-template-columns: minmax(0, 1fr) minmax(280px, 420px);
+    align-items: center;
+    padding: 1.35rem;
+  }
+
+  .searchBand h1 {
+    font-size: 2.25rem;
+  }
+
+  .section {
+    padding: 1.15rem;
+  }
+
+  .cardGrid,
+  .splitCards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 980px) {
+  .cardGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}

@@ -54,19 +54,19 @@ export const PRIVATE_SHELL_NAV_ITEMS: readonly PrivateShellNavItem[] = [
     disabled: true,
   },
   {
-    label: "Base Boards",
+    label: "Baseboard",
     path: "/app/base",
     description: "Future base-specific knowledge surface.",
     disabled: true,
   },
   {
-    label: "Layover Boards",
+    label: "Layovers",
     path: "/app/layovers",
     description: "Future layover and city intel surface.",
     disabled: true,
   },
   {
-    label: "Verified Rooms",
+    label: "Lounges",
     path: "/app/rooms",
     description: "Future gated discussion surface.",
     disabled: true,
@@ -119,36 +119,36 @@ export const PRIVATE_SHELL_CHILD_ROUTE_RECORD: Record<string, PrivateShellChildR
   base: {
     slug: "base",
     path: "/app/base",
-    navLabel: "Base Boards",
-    title: "Base Boards is not available yet.",
+    navLabel: "Baseboard",
+    title: "Baseboard is not available yet.",
     detail:
       "Account login and profile setup exist now, but beta approval and worker verification still come later, and this route does not grant real private-community access yet.",
     message: createChildRouteMessage(
-      "Base Boards",
+      "Baseboard",
       "Base-specific knowledge and commuting guidance",
     ),
   },
   layovers: {
     slug: "layovers",
     path: "/app/layovers",
-    navLabel: "Layover Boards",
-    title: "Layover Boards is not available yet.",
+    navLabel: "Layovers",
+    title: "Layovers is not available yet.",
     detail:
       "Account login and profile setup exist now, but beta approval and worker verification still come later, and this route does not grant real private-community access yet.",
     message: createChildRouteMessage(
-      "Layover Boards",
+      "Layovers",
       "Layover and city-intel guidance",
     ),
   },
   rooms: {
     slug: "rooms",
     path: "/app/rooms",
-    navLabel: "Verified Rooms",
-    title: "Verified Rooms is not available yet.",
+    navLabel: "Lounges",
+    title: "Lounges is not available yet.",
     detail:
       "Account login and profile setup exist now, but beta approval and worker verification still come later, and this route does not grant real private-community access yet.",
     message: createChildRouteMessage(
-      "Verified Rooms",
+      "Lounges",
       "Gated discussion areas",
     ),
   },

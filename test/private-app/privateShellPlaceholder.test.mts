@@ -49,9 +49,9 @@ test("private shell exposes only disabled placeholder nav items", () => {
     PRIVATE_SHELL_NAV_ITEMS.map((item) => item.label),
     [
       "Home Base",
-      "Base Boards",
-      "Layover Boards",
-      "Verified Rooms",
+      "Baseboard",
+      "Layovers",
+      "Lounges",
       "Profile",
       "Verification",
       "Admin",
@@ -78,7 +78,7 @@ test("private child routes are defined as locked placeholders only", () => {
   const layovers = getPrivateShellChildRoute("layovers");
 
   assert.equal(layovers?.path, "/app/layovers");
-  assert.equal(layovers?.navLabel, "Layover Boards");
+  assert.equal(layovers?.navLabel, "Layovers");
   assert.match(layovers?.title ?? "", /not available yet/i);
   assert.match(layovers?.detail ?? "", /beta approval and worker verification still come later/i);
   assert.match(layovers?.message.disclaimer ?? "", /not a real security boundary/i);
@@ -111,15 +111,17 @@ test("public and private route source files stay separated", () => {
 
   assert.match(publicRouteSource, /Join the private beta waitlist\./);
   assert.doesNotMatch(publicRouteSource, /PrivateShellPlaceholder/);
-  assert.match(privateRootSource, /PrivateShellPlaceholder/);
-  assert.match(privateRootSource, /context\.operatorPrivateAppAccess/);
+  assert.match(privateRootSource, /HomeHubShell/);
+  assert.match(privateRootSource, /getCurrentUserHomeBase/);
   assert.match(privateRootSource, /access_source/);
   assert.match(privateRootSource, /operator_private_app_access/);
+  assert.match(privateRootSource, /getPrivateAccessSource\(gate\) === "operator_internal"/);
   assert.doesNotMatch(privateRootSource, /operator_uuid|operator_email/i);
   assert.doesNotMatch(privateRootSource, /Join the private beta waitlist\./);
   assert.doesNotMatch(privateChildSource, /Join the private beta waitlist\./);
-  assert.doesNotMatch(privateRootSource, /fetch\(|axios|supabase|prisma|api\//);
+  assert.doesNotMatch(privateRootSource, /fetch\(|axios|prisma|api\//);
+  assert.doesNotMatch(privateRootSource, /setUserHomeBaseByCode|insert\(|update\(|delete\(/);
   assert.doesNotMatch(privateChildSource, /fetch\(|axios|supabase|prisma|api\//);
-  assert.doesNotMatch(privateRootSource, /\bPost\b|\bComment\b|\bSave\b|\bSearch\b/);
+  assert.doesNotMatch(privateRootSource, /\bPost\b|\bComment\b|\bSave\b/);
   assert.doesNotMatch(privateChildSource, /\bPost\b|\bComment\b|\bSave\b|\bSearch\b/);
 });

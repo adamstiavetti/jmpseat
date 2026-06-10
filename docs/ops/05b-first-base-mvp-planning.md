@@ -296,6 +296,23 @@ Current T07 implementation note:
 - The runtime pass used targeted apply only; known Supabase migration-history
   drift remains and still blocks broad `supabase db push`.
 
+Current T08 implementation note:
+
+- T08 adds the first read-only Home Dashboard shell at `/app` after the
+  existing private app gates pass.
+- T08 adds a read-only DFW Hub destination shell at `/app/hubs/dfw`.
+- It uses the T06 Home Base helper only to read optional Home Base state.
+- Users with DFW Home Base see the DFW Hub / Home Base card.
+- Users with no Home Base see a skip-for-now/default state with no fake DFW
+  assignment and no app-entry block.
+- Product-facing labels follow the Hub taxonomy: Hub, Baseboard, Layovers,
+  Lounges, and Crew Picks.
+- The DFW Hub card opens the read-only DFW Hub shell.
+- T08 does not add migrations, dashboard mutations, Start with DFW mutation
+  behavior, board discovery, follow/unfollow UI, posts/comments, saves,
+  reactions, search backend, lounge request/review flows, Crew Lead panel UI,
+  AI, seed content, or proof-upload scope.
+
 Rationale:
 
 - no current board/community schema exists
@@ -333,7 +350,7 @@ The current implementation sequence is:
 2. `FBMVP-T06` Home Base preference and board-follow foundation, merged and runtime-hardened
 3. `FBMVP-T07` restricted lounge membership/access request/Crew Lead foundation, merged and runtime-applied
 4. Hub / Board taxonomy, governing board discovery and dashboard destinations
-5. `FBMVP-T08` DFW Base Board read-only dashboard shell
+5. `FBMVP-T08` Home Dashboard and DFW Hub read-only shell
 6. `FBMVP-T09` board/layover discovery and follow UI shell
 7. `FBMVP-T10` text posts/comments foundation
 8. `FBMVP-T11` saves/reactions/useful/trending foundation
