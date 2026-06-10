@@ -549,10 +549,12 @@ Current T16 runtime state:
 - Known Supabase migration-history drift remains, so broad `supabase db push`
   remains unsafe.
 
-Current T17 local state:
+Current T17 runtime state:
 
-- `FBMVP-T17` is locally implemented and runtime-pending as
-  `20260610203000 create_open_baseboard_post_detail_rpc`.
+- `FBMVP-T17` is runtime-applied as
+  `20260610203000 create_open_baseboard_post_detail_rpc`. The runtime pass is
+  recorded in
+  `docs/ops/fbmvp-t17-dfw-baseboard-post-detail-runtime-pass.md`.
 - It adds `public.get_open_baseboard_post(p_base_code text, p_post_id uuid)` as
   the safe DFW Baseboard post detail read RPC.
 - The RPC requires `auth.uid()` and DB-level open board read eligibility through
@@ -575,10 +577,15 @@ Current T17 local state:
   moderation queue UI, public sharing, lounge/restricted posting, Layovers
   content, Crew Picks ranking, media, AI moderation, bans, proof-upload scope,
   direct `board_posts` write policies, RLS weakening, deploy, runtime settings
-  changes, or content creation during validation.
+  changes, or content creation during validation/runtime verification.
+- Runtime verification used catalog/count checks only. No post content was read
+  or printed. `public.board_posts` count was `1`, and
+  `public.board_post_reports` count was `0`.
+- No posts, reports, moderation records, comments, replies, saves, reactions,
+  search indexes, or user/community content were created by the T17
+  migration/apply.
 - Known Supabase migration-history drift remains, so broad `supabase db push`
-  remains unsafe. Targeted runtime preflight/apply is required before T17 is
-  runtime-applied.
+  remains unsafe.
 
 Important fields:
 

@@ -20,9 +20,10 @@ T17 is intentionally limited to:
 - private route-gated rendering
 - existing report affordance support
 
-T17 is implemented locally and runtime-pending. The new migration must go
-through targeted runtime preflight/apply before this surface is considered
-runtime-applied.
+T17 is runtime-applied as
+`20260610203000 create_open_baseboard_post_detail_rpc`. The runtime pass is
+recorded in
+`docs/ops/fbmvp-t17-dfw-baseboard-post-detail-runtime-pass.md`.
 
 ## What T17 Adds
 
@@ -112,7 +113,8 @@ Baseboard, and the existing report form/status copy.
 
 ## Runtime Boundary
 
-T17 is not runtime-applied yet.
+T17 is runtime-applied on the intended `jmpseat` Supabase project
+(`qcdfjrcnwuioqprmqqzx`).
 
 Known Supabase migration-history drift remains, so broad Supabase db push
 remains unsafe. Plain-language guardrail: broad Supabase db push remains unsafe.
@@ -121,12 +123,25 @@ remains unsafe. Plain-language guardrail: broad Supabase db push remains unsafe.
 - local `20260607204212` vs remote `20260607205909`
 - local T06 `20260609130534` vs remote T06 `20260609194858`
 
-The required next runtime step is targeted T17 preflight/apply for:
+The runtime pass verified the exact ledger row:
 
 - version: `20260610203000`
 - name: `create_open_baseboard_post_detail_rpc`
 - file:
   `supabase/migrations/20260610203000_create_open_baseboard_post_detail_rpc.sql`
+
+Runtime verification confirmed the detail RPC exists, returns safe columns
+only, uses the expected function security/search-path posture, requires
+`auth.uid()` and `public.current_user_can_read_open_board_posts()`, filters to
+published board-visible posts, uses `profiles.handle` with `jmpseat member`
+fallback, and preserves function grants, `board_posts` policy posture, and
+T14/T16 function availability.
+
+Runtime verification used catalog/count checks only. No post content was read or
+printed. `public.board_posts` count was `1`, and
+`public.board_post_reports` count was `0`. T17 did not create posts, reports,
+moderation records, comments, replies, saves, reactions, search indexes, or
+user/community content during migration/apply.
 
 ## What T17 Does Not Add
 

@@ -371,10 +371,10 @@ The current implementation sequence is:
 11. `FBMVP-T14` board post read foundation, merged and runtime-applied
 12. `FBMVP-T15` minimal DFW Baseboard post composer, merged and runtime-applied
 13. `FBMVP-T16` board post safety foundation, merged and runtime-applied
-14. `FBMVP-T17` DFW Baseboard post detail, locally implemented and runtime-pending
+14. `FBMVP-T17` DFW Baseboard post detail, merged and runtime-applied
 
 Do not proceed to comments, saves/reactions, search, Crew Picks, or Layovers
-content until T17 is reviewed, committed, and targeted-runtime applied.
+content until T17 runtime-pass documentation is reviewed and committed.
 
 Recommended direction:
 
@@ -441,10 +441,11 @@ Recommended direction:
   `public.board_post_reports` count `0` and `public.board_posts` count `1`; the
   existing post is user-created test content separate from the T16
   migration/apply.
-- T17 is locally implemented and runtime-pending as
+- T17 is runtime-applied as
   `20260610203000 create_open_baseboard_post_detail_rpc`. It adds a read-only
   DFW Baseboard post detail route at `/app/hubs/dfw/baseboard/[postId]`, using
-  the private route gate and a safe DB read RPC by post id.
+  the private route gate and a safe DB read RPC by post id. The runtime pass is
+  recorded in `docs/ops/fbmvp-t17-dfw-baseboard-post-detail-runtime-pass.md`.
 - T17 returns safe fields only, uses `profiles.handle` with `jmpseat member`
   fallback for author labels, includes the existing report affordance, and
   keeps hidden/removed posts excluded because reads filter to published /
@@ -453,7 +454,13 @@ Recommended direction:
   moderation queue UI, public sharing, lounge/restricted posting, Layovers
   content, Crew Picks ranking, media, AI moderation, bans, proof-upload scope,
   direct `board_posts` write policies, deploy, runtime settings changes, or
-  content/report/moderation record creation during validation.
+  content/report/moderation record creation during validation/runtime
+  verification.
+- T17 runtime verification used catalog/count checks only. No post content was
+  read or printed. `public.board_posts` count was `1`, and
+  `public.board_post_reports` count was `0`. No posts, reports, moderation
+  records, comments, replies, saves, reactions, search indexes, or
+  user/community content were created by T17 migration/apply.
 - Known Supabase migration-history drift remains and broad `supabase db push`
   remains unsafe.
 - Moderation/reporting remains required before broad beta posting expansion.
