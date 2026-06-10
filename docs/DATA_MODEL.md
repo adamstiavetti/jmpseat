@@ -515,9 +515,11 @@ Current T15 implementation direction:
 - Known Supabase migration-history drift remains, so broad `supabase db push`
   remains unsafe.
 
-Current T16 implementation direction:
+Current T16 runtime state:
 
-- `FBMVP-T16` adds the local runtime-pending Board Post Safety Foundation.
+- `FBMVP-T16` is runtime-applied as
+  `20260610191809 create_board_post_safety_foundation`. The runtime pass is
+  recorded in `docs/ops/fbmvp-t16-board-post-safety-runtime-pass.md`.
 - It adds `public.board_post_reports` for minimal DFW Baseboard post reports.
 - It adds `public.report_open_baseboard_post(...)`, which requires DB-level
   open board read eligibility, resolves DFW by base code to the active
@@ -538,10 +540,14 @@ Current T16 implementation direction:
 - T16 does not add post detail, comments, saves, reactions, search backend,
   moderation queue UI, AI moderation, bans, lounge/restricted posting, Layovers
   seeded content, Crew Picks ranking, public sharing, media, proof-upload scope,
-  deploy, runtime settings changes, or content creation during validation.
+  deploy, runtime settings changes, or T16-created posts/reports/moderation
+  records during migration/apply.
+- Runtime verification found `public.board_post_reports` count `0` immediately
+  after apply verification and `public.board_posts` count `1`. The existing post
+  is user-created test content separate from the T16 migration/apply, not a
+  migration side effect.
 - Known Supabase migration-history drift remains, so broad `supabase db push`
-  remains unsafe. Targeted runtime preflight/apply is required before runtime
-  pass.
+  remains unsafe.
 
 Important fields:
 

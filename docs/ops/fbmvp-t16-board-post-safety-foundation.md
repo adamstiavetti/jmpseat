@@ -18,9 +18,9 @@ T16 is intentionally limited to:
 - an operator-scoped hide/remove RPC for unsafe published Baseboard posts
 - server actions/RPCs only for user-facing mutations
 
-T16 is implemented locally and runtime-pending because it adds a migration.
-Targeted runtime preflight/apply is required before a runtime pass can be
-declared.
+T16 is runtime-applied as `20260610191809 create_board_post_safety_foundation`.
+The runtime pass is recorded in
+`docs/ops/fbmvp-t16-board-post-safety-runtime-pass.md`.
 
 ## What T16 Adds
 
@@ -153,7 +153,8 @@ No reporter identity is shown. No moderation queue UI is added.
 
 ## Runtime Boundary
 
-T16 is local-only and runtime-pending until the migration is targeted-applied.
+T16 is runtime-applied on the intended `jmpseat` Supabase project
+(`qcdfjrcnwuioqprmqqzx`).
 
 Known Supabase migration-history drift remains, so broad Supabase db push
 remains unsafe. Plain-language guardrail: broad Supabase db push remains unsafe.
@@ -162,7 +163,17 @@ remains unsafe. Plain-language guardrail: broad Supabase db push remains unsafe.
 - local `20260607204212` vs remote `20260607205909`
 - local T06 `20260609130534` vs remote T06 `20260609194858`
 
-Targeted runtime preflight/apply is required before runtime pass documentation.
+The runtime pass verified the exact ledger row
+`20260610191809 create_board_post_safety_foundation`, RLS/report-table posture,
+T16 RPC grants, zero direct `board_posts` write policies, and T14 read filtering
+for `status = 'published'` and `visibility = 'board'`.
+
+Runtime verification used catalog, permission, schema, policy, and count checks
+only. T16 did not create posts, reports, or moderation records during
+migration/apply. `public.board_post_reports` count was `0` immediately after
+apply verification. `public.board_posts` count after apply was `1`; that post is
+user-created test content separate from the T16 migration/apply, not a migration
+side effect.
 
 ## What T16 Does Not Add
 

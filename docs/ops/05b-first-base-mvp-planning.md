@@ -370,11 +370,10 @@ The current implementation sequence is:
 10. `FBMVP-T13` server-controlled create-post foundation, merged and runtime-applied
 11. `FBMVP-T14` board post read foundation, merged and runtime-applied
 12. `FBMVP-T15` minimal DFW Baseboard post composer, merged and runtime-applied
-13. `FBMVP-T16` board post safety foundation, implemented locally and runtime-pending
+13. `FBMVP-T16` board post safety foundation, merged and runtime-applied
 
-Post-T16 runtime sequencing should use targeted preflight/apply before declaring
-runtime pass. Do not proceed to post detail, comments, saves/reactions, search,
-Crew Picks, or Layovers content until T16 is reviewed and runtime-applied.
+Do not proceed to post detail, comments, saves/reactions, search, Crew Picks, or
+Layovers content until T16 runtime-pass documentation is reviewed and committed.
 
 Recommended direction:
 
@@ -423,9 +422,10 @@ Recommended direction:
   lounge/restricted posting, Layovers seeded content, Crew Picks ranking,
   proof-upload scope, direct `board_posts` write policies, deploy, runtime
   settings changes, or content creation during validation/runtime verification.
-- T16 is implemented locally as
-  `20260610191809_create_board_post_safety_foundation.sql` and remains
-  runtime-pending. It adds minimal DFW Baseboard reporting, a private
+- T16 is runtime-applied as
+  `20260610191809 create_board_post_safety_foundation`. The runtime pass is
+  recorded in `docs/ops/fbmvp-t16-board-post-safety-runtime-pass.md`. It adds
+  minimal DFW Baseboard reporting, a private
   `board_post_reports` table, `public.report_open_baseboard_post(...)`, and
   operator-scoped `public.moderate_open_baseboard_post(...)` for hide/remove
   actions using `operator.community_moderation`.
@@ -435,7 +435,11 @@ Recommended direction:
 - T16 does not add post detail, comments, saves/reactions, search backend,
   moderation queue UI, AI moderation, bans, lounge/restricted posting, Layovers
   seeded content, Crew Picks ranking, public sharing, media, proof-upload scope,
-  deploy, runtime settings changes, or content creation during validation.
+  deploy, runtime settings changes, or T16-created posts/reports/moderation
+  records during migration/apply. Runtime verification found
+  `public.board_post_reports` count `0` and `public.board_posts` count `1`; the
+  existing post is user-created test content separate from the T16
+  migration/apply.
 - Known Supabase migration-history drift remains and broad `supabase db push`
   remains unsafe.
 - Moderation/reporting remains required before broad beta posting expansion.
