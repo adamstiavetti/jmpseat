@@ -146,11 +146,21 @@ T13 does not add:
 
 ## Runtime Status
 
-Runtime apply is pending until separately approved.
+T13 is runtime-applied in the intended Supabase project:
+
+- project name: `jmpseat`
+- project ref: `qcdfjrcnwuioqprmqqzx`
+- migration ledger row: `20260610143547 create_board_post_rpc`
+- runtime pass record: `docs/ops/fbmvp-t13-create-post-runtime-pass.md`
+
+The runtime pass verified that both T13 functions exist, execute is unavailable
+to `anon`/`public`, execute is granted to `authenticated` and `service_role`,
+`public.board_posts` keeps authenticated `SELECT` only, no direct write policies
+were added, and no user/community content was created.
 
 Do not run broad `supabase db push`. Known migration-history drift remains, so
-T13 must use a later targeted apply path that preserves the exact migration
-version if runtime apply is approved.
+future runtime work should continue using targeted apply paths that preserve
+exact migration versions.
 
 ## Validation
 

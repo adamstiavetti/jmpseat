@@ -367,9 +367,10 @@ The current implementation sequence is:
 7. `FBMVP-T10` DFW Hub section read-only route shells
 8. `FBMVP-T11` Seeded Layovers strategy and editorial model
 9. `FBMVP-T12` shared posts/threads foundation, merged and runtime-applied
-10. `FBMVP-T13` server-controlled create-post foundation, local migration only
+10. `FBMVP-T13` server-controlled create-post foundation, merged and runtime-applied
 
-Post-T13 implementation sequencing remains under review.
+Post-T13 implementation sequencing now points next to `FBMVP-T14: Board Post
+Read Foundation`.
 
 The next implementation lane should be selected after deciding whether to
 prioritize comment/reply foundation, seeded Layovers implementation, or another
@@ -390,7 +391,9 @@ Recommended direction:
 - T13 adds `public.create_board_post(...)` as a server-controlled foundation for
   active open verified Baseboards, with DFW Baseboard as the first intended
   consumer.
-- T13 runtime apply is pending until separately approved.
+- T13 is runtime-applied as `20260610143547 create_board_post_rpc`. The runtime
+  pass is recorded in
+  `docs/ops/fbmvp-t13-create-post-runtime-pass.md`.
 - T13 now requires DB-level contribution eligibility before insert; auth alone
   is not enough. The current eligibility rule requires completed profile plus
   operator internal private-app access or active beta access with verified

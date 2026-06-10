@@ -73,8 +73,12 @@ Home Dashboard note:
   Supabase migration-history drift remains, so broad `supabase db push` remains
   unsafe.
 - `ops/fbmvp-t13-create-post-foundation.md` adds the first local
-  server-controlled create-post RPC for active open verified Baseboards. Runtime
-  apply is pending until separately approved.
+  server-controlled create-post RPC for active open verified Baseboards. It is
+  runtime-applied as `20260610143547 create_board_post_rpc`.
+- `ops/fbmvp-t13-create-post-runtime-pass.md` records the targeted runtime
+  apply for T13, including function grant verification, DB-level contribution
+  eligibility, `board_posts` read/write posture, and confirmation that no
+  user/community content was created.
 
 ## Profile
 
@@ -420,6 +424,8 @@ Current T13 implementation direction:
 
 - `FBMVP-T13` adds `public.create_board_post(...)` as the first narrow
   server-controlled mutation path for `board_posts`.
+- T13 is runtime-applied as `20260610143547 create_board_post_rpc` in the
+  intended `jmpseat` Supabase project.
 - The RPC is intended first for DFW Baseboard and active open verified
   Baseboards.
 - It uses `auth.uid()` for `author_user_id`.
@@ -435,7 +441,8 @@ Current T13 implementation direction:
 - It does not add direct insert policies, lounge/restricted posting, comments,
   edits/deletes, saves, reactions, search backend, AI moderation, seed content,
   or full posting UI.
-- Runtime apply is pending until separately approved.
+- Runtime smoke verification did not create posts; `public.board_posts` remained
+  empty at verification.
 
 Important fields:
 
