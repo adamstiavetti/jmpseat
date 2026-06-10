@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import type { BaseboardPostListItem } from "../../lib/community/boardPostReads";
 
 import styles from "./homeHubShell.module.css";
 
@@ -30,6 +31,12 @@ type DfwHubSectionShell = {
   purpose: string;
   safetyNotes?: readonly string[];
   placeholders: readonly DashboardItem[];
+};
+
+type DfwHubSectionReadOnlyShellProps = {
+  section: DfwHubSectionShell;
+  baseboardPosts?: readonly BaseboardPostListItem[];
+  baseboardPostsUnavailable?: boolean;
 };
 
 type QuickAction = {
@@ -148,21 +155,17 @@ export const dfwHubSectionShells: Record<DfwHubSectionKey, DfwHubSectionShell> =
     title: "DFW Baseboard",
     eyebrow: "Based-there community",
     purpose:
-      "A read-only shell for DFW aviation-worker Q&A, updates, practical notes, and useful discussion. Community posting is not live yet.",
+      "A read-only surface for published DFW aviation-worker Q&A, updates, practical notes, and useful discussion.",
     placeholders: [
       {
-        title: "Recent discussions coming later",
-        detail: "Threads and replies will appear after the posting foundation exists.",
+        title: "No DFW Baseboard posts yet.",
+        detail:
+          "Published DFW Baseboard posts will appear here when they exist. Posting, replies, saves, reactions, and search are not live in this read-only foundation.",
         meta: "No posts yet",
       },
       {
-        title: "Ask Baseboard coming later",
-        detail: "The ask/post flow is not implemented in this shell.",
-        meta: "Read-only",
-      },
-      {
-        title: "Community posting is not live yet",
-        detail: "This route is only a destination placeholder behind the private app gate.",
+        title: "Read-only foundation",
+        detail: "This route renders published Baseboard posts only. Creating posts remains outside this UI.",
         meta: "Scope boundary",
       },
     ],
@@ -572,6 +575,85 @@ function SavedSection() {
   );
 }
 
+function formatPostMetaValue(value: string) {
+  return value
+    .split("_")
+    .filter(Boolean)
+    .map((part) => part.slice(0, 1).toUpperCase() + part.slice(1))
+    .join(" ");
+}
+
+function formatPostDate(value: string) {
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return "";
+  }
+
+  return new Intl.DateTimeFormat("en", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  }).format(date);
+}
+
+function DfwBaseboardPostsSection({
+  posts = [],
+  unavailable = false,
+}: {
+  posts?: readonly BaseboardPostListItem[];
+  unavailable?: boolean;
+}) {
+  return (
+    <section className={styles.hubSurfaceGrid} aria-labelledby="baseboard-posts-title">
+      <div className={styles.sectionTitleRow}>
+        <div>
+          <h2 id="baseboard-posts-title">Recent Baseboard posts</h2>
+          <p>Read-only foundation. Posting, replies, saves, reactions, and search are not live.</p>
+        </div>
+      </div>
+
+      {unavailable ? (
+        <p className={styles.actionFeedback}>
+          Published DFW Baseboard posts are unavailable right now.
+        </p>
+      ) : null}
+
+      {posts.length > 0 ? (
+        <div className={styles.postList}>
+          {posts.map((post) => (
+            <article className={styles.postCard} key={post.id}>
+              <div className={styles.postHeader}>
+                <span className={styles.cardMeta}>
+                  {post.isPinned ? "Pinned" : "Read-only foundation"}
+                </span>
+                <span className={styles.postDate}>{formatPostDate(post.createdAt)}</span>
+              </div>
+              <h3>{post.title}</h3>
+              <p>{post.body}</p>
+              <div className={styles.postMetaRow} aria-label="Post metadata">
+                <span>{formatPostMetaValue(post.contentType)}</span>
+                <span>{formatPostMetaValue(post.category)}</span>
+                <span>{post.authorLabel}</span>
+              </div>
+            </article>
+          ))}
+        </div>
+      ) : (
+        <article className={styles.postEmptyState}>
+          <span className={styles.cardMeta}>No posts yet</span>
+          <h3>No DFW Baseboard posts yet.</h3>
+          <p>
+            Published DFW Baseboard posts will appear here when they exist.
+            Posting, replies, saves, reactions, and search are not live in this
+            read-only foundation.
+          </p>
+        </article>
+      )}
+    </section>
+  );
+}
+
 function BottomNavVisual() {
   return (
     <nav className={styles.bottomNav} aria-label="Private app visual navigation">
@@ -680,9 +762,9 @@ export function DfwHubReadOnlyShell() {
 
 export function DfwHubSectionReadOnlyShell({
   section,
-}: {
-  section: DfwHubSectionShell;
-}) {
+  baseboardPosts,
+  baseboardPostsUnavailable = false,
+}: DfwHubSectionReadOnlyShellProps) {
   return (
     <main className={styles.shell}>
       <div className={styles.mobileFrame}>
@@ -705,23 +787,30 @@ export function DfwHubSectionReadOnlyShell({
           <p>{section.purpose}</p>
         </section>
 
-        <section className={styles.hubSurfaceGrid} aria-labelledby={`${section.key}-coming-title`}>
-          <div className={styles.sectionTitleRow}>
-            <div>
-              <h2 id={`${section.key}-coming-title`}>Coming later</h2>
-              <p>This route is a private, read-only placeholder for the DFW Hub section.</p>
+        {section.key === "baseboard" ? (
+          <DfwBaseboardPostsSection
+            posts={baseboardPosts}
+            unavailable={baseboardPostsUnavailable}
+          />
+        ) : (
+          <section className={styles.hubSurfaceGrid} aria-labelledby={`${section.key}-coming-title`}>
+            <div className={styles.sectionTitleRow}>
+              <div>
+                <h2 id={`${section.key}-coming-title`}>Coming later</h2>
+                <p>This route is a private, read-only placeholder for the DFW Hub section.</p>
+              </div>
             </div>
-          </div>
-          <div className={styles.surfaceGrid}>
-            {section.placeholders.map((item) => (
-              <article className={styles.surfaceCard} key={item.title}>
-                <span className={styles.cardMeta}>{item.meta}</span>
-                <h3>{item.title}</h3>
-                <p>{item.detail}</p>
-              </article>
-            ))}
-          </div>
-        </section>
+            <div className={styles.surfaceGrid}>
+              {section.placeholders.map((item) => (
+                <article className={styles.surfaceCard} key={item.title}>
+                  <span className={styles.cardMeta}>{item.meta}</span>
+                  <h3>{item.title}</h3>
+                  <p>{item.detail}</p>
+                </article>
+              ))}
+            </div>
+          </section>
+        )}
 
         {section.safetyNotes ? (
           <section className={styles.safetyBand} aria-labelledby={`${section.key}-safety-title`}>

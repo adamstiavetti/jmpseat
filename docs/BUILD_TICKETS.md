@@ -58,6 +58,7 @@ Supplemental epoch-specific ticket packs:
 - [FBMVP-T12 Board Posts Runtime Pass](ops/fbmvp-t12-board-posts-runtime-pass.md) - records targeted runtime application of `20260610010000 create_board_posts_foundation` to the intended `jmpseat` Supabase project, confirms only T12 was recorded in migration history, preserves known migration drift handling, and verifies `board_posts` schema, RLS, and membership-aware read policies.
 - [FBMVP-T13 Server-Controlled Create Post Foundation](ops/fbmvp-t13-create-post-foundation.md) - runtime-applied RPC foundation for creating `board_posts` through `public.create_board_post` on active open verified Baseboards, with DB-level contribution eligibility, authenticated/service-role execute only, forced safe post fields, no direct insert policies, no lounge/restricted posting, and no comments, saves, reactions, search backend, AI, seed content, proof-upload, or full posting UI scope.
 - [FBMVP-T13 Create Post Runtime Pass](ops/fbmvp-t13-create-post-runtime-pass.md) - records targeted runtime application of `20260610143547 create_board_post_rpc` to the intended `jmpseat` Supabase project, verifies function grants, DB-level contribution eligibility, `board_posts` read/write posture, and confirms no user/community content was created.
+- [FBMVP-T14 Board Post Read Foundation](ops/fbmvp-t14-board-post-read-foundation.md) - local read-only DFW Baseboard post rendering foundation using a narrow `list_open_baseboard_posts` RPC, DB-level private-beta read eligibility, safe handle-only author labels, and no composer, comments, saves, reactions, search, lounge/restricted content, seeded layover implementation, proof-upload scope, runtime mutation, deploy, or broad Supabase `db push`; runtime is pending targeted migration preflight/apply.
 - [First-Base MVP Implementation Ticket Pack](epochs/first-base-mvp-implementation-ticket-pack.md) - translates the pivot strategy docs into the ordered `FBMVP` implementation sequence; the immediate post-Epoch-5 narrow lane is first reconciled in `ops/private-beta-readiness-bridge.md`, and auth email branding/custom SMTP is now tracked as a deferred beta-readiness polish TODO rather than the active next auth-flow implementation task.
 - [FBMVP-T01: Freeze User-Facing Proof Verification Surfaces](epochs/fbmvp-t01-freeze-user-facing-proof-verification-surfaces.md) - freezes normal proof-upload UX while preserving historical proof infrastructure, cleanup, audit, and admin/operator safety.
 - [FBMVP-T02: Airline Email Verification Access State Design](epochs/fbmvp-t02-airline-email-verification-access-state-design.md) - defines the forward `airline_email_verified` app-level eligibility state and how it maps from existing work-email verification foundations.
@@ -253,9 +254,11 @@ Current sequence:
 9. `FBMVP-T11` Seeded Layovers strategy and editorial model
 10. `FBMVP-T12` shared post/thread foundation, merged and runtime-applied
 11. `FBMVP-T13` server-controlled create-post foundation, merged and runtime-applied
+12. `FBMVP-T14` board post read foundation, implemented locally and runtime-pending
 
-Post-T13 implementation sequencing now points next to `FBMVP-T14: Board Post
-Read Foundation`.
+Post-T14 implementation sequencing should wait for the targeted T14 runtime
+preflight/apply pass before treating the new read RPC as available in the
+intended Supabase runtime.
 
 The next implementation lane should be selected after deciding whether to
 prioritize comment/reply foundation, seeded Layovers implementation, or another
@@ -279,6 +282,15 @@ Recommended direction:
 - Self-declared profile fields do not grant posting rights.
 - T13 does not add comments, saves/reactions, search backend, AI moderation,
   seeded layover content, lounge/restricted posting, or full posting UI.
+- T14 is implemented locally in `ops/fbmvp-t14-board-post-read-foundation.md`.
+  It adds read-only DFW Baseboard post rendering, safe handle-only author labels
+  with `jmpseat member` fallback, and an empty state when no published posts
+  exist. It does not add a composer, post creation UI, comments, saves,
+  reactions, search, lounge/restricted content, seeded layover implementation,
+  proof-upload scope, runtime mutation, deploy, or runtime settings changes.
+- T14 adds a local migration, so runtime remains pending until targeted
+  migration preflight/apply is performed. Broad `supabase db push` remains
+  unsafe due known migration drift.
 
 Do not let older broad V1/backlog sections below turn this into an unsequenced
 social feed or marketplace build. For the current lane, keep proof uploads,

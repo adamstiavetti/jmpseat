@@ -79,6 +79,10 @@ Home Dashboard note:
   apply for T13, including function grant verification, DB-level contribution
   eligibility, `board_posts` read/write posture, and confirmation that no
   user/community content was created.
+- `ops/fbmvp-t14-board-post-read-foundation.md` adds the first local read-only
+  DFW Baseboard post surface through a narrow read RPC and server helper. It is
+  implemented locally but runtime-pending because the new migration has not
+  been targeted-applied.
 
 ## Profile
 
@@ -443,6 +447,35 @@ Current T13 implementation direction:
   or full posting UI.
 - Runtime smoke verification did not create posts; `public.board_posts` remained
   empty at verification.
+
+Current T14 implementation direction:
+
+- `FBMVP-T14` adds `public.list_open_baseboard_posts(...)` as the first narrow
+  read RPC for published open Baseboard posts.
+- T14 is implemented locally and runtime-pending. A targeted runtime
+  preflight/apply is required before declaring a runtime pass.
+- The DFW Baseboard route reads posts server-side only after the private app
+  route gate succeeds.
+- The RPC accepts a base code and is first called with `DFW`; it resolves the
+  active base by code and the active `open_verified` `base_board`.
+- Auth alone is not enough. The read RPC requires DB-level read eligibility:
+  completed profile plus either operator internal private-app access or active
+  beta access with verified work-email / aviation-worker status.
+- It does not authorize from self-declared `claimed_airline`, `claimed_role`,
+  or `claimed_base`.
+- It returns only published posts with `visibility = 'board'`, ordered by
+  pinned state then creation time.
+- The safe UI read model exposes `id`, `title`, `body`, `content_type`,
+  `category`, `is_pinned`, `created_at`, `updated_at`, and `author_label`.
+- Author display uses `profiles.handle` only, with `jmpseat member` fallback.
+- It does not expose author user IDs, email addresses, claimed fields,
+  verification status, verification evidence, proof/storage data, private
+  storage paths, or signed URLs.
+- It does not add composer/post creation UI, comments, saves, reactions, search,
+  Crew Picks ranking, lounge/restricted content, seeded layover implementation,
+  proof-upload scope, runtime mutation, deploy, or runtime setting changes.
+- Known Supabase migration-history drift remains, so broad `supabase db push`
+  remains unsafe.
 
 Important fields:
 

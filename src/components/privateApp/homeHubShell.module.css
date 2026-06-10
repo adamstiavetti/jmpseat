@@ -544,13 +544,16 @@
 }
 
 .crewPickList,
-.surfaceGrid {
+.surfaceGrid,
+.postList {
   display: grid;
   gap: 0.72rem;
 }
 
 .compactCard,
-.surfaceCard {
+.surfaceCard,
+.postCard,
+.postEmptyState {
   border: 1px solid rgba(217, 225, 236, 0.95);
   border-radius: var(--app-radius);
   padding: 0.88rem;
@@ -576,10 +579,50 @@ a.surfaceCard:hover {
 }
 
 .compactCard h3,
-.surfaceCard h3 {
+.surfaceCard h3,
+.postCard h3,
+.postEmptyState h3 {
   margin-top: 0.48rem;
   font-size: 0.95rem;
   line-height: 1.18;
+}
+
+.postHeader,
+.postMetaRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.42rem;
+}
+
+.postHeader {
+  justify-content: space-between;
+}
+
+.postDate,
+.postMetaRow {
+  color: var(--app-text-soft);
+  font-size: 0.74rem;
+  font-weight: 780;
+}
+
+.postCard p,
+.postEmptyState p {
+  margin: 0.5rem 0 0;
+  color: var(--app-text-muted);
+  font-size: 0.84rem;
+  line-height: 1.5;
+}
+
+.postMetaRow {
+  margin-top: 0.72rem;
+}
+
+.postMetaRow span {
+  border: 1px solid rgba(217, 225, 236, 0.95);
+  border-radius: 999px;
+  padding: 0.22rem 0.48rem;
+  background: var(--app-white);
 }
 
 .railSection {

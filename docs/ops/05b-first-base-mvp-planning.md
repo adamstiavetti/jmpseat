@@ -368,9 +368,11 @@ The current implementation sequence is:
 8. `FBMVP-T11` Seeded Layovers strategy and editorial model
 9. `FBMVP-T12` shared posts/threads foundation, merged and runtime-applied
 10. `FBMVP-T13` server-controlled create-post foundation, merged and runtime-applied
+11. `FBMVP-T14` board post read foundation, implemented locally and runtime-pending
 
-Post-T13 implementation sequencing now points next to `FBMVP-T14: Board Post
-Read Foundation`.
+Post-T14 implementation sequencing should wait for the targeted T14 runtime
+preflight/apply pass before treating the read RPC as available in the intended
+Supabase runtime.
 
 The next implementation lane should be selected after deciding whether to
 prioritize comment/reply foundation, seeded Layovers implementation, or another
@@ -402,6 +404,16 @@ Recommended direction:
 - T13 does not enable lounge/restricted posting, comments, edits/deletes,
   saves/reactions, search backend, AI moderation, seed content, Crew Picks
   ranking, or full posting UI.
+- T14 is implemented locally in
+  `docs/ops/fbmvp-t14-board-post-read-foundation.md`. It adds read-only DFW
+  Baseboard post rendering with safe handle-only author labels and
+  `jmpseat member` fallback, plus an empty state when no published posts exist.
+- T14 does not add a composer, post creation UI, comments, saves, reactions,
+  search, lounge/restricted content, seeded layover implementation,
+  proof-upload scope, runtime mutation, deploy, or runtime setting changes.
+- T14 adds a local read RPC migration, so targeted runtime preflight/apply is
+  required before declaring runtime pass. Known Supabase migration-history drift
+  remains and broad `supabase db push` remains unsafe.
 - Moderation/reporting remains required before broad beta posting expansion.
 
 ## 10. Authorization Rules To Preserve

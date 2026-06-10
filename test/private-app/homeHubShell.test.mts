@@ -64,10 +64,19 @@ const dfwSectionRoutes = [
     ),
   },
 ] as const;
+const dfwBaseboardRouteSource = dfwSectionRoutes[0].source;
 const t08DocsSource = readFileSync(
   new URL("../../docs/ops/fbmvp-t08-home-hub-shell.md", import.meta.url),
   "utf8",
 );
+const boardPostReadsSource = existsSync(
+  new URL("../../src/lib/community/boardPostReads.ts", import.meta.url),
+)
+  ? readFileSync(
+      new URL("../../src/lib/community/boardPostReads.ts", import.meta.url),
+      "utf8",
+    )
+  : "";
 
 const combinedSource = [
   appRootSource,
@@ -171,6 +180,49 @@ test("DFW Hub section routes exist and remain behind the private gate and audit 
     assert.match(route.source, new RegExp(`section: "${route.section}"`));
     assert.match(route.source, /DfwHubSectionReadOnlyShell/);
   }
+});
+
+test("DFW Baseboard route fetches read-only posts only after the private gate", () => {
+  assert.match(dfwBaseboardRouteSource, /requireDfwHubRouteAccess/);
+  assert.match(dfwBaseboardRouteSource, /await requireDfwHubRouteAccess[\s\S]*await listDfwBaseboardPosts/s);
+  assert.match(dfwBaseboardRouteSource, /listDfwBaseboardPosts/);
+  assert.match(dfwBaseboardRouteSource, /baseboardPosts/);
+  assert.match(dfwBaseboardRouteSource, /baseboardPostsUnavailable/);
+  assert.match(dfwBaseboardRouteSource, /DfwHubSectionReadOnlyShell/);
+  assert.match(dfwBaseboardRouteSource, /section=\{dfwHubSectionShells\.baseboard\}/);
+  assert.match(dfwBaseboardRouteSource, /dynamic = "force-dynamic"/);
+
+  assert.doesNotMatch(dfwBaseboardRouteSource, /create_board_post|createBoardPost|submit|composer/i);
+  assert.doesNotMatch(dfwBaseboardRouteSource, /\.insert\(|\.update\(|\.delete\(/);
+});
+
+test("DFW Baseboard shell supports empty and populated read-only post states", () => {
+  assert.match(shellSource, /baseboardPosts\?:/);
+  assert.match(shellSource, /baseboardPostsUnavailable\?: boolean/);
+  assert.match(shellSource, /No DFW Baseboard posts yet\./);
+  assert.match(
+    shellSource,
+    /Published DFW Baseboard posts will appear here when they exist\. Posting, replies, saves, reactions, and search are not live in this read-only foundation\./,
+  );
+  assert.match(shellSource, /Read-only foundation/);
+  assert.match(shellSource, /authorLabel/);
+  assert.match(shellSource, /contentType/);
+  assert.match(shellSource, /category/);
+  assert.match(shellSource, /isPinned/);
+  assert.match(shellSource, /DfwBaseboardPostsSection/);
+  assert.match(shellSource, /section\.key === "baseboard"/);
+
+  assert.doesNotMatch(shellSource, /Ask Baseboard coming later/);
+  assert.doesNotMatch(shellSource, /Community posting is not live yet/);
+  assert.doesNotMatch(shellSource, /create_board_post|createBoardPost|composer/i);
+});
+
+test("DFW Baseboard post rendering stays safe and avoids out-of-scope surfaces", () => {
+  const combined = `${dfwBaseboardRouteSource}\n${shellSource}\n${shellStyles}\n${boardPostReadsSource}`;
+
+  assert.doesNotMatch(combined, /author_user_id|email|claimedAirline|claimedRole|claimedBase|verification evidence|proof artifact|storage_path|signed_url/i);
+  assert.doesNotMatch(combined, /comment form|reply form|save button|reaction button|search backend|crew picks ranking/i);
+  assert.doesNotMatch(combined, /lounge_memberships|members_only|operator_only|seeded layover/i);
 });
 
 test("DFW Hub cards link to read-only section route shells", () => {

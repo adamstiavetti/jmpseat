@@ -159,7 +159,7 @@ test("T13 keeps comments, reactions, saves, search, lounge posting, AI, proof up
   assert.doesNotMatch(sql, /verification_proofs|storage\.objects|storage_path|signed_url|proof upload|badge upload/i);
 });
 
-test("T13 docs describe the server-controlled create-post foundation without runtime overclaims", () => {
+test("T13 docs describe the server-controlled create-post foundation and runtime pass", () => {
   const docs = [
     "../../docs/ops/fbmvp-t13-create-post-foundation.md",
     "../../docs/BUILD_TICKETS.md",
@@ -184,7 +184,9 @@ test("T13 docs describe the server-controlled create-post foundation without run
   assert.match(docs, /Home Base.*do not grant|Home Base\/follows\/self-declared/i);
   assert.match(docs, /self-declared/i);
   assert.match(docs, /moderation\/reporting is required|moderation and reporting/i);
-  assert.match(docs, /runtime apply is pending|runtime-applied later|not runtime-applied/i);
+  assert.match(docs, /runtime-applied/i);
+  assert.match(docs, /fbmvp-t13-create-post-runtime-pass/i);
+  assert.match(docs, /no user\/community content was created/i);
   assert.match(docs, /posting UI/i);
   assert.match(docs, /comments/i);
   assert.match(docs, /saves|reactions/i);
@@ -192,6 +194,5 @@ test("T13 docs describe the server-controlled create-post foundation without run
   assert.match(docs, /AI/i);
   assert.match(docs, /seed content|seeded layover/i);
 
-  assert.doesNotMatch(docs, /T13.*runtime-applied/i);
   assert.doesNotMatch(docs, /T13.*deployed/i);
 });
