@@ -8,6 +8,11 @@ import {
 } from "../../../../../src/lib/community/boardPostActionState";
 import { createDfwBaseboardPostAction } from "../../../../../src/lib/community/boardPostActions";
 import { listDfwBaseboardPosts } from "../../../../../src/lib/community/boardPostReads";
+import {
+  DFW_BASEBOARD_REPORT_STATUS_PARAM,
+  isDfwBaseboardReportStatus,
+} from "../../../../../src/lib/community/boardPostSafetyActionState";
+import { reportDfwBaseboardPostAction } from "../../../../../src/lib/community/boardPostSafetyActions";
 import { requireDfwHubRouteAccess } from "../../../../../src/lib/privateApp/dfwHubAccess";
 
 const DFW_BASEBOARD_ROUTE = "/app/hubs/dfw/baseboard";
@@ -31,6 +36,10 @@ export default async function DfwBaseboardPage({
   const postStatus = isDfwBaseboardPostStatus(postStatusValue)
     ? postStatusValue
     : null;
+  const reportStatusValue = params[DFW_BASEBOARD_REPORT_STATUS_PARAM];
+  const reportStatus = isDfwBaseboardReportStatus(reportStatusValue)
+    ? reportStatusValue
+    : null;
   const baseboardPostResult = await listDfwBaseboardPosts();
 
   return (
@@ -38,7 +47,9 @@ export default async function DfwBaseboardPage({
       baseboardPosts={baseboardPostResult.posts}
       baseboardPostsUnavailable={Boolean(baseboardPostResult.error)}
       baseboardPostStatus={postStatus}
+      baseboardReportStatus={reportStatus}
       createBaseboardPostAction={createDfwBaseboardPostAction}
+      reportBaseboardPostAction={reportDfwBaseboardPostAction}
       section={dfwHubSectionShells.baseboard}
     />
   );

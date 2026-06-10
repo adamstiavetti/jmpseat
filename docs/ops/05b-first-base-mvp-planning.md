@@ -370,13 +370,11 @@ The current implementation sequence is:
 10. `FBMVP-T13` server-controlled create-post foundation, merged and runtime-applied
 11. `FBMVP-T14` board post read foundation, merged and runtime-applied
 12. `FBMVP-T15` minimal DFW Baseboard post composer, merged and runtime-applied
+13. `FBMVP-T16` board post safety foundation, implemented locally and runtime-pending
 
-Post-T15 implementation sequencing now points next to T16, after the T15
-runtime-pass documentation is reviewed and committed.
-
-The next implementation lane should be selected after deciding whether to
-prioritize comment/reply foundation, seeded Layovers implementation, or another
-narrow surface on top of the shared post model.
+Post-T16 runtime sequencing should use targeted preflight/apply before declaring
+runtime pass. Do not proceed to post detail, comments, saves/reactions, search,
+Crew Picks, or Layovers content until T16 is reviewed and runtime-applied.
 
 Recommended direction:
 
@@ -425,6 +423,19 @@ Recommended direction:
   lounge/restricted posting, Layovers seeded content, Crew Picks ranking,
   proof-upload scope, direct `board_posts` write policies, deploy, runtime
   settings changes, or content creation during validation/runtime verification.
+- T16 is implemented locally as
+  `20260610191809_create_board_post_safety_foundation.sql` and remains
+  runtime-pending. It adds minimal DFW Baseboard reporting, a private
+  `board_post_reports` table, `public.report_open_baseboard_post(...)`, and
+  operator-scoped `public.moderate_open_baseboard_post(...)` for hide/remove
+  actions using `operator.community_moderation`.
+- T16 preserves zero direct board_posts write policies. Hidden/removed posts
+  are excluded from current read surfaces because T14 reads only published
+  board-visible posts.
+- T16 does not add post detail, comments, saves/reactions, search backend,
+  moderation queue UI, AI moderation, bans, lounge/restricted posting, Layovers
+  seeded content, Crew Picks ranking, public sharing, media, proof-upload scope,
+  deploy, runtime settings changes, or content creation during validation.
 - Known Supabase migration-history drift remains and broad `supabase db push`
   remains unsafe.
 - Moderation/reporting remains required before broad beta posting expansion.

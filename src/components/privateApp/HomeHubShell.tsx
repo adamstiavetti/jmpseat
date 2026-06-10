@@ -7,6 +7,12 @@ import {
   type DfwBaseboardPostStatus,
 } from "../../lib/community/boardPostActionState";
 import type { BaseboardPostListItem } from "../../lib/community/boardPostReads";
+import {
+  DFW_BASEBOARD_REPORT_FAILED_STATUS,
+  DFW_BASEBOARD_REPORT_INVALID_STATUS,
+  DFW_BASEBOARD_REPORT_REPORTED_STATUS,
+  type DfwBaseboardReportStatus,
+} from "../../lib/community/boardPostSafetyActionState";
 
 import styles from "./homeHubShell.module.css";
 
@@ -44,7 +50,9 @@ type DfwHubSectionReadOnlyShellProps = {
   baseboardPosts?: readonly BaseboardPostListItem[];
   baseboardPostsUnavailable?: boolean;
   baseboardPostStatus?: DfwBaseboardPostStatus | null;
+  baseboardReportStatus?: DfwBaseboardReportStatus | null;
   createBaseboardPostAction?: (formData: FormData) => Promise<void>;
+  reportBaseboardPostAction?: (formData: FormData) => Promise<void>;
 };
 
 type QuickAction = {
@@ -609,12 +617,16 @@ function DfwBaseboardPostsSection({
   posts = [],
   unavailable = false,
   postStatus = null,
+  reportStatus = null,
   createAction,
+  reportAction,
 }: {
   posts?: readonly BaseboardPostListItem[];
   unavailable?: boolean;
   postStatus?: DfwBaseboardPostStatus | null;
+  reportStatus?: DfwBaseboardReportStatus | null;
   createAction?: (formData: FormData) => Promise<void>;
+  reportAction?: (formData: FormData) => Promise<void>;
 }) {
   const statusMessage =
     postStatus === DFW_BASEBOARD_POST_CREATED_STATUS
@@ -625,6 +637,15 @@ function DfwBaseboardPostsSection({
           ? "jmpseat could not publish that post right now. Try again in a moment."
           : null;
   const isSuccessStatus = postStatus === DFW_BASEBOARD_POST_CREATED_STATUS;
+  const reportStatusMessage =
+    reportStatus === DFW_BASEBOARD_REPORT_REPORTED_STATUS
+      ? "Thanks — the post was reported for review."
+      : reportStatus === DFW_BASEBOARD_REPORT_INVALID_STATUS
+        ? "Choose a report reason before submitting."
+        : reportStatus === DFW_BASEBOARD_REPORT_FAILED_STATUS
+          ? "jmpseat could not submit that report right now. Try again in a moment."
+          : null;
+  const isReportSuccessStatus = reportStatus === DFW_BASEBOARD_REPORT_REPORTED_STATUS;
 
   return (
     <section className={styles.hubSurfaceGrid} aria-labelledby="baseboard-posts-title">
@@ -681,6 +702,15 @@ function DfwBaseboardPostsSection({
         </p>
       ) : null}
 
+      {reportStatusMessage ? (
+        <p
+          className={isReportSuccessStatus ? styles.actionSuccess : styles.actionFeedback}
+          role="status"
+        >
+          {reportStatusMessage}
+        </p>
+      ) : null}
+
       {unavailable ? (
         <p className={styles.actionFeedback}>
           Published DFW Baseboard posts are unavailable right now.
@@ -704,6 +734,37 @@ function DfwBaseboardPostsSection({
                 <span>{formatPostMetaValue(post.category)}</span>
                 <span>{post.authorLabel}</span>
               </div>
+              {reportAction ? (
+                <form action={reportAction} className={styles.reportForm}>
+                  <input name="postId" type="hidden" value={post.id} />
+                  <label className={styles.reportField}>
+                    <span>Report this post</span>
+                    <select name="reason" required defaultValue="">
+                      <option disabled value="">
+                        Choose a reason
+                      </option>
+                      <option value="spam">Spam</option>
+                      <option value="harassment">Harassment</option>
+                      <option value="unsafe_info">Unsafe information</option>
+                      <option value="privacy">Privacy</option>
+                      <option value="off_topic">Off topic</option>
+                      <option value="other">Other</option>
+                    </select>
+                  </label>
+                  <label className={styles.reportField}>
+                    <span>Details</span>
+                    <textarea
+                      maxLength={1000}
+                      name="details"
+                      placeholder="Optional context for review"
+                      rows={2}
+                    />
+                  </label>
+                  <button className={styles.reportSubmit} type="submit">
+                    Submit report
+                  </button>
+                </form>
+              ) : null}
             </article>
           ))}
         </div>
@@ -833,7 +894,9 @@ export function DfwHubSectionReadOnlyShell({
   baseboardPosts,
   baseboardPostsUnavailable = false,
   baseboardPostStatus = null,
+  baseboardReportStatus = null,
   createBaseboardPostAction,
+  reportBaseboardPostAction,
 }: DfwHubSectionReadOnlyShellProps) {
   return (
     <main className={styles.shell}>
@@ -862,6 +925,8 @@ export function DfwHubSectionReadOnlyShell({
             createAction={createBaseboardPostAction}
             postStatus={baseboardPostStatus}
             posts={baseboardPosts}
+            reportAction={reportBaseboardPostAction}
+            reportStatus={baseboardReportStatus}
             unavailable={baseboardPostsUnavailable}
           />
         ) : (

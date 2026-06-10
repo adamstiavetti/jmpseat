@@ -515,6 +515,34 @@ Current T15 implementation direction:
 - Known Supabase migration-history drift remains, so broad `supabase db push`
   remains unsafe.
 
+Current T16 implementation direction:
+
+- `FBMVP-T16` adds the local runtime-pending Board Post Safety Foundation.
+- It adds `public.board_post_reports` for minimal DFW Baseboard post reports.
+- It adds `public.report_open_baseboard_post(...)`, which requires DB-level
+  open board read eligibility, resolves DFW by base code to the active
+  `open_verified` `base_board`, reports only `published` / `visibility =
+  'board'` posts, forces `reporter_user_id = auth.uid()`, and returns only a
+  report UUID.
+- It adds `public.moderate_open_baseboard_post(...)`, which requires
+  `operator.community_moderation`, resolves the active open verified Baseboard
+  by base code, and supports only `hide` and `remove` actions.
+- The moderation RPC updates the existing `board_posts` lifecycle fields:
+  `status`, `removed_at`, `removed_by`, and `removal_reason`.
+- T16 preserves zero direct board_posts write policies and does not weaken
+  RLS.
+- Hidden/removed posts are excluded from current read surfaces because T14 reads
+  only `status = 'published'` and `visibility = 'board'`.
+- T16 does not expose reporter identity broadly.
+- T16 relies on server actions/RPCs only.
+- T16 does not add post detail, comments, saves, reactions, search backend,
+  moderation queue UI, AI moderation, bans, lounge/restricted posting, Layovers
+  seeded content, Crew Picks ranking, public sharing, media, proof-upload scope,
+  deploy, runtime settings changes, or content creation during validation.
+- Known Supabase migration-history drift remains, so broad `supabase db push`
+  remains unsafe. Targeted runtime preflight/apply is required before runtime
+  pass.
+
 Important fields:
 
 - id
