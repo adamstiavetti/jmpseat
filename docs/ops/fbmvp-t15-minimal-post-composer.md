@@ -109,12 +109,15 @@ The UI does not add category or content-type selectors yet.
 
 ## Runtime Boundary
 
-T15 is implemented locally and is runtime-pending because it adds a migration.
+T15 is runtime-applied to the intended `jmpseat` Supabase project. The targeted
+runtime pass is recorded in
+`docs/ops/fbmvp-t15-minimal-post-composer-runtime-pass.md`.
 
-Targeted runtime preflight/apply is required before declaring a T15 runtime pass:
+Applied migration:
 
-- expected ledger version: `20260610182000`
-- expected ledger name: `create_open_baseboard_post`
+- project ref/id: `qcdfjrcnwuioqprmqqzx`
+- ledger version: `20260610182000`
+- ledger name: `create_open_baseboard_post`
 - migration file:
   `supabase/migrations/20260610182000_create_open_baseboard_post.sql`
 
@@ -125,10 +128,12 @@ remains unsafe. Plain-language guardrail: broad Supabase db push remains unsafe.
 - local `20260607204212` vs remote `20260607205909`
 - local T06 `20260609130534` vs remote T06 `20260609194858`
 
-Use targeted runtime preflight/apply only. Do not run broad migration repair or
-retrofit the known drift.
+The runtime pass used targeted SQL execution only, applied the migration SQL and
+exact ledger row in one explicit transaction, and verified the wrapper RPC,
+function grants, unchanged `board_posts` write-policy posture, unchanged
+`board_posts` count, and no content creation.
 
-No post/content smoke test was run during local validation, and no
+No post/content smoke test was run during runtime verification, and no
 user/community content was created.
 
 ## What T15 Does Not Add
@@ -147,5 +152,4 @@ T15 does not add:
 - direct `board_posts` write policies
 - table changes
 - RLS weakening
-- runtime migration apply
 - deploy or runtime settings changes

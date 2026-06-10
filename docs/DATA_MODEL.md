@@ -489,8 +489,10 @@ Current T15 implementation direction:
 
 - `FBMVP-T15` adds `public.create_open_baseboard_post(...)` as a narrow
   base-code wrapper for the minimal DFW Baseboard composer.
-- T15 is implemented locally as
-  `20260610182000 create_open_baseboard_post` and is runtime-pending.
+- T15 is runtime-applied as `20260610182000 create_open_baseboard_post` in the
+  intended `jmpseat` Supabase project.
+- The runtime pass is recorded in
+  `docs/ops/fbmvp-t15-minimal-post-composer-runtime-pass.md`.
 - The wrapper accepts a base code, title, body, default content type `note`, and
   default category `general`.
 - It resolves the active base by code and the active `open_verified`
@@ -507,9 +509,9 @@ Current T15 implementation direction:
 - T15 does not add comments, saves, reactions, search backend, moderation
   queue, lounge/restricted posting, Layovers seeded content, Crew Picks ranking,
   proof-upload scope, direct `board_posts` write policies, table changes, RLS
-  weakening, runtime migration apply, deploy, or runtime settings changes.
-- No post/content smoke test was run during local validation, and no
-  user/community content was created.
+  weakening, deploy, or runtime settings changes.
+- No post/content smoke test was run during local validation or runtime
+  verification, and no user/community content was created.
 - Known Supabase migration-history drift remains, so broad `supabase db push`
   remains unsafe.
 
