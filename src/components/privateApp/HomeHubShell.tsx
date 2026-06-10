@@ -55,6 +55,13 @@ type DfwHubSectionReadOnlyShellProps = {
   reportBaseboardPostAction?: (formData: FormData) => Promise<void>;
 };
 
+type DfwBaseboardPostDetailShellProps = {
+  post?: BaseboardPostListItem | null;
+  postUnavailable?: boolean;
+  reportStatus?: DfwBaseboardReportStatus | null;
+  reportAction?: (formData: FormData) => Promise<void>;
+};
+
 type QuickAction = {
   title: string;
   detail: string;
@@ -613,6 +620,66 @@ function formatPostDate(value: string) {
   }).format(date);
 }
 
+function getDfwBaseboardPostHref(postId: string) {
+  return `/app/hubs/dfw/baseboard/${encodeURIComponent(postId)}`;
+}
+
+function getDfwBaseboardReportStatusMessage(
+  reportStatus: DfwBaseboardReportStatus | null,
+) {
+  return reportStatus === DFW_BASEBOARD_REPORT_REPORTED_STATUS
+    ? "Thanks — the post was reported for review."
+    : reportStatus === DFW_BASEBOARD_REPORT_INVALID_STATUS
+      ? "Choose a report reason before submitting."
+      : reportStatus === DFW_BASEBOARD_REPORT_FAILED_STATUS
+        ? "jmpseat could not submit that report right now. Try again in a moment."
+        : null;
+}
+
+function DfwBaseboardReportForm({
+  postId,
+  reportAction,
+}: {
+  postId: string;
+  reportAction?: (formData: FormData) => Promise<void>;
+}) {
+  if (!reportAction) {
+    return null;
+  }
+
+  return (
+    <form action={reportAction} className={styles.reportForm}>
+      <input name="postId" type="hidden" value={postId} />
+      <label className={styles.reportField}>
+        <span>Report this post</span>
+        <select name="reason" required defaultValue="">
+          <option disabled value="">
+            Choose a reason
+          </option>
+          <option value="spam">Spam</option>
+          <option value="harassment">Harassment</option>
+          <option value="unsafe_info">Unsafe information</option>
+          <option value="privacy">Privacy</option>
+          <option value="off_topic">Off topic</option>
+          <option value="other">Other</option>
+        </select>
+      </label>
+      <label className={styles.reportField}>
+        <span>Details</span>
+        <textarea
+          maxLength={1000}
+          name="details"
+          placeholder="Optional context for review"
+          rows={2}
+        />
+      </label>
+      <button className={styles.reportSubmit} type="submit">
+        Submit report
+      </button>
+    </form>
+  );
+}
+
 function DfwBaseboardPostsSection({
   posts = [],
   unavailable = false,
@@ -637,14 +704,7 @@ function DfwBaseboardPostsSection({
           ? "jmpseat could not publish that post right now. Try again in a moment."
           : null;
   const isSuccessStatus = postStatus === DFW_BASEBOARD_POST_CREATED_STATUS;
-  const reportStatusMessage =
-    reportStatus === DFW_BASEBOARD_REPORT_REPORTED_STATUS
-      ? "Thanks — the post was reported for review."
-      : reportStatus === DFW_BASEBOARD_REPORT_INVALID_STATUS
-        ? "Choose a report reason before submitting."
-        : reportStatus === DFW_BASEBOARD_REPORT_FAILED_STATUS
-          ? "jmpseat could not submit that report right now. Try again in a moment."
-          : null;
+  const reportStatusMessage = getDfwBaseboardReportStatusMessage(reportStatus);
   const isReportSuccessStatus = reportStatus === DFW_BASEBOARD_REPORT_REPORTED_STATUS;
 
   return (
@@ -727,44 +787,21 @@ function DfwBaseboardPostsSection({
                 </span>
                 <span className={styles.postDate}>{formatPostDate(post.createdAt)}</span>
               </div>
-              <h3>{post.title}</h3>
+              <h3>
+                <Link
+                  className={styles.postTitleLink}
+                  href={getDfwBaseboardPostHref(post.id)}
+                >
+                  {post.title}
+                </Link>
+              </h3>
               <p>{post.body}</p>
               <div className={styles.postMetaRow} aria-label="Post metadata">
                 <span>{formatPostMetaValue(post.contentType)}</span>
                 <span>{formatPostMetaValue(post.category)}</span>
                 <span>{post.authorLabel}</span>
               </div>
-              {reportAction ? (
-                <form action={reportAction} className={styles.reportForm}>
-                  <input name="postId" type="hidden" value={post.id} />
-                  <label className={styles.reportField}>
-                    <span>Report this post</span>
-                    <select name="reason" required defaultValue="">
-                      <option disabled value="">
-                        Choose a reason
-                      </option>
-                      <option value="spam">Spam</option>
-                      <option value="harassment">Harassment</option>
-                      <option value="unsafe_info">Unsafe information</option>
-                      <option value="privacy">Privacy</option>
-                      <option value="off_topic">Off topic</option>
-                      <option value="other">Other</option>
-                    </select>
-                  </label>
-                  <label className={styles.reportField}>
-                    <span>Details</span>
-                    <textarea
-                      maxLength={1000}
-                      name="details"
-                      placeholder="Optional context for review"
-                      rows={2}
-                    />
-                  </label>
-                  <button className={styles.reportSubmit} type="submit">
-                    Submit report
-                  </button>
-                </form>
-              ) : null}
+              <DfwBaseboardReportForm postId={post.id} reportAction={reportAction} />
             </article>
           ))}
         </div>
@@ -780,6 +817,87 @@ function DfwBaseboardPostsSection({
         </article>
       )}
     </section>
+  );
+}
+
+export function DfwBaseboardPostDetailShell({
+  post,
+  postUnavailable = false,
+  reportStatus = null,
+  reportAction,
+}: DfwBaseboardPostDetailShellProps) {
+  const reportStatusMessage = getDfwBaseboardReportStatusMessage(reportStatus);
+  const isReportSuccessStatus = reportStatus === DFW_BASEBOARD_REPORT_REPORTED_STATUS;
+
+  return (
+    <main className={styles.shell}>
+      <div className={styles.mobileFrame}>
+        <AppHeader
+          backHref="/app/hubs/dfw/baseboard"
+          backLabel="Baseboard"
+          subtitle="DFW Baseboard post"
+          showBackLink
+        />
+
+        <nav className={styles.breadcrumb} aria-label="DFW Baseboard breadcrumb">
+          <Link href="/app/hubs/dfw">DFW Hub</Link>
+          <span aria-hidden="true">/</span>
+          <Link href="/app/hubs/dfw/baseboard">Baseboard</Link>
+          <span aria-hidden="true">/</span>
+          <span>Post</span>
+        </nav>
+
+        <section className={styles.postDetailSurface} aria-labelledby="baseboard-post-detail-title">
+          <Link className={styles.inlineBackLink} href="/app/hubs/dfw/baseboard">
+            Back to DFW Baseboard
+          </Link>
+
+          {reportStatusMessage ? (
+            <p
+              className={isReportSuccessStatus ? styles.actionSuccess : styles.actionFeedback}
+              role="status"
+            >
+              {reportStatusMessage}
+            </p>
+          ) : null}
+
+          {post && !postUnavailable ? (
+            <article className={styles.postDetailCard}>
+              <div className={styles.postHeader}>
+                <span className={styles.cardMeta}>
+                  {post.isPinned ? "Pinned" : "Read-only post"}
+                </span>
+                <span className={styles.postDate}>{formatPostDate(post.createdAt)}</span>
+              </div>
+              <h1 id="baseboard-post-detail-title">{post.title}</h1>
+              <div className={styles.postMetaRow} aria-label="Post metadata">
+                <span>{formatPostMetaValue(post.contentType)}</span>
+                <span>{formatPostMetaValue(post.category)}</span>
+                <span>{post.authorLabel}</span>
+              </div>
+              <p className={styles.postDetailBody}>{post.body}</p>
+              {post.updatedAt !== post.createdAt ? (
+                <p className={styles.mutedNote}>Updated {formatPostDate(post.updatedAt)}</p>
+              ) : null}
+              <p className={styles.mutedNote}>
+                This detail view is read-only except reporting. Comments, replies,
+                saves, reactions, search, and public sharing are not live.
+              </p>
+              <DfwBaseboardReportForm postId={post.id} reportAction={reportAction} />
+            </article>
+          ) : (
+            <article className={styles.postEmptyState}>
+              <span className={styles.cardMeta}>Unavailable</span>
+              <h1 id="baseboard-post-detail-title">That DFW Baseboard post is unavailable.</h1>
+              <p>
+                jmpseat can only show published DFW Baseboard posts available to
+                this private app surface.
+              </p>
+            </article>
+          )}
+        </section>
+      </div>
+    </main>
   );
 }
 

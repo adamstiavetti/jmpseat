@@ -17,6 +17,8 @@ export type BaseboardPostListItem = {
   authorLabel: string;
 };
 
+export type BaseboardPostDetail = BaseboardPostListItem;
+
 type OpenBaseboardPostRpcRow = {
   id: string;
   title: string;
@@ -28,6 +30,12 @@ type OpenBaseboardPostRpcRow = {
   updated_at: string;
   author_label: string | null;
 };
+
+function isUuid(value: string) {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+    value,
+  );
+}
 
 function getSafeAuthorLabel(value: string | null | undefined) {
   const normalized = value?.trim() ?? "";
@@ -70,6 +78,39 @@ export async function listDfwBaseboardPosts(
 
   return {
     posts: (Array.isArray(data) ? data : []).map(mapOpenBaseboardPostRow),
+    error: null,
+  };
+}
+
+export async function getDfwBaseboardPost(postId: string) {
+  const normalizedPostId = postId.trim();
+
+  if (!isUuid(normalizedPostId)) {
+    return {
+      post: null,
+      error: null,
+    };
+  }
+
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .rpc("get_open_baseboard_post", {
+      p_base_code: "DFW",
+      p_post_id: normalizedPostId,
+    })
+    .returns<OpenBaseboardPostRpcRow[]>();
+
+  if (error) {
+    return {
+      post: null,
+      error,
+    };
+  }
+
+  const [row] = Array.isArray(data) ? data : [];
+
+  return {
+    post: row ? mapOpenBaseboardPostRow(row) : null,
     error: null,
   };
 }

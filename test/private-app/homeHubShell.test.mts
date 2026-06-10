@@ -65,6 +65,14 @@ const dfwSectionRoutes = [
   },
 ] as const;
 const dfwBaseboardRouteSource = dfwSectionRoutes[0].source;
+const dfwBaseboardDetailRouteSource = existsSync(
+  new URL("../../app/app/hubs/dfw/baseboard/[postId]/page.tsx", import.meta.url),
+)
+  ? readFileSync(
+      new URL("../../app/app/hubs/dfw/baseboard/[postId]/page.tsx", import.meta.url),
+      "utf8",
+    )
+  : "";
 const t08DocsSource = readFileSync(
   new URL("../../docs/ops/fbmvp-t08-home-hub-shell.md", import.meta.url),
   "utf8",
@@ -239,12 +247,33 @@ test("DFW Baseboard shell supports empty, populated, and minimal composer states
 });
 
 test("DFW Baseboard post rendering stays safe and avoids out-of-scope surfaces", () => {
-  const combined = `${dfwBaseboardRouteSource}\n${shellSource}\n${shellStyles}\n${boardPostReadsSource}\n${boardPostActionsSource}`;
+  const combined = `${dfwBaseboardRouteSource}\n${dfwBaseboardDetailRouteSource}\n${shellSource}\n${shellStyles}\n${boardPostReadsSource}\n${boardPostActionsSource}`;
 
   assert.doesNotMatch(combined, /author_user_id|email|claimedAirline|claimedRole|claimedBase|verification evidence|proof artifact|storage_path|signed_url/i);
-  assert.doesNotMatch(combined, /comment form|reply form|save button|reaction button|search backend|crew picks ranking/i);
+  assert.doesNotMatch(combined, /comment form|reply form|save button|reaction button|search backend|crew picks ranking|public sharing button/i);
   assert.doesNotMatch(combined, /lounge_memberships|members_only|operator_only|seeded layover/i);
   assert.doesNotMatch(combined, /createBrowserClient|service_role|\.insert\(|\.update\(|\.delete\(/);
+});
+
+test("DFW Baseboard detail route is private gated and read-only", () => {
+  assert.match(dfwBaseboardDetailRouteSource, /dynamic = "force-dynamic"/);
+  assert.match(dfwBaseboardDetailRouteSource, /requireDfwHubRouteAccess/);
+  assert.match(dfwBaseboardDetailRouteSource, /await requireDfwHubRouteAccess[\s\S]*await getDfwBaseboardPost/s);
+  assert.match(dfwBaseboardDetailRouteSource, /section: "dfw-baseboard"/);
+  assert.match(dfwBaseboardDetailRouteSource, /DfwBaseboardPostDetailShell/);
+  assert.match(dfwBaseboardDetailRouteSource, /reportDfwBaseboardPostAction/);
+  assert.doesNotMatch(dfwBaseboardDetailRouteSource, /create_board_post|report_open_baseboard_post|moderate_open_baseboard_post/);
+  assert.doesNotMatch(dfwBaseboardDetailRouteSource, /\.insert\(|\.update\(|\.delete\(/);
+});
+
+test("DFW Baseboard list cards link to private post detail", () => {
+  assert.match(shellSource, /getDfwBaseboardPostHref/);
+  assert.match(shellSource, /href=\{getDfwBaseboardPostHref\(post\.id\)\}/);
+  assert.match(shellSource, /DfwBaseboardPostDetailShell/);
+  assert.match(shellSource, /Back to DFW Baseboard/);
+  assert.match(shellSource, /This detail view is read-only except reporting/);
+  assert.match(shellSource, /Report this post/);
+  assert.doesNotMatch(shellSource, /share button|copy link|public URL|external post/i);
 });
 
 test("DFW Baseboard composer is not wired into non-Baseboard hub sections", () => {

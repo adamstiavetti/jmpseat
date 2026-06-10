@@ -244,7 +244,8 @@ test("DFW Baseboard UI renders compact report affordance only on post cards", ()
   assert.match(shellSource, /name="postId"/);
   assert.match(shellSource, /name="reason"/);
   assert.match(shellSource, /name="details"/);
-  assert.match(shellSource, /value=\{post\.id\}/);
+  assert.match(shellSource, /postId=\{post\.id\}/);
+  assert.match(shellSource, /value=\{postId\}/);
   assert.match(shellSource, /spam/i);
   assert.match(shellSource, /harassment/i);
   assert.match(shellSource, /unsafe information/i);

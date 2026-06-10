@@ -759,6 +759,21 @@ a.surfaceCard:hover {
   line-height: 1.5;
 }
 
+.postTitleLink {
+  color: inherit;
+  text-decoration: none;
+}
+
+.postTitleLink:hover {
+  color: var(--app-blue);
+}
+
+.postTitleLink:focus-visible,
+.inlineBackLink:focus-visible {
+  outline: 3px solid var(--app-amber);
+  outline-offset: 3px;
+}
+
 .postMetaRow {
   margin-top: 0.72rem;
 }
@@ -768,6 +783,44 @@ a.surfaceCard:hover {
   border-radius: 999px;
   padding: 0.22rem 0.48rem;
   background: var(--app-white);
+}
+
+.postDetailSurface {
+  display: grid;
+  gap: 0.82rem;
+  margin-top: 1rem;
+}
+
+.inlineBackLink {
+  justify-self: start;
+  color: var(--app-blue);
+  font-size: 0.82rem;
+  font-weight: 850;
+  text-decoration: none;
+}
+
+.postDetailCard {
+  border: 1px solid rgba(217, 225, 236, 0.95);
+  border-radius: var(--app-radius);
+  padding: 1rem;
+  background: linear-gradient(180deg, #ffffff, #f8fafc);
+}
+
+.postDetailCard h1,
+.postEmptyState h1 {
+  margin: 0.62rem 0 0;
+  color: var(--app-text);
+  font-size: 1.32rem;
+  font-weight: 880;
+  line-height: 1.08;
+}
+
+.postDetailBody {
+  white-space: pre-wrap;
+  margin: 0.9rem 0 0;
+  color: var(--app-text);
+  font-size: 0.96rem;
+  line-height: 1.62;
 }
 
 .railSection {

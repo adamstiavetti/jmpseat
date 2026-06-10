@@ -549,6 +549,37 @@ Current T16 runtime state:
 - Known Supabase migration-history drift remains, so broad `supabase db push`
   remains unsafe.
 
+Current T17 local state:
+
+- `FBMVP-T17` is locally implemented and runtime-pending as
+  `20260610203000 create_open_baseboard_post_detail_rpc`.
+- It adds `public.get_open_baseboard_post(p_base_code text, p_post_id uuid)` as
+  the safe DFW Baseboard post detail read RPC.
+- The RPC requires `auth.uid()` and DB-level open board read eligibility through
+  `public.current_user_can_read_open_board_posts()`.
+- The RPC resolves the active base by `p_base_code`, resolves the active
+  `open_verified` `base_board`, and returns only one requested post when it is
+  `status = 'published'` and `visibility = 'board'`.
+- Safe fields only are returned: `id`, `title`, `body`, `content_type`,
+  `category`, `is_pinned`, `created_at`, `updated_at`, and `author_label`.
+- Author labels use `profiles.handle` with `jmpseat member` fallback.
+- The route `/app/hubs/dfw/baseboard/[postId]` remains private-gated with
+  `requireDfwHubRouteAccess(...)`, uses the server-only read helper, and keeps
+  the existing report affordance.
+- Hidden/removed posts are excluded because the detail RPC filters to published
+  board-visible posts.
+- T17 does not expose author user IDs, emails, claimed fields, verification
+  status/evidence, reporter identity, proof/storage data, signed URLs, or
+  private paths.
+- T17 does not add comments, replies, saves, reactions, search backend,
+  moderation queue UI, public sharing, lounge/restricted posting, Layovers
+  content, Crew Picks ranking, media, AI moderation, bans, proof-upload scope,
+  direct `board_posts` write policies, RLS weakening, deploy, runtime settings
+  changes, or content creation during validation.
+- Known Supabase migration-history drift remains, so broad `supabase db push`
+  remains unsafe. Targeted runtime preflight/apply is required before T17 is
+  runtime-applied.
+
 Important fields:
 
 - id

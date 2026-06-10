@@ -64,6 +64,7 @@ Supplemental epoch-specific ticket packs:
 - [FBMVP-T15 Minimal Post Composer Runtime Pass](ops/fbmvp-t15-minimal-post-composer-runtime-pass.md) - records targeted runtime application of `20260610182000 create_open_baseboard_post` to the intended `jmpseat` Supabase project, verifies function grants, T13 delegation, `board_posts` RLS/policy posture, and confirms no user/community content was created.
 - [FBMVP-T16 Board Post Safety Foundation](ops/fbmvp-t16-board-post-safety-foundation.md) - runtime-applied safety foundation for minimal DFW Baseboard reporting plus an operator-scoped hide/remove RPC, preserving zero direct `board_posts` write policies and adding no post detail, comments, saves, reactions, search, moderation queue UI, AI moderation, bans, lounge/restricted posting, Layovers seeded content, Crew Picks ranking, public sharing, media, proof-upload scope, deploy, T16-created content, or broad Supabase `db push`.
 - [FBMVP-T16 Board Post Safety Runtime Pass](ops/fbmvp-t16-board-post-safety-runtime-pass.md) - records targeted runtime application of `20260610191809 create_board_post_safety_foundation` to the intended `jmpseat` Supabase project, verifies report table RLS/grants, report and moderation RPC grants, zero direct `board_posts` write policies, T14 read filtering, and confirms T16 created no posts, reports, or moderation records during migration/apply.
+- [FBMVP-T17 DFW Baseboard Post Detail](ops/fbmvp-t17-dfw-baseboard-post-detail.md) - locally implemented runtime-pending read-only DFW Baseboard post detail route using a private route gate and safe `get_open_baseboard_post` RPC, preserving existing report affordance support and adding no comments, replies, saves, reactions, search, moderation queue UI, public sharing, lounge/restricted posting, Layovers content, Crew Picks ranking, media, AI moderation, bans, proof-upload scope, direct `board_posts` write policies, deploy, content creation, or broad Supabase `db push`.
 - [First-Base MVP Implementation Ticket Pack](epochs/first-base-mvp-implementation-ticket-pack.md) - translates the pivot strategy docs into the ordered `FBMVP` implementation sequence; the immediate post-Epoch-5 narrow lane is first reconciled in `ops/private-beta-readiness-bridge.md`, and auth email branding/custom SMTP is now tracked as a deferred beta-readiness polish TODO rather than the active next auth-flow implementation task.
 - [FBMVP-T01: Freeze User-Facing Proof Verification Surfaces](epochs/fbmvp-t01-freeze-user-facing-proof-verification-surfaces.md) - freezes normal proof-upload UX while preserving historical proof infrastructure, cleanup, audit, and admin/operator safety.
 - [FBMVP-T02: Airline Email Verification Access State Design](epochs/fbmvp-t02-airline-email-verification-access-state-design.md) - defines the forward `airline_email_verified` app-level eligibility state and how it maps from existing work-email verification foundations.
@@ -262,9 +263,10 @@ Current sequence:
 12. `FBMVP-T14` board post read foundation, merged and runtime-applied
 13. `FBMVP-T15` minimal DFW Baseboard post composer, merged and runtime-applied
 14. `FBMVP-T16` board post safety foundation, merged and runtime-applied
+15. `FBMVP-T17` DFW Baseboard post detail, locally implemented and runtime-pending
 
-Do not proceed to post detail, comments, saves/reactions, search, Crew Picks, or
-Layovers content until T16 runtime-pass documentation is reviewed and committed.
+Do not proceed to comments, saves/reactions, search, Crew Picks, or Layovers
+content until T17 is reviewed, committed, and targeted-runtime applied.
 
 Recommended direction:
 
@@ -321,6 +323,20 @@ Recommended direction:
   `public.board_post_reports` count `0` and `public.board_posts` count `1`; the
   existing post is user-created test content separate from the T16
   migration/apply.
+- T17 is locally implemented and runtime-pending as
+  `20260610203000 create_open_baseboard_post_detail_rpc`. It adds a private
+  `/app/hubs/dfw/baseboard/[postId]` detail route and
+  `public.get_open_baseboard_post(p_base_code text, p_post_id uuid)`.
+- T17 uses the same private DFW route gate, DB-level open-board read
+  eligibility, active base-code/open verified Baseboard scoping, `published` /
+  `board` filtering, safe handle-only author label, and existing DFW Baseboard
+  report affordance. Hidden/removed posts remain excluded because reads filter
+  to published board-visible posts.
+- T17 does not add comments/replies, saves/reactions, search backend,
+  moderation queue UI, public sharing, lounge/restricted posting, Layovers
+  content, Crew Picks ranking, media, AI moderation, bans, proof-upload scope,
+  direct `board_posts` write policies, deploy, runtime settings changes, or
+  content/report/moderation record creation during validation.
 - Known migration drift remains preserved and broad `supabase db push` remains
   unsafe.
 
