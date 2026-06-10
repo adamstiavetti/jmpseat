@@ -128,7 +128,9 @@
 }
 
 .backLink:focus-visible,
-.primaryButton:focus-visible {
+.primaryButton:focus-visible,
+.surfaceCard:focus-visible,
+.breadcrumb a:focus-visible {
   outline: 3px solid var(--app-amber);
   outline-offset: 3px;
 }
@@ -555,6 +557,24 @@
   background: linear-gradient(180deg, #ffffff, #f8fafc);
 }
 
+.surfaceCard {
+  color: inherit;
+  text-decoration: none;
+}
+
+a.surfaceCard {
+  transition:
+    border-color 140ms ease,
+    box-shadow 140ms ease,
+    transform 140ms ease;
+}
+
+a.surfaceCard:hover {
+  border-color: rgba(15, 76, 154, 0.32);
+  box-shadow: 0 0.7rem 1.4rem rgba(15, 23, 42, 0.08);
+  transform: translateY(-1px);
+}
+
 .compactCard h3,
 .surfaceCard h3 {
   margin-top: 0.48rem;
@@ -690,6 +710,21 @@
   color: rgba(248, 250, 252, 0.86);
 }
 
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 0.42rem;
+  margin-top: 1rem;
+  color: var(--app-text-soft);
+  font-size: 0.76rem;
+  font-weight: 800;
+}
+
+.breadcrumb a {
+  color: var(--app-blue);
+  text-decoration: none;
+}
+
 .hubSurfaceGrid {
   margin-top: 1rem;
 }
@@ -700,6 +735,16 @@
   background:
     linear-gradient(135deg, rgba(255, 176, 46, 0.14), rgba(255, 255, 255, 0.98)),
     var(--app-white);
+}
+
+.safetyList {
+  display: grid;
+  gap: 0.45rem;
+  margin: 0.72rem 0 0;
+  padding-left: 1.1rem;
+  color: var(--app-text-muted);
+  font-size: 0.84rem;
+  line-height: 1.45;
 }
 
 @media (min-width: 680px) {

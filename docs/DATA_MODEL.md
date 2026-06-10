@@ -56,6 +56,10 @@ Home Dashboard note:
   the shell. It uses the existing T06 RPC/helper to set DFW and auto-follow the
   DFW Baseboard for app-eligible users who choose Start with DFW. It does not
   add schema or make Home Base an authorization signal.
+- `ops/fbmvp-t10-dfw-hub-section-shells.md` records the read-only child routes
+  for DFW Baseboard, Layovers, Lounges, and Crew Picks. It does not add schema,
+  posting/comments, search backend, saves/reactions, lounge requests, Crew Lead
+  tooling, AI, seed content, or proof-upload scope.
 
 ## Profile
 
@@ -519,6 +523,8 @@ Home Dashboard note:
 - The T08 read-only shell may display a followed-board placeholder for a user
   who has explicitly started with DFW, but the shell does not implement manual
   follow/unfollow behavior.
+- The T10 read-only DFW Hub section routes are destinations only. They do not
+  add manual follow/unfollow behavior or make follows an access grant.
 
 ## Airport
 

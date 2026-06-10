@@ -308,12 +308,17 @@ Current T08 implementation note:
 - Product-facing labels follow the Hub taxonomy: Hub, Baseboard, Layovers,
   Lounges, and Crew Picks.
 - The DFW Hub card opens the read-only DFW Hub shell.
+- T10 links DFW Hub section cards to read-only child routes for Baseboard,
+  Layovers, Lounges, and Crew Picks.
 - T08 does not add migrations, dashboard mutations, board discovery,
   follow/unfollow UI, posts/comments, saves,
   reactions, search backend, lounge request/review flows, Crew Lead panel UI,
   AI, seed content, or proof-upload scope.
 - T09 adds the narrow Start with DFW mutation path through the existing T06
   Home Base RPC/helper without adding schema or restricted-access behavior.
+- T10 does not add posting, comments, search backend, saves/reactions, Crew
+  Picks ranking, lounge request/review flows, Crew Lead panel UI, AI, seed
+  layover content, migrations, or proof-upload scope.
 
 Rationale:
 
@@ -354,12 +359,13 @@ The current implementation sequence is:
 4. Hub / Board taxonomy, governing board discovery and dashboard destinations
 5. `FBMVP-T08` Home Dashboard and DFW Hub read-only shell
 6. `FBMVP-T09` Start with DFW Home Base action
-7. `FBMVP-T10` board/layover discovery and follow UI shell
-8. `FBMVP-T11` text posts/comments foundation
-9. `FBMVP-T12` saves/reactions/useful/trending foundation
-10. `FBMVP-T13` search foundation with access-aware boundaries
-11. `FBMVP-T14` reporting/moderation/admin controls
-12. `FBMVP-T15` seeded DFW content, safety copy, and launch validation
+7. `FBMVP-T10` DFW Hub section read-only route shells
+8. `FBMVP-T11` board/layover discovery and follow UI shell
+9. `FBMVP-T12` text posts/comments foundation
+10. `FBMVP-T13` saves/reactions/useful/trending foundation
+11. `FBMVP-T14` search foundation with access-aware boundaries
+12. `FBMVP-T15` reporting/moderation/admin controls
+13. `FBMVP-T16` seeded DFW content, safety copy, and launch validation
 
 ## 10. Authorization Rules To Preserve
 

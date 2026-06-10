@@ -17,6 +17,21 @@ type DashboardItem = {
   meta: string;
 };
 
+type DfwHubSectionItem = DashboardItem & {
+  href: string;
+};
+
+export type DfwHubSectionKey = "baseboard" | "layovers" | "lounges" | "crew-picks";
+
+type DfwHubSectionShell = {
+  key: DfwHubSectionKey;
+  title: string;
+  eyebrow: string;
+  purpose: string;
+  safetyNotes?: readonly string[];
+  placeholders: readonly DashboardItem[];
+};
+
 type QuickAction = {
   title: string;
   detail: string;
@@ -100,35 +115,158 @@ const loungePreviews: readonly DashboardItem[] = [
   },
 ];
 
-const dfwHubSections: readonly DashboardItem[] = [
+const dfwHubSections: readonly DfwHubSectionItem[] = [
   {
     title: "Baseboard",
     detail: "DFW-based community questions, updates, and practical base knowledge.",
+    href: "/app/hubs/dfw/baseboard",
     meta: "Primary hub surface",
   },
   {
     title: "Layovers",
     detail: "Passing-through utility for food, transport, coffee, gyms, and area tips.",
+    href: "/app/hubs/dfw/layovers",
     meta: "Seed content later",
   },
   {
     title: "Lounges",
     detail: "Restricted membership spaces managed by scoped Crew Leads.",
+    href: "/app/hubs/dfw/lounges",
     meta: "Membership gated",
   },
   {
     title: "Crew Picks",
     detail: "Saved-driven and admin-curated useful content for the hub.",
+    href: "/app/hubs/dfw/crew-picks",
     meta: "Access aware later",
   },
 ];
 
+export const dfwHubSectionShells: Record<DfwHubSectionKey, DfwHubSectionShell> = {
+  baseboard: {
+    key: "baseboard",
+    title: "DFW Baseboard",
+    eyebrow: "Based-there community",
+    purpose:
+      "A read-only shell for DFW aviation-worker Q&A, updates, practical notes, and useful discussion. Community posting is not live yet.",
+    placeholders: [
+      {
+        title: "Recent discussions coming later",
+        detail: "Threads and replies will appear after the posting foundation exists.",
+        meta: "No posts yet",
+      },
+      {
+        title: "Ask Baseboard coming later",
+        detail: "The ask/post flow is not implemented in this shell.",
+        meta: "Read-only",
+      },
+      {
+        title: "Community posting is not live yet",
+        detail: "This route is only a destination placeholder behind the private app gate.",
+        meta: "Scope boundary",
+      },
+    ],
+  },
+  layovers: {
+    key: "layovers",
+    title: "DFW Layovers",
+    eyebrow: "Passing-through utility",
+    purpose:
+      "A read-only shell for crew layover utility: food, coffee, gyms, transportation basics, weather basics, quick recommendations, and Q&A.",
+    safetyNotes: [
+      "No exact crew hotel locations.",
+      "No live crew tracking.",
+      "No security-sensitive or operationally sensitive information.",
+    ],
+    placeholders: [
+      {
+        title: "Recommendations coming later",
+        detail: "Food, coffee, transport, and practical tips need content and moderation first.",
+        meta: "No seed content",
+      },
+      {
+        title: "Layover Q&A coming later",
+        detail: "Question and answer flows are not implemented in this shell.",
+        meta: "Read-only",
+      },
+      {
+        title: "Seeded destination strategy remains future",
+        detail: "No layover content was added by this ticket.",
+        meta: "Future lane",
+      },
+    ],
+  },
+  lounges: {
+    key: "lounges",
+    title: "DFW Lounges",
+    eyebrow: "Restricted spaces",
+    purpose:
+      "A read-only shell for restricted membership-based spaces associated with the DFW Hub and managed by Crew Leads later.",
+    safetyNotes: [
+      "Home Base does not grant lounge access.",
+      "Board follows do not grant lounge access.",
+      "Self-declared profile fields do not grant lounge access.",
+      "Lounge request and review flow is not live yet.",
+    ],
+    placeholders: [
+      {
+        title: "Flight Attendants Lounge coming later",
+        detail: "Access requires future approved membership, not Home Base or follows.",
+        meta: "Membership gated",
+      },
+      {
+        title: "Pilots Lounge coming later",
+        detail: "Crew Lead review tooling is not implemented in this shell.",
+        meta: "Coming later",
+      },
+      {
+        title: "New Hires Lounge coming later",
+        detail: "Request access remains future work.",
+        meta: "Request flow later",
+      },
+    ],
+  },
+  "crew-picks": {
+    key: "crew-picks",
+    title: "DFW Crew Picks",
+    eyebrow: "Useful signal",
+    purpose:
+      "A read-only shell for high-signal useful content curated by admins or saved-driven over time.",
+    safetyNotes: [
+      "No ranking is live.",
+      "No AI surfacing is live.",
+      "Lounge-visible content remains access-aware later.",
+    ],
+    placeholders: [
+      {
+        title: "Useful posts coming later",
+        detail: "Posts and guides need the content foundation before they can appear here.",
+        meta: "No posts yet",
+      },
+      {
+        title: "Layover picks coming later",
+        detail: "Layover recommendations require seeded content and safety review.",
+        meta: "Future lane",
+      },
+      {
+        title: "Access-aware content later",
+        detail: "Restricted lounge content must stay hidden unless membership permits it.",
+        meta: "Access boundary",
+      },
+    ],
+  },
+};
+
 function AppHeader({
   subtitle,
   showBackLink = false,
+  backHref = "/app",
+  backLabel = "Back Home",
 }: {
   subtitle?: string;
   showBackLink?: boolean;
+  backHref?: string;
+  backLabel?: string;
 }) {
   return (
     <header className={styles.appHeader}>
@@ -137,8 +275,8 @@ function AppHeader({
         {subtitle ? <span>{subtitle}</span> : null}
       </div>
       {showBackLink ? (
-        <Link className={styles.backLink} href="/app">
-          Back Home
+        <Link className={styles.backLink} href={backHref}>
+          {backLabel}
         </Link>
       ) : (
         <div className={styles.headerTools} aria-hidden="true">
@@ -517,11 +655,11 @@ export function DfwHubReadOnlyShell() {
           </div>
           <div className={styles.surfaceGrid}>
             {dfwHubSections.map((item) => (
-              <article className={styles.surfaceCard} key={item.title}>
+              <Link className={styles.surfaceCard} href={item.href} key={item.title}>
                 <span className={styles.cardMeta}>{item.meta}</span>
                 <h3>{item.title}</h3>
                 <p>{item.detail}</p>
-              </article>
+              </Link>
             ))}
           </div>
         </section>
@@ -535,6 +673,67 @@ export function DfwHubReadOnlyShell() {
             sensitive information belongs in this shell.
           </p>
         </section>
+      </div>
+    </main>
+  );
+}
+
+export function DfwHubSectionReadOnlyShell({
+  section,
+}: {
+  section: DfwHubSectionShell;
+}) {
+  return (
+    <main className={styles.shell}>
+      <div className={styles.mobileFrame}>
+        <AppHeader
+          backHref="/app/hubs/dfw"
+          backLabel="DFW Hub"
+          subtitle="DFW Hub section shell"
+          showBackLink
+        />
+
+        <nav className={styles.breadcrumb} aria-label="DFW Hub breadcrumb">
+          <Link href="/app/hubs/dfw">DFW Hub</Link>
+          <span aria-hidden="true">/</span>
+          <span>{section.title.replace("DFW ", "")}</span>
+        </nav>
+
+        <section className={styles.destinationHero} aria-labelledby={`${section.key}-title`}>
+          <span className={styles.cardLabel}>{section.eyebrow}</span>
+          <h1 id={`${section.key}-title`}>{section.title}</h1>
+          <p>{section.purpose}</p>
+        </section>
+
+        <section className={styles.hubSurfaceGrid} aria-labelledby={`${section.key}-coming-title`}>
+          <div className={styles.sectionTitleRow}>
+            <div>
+              <h2 id={`${section.key}-coming-title`}>Coming later</h2>
+              <p>This route is a private, read-only placeholder for the DFW Hub section.</p>
+            </div>
+          </div>
+          <div className={styles.surfaceGrid}>
+            {section.placeholders.map((item) => (
+              <article className={styles.surfaceCard} key={item.title}>
+                <span className={styles.cardMeta}>{item.meta}</span>
+                <h3>{item.title}</h3>
+                <p>{item.detail}</p>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        {section.safetyNotes ? (
+          <section className={styles.safetyBand} aria-labelledby={`${section.key}-safety-title`}>
+            <span className={styles.cardLabel}>Safety boundary</span>
+            <h2 id={`${section.key}-safety-title`}>Access and safety rules still apply.</h2>
+            <ul className={styles.safetyList}>
+              {section.safetyNotes.map((note) => (
+                <li key={note}>{note}</li>
+              ))}
+            </ul>
+          </section>
+        ) : null}
       </div>
     </main>
   );

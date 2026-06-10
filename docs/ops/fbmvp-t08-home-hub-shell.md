@@ -35,6 +35,16 @@ Home Base remains valid and does not block app entry.
 `/app/hubs/dfw` is a read-only DFW Hub shell. It shows the intended Hub
 surfaces without implementing their content or mutation behavior.
 
+`FBMVP-T10` adds read-only child route shells for those DFW Hub surfaces:
+
+- `/app/hubs/dfw/baseboard`
+- `/app/hubs/dfw/layovers`
+- `/app/hubs/dfw/lounges`
+- `/app/hubs/dfw/crew-picks`
+
+Those routes preserve the same private app gate/audit boundary and remain
+placeholder destinations only.
+
 ## Product-Facing Labels
 
 Use the current product-facing taxonomy from
