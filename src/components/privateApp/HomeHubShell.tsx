@@ -1,5 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
+import {
+  DFW_BASEBOARD_POST_CREATED_STATUS,
+  DFW_BASEBOARD_POST_FAILED_STATUS,
+  DFW_BASEBOARD_POST_INVALID_STATUS,
+  type DfwBaseboardPostStatus,
+} from "../../lib/community/boardPostActionState";
 import type { BaseboardPostListItem } from "../../lib/community/boardPostReads";
 
 import styles from "./homeHubShell.module.css";
@@ -37,6 +43,8 @@ type DfwHubSectionReadOnlyShellProps = {
   section: DfwHubSectionShell;
   baseboardPosts?: readonly BaseboardPostListItem[];
   baseboardPostsUnavailable?: boolean;
+  baseboardPostStatus?: DfwBaseboardPostStatus | null;
+  createBaseboardPostAction?: (formData: FormData) => Promise<void>;
 };
 
 type QuickAction = {
@@ -155,17 +163,17 @@ export const dfwHubSectionShells: Record<DfwHubSectionKey, DfwHubSectionShell> =
     title: "DFW Baseboard",
     eyebrow: "Based-there community",
     purpose:
-      "A read-only surface for published DFW aviation-worker Q&A, updates, practical notes, and useful discussion.",
+      "A minimal posting surface for published DFW aviation-worker Q&A, updates, practical notes, and useful discussion.",
     placeholders: [
       {
         title: "No DFW Baseboard posts yet.",
         detail:
-          "Published DFW Baseboard posts will appear here when they exist. Posting, replies, saves, reactions, and search are not live in this read-only foundation.",
+          "Published DFW Baseboard posts will appear here when they exist. Replies, saves, reactions, and search are not live in this minimal composer foundation.",
         meta: "No posts yet",
       },
       {
-        title: "Read-only foundation",
-        detail: "This route renders published Baseboard posts only. Creating posts remains outside this UI.",
+        title: "Minimal composer foundation",
+        detail: "This route supports title and body posting only. Replies and richer post tools remain outside this UI.",
         meta: "Scope boundary",
       },
     ],
@@ -600,18 +608,78 @@ function formatPostDate(value: string) {
 function DfwBaseboardPostsSection({
   posts = [],
   unavailable = false,
+  postStatus = null,
+  createAction,
 }: {
   posts?: readonly BaseboardPostListItem[];
   unavailable?: boolean;
+  postStatus?: DfwBaseboardPostStatus | null;
+  createAction?: (formData: FormData) => Promise<void>;
 }) {
+  const statusMessage =
+    postStatus === DFW_BASEBOARD_POST_CREATED_STATUS
+      ? "Your DFW Baseboard post is live."
+      : postStatus === DFW_BASEBOARD_POST_INVALID_STATUS
+        ? "Add a title and body before posting. Titles can be up to 120 characters and posts up to 4,000 characters."
+        : postStatus === DFW_BASEBOARD_POST_FAILED_STATUS
+          ? "jmpseat could not publish that post right now. Try again in a moment."
+          : null;
+  const isSuccessStatus = postStatus === DFW_BASEBOARD_POST_CREATED_STATUS;
+
   return (
     <section className={styles.hubSurfaceGrid} aria-labelledby="baseboard-posts-title">
       <div className={styles.sectionTitleRow}>
         <div>
           <h2 id="baseboard-posts-title">Recent Baseboard posts</h2>
-          <p>Read-only foundation. Posting, replies, saves, reactions, and search are not live.</p>
+          <p>Minimal composer foundation. Replies, saves, reactions, and search are not live.</p>
         </div>
       </div>
+
+      {createAction ? (
+        <form
+          action={createAction}
+          aria-labelledby="baseboard-composer-title"
+          className={styles.baseboardComposer}
+        >
+          <div>
+            <span className={styles.cardMeta}>Title and body only</span>
+            <h3 id="baseboard-composer-title">Post to DFW Baseboard</h3>
+            <p>Published posts appear here after the server action completes.</p>
+          </div>
+          <label className={styles.composerField}>
+            <span>Title</span>
+            <input
+              maxLength={120}
+              name="title"
+              placeholder="Ask a question or share a practical update"
+              required
+              type="text"
+            />
+          </label>
+          <label className={styles.composerField}>
+            <span>Body</span>
+            <textarea
+              maxLength={4000}
+              name="body"
+              placeholder="Keep it useful for DFW aviation workers."
+              required
+              rows={5}
+            />
+          </label>
+          <button className={styles.composerSubmit} type="submit">
+            Publish post
+          </button>
+        </form>
+      ) : null}
+
+      {statusMessage ? (
+        <p
+          className={isSuccessStatus ? styles.actionSuccess : styles.actionFeedback}
+          role="status"
+        >
+          {statusMessage}
+        </p>
+      ) : null}
 
       {unavailable ? (
         <p className={styles.actionFeedback}>
@@ -625,7 +693,7 @@ function DfwBaseboardPostsSection({
             <article className={styles.postCard} key={post.id}>
               <div className={styles.postHeader}>
                 <span className={styles.cardMeta}>
-                  {post.isPinned ? "Pinned" : "Read-only foundation"}
+                  {post.isPinned ? "Pinned" : "Minimal composer foundation"}
                 </span>
                 <span className={styles.postDate}>{formatPostDate(post.createdAt)}</span>
               </div>
@@ -645,8 +713,8 @@ function DfwBaseboardPostsSection({
           <h3>No DFW Baseboard posts yet.</h3>
           <p>
             Published DFW Baseboard posts will appear here when they exist.
-            Posting, replies, saves, reactions, and search are not live in this
-            read-only foundation.
+            Replies, saves, reactions, and search are not live in this minimal
+            composer foundation.
           </p>
         </article>
       )}
@@ -764,6 +832,8 @@ export function DfwHubSectionReadOnlyShell({
   section,
   baseboardPosts,
   baseboardPostsUnavailable = false,
+  baseboardPostStatus = null,
+  createBaseboardPostAction,
 }: DfwHubSectionReadOnlyShellProps) {
   return (
     <main className={styles.shell}>
@@ -789,6 +859,8 @@ export function DfwHubSectionReadOnlyShell({
 
         {section.key === "baseboard" ? (
           <DfwBaseboardPostsSection
+            createAction={createBaseboardPostAction}
+            postStatus={baseboardPostStatus}
             posts={baseboardPosts}
             unavailable={baseboardPostsUnavailable}
           />

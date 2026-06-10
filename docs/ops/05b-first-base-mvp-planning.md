@@ -369,13 +369,14 @@ The current implementation sequence is:
 9. `FBMVP-T12` shared posts/threads foundation, merged and runtime-applied
 10. `FBMVP-T13` server-controlled create-post foundation, merged and runtime-applied
 11. `FBMVP-T14` board post read foundation, merged and runtime-applied
+12. `FBMVP-T15` minimal DFW Baseboard post composer, implemented locally and runtime-pending
 
-Post-T14 implementation sequencing now points next to T15, after the T14
-runtime-pass documentation is reviewed and committed.
+Post-T15 runtime sequencing should use targeted preflight/apply for
+`20260610182000 create_open_baseboard_post` before any T15 runtime-pass record.
 
 The next implementation lane should be selected after deciding whether to
 prioritize comment/reply foundation, seeded Layovers implementation, or another
-narrow read-only surface on top of the shared post model.
+narrow surface on top of the shared post model.
 
 Recommended direction:
 
@@ -413,6 +414,16 @@ Recommended direction:
   search, lounge/restricted content, seeded layover implementation,
   proof-upload scope, user/community content creation, deploy, or runtime
   setting changes.
+- T15 is implemented locally as
+  `20260610182000 create_open_baseboard_post` and is runtime-pending. It adds a
+  minimal DFW Baseboard title/body composer through a server action only. The
+  wrapper RPC resolves DFW by base code to the active `open_verified`
+  `base_board`, then delegates to T13 `public.create_board_post(...)`, so T13
+  DB-level contribution eligibility remains final authority.
+- T15 does not add comments, saves/reactions, search backend, moderation queue,
+  lounge/restricted posting, Layovers seeded content, Crew Picks ranking,
+  proof-upload scope, direct `board_posts` write policies, runtime apply,
+  deploy, runtime settings changes, or content creation during validation.
 - Known Supabase migration-history drift remains and broad `supabase db push`
   remains unsafe.
 - Moderation/reporting remains required before broad beta posting expansion.

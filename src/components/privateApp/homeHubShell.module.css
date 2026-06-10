@@ -445,6 +445,16 @@
   line-height: 1.45;
 }
 
+.actionSuccess {
+  border: 1px solid rgba(22, 163, 74, 0.22);
+  border-radius: var(--app-radius);
+  padding: 0.65rem 0.75rem;
+  color: #166534;
+  background: #ecfdf3;
+  font-size: 0.8rem;
+  line-height: 1.45;
+}
+
 .mutedNote {
   color: var(--app-text-soft);
   font-size: 0.78rem;
@@ -548,6 +558,82 @@
 .postList {
   display: grid;
   gap: 0.72rem;
+}
+
+.baseboardComposer {
+  display: grid;
+  gap: 0.72rem;
+  margin-bottom: 0.85rem;
+  border: 1px solid rgba(217, 225, 236, 0.95);
+  border-radius: var(--app-radius);
+  padding: 0.88rem;
+  background: #f8fbff;
+}
+
+.baseboardComposer h3 {
+  margin: 0.48rem 0 0;
+  color: var(--app-text);
+  font-size: 0.98rem;
+  line-height: 1.18;
+}
+
+.baseboardComposer p {
+  margin: 0.35rem 0 0;
+  color: var(--app-text-muted);
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.composerField {
+  display: grid;
+  gap: 0.35rem;
+  color: var(--app-text);
+  font-size: 0.78rem;
+  font-weight: 820;
+}
+
+.composerField input,
+.composerField textarea {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid rgba(82, 96, 120, 0.24);
+  border-radius: var(--app-radius);
+  padding: 0.72rem 0.78rem;
+  color: var(--app-text);
+  background: var(--app-white);
+  font: inherit;
+  font-weight: 620;
+  line-height: 1.35;
+}
+
+.composerField textarea {
+  min-height: 8.5rem;
+  resize: vertical;
+}
+
+.composerField input:focus,
+.composerField textarea:focus {
+  border-color: rgba(15, 76, 154, 0.5);
+  outline: 3px solid rgba(255, 176, 46, 0.34);
+}
+
+.composerSubmit {
+  justify-self: start;
+  border: 1px solid rgba(8, 32, 61, 0.16);
+  border-radius: var(--app-radius);
+  padding: 0.72rem 0.95rem;
+  color: var(--app-white);
+  background: linear-gradient(135deg, var(--app-navy-850), #0f4c9a);
+  box-shadow: 0 0.7rem 1.5rem rgba(6, 21, 40, 0.14);
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.composerSubmit:focus-visible {
+  outline: 3px solid var(--app-amber);
+  outline-offset: 3px;
 }
 
 .compactCard,

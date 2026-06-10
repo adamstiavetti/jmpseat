@@ -485,6 +485,34 @@ Current T14 implementation direction:
 - Known Supabase migration-history drift remains, so broad `supabase db push`
   remains unsafe.
 
+Current T15 implementation direction:
+
+- `FBMVP-T15` adds `public.create_open_baseboard_post(...)` as a narrow
+  base-code wrapper for the minimal DFW Baseboard composer.
+- T15 is implemented locally as
+  `20260610182000 create_open_baseboard_post` and is runtime-pending.
+- The wrapper accepts a base code, title, body, default content type `note`, and
+  default category `general`.
+- It resolves the active base by code and the active `open_verified`
+  `base_board`, then delegates to T13 `public.create_board_post(...)`.
+- T13 remains the final DB-level contribution authority. Auth alone is not
+  enough, and contribution eligibility still requires completed profile plus
+  operator internal private-app access or active beta access with verified
+  work-email / aviation-worker status.
+- The DFW Baseboard UI adds only a server-action title/body composer and safe
+  status messages.
+- The server action does not hardcode a board UUID, does not use service-role
+  app code for the user posting path, and does not expose SQL/auth/eligibility
+  details to users.
+- T15 does not add comments, saves, reactions, search backend, moderation
+  queue, lounge/restricted posting, Layovers seeded content, Crew Picks ranking,
+  proof-upload scope, direct `board_posts` write policies, table changes, RLS
+  weakening, runtime migration apply, deploy, or runtime settings changes.
+- No post/content smoke test was run during local validation, and no
+  user/community content was created.
+- Known Supabase migration-history drift remains, so broad `supabase db push`
+  remains unsafe.
+
 Important fields:
 
 - id

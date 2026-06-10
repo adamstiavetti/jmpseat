@@ -77,6 +77,14 @@ const boardPostReadsSource = existsSync(
       "utf8",
     )
   : "";
+const boardPostActionsSource = existsSync(
+  new URL("../../src/lib/community/boardPostActions.ts", import.meta.url),
+)
+  ? readFileSync(
+      new URL("../../src/lib/community/boardPostActions.ts", import.meta.url),
+      "utf8",
+    )
+  : "";
 
 const combinedSource = [
   appRootSource,
@@ -186,43 +194,66 @@ test("DFW Baseboard route fetches read-only posts only after the private gate", 
   assert.match(dfwBaseboardRouteSource, /requireDfwHubRouteAccess/);
   assert.match(dfwBaseboardRouteSource, /await requireDfwHubRouteAccess[\s\S]*await listDfwBaseboardPosts/s);
   assert.match(dfwBaseboardRouteSource, /listDfwBaseboardPosts/);
+  assert.match(dfwBaseboardRouteSource, /createDfwBaseboardPostAction/);
   assert.match(dfwBaseboardRouteSource, /baseboardPosts/);
   assert.match(dfwBaseboardRouteSource, /baseboardPostsUnavailable/);
+  assert.match(dfwBaseboardRouteSource, /createBaseboardPostAction=\{createDfwBaseboardPostAction\}/);
   assert.match(dfwBaseboardRouteSource, /DfwHubSectionReadOnlyShell/);
   assert.match(dfwBaseboardRouteSource, /section=\{dfwHubSectionShells\.baseboard\}/);
   assert.match(dfwBaseboardRouteSource, /dynamic = "force-dynamic"/);
 
-  assert.doesNotMatch(dfwBaseboardRouteSource, /create_board_post|createBoardPost|submit|composer/i);
+  assert.doesNotMatch(dfwBaseboardRouteSource, /create_board_post/);
   assert.doesNotMatch(dfwBaseboardRouteSource, /\.insert\(|\.update\(|\.delete\(/);
 });
 
-test("DFW Baseboard shell supports empty and populated read-only post states", () => {
+test("DFW Baseboard shell supports empty, populated, and minimal composer states", () => {
   assert.match(shellSource, /baseboardPosts\?:/);
   assert.match(shellSource, /baseboardPostsUnavailable\?: boolean/);
+  assert.match(shellSource, /createBaseboardPostAction\?:/);
+  assert.match(shellSource, /baseboardPostStatus\?:/);
   assert.match(shellSource, /No DFW Baseboard posts yet\./);
   assert.match(
     shellSource,
-    /Published DFW Baseboard posts will appear here when they exist\. Posting, replies, saves, reactions, and search are not live in this read-only foundation\./,
+    /Published DFW Baseboard posts will appear here when they exist\. Replies, saves, reactions, and search are not live in this minimal composer foundation\./,
   );
-  assert.match(shellSource, /Read-only foundation/);
+  assert.match(shellSource, /Minimal composer foundation/);
+  assert.match(shellSource, /Post to DFW Baseboard/);
+  assert.match(shellSource, /name="title"/);
+  assert.match(shellSource, /name="body"/);
+  assert.match(shellSource, /type="submit"/);
+  assert.match(shellSource, /Your DFW Baseboard post is live\./);
+  assert.match(shellSource, /Add a title and body before posting/);
+  assert.match(shellSource, /jmpseat could not publish that post right now/);
   assert.match(shellSource, /authorLabel/);
   assert.match(shellSource, /contentType/);
   assert.match(shellSource, /category/);
   assert.match(shellSource, /isPinned/);
   assert.match(shellSource, /DfwBaseboardPostsSection/);
   assert.match(shellSource, /section\.key === "baseboard"/);
+  assert.match(shellSource, /createAction \?/);
 
   assert.doesNotMatch(shellSource, /Ask Baseboard coming later/);
   assert.doesNotMatch(shellSource, /Community posting is not live yet/);
-  assert.doesNotMatch(shellSource, /create_board_post|createBoardPost|composer/i);
+  assert.doesNotMatch(shellSource, /create_board_post/);
+  assert.doesNotMatch(shellSource, /name="category"|name="content_type"/);
 });
 
 test("DFW Baseboard post rendering stays safe and avoids out-of-scope surfaces", () => {
-  const combined = `${dfwBaseboardRouteSource}\n${shellSource}\n${shellStyles}\n${boardPostReadsSource}`;
+  const combined = `${dfwBaseboardRouteSource}\n${shellSource}\n${shellStyles}\n${boardPostReadsSource}\n${boardPostActionsSource}`;
 
   assert.doesNotMatch(combined, /author_user_id|email|claimedAirline|claimedRole|claimedBase|verification evidence|proof artifact|storage_path|signed_url/i);
   assert.doesNotMatch(combined, /comment form|reply form|save button|reaction button|search backend|crew picks ranking/i);
   assert.doesNotMatch(combined, /lounge_memberships|members_only|operator_only|seeded layover/i);
+  assert.doesNotMatch(combined, /createBrowserClient|service_role|\.insert\(|\.update\(|\.delete\(/);
+});
+
+test("DFW Baseboard composer is not wired into non-Baseboard hub sections", () => {
+  assert.match(shellSource, /section\.key === "baseboard"/);
+  assert.match(shellSource, /createBaseboardPostAction/);
+
+  for (const route of dfwSectionRoutes.slice(1)) {
+    assert.doesNotMatch(route.source, /createDfwBaseboardPostAction|createBaseboardPostAction|Post to DFW Baseboard/);
+  }
 });
 
 test("DFW Hub cards link to read-only section route shells", () => {

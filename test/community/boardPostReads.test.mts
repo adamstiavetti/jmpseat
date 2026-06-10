@@ -161,9 +161,10 @@ test("T14 keeps comments, reactions, saves, search, lounge posting, AI, proof up
   assert.doesNotMatch(combined, /verification_proofs|storage\.objects|storage_path|signed_url|proof upload|badge upload/i);
 });
 
-test("T14 docs describe the local read foundation and runtime-pending migration boundary", () => {
+test("T14 docs describe the runtime-applied read foundation and runtime pass", () => {
   const docs = [
     "../../docs/ops/fbmvp-t14-board-post-read-foundation.md",
+    "../../docs/ops/fbmvp-t14-board-post-read-runtime-pass.md",
     "../../docs/BUILD_TICKETS.md",
     "../../docs/DATA_MODEL.md",
     "../../docs/ops/05b-first-base-mvp-planning.md",
@@ -174,7 +175,8 @@ test("T14 docs describe the local read foundation and runtime-pending migration 
   assert.match(docs, /FBMVP-T14/i);
   assert.match(docs, /Board Post Read Foundation/i);
   assert.match(docs, /read-only DFW Baseboard/i);
-  assert.match(docs, /runtime-pending|runtime pending/i);
+  assert.match(docs, /runtime-applied/i);
+  assert.match(docs, /fbmvp-t14-board-post-read-runtime-pass/i);
   assert.match(docs, /list_open_baseboard_posts/i);
   assert.match(docs, /current_user_can_read_open_board_posts/i);
   assert.match(docs, /handle only|profiles\.handle/i);

@@ -60,6 +60,7 @@ Supplemental epoch-specific ticket packs:
 - [FBMVP-T13 Create Post Runtime Pass](ops/fbmvp-t13-create-post-runtime-pass.md) - records targeted runtime application of `20260610143547 create_board_post_rpc` to the intended `jmpseat` Supabase project, verifies function grants, DB-level contribution eligibility, `board_posts` read/write posture, and confirms no user/community content was created.
 - [FBMVP-T14 Board Post Read Foundation](ops/fbmvp-t14-board-post-read-foundation.md) - runtime-applied read-only DFW Baseboard post rendering foundation using a narrow `list_open_baseboard_posts` RPC, DB-level private-beta read eligibility, safe handle-only author labels, and no composer, comments, saves, reactions, search, lounge/restricted content, seeded layover implementation, proof-upload scope, content creation, deploy, or broad Supabase `db push`.
 - [FBMVP-T14 Board Post Read Runtime Pass](ops/fbmvp-t14-board-post-read-runtime-pass.md) - records targeted runtime application of `20260610162000 create_board_post_read_rpc` to the intended `jmpseat` Supabase project, verifies function grants, DB-level read eligibility, safe return fields, `board_posts` RLS/policy posture, and confirms no user/community content was created.
+- [FBMVP-T15 Minimal Post Composer](ops/fbmvp-t15-minimal-post-composer.md) - local runtime-pending minimal DFW Baseboard title/body composer using a server action and narrow `create_open_baseboard_post` wrapper that resolves DFW by base code, delegates to T13 `create_board_post`, preserves T13 DB-level contribution eligibility, and adds no comments, saves, reactions, search, moderation queue, lounge/restricted posting, Layovers seeded content, Crew Picks ranking, proof-upload scope, direct write policies, runtime apply, deploy, or broad Supabase `db push`.
 - [First-Base MVP Implementation Ticket Pack](epochs/first-base-mvp-implementation-ticket-pack.md) - translates the pivot strategy docs into the ordered `FBMVP` implementation sequence; the immediate post-Epoch-5 narrow lane is first reconciled in `ops/private-beta-readiness-bridge.md`, and auth email branding/custom SMTP is now tracked as a deferred beta-readiness polish TODO rather than the active next auth-flow implementation task.
 - [FBMVP-T01: Freeze User-Facing Proof Verification Surfaces](epochs/fbmvp-t01-freeze-user-facing-proof-verification-surfaces.md) - freezes normal proof-upload UX while preserving historical proof infrastructure, cleanup, audit, and admin/operator safety.
 - [FBMVP-T02: Airline Email Verification Access State Design](epochs/fbmvp-t02-airline-email-verification-access-state-design.md) - defines the forward `airline_email_verified` app-level eligibility state and how it maps from existing work-email verification foundations.
@@ -256,13 +257,14 @@ Current sequence:
 10. `FBMVP-T12` shared post/thread foundation, merged and runtime-applied
 11. `FBMVP-T13` server-controlled create-post foundation, merged and runtime-applied
 12. `FBMVP-T14` board post read foundation, merged and runtime-applied
+13. `FBMVP-T15` minimal DFW Baseboard post composer, implemented locally and runtime-pending
 
-Post-T14 implementation sequencing now points next to T15, after the T14
-runtime-pass documentation is reviewed and committed.
+Post-T15 runtime sequencing should use targeted preflight/apply for
+`20260610182000 create_open_baseboard_post` before any T15 runtime-pass record.
 
 The next implementation lane should be selected after deciding whether to
 prioritize comment/reply foundation, seeded Layovers implementation, or another
-narrow read-only community surface on top of the shared post model.
+narrow community surface on top of the shared post model.
 
 Recommended direction:
 
@@ -290,6 +292,16 @@ Recommended direction:
   posts exist. It does not add a composer, post creation UI, comments, saves,
   reactions, search, lounge/restricted content, seeded layover implementation,
   proof-upload scope, content creation, deploy, or runtime settings changes.
+- T15 is implemented locally as
+  `20260610182000 create_open_baseboard_post` and is runtime-pending. It adds a
+  minimal DFW Baseboard title/body composer through a server action only. The
+  wrapper RPC resolves DFW by base code to the active `open_verified`
+  `base_board`, delegates to T13 `public.create_board_post(...)`, and preserves
+  T13 DB-level contribution eligibility as final authority.
+- T15 does not add comments, saves/reactions, search backend, moderation queue,
+  lounge/restricted posting, Layovers seeded content, Crew Picks ranking,
+  proof-upload scope, direct `board_posts` write policies, deploy, runtime
+  settings changes, or content creation during validation.
 - Known migration drift remains preserved and broad `supabase db push` remains
   unsafe.
 
