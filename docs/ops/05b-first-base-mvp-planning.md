@@ -374,10 +374,11 @@ The current implementation sequence is:
 14. `FBMVP-T17` DFW Baseboard post detail, merged and runtime-applied
 15. `FBMVP-T18` DFW Baseboard moderation review, merged and runtime-applied
 16. `FBMVP-T19` DFW Baseboard comments foundation, merged and runtime-applied
+17. `FBMVP-T20` DFW Baseboard comment reporting/moderation review integration, merged and runtime-applied
 
-Do not proceed to comment reporting/moderation review integration, saves/
-reactions, search, Crew Picks, or Layovers content until T19 runtime-pass
-documentation is reviewed and committed.
+T20 closes the First Base / DFW Baseboard safety loop pending runtime-pass docs
+review and commit. The next step after that commit should be an epoch
+closeout/readiness audit, not a new feature by default.
 
 Recommended direction:
 
@@ -517,8 +518,10 @@ Recommended direction:
   was `1`, `public.board_post_reports` count was `0`, and
   `public.board_post_comments` count was `0`.
 - Broad Supabase `db push` remains unsafe due known migration drift.
-- T20 is locally implemented as
-  `20260611014500 create_board_post_comment_reports` and is runtime-pending.
+- T20 is runtime-applied as
+  `20260611014500 create_board_post_comment_reports`. The runtime pass is
+  recorded in
+  `docs/ops/fbmvp-t20-dfw-baseboard-comment-reporting-review-runtime-pass.md`.
   It adds private comment report storage, safe comment report/review RPCs,
   compact comment report UI on top-level comments, and a separate comment
   reports section in `/app/admin/community-moderation`.
@@ -530,11 +533,23 @@ Recommended direction:
 - T20 does not add nested replies, saves/reactions, search backend, Crew Picks,
   Layovers, public sharing, lounge/restricted posting, media, AI moderation,
   bans, appeals, proof-upload scope, deploy, runtime settings changes, or
-  content/report/comment/moderation record creation during local validation.
-- Broad Supabase `db push` remains unsafe due known migration drift. T20
-  requires targeted runtime preflight/apply.
-- T21 should be planned only after T20 runtime-pass docs are reviewed and
-  committed.
+  content/report/comment/moderation record creation during local validation or
+  runtime apply.
+- T20 runtime verification confirmed RLS on the comment report table, no direct
+  anon/public/authenticated table access, service-role table access only,
+  expected report constraints/indexes/triggers, and safe report/review RPC
+  grants.
+- T20 runtime verification used catalog/permission/schema/count checks only. No
+  comment report/review RPCs were called for live row output, and no
+  post/comment/report content, author labels, reporter information, user IDs, or
+  runtime content was read or printed. `public.board_posts` count was `1`,
+  `public.board_post_reports` count was `0`, `public.board_post_comments` count
+  was `0`, and `public.board_post_comment_reports` count was `0`.
+- Known migration drift remains preserved and broad Supabase `db push` remains
+  unsafe.
+- T20 closes the First Base / DFW Baseboard safety loop pending runtime-pass
+  docs review and commit. The next step after that commit should be an epoch
+  closeout/readiness audit, not a new feature by default.
 
 ## 10. Authorization Rules To Preserve
 

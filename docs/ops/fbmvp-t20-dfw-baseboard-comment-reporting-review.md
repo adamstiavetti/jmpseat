@@ -1,6 +1,6 @@
 # FBMVP-T20 DFW Baseboard Comment Reporting + Moderation Review
 
-Status: implemented locally, runtime-pending.
+Status: runtime-applied.
 
 `FBMVP-T20` adds the missing safety intake and operator review loop for
 top-level DFW Baseboard comments. It keeps comment reporting server/RPC
@@ -29,14 +29,14 @@ Local migration:
 
 - `supabase/migrations/20260611014500_create_board_post_comment_reports.sql`
 
-Expected targeted runtime ledger row:
+Targeted runtime ledger row:
 
 - version: `20260611014500`
 - name: `create_board_post_comment_reports`
 
 Known Supabase migration-history drift remains preserved. Broad Supabase
-`db push` remains unsafe. T20 requires targeted runtime preflight/apply before a
-runtime-pass record can be created.
+`db push` remains unsafe. The targeted runtime pass is recorded in
+`docs/ops/fbmvp-t20-dfw-baseboard-comment-reporting-review-runtime-pass.md`.
 
 ## Comment Report Storage
 
@@ -173,7 +173,51 @@ T20 preserves zero direct `board_posts` write policies and adds no direct
 No posts, reports, moderation records, comments, replies, saves, reactions,
 search indexes, or user/community content were created during local validation.
 
+## Runtime Verification
+
+T20 was successfully runtime-applied to the Supabase `jmpseat` project
+(`qcdfjrcnwuioqprmqqzx`) as
+`20260611014500 create_board_post_comment_reports`.
+
+Runtime verification confirmed:
+
+- `public.board_post_comment_reports` exists with RLS enabled
+- no direct table access exists for `anon`, `public`, or `authenticated`
+- service_role has expected `select`, `insert`, and `update`
+- report reason/status allowlists, details/resolution-note bounds, the
+  repeated open/reviewing report unique index, and the updated-at trigger exist
+- both T20 RPCs exist with locked `search_path=public, pg_temp`
+- `public.report_open_baseboard_post_comment(...)` requires `auth.uid()` and
+  `public.current_user_can_read_open_board_posts()`, reports only published
+  top-level comments on published board-visible posts, forces reporter identity
+  from `auth.uid()`, and returns only a report UUID
+- `public.list_open_baseboard_post_comment_reports(...)` is `STABLE`, requires
+  `public.is_operator_with_scope('operator.community_moderation')`, returns only
+  open/reviewing comment reports for published top-level comments on published
+  board-visible posts, clamps limit to max `100`, and returns safe bounded
+  operator-review columns only
+- function execute is revoked from `public` and `anon`, and granted only to
+  `authenticated` and `service_role`
+- `public.board_posts` write policy count remains `0`
+- `public.board_post_comments` write policy count remains `0`
+- `public.board_post_comment_reports` policy count is `0`
+
+Runtime smoke verification used count-only checks. No comment report/review RPCs
+were called for live row output, and no post/comment/report content, author
+label, reporter information, user IDs, or runtime content was printed.
+
+Counts at verification:
+
+- `public.board_posts`: `1`
+- `public.board_post_reports`: `0`
+- `public.board_post_comments`: `0`
+- `public.board_post_comment_reports`: `0`
+
+No posts, reports, moderation records, comments, replies, saves, reactions,
+search indexes, or user/community content were created by the T20 migration/apply.
+
 ## Next Step
 
-Run targeted runtime preflight/apply for T20. T21 should be planned only after
-T20 runtime-pass docs are reviewed and committed.
+This closes the First Base / DFW Baseboard safety loop pending runtime-pass docs
+review and commit. The next step after that commit should be an epoch
+closeout/readiness audit, not a new feature by default.

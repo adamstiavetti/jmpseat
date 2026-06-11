@@ -663,10 +663,12 @@ Current T19 runtime state:
   search indexes, or user/community content were created by T19 migration/apply.
 - Known Supabase migration-history drift remains, so broad `supabase db push`
   remains unsafe.
-Current T20 local state:
+Current T20 runtime state:
 
-- `FBMVP-T20` is locally implemented and runtime-pending as
-  `20260611014500 create_board_post_comment_reports`.
+- `FBMVP-T20` is runtime-applied as
+  `20260611014500 create_board_post_comment_reports`. The runtime pass is
+  recorded in
+  `docs/ops/fbmvp-t20-dfw-baseboard-comment-reporting-review-runtime-pass.md`.
 - It adds `public.board_post_comment_reports` for private top-level comment
   report storage.
 - It adds `public.report_open_baseboard_post_comment(...)` for user reporting of
@@ -685,11 +687,29 @@ Current T20 local state:
   bans, appeals, or proof-upload scope.
 - No posts, reports, moderation records, comments, replies, saves, reactions,
   search indexes, or user/community content were created during local
-  validation.
-- Broad Supabase `db push` remains unsafe due known migration drift. T20
-  requires targeted runtime preflight/apply.
-- T21 should be planned only after T20 runtime-pass docs are reviewed and
-  committed.
+  validation or runtime apply.
+- Runtime verification confirmed RLS on `public.board_post_comment_reports`, no
+  direct anon/public/authenticated report-table access, service-role table
+  access only, expected reason/status allowlists, bounded details/resolution
+  notes, repeated open/reviewing report prevention, and updated-at trigger
+  support.
+- Runtime verification confirmed both T20 RPCs use locked
+  `search_path=public, pg_temp`; the report RPC requires `auth.uid()` and
+  `public.current_user_can_read_open_board_posts()` and returns only a UUID; the
+  operator review RPC is `STABLE`, requires
+  `public.is_operator_with_scope('operator.community_moderation')`, clamps
+  limit to `100`, and returns safe bounded operator-review columns only.
+- T20 runtime verification used catalog/permission/schema/count checks only. No
+  comment report/review RPCs were called for live row output, and no
+  post/comment/report content, author labels, reporter information, user IDs, or
+  runtime content was read or printed. `public.board_posts` count was `1`,
+  `public.board_post_reports` count was `0`, `public.board_post_comments` count
+  was `0`, and `public.board_post_comment_reports` count was `0`.
+- Known migration drift remains preserved and broad Supabase `db push` remains
+  unsafe.
+- T20 closes the First Base / DFW Baseboard safety loop pending runtime-pass
+  docs review and commit. The next step after that commit should be an epoch
+  closeout/readiness audit, not a new feature by default.
 
 Important fields:
 
