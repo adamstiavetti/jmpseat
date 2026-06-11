@@ -32,6 +32,8 @@ Use this source pack for Hub implementation, product planning, and wireframes:
 - `docs/ops/fbmvp-t23a-full-mobile-hub-wireframes.md` - mobile-first
   wireframe packet for the post-pivot private-beta Hub experience, including
   approved visual mockup direction and required prototype cleanup.
+- `docs/ops/fbmvp-t23b-static-wireframe-prototype-manual-review.md` - manual
+  beta visual review result for the protected static Hub prototype route.
 
 Wireframe source pack:
 
@@ -411,6 +413,16 @@ The route uses the existing admin-shell authorization boundary and isolated
 static prototype UI with local fake data only. It is not linked from normal user
 navigation, does not import community content fetchers, does not call Supabase
 content RPCs, and does not implement real Channels.
+
+Manual beta visual review is recorded in
+`docs/ops/fbmvp-t23b-static-wireframe-prototype-manual-review.md` for commit
+`07ebf7b fix: polish hub wireframe prototype`. Decision: approved with future
+UI polish. No functionality blocker remains, and the prototype route should not
+receive more polish before implementation planning.
+
+Next recommended work: a narrow real Home / DFW Hub visual refresh
+implementation that preserves existing access gates and safe data paths. Do not
+start DB/RPC-backed Channels until explicitly scoped.
 
 Alternative implementation ticket:
 

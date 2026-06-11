@@ -111,6 +111,13 @@ authorization, local fake/static arrays, isolated route styles, and no
 community content fetchers or Supabase content RPCs. It remains a design review
 surface only, not a real Channels implementation.
 
+T23B manual beta visual review is recorded in
+`docs/ops/fbmvp-t23b-static-wireframe-prototype-manual-review.md` for commit
+`07ebf7b fix: polish hub wireframe prototype`. Decision: approved with future
+UI polish. No functionality blocker remains, and the next work should move into
+narrow Home / DFW Hub implementation planning instead of more prototype
+polishing.
+
 Wireframe agents should use the current product language `[AIRPORT] Hub`,
 `[AIRPORT] Today`, Base, Layover, Channels, Recent Useful Threads, and Request
 a Channel inside Channels. DFW default Channels are DFW Questions, Commuting &
@@ -428,8 +435,9 @@ The current implementation sequence is:
 18. `FBMVP-T21` DFW Hub product framing, implemented locally with no migration
 19. `FBMVP-T22` Hub Channels IA/data-model lock, docs-only
 20. `FBMVP-T23A` full mobile Hub wireframes, docs/design-only
-21. `FBMVP-T23B` protected static Hub wireframe prototype route, local
-    implementation only with no migration or runtime mutation
+21. `FBMVP-T23B` protected static Hub wireframe prototype route, locally
+    implemented and manually reviewed; approved with future UI polish and no
+    migration or runtime mutation
 
 T20 runtime-pass docs are committed. The First Base / DFW Baseboard safety loop
 is complete. The approved pivot is recorded in `ops/hub-pivot-plan.md`.
@@ -685,7 +693,12 @@ Recommended direction:
   `board_posts`, comments, reports, author IDs, reporter identity, or runtime
   UGC, mutate no runtime data, and apply no migrations. T23B is now locally
   implemented as that protected admin-only static prototype route, with no
-  normal-user navigation and no runtime apply/deploy yet.
+  normal-user navigation. Manual beta visual review at
+  `07ebf7b fix: polish hub wireframe prototype` approved the route with future
+  UI polish and no functionality blocker. Do not keep polishing the prototype;
+  move into a narrow real Home / DFW Hub visual refresh implementation ticket
+  while preserving existing access gates and safe data paths. Do not start
+  DB/RPC-backed Channels until explicitly scoped.
 
 Pre-closeout access baseline: public `jmpseat.com` and `www.jmpseat.com` are
 marketing/waitlist-only through `bad2110 fix: gate private app on public
