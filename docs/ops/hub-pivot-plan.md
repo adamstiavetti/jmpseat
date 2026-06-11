@@ -426,6 +426,12 @@ real private-app Home/dashboard and real DFW Hub overview while preserving
 existing access gates and safe data paths. Do not start DB/RPC-backed Channels
 until explicitly scoped.
 
+T24A deployed beta/manual browser smoke is recorded in
+`docs/ops/fbmvp-t24a-real-home-dfw-hub-runtime-smoke.md` for commit
+`12df45b feat: refresh home and dfw hub surfaces`. Decision: runtime smoke
+passed with non-blocking visual polish. No functionality blocker was observed,
+and no further T24A implementation patch is required before moving forward.
+
 Alternative implementation ticket:
 
 `FBMVP-T23: DFW Hub Channels Foundation`

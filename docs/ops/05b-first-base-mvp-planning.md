@@ -118,6 +118,12 @@ UI polish. No functionality blocker remains, and `FBMVP-T24A` now records the
 narrow real Home / DFW Hub visual refresh implementation status in
 `docs/ops/fbmvp-t24a-real-home-dfw-hub-visual-refresh.md`.
 
+T24A deployed beta/manual browser smoke is recorded in
+`docs/ops/fbmvp-t24a-real-home-dfw-hub-runtime-smoke.md` for commit
+`12df45b feat: refresh home and dfw hub surfaces`. Decision: runtime smoke
+passed with non-blocking visual polish. No functionality blocker was observed,
+and no further T24A implementation patch is required before moving forward.
+
 Wireframe agents should use the current product language `[AIRPORT] Hub`,
 `[AIRPORT] Today`, Base, Layover, Channels, Recent Useful Threads, and Request
 a Channel inside Channels. DFW default Channels are DFW Questions, Commuting &
@@ -440,6 +446,8 @@ The current implementation sequence is:
     migration or runtime mutation
 22. `FBMVP-T24A` real Home + DFW Hub visual refresh, locally implemented with
     no migration, runtime mutation, deploy, or DB/RPC-backed Channels
+23. `FBMVP-T24A` deployed beta/manual browser smoke, passed with non-blocking
+    visual polish and no functionality blocker
 
 T20 runtime-pass docs are committed. The First Base / DFW Baseboard safety loop
 is complete. The approved pivot is recorded in `ops/hub-pivot-plan.md`.
@@ -699,8 +707,11 @@ Recommended direction:
   `07ebf7b fix: polish hub wireframe prototype` approved the route with future
   UI polish and no functionality blocker. Do not keep polishing the prototype.
   `FBMVP-T24A` now locally refreshes the real Home/dashboard and DFW Hub
-  overview while preserving existing access gates and safe data paths. Do not
-  start DB/RPC-backed Channels until explicitly scoped.
+  overview while preserving existing access gates and safe data paths. T24A
+  deployed beta/manual browser smoke passed with non-blocking visual polish and
+  no functionality blocker, so move to next implementation planning unless a
+  functional issue appears. Do not start DB/RPC-backed Channels until
+  explicitly scoped.
 
 Pre-closeout access baseline: public `jmpseat.com` and `www.jmpseat.com` are
 marketing/waitlist-only through `bad2110 fix: gate private app on public

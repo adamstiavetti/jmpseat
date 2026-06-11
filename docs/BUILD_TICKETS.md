@@ -39,6 +39,11 @@ Current controlling docs for Hub work:
   using the approved post-Hub-pivot direction while preserving existing access
   gates, safe data paths, internal Baseboard primitives, and the deferred
   DB/RPC-backed Channels scope.
+- [FBMVP-T24A Real Home + DFW Hub Runtime Smoke](ops/fbmvp-t24a-real-home-dfw-hub-runtime-smoke.md) - records deployed beta/manual browser
+  review of `12df45b` on `beta.jmpseat.com` for `/app` and `/app/hubs/dfw`.
+  Decision: runtime smoke passed with non-blocking visual polish, no
+  functionality blocker, and no need for further T24A implementation patches
+  before moving forward.
 
 Wireframe source pack:
 
@@ -128,6 +133,11 @@ Supplemental epoch-specific ticket packs:
   and section-first overview, keeps Request a Channel secondary inside the
   Channels section, and adds no migrations, runtime mutation, new content RPCs,
   live integrations, or DB/RPC-backed Channels.
+- [FBMVP-T24A Real Home + DFW Hub Runtime Smoke](ops/fbmvp-t24a-real-home-dfw-hub-runtime-smoke.md) - deployed beta/manual browser smoke for
+  `12df45b` on `beta.jmpseat.com`, covering `/app` and `/app/hubs/dfw`.
+  It records that the UI still needs visual polish, but no functionality
+  blocker was observed and the build path should move forward instead of
+  continuing to polish this slice.
 - [First-Base MVP Implementation Ticket Pack](epochs/first-base-mvp-implementation-ticket-pack.md) - translates the pivot strategy docs into the ordered `FBMVP` implementation sequence; the immediate post-Epoch-5 narrow lane is first reconciled in `ops/private-beta-readiness-bridge.md`, and auth email branding/custom SMTP is now tracked as a deferred beta-readiness polish TODO rather than the active next auth-flow implementation task.
 - [FBMVP-T01: Freeze User-Facing Proof Verification Surfaces](epochs/fbmvp-t01-freeze-user-facing-proof-verification-surfaces.md) - freezes normal proof-upload UX while preserving historical proof infrastructure, cleanup, audit, and admin/operator safety.
 - [FBMVP-T02: Airline Email Verification Access State Design](epochs/fbmvp-t02-airline-email-verification-access-state-design.md) - defines the forward `airline_email_verified` app-level eligibility state and how it maps from existing work-email verification foundations.
