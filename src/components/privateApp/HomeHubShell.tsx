@@ -24,6 +24,7 @@ import {
   DFW_BASEBOARD_REPORT_REPORTED_STATUS,
   type DfwBaseboardReportStatus,
 } from "../../lib/community/boardPostSafetyActionState";
+import type { HubChannelListItem } from "../../lib/community/hubChannels";
 
 import styles from "./homeHubShell.module.css";
 
@@ -56,6 +57,11 @@ type DfwHubSectionShell = {
   purpose: string;
   safetyNotes?: readonly string[];
   placeholders: readonly DashboardItem[];
+};
+
+type DfwChannelsOverviewShellProps = {
+  channels?: readonly HubChannelListItem[];
+  channelsUnavailable?: boolean;
 };
 
 type DfwHubSectionReadOnlyShellProps = {
@@ -96,23 +102,23 @@ type SuggestedChannel = DashboardItem & {
 
 const suggestedChannels: readonly SuggestedChannel[] = [
   {
-    title: "DFW Questions",
-    detail: "Ask and get answers from verified aviation workers.",
-    href: "/app/hubs/dfw/baseboard",
+    title: "DFW Q&A",
+    detail: "General questions when a topic does not fit a specific channel.",
+    href: "/app/hubs/dfw/channels",
     icon: "question",
     meta: "Channel preview",
   },
   {
-    title: "Food & Coffee",
-    detail: "Useful local picks stay inside scoped DFW discussion.",
-    href: "/app/hubs/dfw/baseboard",
+    title: "Commuting & Parking",
+    detail: "Employee parking, commuting, transit, and practical access questions.",
+    href: "/app/hubs/dfw/channels",
     icon: "coffee",
     meta: "Channel preview",
   },
   {
-    title: "Crew Tips",
-    detail: "Helpful practical notes from experienced workers.",
-    href: "/app/hubs/dfw/baseboard",
+    title: "DFW Layover & Local",
+    detail: "Safe local recommendations without exact crew hotel exposure.",
+    href: "/app/hubs/dfw/channels",
     icon: "crew",
     meta: "Channel preview",
   },
@@ -129,7 +135,7 @@ const quickActions: readonly QuickAction[] = [
   {
     title: "Browse Channels",
     detail: "Scoped threads",
-    href: "/app/hubs/dfw/baseboard",
+    href: "/app/hubs/dfw/channels",
     icon: "chat",
     tone: "channels",
   },
@@ -175,9 +181,9 @@ const dfwHubSections: readonly DfwHubSectionItem[] = [
   {
     title: "Channels",
     detail:
-      "Browse DFW Questions, Commuting & Parking, Food & Coffee, and Crew Tips.",
+      "Browse active DFW channel spaces backed by Hub child board metadata.",
     cta: "Browse Channels",
-    href: "/app/hubs/dfw/baseboard",
+    href: "/app/hubs/dfw/channels",
     icon: "channels",
     meta: "Scoped discussion",
   },
@@ -639,7 +645,7 @@ function SuggestedChannelsSection() {
     <section className={styles.panelSection} aria-labelledby="suggested-channels-title">
       <div className={styles.sectionTitleRow}>
         <h2 id="suggested-channels-title">Suggested Channels</h2>
-        <Link className={styles.viewAll} href="/app/hubs/dfw/baseboard">
+        <Link className={styles.viewAll} href="/app/hubs/dfw/channels">
           View all
         </Link>
       </div>
@@ -660,6 +666,19 @@ function SuggestedChannelsSection() {
         ))}
       </div>
     </section>
+  );
+}
+
+function DfwChannelsRequestFooter() {
+  return (
+    <article className={styles.channelRequestCard}>
+      <span className={styles.cardMeta}>Reviewed request</span>
+      <h3>Request a Channel</h3>
+      <p>Need a focused place for another aviation-worker topic? Request a Channel.</p>
+      <button className={styles.disabledButton} type="button" disabled>
+        Request workflow coming later
+      </button>
+    </article>
   );
 }
 
@@ -1357,6 +1376,82 @@ export function DfwHubReadOnlyShell() {
             not part of the open Hub section model.
           </p>
         </section>
+        <BottomNavVisual active="Hubs" />
+      </div>
+    </main>
+  );
+}
+
+export function DfwChannelsOverviewShell({
+  channels = [],
+  channelsUnavailable = false,
+}: DfwChannelsOverviewShellProps) {
+  return (
+    <main className={styles.shell}>
+      <div className={styles.mobileFrame}>
+        <AppHeader
+          backHref="/app/hubs/dfw"
+          backLabel="DFW Hub"
+          subtitle="DFW Hub Channels"
+          showBackLink
+        />
+
+        <nav className={styles.breadcrumb} aria-label="DFW Channels breadcrumb">
+          <Link href="/app/hubs/dfw">DFW Hub</Link>
+          <span aria-hidden="true">/</span>
+          <span>Channels</span>
+        </nav>
+
+            <section className={styles.destinationHero} aria-labelledby="dfw-channels-title">
+              <span className={styles.cardLabel}>Browse-first Channels</span>
+              <h1 id="dfw-channels-title">DFW Channels</h1>
+              <p>focused spaces for verified aviation workers.</p>
+            </section>
+
+        <section className={styles.hubSurfaceGrid} aria-labelledby="dfw-channel-list-title">
+          <div className={styles.sectionTitleRow}>
+            <div>
+              <h2 id="dfw-channel-list-title">Available Channels</h2>
+              <p>
+                Active DFW channel metadata from the Hub board foundation.
+                Posts, comments, and channel creation are not live here yet.
+              </p>
+            </div>
+          </div>
+
+          {channelsUnavailable ? (
+            <p className={styles.actionFeedback}>
+              DFW Channels are unavailable right now.
+            </p>
+          ) : null}
+
+          {channels.length > 0 ? (
+            <div className={styles.channelList}>
+              {channels.map((channel) => (
+                <article className={styles.channelRow} key={channel.slug}>
+                  <span className={styles.channelShortName}>{channel.shortName}</span>
+                  <span className={styles.channelRowBody}>
+                    <h3>{channel.name}</h3>
+                    <p>{channel.description}</p>
+                  </span>
+                  <span className={styles.rowState}>Active</span>
+                </article>
+              ))}
+            </div>
+          ) : (
+            <article className={styles.postEmptyState}>
+              <span className={styles.cardMeta}>No channels available</span>
+              <h3>No DFW Channels are available yet.</h3>
+              <p>
+                Active DFW channel rows will appear after the channel metadata
+                migration is applied and available to this private app surface.
+              </p>
+            </article>
+          )}
+
+          <DfwChannelsRequestFooter />
+        </section>
+
         <BottomNavVisual active="Hubs" />
       </div>
     </main>

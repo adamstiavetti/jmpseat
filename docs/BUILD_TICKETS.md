@@ -55,6 +55,12 @@ Current controlling docs for Hub work:
   board type and six DFW child channel boards, with no UI routes, channel
   post/list/create/detail RPCs, composer changes, comments, reports, moderation
   review changes, broad database push, deploy, or app code changes.
+- [FBMVP-T26A Hub Channel List Read + DFW Channels Overview](ops/fbmvp-t26a-hub-channel-list-read-route.md) - local implementation note for the first real
+  Channels read slice: a safe `list_open_hub_channels(p_base_code)` metadata RPC,
+  a server helper, and `/app/hubs/dfw/channels`. It adds no channel post
+  list/read/create/detail behavior, composer, comments, reports, moderation
+  review changes, request/create workflow, runtime apply, broad database push, or
+  deploy.
 
 Wireframe source pack:
 
@@ -159,6 +165,10 @@ Supplemental epoch-specific ticket packs:
   apply pass for the T25B metadata foundation. Child channel boards now exist in
   runtime but are not yet surfaced by real channel routes or channel-aware post
   RPCs.
+- [FBMVP-T26A Hub Channel List Read + DFW Channels Overview](ops/fbmvp-t26a-hub-channel-list-read-route.md) - locally adds safe active child-channel metadata
+  reads and the protected DFW Channels overview route. Channel posts, detail,
+  composer, comments, reports, moderation integration, and request/create channel
+  workflow remain later tickets.
 - [First-Base MVP Implementation Ticket Pack](epochs/first-base-mvp-implementation-ticket-pack.md) - translates the pivot strategy docs into the ordered `FBMVP` implementation sequence; the immediate post-Epoch-5 narrow lane is first reconciled in `ops/private-beta-readiness-bridge.md`, and auth email branding/custom SMTP is now tracked as a deferred beta-readiness polish TODO rather than the active next auth-flow implementation task.
 - [FBMVP-T01: Freeze User-Facing Proof Verification Surfaces](epochs/fbmvp-t01-freeze-user-facing-proof-verification-surfaces.md) - freezes normal proof-upload UX while preserving historical proof infrastructure, cleanup, audit, and admin/operator safety.
 - [FBMVP-T02: Airline Email Verification Access State Design](epochs/fbmvp-t02-airline-email-verification-access-state-design.md) - defines the forward `airline_email_verified` app-level eligibility state and how it maps from existing work-email verification foundations.

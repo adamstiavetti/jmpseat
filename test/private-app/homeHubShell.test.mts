@@ -26,6 +26,10 @@ const dfwHubAccessSource = readFileSync(
   new URL("../../src/lib/privateApp/dfwHubAccess.ts", import.meta.url),
   "utf8",
 );
+const dfwChannelsRouteSource = readFileSync(
+  new URL("../../app/app/hubs/dfw/channels/page.tsx", import.meta.url),
+  "utf8",
+);
 const dfwSectionRoutes = [
   {
     label: "DFW Baseboard",
@@ -100,6 +104,7 @@ const combinedSource = [
   shellStyles,
   dfwHubRouteSource,
   dfwHubAccessSource,
+  dfwChannelsRouteSource,
   ...dfwSectionRoutes.map((route) => route.source),
   t08DocsSource,
 ].join("\n");
@@ -110,6 +115,7 @@ const implementationSource = [
   homeBaseActionsSource,
   dfwHubRouteSource,
   dfwHubAccessSource,
+  dfwChannelsRouteSource,
   ...dfwSectionRoutes.map((route) => route.source),
 ].join("\n");
 
@@ -157,9 +163,9 @@ test("T24A real Home dashboard follows the approved mobile visual hierarchy", ()
   assert.match(shellSource, /Browse Channels/);
   assert.match(shellSource, /Find Layover Info/);
   assert.match(shellSource, /No recent threads yet/);
-  assert.match(shellSource, /DFW Questions/);
-  assert.match(shellSource, /Food & Coffee/);
-  assert.match(shellSource, /Crew Tips/);
+  assert.match(shellSource, /DFW Q&A/);
+  assert.match(shellSource, /Commuting & Parking/);
+  assert.match(shellSource, /DFW Layover & Local/);
 
   assert.doesNotMatch(homeSource, /<CrewPicksSection/);
   assert.doesNotMatch(homeSource, /<LayoversSection/);
@@ -234,7 +240,7 @@ test("T24A production Home and Hub avoid retired product-facing labels and DB sc
     assert.doesNotMatch(productionUiSource, new RegExp(retiredLabel));
   }
 
-  assert.doesNotMatch(productionUiSource, /createChannelAction|create_channel|hub_channel|list_open_hub_channels/);
+  assert.doesNotMatch(productionUiSource, /createChannelAction|create_channel/);
   assert.doesNotMatch(productionUiSource, /Boards/);
   assert.doesNotMatch(productionUiSource, /Profile/);
 });
@@ -301,6 +307,18 @@ test("DFW Hub section routes exist and remain behind the private gate and audit 
     assert.match(route.source, new RegExp(`section: "${route.section}"`));
     assert.match(route.source, /DfwHubSectionReadOnlyShell/);
   }
+});
+
+test("DFW Channels overview route is private gated and reads channel metadata only after the gate", () => {
+  assert.match(dfwChannelsRouteSource, /dynamic = "force-dynamic"/);
+  assert.match(dfwChannelsRouteSource, /requireDfwHubRouteAccess/);
+  assert.match(dfwChannelsRouteSource, /\/app\/hubs\/dfw\/channels/);
+  assert.match(dfwChannelsRouteSource, /section: "dfw-channels"/);
+  assert.match(dfwChannelsRouteSource, /await requireDfwHubRouteAccess[\s\S]*await listDfwHubChannels/s);
+  assert.match(dfwChannelsRouteSource, /DfwChannelsOverviewShell/);
+  assert.match(dfwChannelsRouteSource, /channelsUnavailable/);
+  assert.doesNotMatch(dfwChannelsRouteSource, /createDfwBaseboardPostAction|reportDfwBaseboardPostAction|listDfwBaseboardPosts/);
+  assert.doesNotMatch(dfwChannelsRouteSource, /\.insert\(|\.update\(|\.delete\(/);
 });
 
 test("DFW Baseboard route fetches read-only posts only after the private gate", () => {
@@ -384,13 +402,12 @@ test("DFW Baseboard list cards link to private post detail", () => {
 
 test("Request a Channel is an in-section Channels action only", () => {
   const hubOverviewSource = sourceForFunction("DfwHubReadOnlyShell");
-  const postsSectionSource = sourceForFunction("DfwBaseboardPostsSection");
+  const channelsOverviewSource = sourceForFunction("DfwChannelsOverviewShell");
 
   assert.match(shellSource, /Request a Channel/);
-  assert.match(postsSectionSource, /DfwChannelRequestCallout/);
+  assert.match(channelsOverviewSource, /DfwChannelsRequestFooter/);
   assert.match(shellSource, /Reviewed request/);
-  assert.match(shellSource, /Admin approval required/);
-  assert.match(shellSource, /free user-created channels are not live/i);
+  assert.match(shellSource, /Need a focused place for another aviation-worker topic\? Request a Channel\./);
   assert.doesNotMatch(hubOverviewSource, /Request a Channel|DfwChannelRequestCallout/);
   assert.doesNotMatch(shellSource, /createChannelAction/);
 });
@@ -405,7 +422,9 @@ test("DFW Baseboard composer is not wired into non-Baseboard hub sections", () =
 });
 
 test("DFW Hub cards link to read-only section route shells", () => {
-  for (const route of dfwSectionRoutes.filter((item) => item.section !== "dfw-lounges")) {
+  for (const route of dfwSectionRoutes.filter(
+    (item) => item.section !== "dfw-lounges" && item.section !== "dfw-baseboard",
+  )) {
     assert.match(shellSource, new RegExp(`href: "${route.route.replaceAll("/", "\\/")}"`));
   }
 
@@ -413,6 +432,7 @@ test("DFW Hub cards link to read-only section route shells", () => {
   assert.match(shellSource, /title: "Base"/);
   assert.match(shellSource, /title: "Layover"/);
   assert.match(shellSource, /title: "Channels"/);
+  assert.match(shellSource, /href: "\/app\/hubs\/dfw\/channels"/);
   assert.match(shellSource, /Recent Useful Threads/);
   assert.match(shellSource, /DFW Lounges route/);
   assert.match(shellSource, /Coming later/);
@@ -474,6 +494,7 @@ test("T08 expected files exist", () => {
     true,
   );
   for (const route of [
+    "../../app/app/hubs/dfw/channels/page.tsx",
     "../../app/app/hubs/dfw/baseboard/page.tsx",
     "../../app/app/hubs/dfw/layovers/page.tsx",
     "../../app/app/hubs/dfw/lounges/page.tsx",

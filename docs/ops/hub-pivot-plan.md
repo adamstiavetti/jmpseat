@@ -461,6 +461,14 @@ and did not use broad database push, deploy, or app code changes. The child
 channel boards are not yet surfaced by real channel routes or channel-aware post
 RPCs.
 
+T26A local implementation is recorded in
+`docs/ops/fbmvp-t26a-hub-channel-list-read-route.md`. It adds a safe
+`public.list_open_hub_channels(p_base_code text)` metadata RPC, a server helper,
+and the protected `/app/hubs/dfw/channels` overview route. It does not add
+channel post list/read/create/detail behavior, composer behavior, comments,
+reports, moderation review changes, request/create channel workflow, runtime
+apply, broad database push, or deploy.
+
 Alternative implementation ticket:
 
 `FBMVP-T23: DFW Hub Channels Foundation`

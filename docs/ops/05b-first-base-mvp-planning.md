@@ -140,6 +140,14 @@ apply used targeted SQL execution only, inserted the exact ledger row
 changes, no broad `supabase db push`, and no deploy. DB/RPC-backed Channels
 remain incomplete until later channel-aware RPC and UI tickets.
 
+T26A local implementation is recorded in
+`docs/ops/fbmvp-t26a-hub-channel-list-read-route.md`. It adds the first safe
+channel-aware metadata read RPC, `public.list_open_hub_channels(p_base_code
+text)`, and the protected real route `/app/hubs/dfw/channels`. It does not add
+channel post list/read/create/detail behavior, composer behavior, comments,
+reports, moderation review changes, request/create channel workflow, runtime
+apply, broad database push, or deploy.
+
 Wireframe agents should use the current product language `[AIRPORT] Hub`,
 `[AIRPORT] Today`, Base, Layover, Channels, Recent Useful Threads, and Request
 a Channel inside Channels. Current DFW private-beta channel seed defaults are
@@ -468,6 +476,10 @@ The current implementation sequence is:
 24. `FBMVP-T25B` `hub_channel` board type plus six DFW child board seed rows,
     runtime-applied with targeted SQL only and no channel RPCs, UI routes,
     broad database push, deploy, or app code changes
+25. `FBMVP-T26A` local channel-list read RPC plus protected
+    `/app/hubs/dfw/channels` overview route, with no channel post behavior,
+    composer, comments, reports, moderation integration, runtime apply, broad
+    database push, or deploy
 
 T20 runtime-pass docs are committed. The First Base / DFW Baseboard safety loop
 is complete. The approved pivot is recorded in `ops/hub-pivot-plan.md`.
@@ -499,7 +511,9 @@ maps to `public.board_posts`, Comments map to `public.board_post_comments`, and
 reports/moderation continue to use the existing post/comment primitives.
 `board_posts.category` alone is too weak for real Channels. Future DB/RPC work
 T25B adds and runtime-applies the `hub_channel` board type and six DFW child
-channel board seeds only. Channel-aware safe RPCs should follow in later tickets rather than
+channel board seeds only. T26A locally adds the first safe channel-list metadata
+RPC and DFW Channels overview route. Channel post list/create/detail RPCs should
+follow in later tickets rather than
 creating a standalone `channels` table now.
 The recommended next ticket is `FBMVP-T23A: DFW Hub Channels UX Wireframe`
 before DB implementation unless there is a strong reason to proceed directly to

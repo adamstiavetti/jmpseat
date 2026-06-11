@@ -685,7 +685,8 @@
 .crewPickList,
 .surfaceGrid,
 .postList,
-.commentList {
+.commentList,
+.channelList {
   display: grid;
   gap: 0.72rem;
 }
@@ -1033,6 +1034,49 @@ a.surfaceCard:hover {
   gap: 0.78rem;
   align-items: center;
   padding: 0.88rem;
+}
+
+.channelRow {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 0.78rem;
+  align-items: center;
+  border: 1px solid rgba(217, 225, 236, 0.95);
+  border-radius: var(--app-radius);
+  padding: 0.88rem;
+  background: linear-gradient(180deg, #ffffff, #f8fbff);
+}
+
+.channelShortName {
+  width: 3.1rem;
+  height: 3.1rem;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 50%;
+  color: var(--app-white);
+  background: #6846d8;
+  font-size: 0.72rem;
+  font-weight: 900;
+  line-height: 1;
+  text-align: center;
+}
+
+.channelRowBody {
+  min-width: 0;
+}
+
+.channelRow h3 {
+  margin: 0;
+  color: var(--app-text);
+  font-size: 0.98rem;
+  line-height: 1.16;
+}
+
+.channelRow p {
+  margin: 0.26rem 0 0;
+  color: var(--app-text-muted);
+  font-size: 0.78rem;
+  line-height: 1.36;
 }
 
 .loungeRow + .loungeRow {

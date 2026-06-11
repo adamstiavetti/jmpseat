@@ -383,9 +383,17 @@ Current data model implication:
 - T25B does not add channel-aware RPCs, UI routes, post reads, composer,
   comments, reports, or moderation review changes. Safe channel-aware RPCs such
   as
-  `list_open_hub_channels`, `list_open_hub_channel_posts`,
-  `create_open_hub_channel_post`, and `get_open_hub_channel_post` remain future
-  work.
+  `list_open_hub_channel_posts`, `create_open_hub_channel_post`, and
+  `get_open_hub_channel_post` remain future work.
+- `FBMVP-T26A` locally adds the first channel-aware read RPC,
+  `public.list_open_hub_channels(p_base_code text)`, plus the protected
+  `/app/hubs/dfw/channels` overview route. It reads active visible
+  `hub_channel` child board metadata only and returns no board IDs, base IDs,
+  parent board IDs, user IDs, author IDs, reporter identity, moderation fields,
+  verification fields, storage paths, signed URLs, posts, comments, or reports.
+- T26A does not add channel post list/read/create/detail behavior, composer,
+  comments, reports, moderation review changes, request/create channel workflow,
+  runtime apply, broad database push, or deploy.
 - Future multi-airport channel expansion may need airport-prefixed slugs or a
   scoped uniqueness model because `boards.slug` is currently globally unique.
   Once meaningful user content exists in channel boards, slugs should be
@@ -419,6 +427,10 @@ metadata-only ticket.
 Runtime note: the six T25B child channel board rows now exist in the intended
 `jmpseat` Supabase runtime, but real Channels routes and channel-aware post
 RPCs are still incomplete.
+
+T26A local implementation starts surfacing channel metadata through the real DFW
+Channels overview route, but channel posts and thread detail remain incomplete
+until later scoped tickets.
 
 Layover section strategy:
 
