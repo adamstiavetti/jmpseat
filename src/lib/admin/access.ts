@@ -9,6 +9,7 @@ export const ADMIN_ROUTES = {
   reviewerScopes: "/app/admin/reviewer-scopes",
   auditInspection: "/app/admin/audit",
   proofCleanup: "/app/admin/proof-cleanup",
+  communityModeration: "/app/admin/community-moderation",
 } as const;
 
 export const OPERATOR_GRANT_IMPLEMENTATION_STATUS = "implemented" as const;
@@ -17,6 +18,7 @@ export const OPERATOR_SCOPE_VALUES = [
   "operator.internal_private_app_access",
   "operator.read_audit",
   "operator.view_waitlist_contacts",
+  "operator.community_moderation",
   "operator.manage_approved_domains",
   "operator.manage_reviewer_scopes",
   "operator.read_verification_requests",
@@ -30,6 +32,9 @@ export type OperatorScope = (typeof OPERATOR_SCOPE_VALUES)[number];
 
 export const OPERATOR_INTERNAL_PRIVATE_APP_ACCESS_SCOPE =
   "operator.internal_private_app_access" as const satisfies OperatorScope;
+
+export const COMMUNITY_MODERATION_SCOPE =
+  "operator.community_moderation" as const satisfies OperatorScope;
 
 export const OPERATOR_ACCESS_NOT_READY_MESSAGE =
   "Operator access is not ready yet. Apply the operator grants foundation migration to this Supabase project before using operator-only admin sections.";
@@ -50,7 +55,8 @@ export type AdminNavigationItem = {
     | "approved_domains"
     | "reviewer_scopes"
     | "audit_inspection"
-    | "proof_cleanup";
+    | "proof_cleanup"
+    | "community_moderation";
   label: string;
   path: string;
   description: string;
@@ -316,6 +322,15 @@ export function buildAdminNavigation(input: {
         "operator.read_audit",
         "operator.read_verification_requests",
       ],
+      grantedScopes: input.operatorScopes,
+      implemented: true,
+    }),
+    buildOperatorNavigationItem({
+      key: "community_moderation",
+      label: "Community Moderation",
+      path: ADMIN_ROUTES.communityModeration,
+      description: "DFW Baseboard report review and scoped hide/remove actions for unsafe posts.",
+      requiredScopes: ["operator.community_moderation"],
       grantedScopes: input.operatorScopes,
       implemented: true,
     }),

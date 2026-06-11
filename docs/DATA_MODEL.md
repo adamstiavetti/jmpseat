@@ -587,6 +587,36 @@ Current T17 runtime state:
 - Known Supabase migration-history drift remains, so broad `supabase db push`
   remains unsafe.
 
+Current T18 local state:
+
+- `FBMVP-T18` is implemented locally and runtime-pending as
+  `20260610235111 create_board_post_report_review_rpc`.
+- It adds `public.list_open_baseboard_post_reports(p_base_code text, p_limit
+  integer default 50)` for operator-scoped DFW Baseboard report review.
+- The RPC requires `auth.uid()` and
+  `public.is_operator_with_scope('operator.community_moderation')`.
+- The RPC resolves the active base by `p_base_code`, resolves the active
+  `open_verified` Baseboard, and returns only open/reviewing reports for posts
+  on that Baseboard.
+- Returned report-review fields are limited to report ID, post ID, bounded post
+  preview fields, safe author label, reason, details, report status, and
+  reported timestamp.
+- T18 adds `/app/admin/community-moderation` and a server action that calls
+  existing T16 `public.moderate_open_baseboard_post(...)` for hide/remove
+  actions only.
+- T18 preserves zero direct `board_posts` write policies and does not expose
+  reporter identity, author IDs, emails, claimed fields, verification
+  status/evidence, proof/storage data, signed URLs, private paths, or sensitive
+  evidence.
+- T18 does not add comments, replies, saves, reactions, search backend, Crew
+  Picks, Layovers, public sharing, appeal workflow, bans, AI moderation,
+  proof-upload scope, or comment moderation.
+- Known Supabase migration-history drift remains, so broad `supabase db push`
+  remains unsafe. Targeted runtime preflight/apply is required before T18 can be
+  marked runtime-applied.
+- The next comments/replies milestone should wait until T18 is runtime-applied
+  and documented.
+
 Important fields:
 
 - id

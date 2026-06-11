@@ -66,6 +66,7 @@ Supplemental epoch-specific ticket packs:
 - [FBMVP-T16 Board Post Safety Runtime Pass](ops/fbmvp-t16-board-post-safety-runtime-pass.md) - records targeted runtime application of `20260610191809 create_board_post_safety_foundation` to the intended `jmpseat` Supabase project, verifies report table RLS/grants, report and moderation RPC grants, zero direct `board_posts` write policies, T14 read filtering, and confirms T16 created no posts, reports, or moderation records during migration/apply.
 - [FBMVP-T17 DFW Baseboard Post Detail](ops/fbmvp-t17-dfw-baseboard-post-detail.md) - runtime-applied read-only DFW Baseboard post detail route using a private route gate and safe `get_open_baseboard_post` RPC, preserving existing report affordance support and adding no comments, replies, saves, reactions, search, moderation queue UI, public sharing, lounge/restricted posting, Layovers content, Crew Picks ranking, media, AI moderation, bans, proof-upload scope, direct `board_posts` write policies, deploy, content creation, or broad Supabase `db push`.
 - [FBMVP-T17 DFW Baseboard Post Detail Runtime Pass](ops/fbmvp-t17-dfw-baseboard-post-detail-runtime-pass.md) - records targeted runtime application of `20260610203000 create_open_baseboard_post_detail_rpc` to the intended `jmpseat` Supabase project, verifies safe detail RPC return fields/grants, `board_posts` policy posture, T14/T16 function availability, count-only smoke checks, and confirms no post content was read or printed and no content/report/moderation records were created by T17 migration/apply.
+- [FBMVP-T18 DFW Baseboard Moderation Review](ops/fbmvp-t18-dfw-baseboard-moderation-review.md) - locally implemented, runtime-pending operator-scoped moderation review surface for DFW Baseboard reports, using `operator.community_moderation`, a safe `list_open_baseboard_post_reports` RPC, and existing T16 hide/remove RPC while preserving zero direct `board_posts` write policies and adding no comments, replies, saves, reactions, search, Crew Picks, Layovers, public sharing, appeal workflow, bans, AI moderation, proof-upload scope, deploy, content/report/moderation creation, or broad Supabase `db push`.
 - [First-Base MVP Implementation Ticket Pack](epochs/first-base-mvp-implementation-ticket-pack.md) - translates the pivot strategy docs into the ordered `FBMVP` implementation sequence; the immediate post-Epoch-5 narrow lane is first reconciled in `ops/private-beta-readiness-bridge.md`, and auth email branding/custom SMTP is now tracked as a deferred beta-readiness polish TODO rather than the active next auth-flow implementation task.
 - [FBMVP-T01: Freeze User-Facing Proof Verification Surfaces](epochs/fbmvp-t01-freeze-user-facing-proof-verification-surfaces.md) - freezes normal proof-upload UX while preserving historical proof infrastructure, cleanup, audit, and admin/operator safety.
 - [FBMVP-T02: Airline Email Verification Access State Design](epochs/fbmvp-t02-airline-email-verification-access-state-design.md) - defines the forward `airline_email_verified` app-level eligibility state and how it maps from existing work-email verification foundations.
@@ -265,9 +266,11 @@ Current sequence:
 13. `FBMVP-T15` minimal DFW Baseboard post composer, merged and runtime-applied
 14. `FBMVP-T16` board post safety foundation, merged and runtime-applied
 15. `FBMVP-T17` DFW Baseboard post detail, merged and runtime-applied
+16. `FBMVP-T18` DFW Baseboard moderation review, implemented locally and runtime-pending
 
 Do not proceed to comments, saves/reactions, search, Crew Picks, or Layovers
-content until T17 runtime-pass documentation is reviewed and committed.
+content until T18 is runtime-applied and its runtime-pass documentation is
+reviewed and committed.
 
 Recommended direction:
 
@@ -346,6 +349,19 @@ Recommended direction:
   `public.board_post_reports` count was `0`. No posts, reports, moderation
   records, comments, replies, saves, reactions, search indexes, or
   user/community content were created by T17 migration/apply.
+- T18 is implemented locally and runtime-pending as
+  `20260610235111 create_board_post_report_review_rpc`. It adds app-side
+  `operator.community_moderation` support, `/app/admin/community-moderation`,
+  a safe `public.list_open_baseboard_post_reports(...)` RPC, a server-only
+  report read helper, and a server action that calls existing T16
+  `public.moderate_open_baseboard_post(...)`.
+- T18 allows only hide/remove actions for reported DFW Baseboard posts and does
+  not expose reporter identity or sensitive verification/proof data.
+- T18 preserves zero direct `board_posts` write policies. It does not add
+  comments, replies, saves/reactions, search backend, Crew Picks, Layovers,
+  public sharing, appeal workflow, bans, AI moderation, proof-upload scope,
+  comment moderation, deploy, runtime settings changes, or content/report/
+  moderation record creation during local validation.
 - Known migration drift remains preserved and broad `supabase db push` remains
   unsafe.
 
