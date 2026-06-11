@@ -105,6 +105,21 @@ const commentRows = [
   },
 ] as const;
 
+const quickActions = [
+  { label: "Open DFW Hub", iconClass: styles.actionHub },
+  { label: "Browse Channels", iconClass: styles.actionChannels },
+  { label: "Find Layover Info", iconClass: styles.actionLayover },
+  { label: "Saved", iconClass: styles.actionSaved },
+] as const;
+
+const navItems = [
+  { label: "Home", iconClass: styles.navHome },
+  { label: "Hubs", iconClass: styles.navHubs },
+  { label: "Search", iconClass: styles.navSearch },
+  { label: "Saved", iconClass: styles.navSaved },
+  { label: "Me", iconClass: styles.navMe },
+] as const;
+
 function PhoneFrame({
   title,
   activeNav,
@@ -116,24 +131,23 @@ function PhoneFrame({
 }) {
   return (
     <section className={styles.phonePanel} aria-label={title}>
-      <div className={styles.phoneChrome}>
-        <div className={styles.statusBar}>
-          <span>9:41</span>
-          <span className={styles.statusIcons}>LTE 100</span>
-        </div>
+      <div className={styles.appSurface}>
         <div className={styles.phoneBody}>{children}</div>
         <nav className={styles.bottomNav} aria-label={`${title} prototype navigation`}>
-          {["Home", "Hubs", "Search", "Saved", "Me"].map((item) => (
+          {navItems.map((item) => (
             <span
-              key={item}
+              key={item.label}
               className={
-                item === activeNav
+                item.label === activeNav
                   ? `${styles.navItem} ${styles.navItemActive}`.trim()
                   : styles.navItem
               }
             >
-              <span className={styles.navIcon} aria-hidden="true" />
-              {item}
+              <span
+                className={`${styles.navIcon} ${item.iconClass}`.trim()}
+                aria-hidden="true"
+              />
+              {item.label}
             </span>
           ))}
         </nav>
@@ -166,14 +180,20 @@ function SearchBox({ label }: { label: string }) {
   );
 }
 
-function HubHero({ compact = false }: { compact?: boolean }) {
+function HubHero({
+  compact = false,
+  action = "Open DFW Hub",
+}: {
+  compact?: boolean;
+  action?: string | null;
+}) {
   return (
     <section className={compact ? styles.hubHeroCompact : styles.hubHero}>
       <div className={styles.hubHeroText}>
         <p className={styles.kicker}>Your Hub</p>
         <h2>DFW Hub</h2>
         <p>DFW Today - Base - Layover - Channels</p>
-        <span className={styles.heroAction}>Open DFW Hub</span>
+        {action ? <span className={styles.heroAction}>{action}</span> : null}
       </div>
       <div className={styles.skylinePanel} aria-hidden="true">
         <span>DFW</span>
@@ -207,11 +227,15 @@ function ChannelRows() {
     <div className={styles.rowList}>
       {channels.map((channel) => (
         <article key={channel.name} className={styles.compactRow}>
-          <div>
+          <span className={styles.channelBadge} aria-hidden="true">
+            {channel.name.slice(0, 1)}
+          </span>
+          <div className={styles.rowText}>
             <h3>{channel.name}</h3>
             <p>{channel.purpose}</p>
           </div>
-          <span>{channel.status}</span>
+          <span className={styles.statusPill}>{channel.status}</span>
+          <span className={styles.rowChevron} aria-hidden="true" />
         </article>
       ))}
     </div>
@@ -228,7 +252,9 @@ function ThreadRows() {
             <p>{thread.excerpt}</p>
             <small>{thread.meta}</small>
           </div>
-          <button type="button">Report</button>
+          <button type="button" aria-label="More thread actions">
+            ...
+          </button>
         </article>
       ))}
     </div>
@@ -264,11 +290,15 @@ function HomeScreen() {
       <SearchBox label="Search jmpseat..." />
       <HubHero />
       <section className={styles.quickActions} aria-label="Quick actions">
-        {["Open DFW Hub", "Browse Channels", "Find Layover Info", "Saved"].map(
-          (action) => (
-            <span key={action}>{action}</span>
-          ),
-        )}
+        {quickActions.map((action) => (
+          <span key={action.label}>
+            <span
+              className={`${styles.quickActionIcon} ${action.iconClass}`.trim()}
+              aria-hidden="true"
+            />
+            {action.label}
+          </span>
+        ))}
       </section>
       <SectionCard
         title="Recent Useful Threads"
@@ -282,6 +312,9 @@ function HomeScreen() {
         </div>
         {channels.slice(0, 3).map((channel) => (
           <article key={channel.name} className={styles.miniRow}>
+            <span className={styles.miniBadge} aria-hidden="true">
+              {channel.name.slice(0, 1)}
+            </span>
             <strong>{channel.name}</strong>
             <span>{channel.status}</span>
           </article>
@@ -295,7 +328,7 @@ function HubOverviewScreen() {
   return (
     <PhoneFrame title="DFW Hub Overview" activeNav="Hubs">
       <AppHeader eyebrow="Dallas/Fort Worth" />
-      <HubHero compact />
+      <HubHero compact action="Browse sections" />
       <SearchBox label="Search within DFW..." />
       <div className={styles.cardGrid}>
         <SectionCard
@@ -446,7 +479,10 @@ function ReportFlowScreen() {
           readOnly
         />
         <button type="button">Submit report</button>
-        <p className={styles.confirmation}>Thanks - the report preview is ready for review.</p>
+        <p className={styles.formHint}>
+          Prototype form state only. Confirmation should appear as a separate
+          state during implementation review.
+        </p>
       </section>
     </PhoneFrame>
   );

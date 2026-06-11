@@ -88,3 +88,14 @@ test("DFW Hub wireframe prototype includes approved labels and avoids retired pr
 
   assert.doesNotMatch(source, /["'`]Routes["'`]/i);
 });
+
+test("DFW Hub wireframe prototype avoids nested phone chrome and mixed report states", () => {
+  const source = readPageSource();
+
+  assert.doesNotMatch(source, /9:41/);
+  assert.doesNotMatch(source, /LTE 100/);
+  assert.doesNotMatch(source, /statusBar/);
+  assert.doesNotMatch(source, /the report preview is ready for review/);
+  assert.match(source, /Browse sections/);
+  assert.match(source, /More thread actions/);
+});
