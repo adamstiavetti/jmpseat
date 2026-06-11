@@ -420,9 +420,11 @@ Manual beta visual review is recorded in
 UI polish. No functionality blocker remains, and the prototype route should not
 receive more polish before implementation planning.
 
-Next recommended work: a narrow real Home / DFW Hub visual refresh
-implementation that preserves existing access gates and safe data paths. Do not
-start DB/RPC-backed Channels until explicitly scoped.
+T24A local implementation is recorded in
+`docs/ops/fbmvp-t24a-real-home-dfw-hub-visual-refresh.md`. It refreshes the
+real private-app Home/dashboard and real DFW Hub overview while preserving
+existing access gates and safe data paths. Do not start DB/RPC-backed Channels
+until explicitly scoped.
 
 Alternative implementation ticket:
 

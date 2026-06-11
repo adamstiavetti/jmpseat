@@ -114,9 +114,9 @@ surface only, not a real Channels implementation.
 T23B manual beta visual review is recorded in
 `docs/ops/fbmvp-t23b-static-wireframe-prototype-manual-review.md` for commit
 `07ebf7b fix: polish hub wireframe prototype`. Decision: approved with future
-UI polish. No functionality blocker remains, and the next work should move into
-narrow Home / DFW Hub implementation planning instead of more prototype
-polishing.
+UI polish. No functionality blocker remains, and `FBMVP-T24A` now records the
+narrow real Home / DFW Hub visual refresh implementation status in
+`docs/ops/fbmvp-t24a-real-home-dfw-hub-visual-refresh.md`.
 
 Wireframe agents should use the current product language `[AIRPORT] Hub`,
 `[AIRPORT] Today`, Base, Layover, Channels, Recent Useful Threads, and Request
@@ -438,15 +438,17 @@ The current implementation sequence is:
 21. `FBMVP-T23B` protected static Hub wireframe prototype route, locally
     implemented and manually reviewed; approved with future UI polish and no
     migration or runtime mutation
+22. `FBMVP-T24A` real Home + DFW Hub visual refresh, locally implemented with
+    no migration, runtime mutation, deploy, or DB/RPC-backed Channels
 
 T20 runtime-pass docs are committed. The First Base / DFW Baseboard safety loop
 is complete. The approved pivot is recorded in `ops/hub-pivot-plan.md`.
-Baseboards should no longer be treated as open mixed discussion boards. The next
-implementation ticket should convert DFW Baseboard product framing to the DFW
-Hub shell, introduce DFW Today / Base / Layover / Channels / Recent Useful
-Threads, place Request a Channel inside Channels, preserve existing
-posts/comments/reporting/moderation primitives, avoid free user-created
-channels, and avoid database table renames unless separately planned.
+Baseboards should no longer be treated as open mixed discussion boards. T21
+converted DFW Baseboard product framing to the DFW Hub shell, introduced DFW
+Today / Base / Layover / Channels / Recent Useful Threads, placed Request a
+Channel inside Channels, preserved existing posts/comments/reporting/moderation
+primitives, avoided free user-created channels, and avoided database table
+renames.
 
 T21 implements that product-framing step locally with no migration. Existing
 internal Baseboard route, RPC, helper, and table names remain in place while the
@@ -695,10 +697,10 @@ Recommended direction:
   implemented as that protected admin-only static prototype route, with no
   normal-user navigation. Manual beta visual review at
   `07ebf7b fix: polish hub wireframe prototype` approved the route with future
-  UI polish and no functionality blocker. Do not keep polishing the prototype;
-  move into a narrow real Home / DFW Hub visual refresh implementation ticket
-  while preserving existing access gates and safe data paths. Do not start
-  DB/RPC-backed Channels until explicitly scoped.
+  UI polish and no functionality blocker. Do not keep polishing the prototype.
+  `FBMVP-T24A` now locally refreshes the real Home/dashboard and DFW Hub
+  overview while preserving existing access gates and safe data paths. Do not
+  start DB/RPC-backed Channels until explicitly scoped.
 
 Pre-closeout access baseline: public `jmpseat.com` and `www.jmpseat.com` are
 marketing/waitlist-only through `bad2110 fix: gate private app on public

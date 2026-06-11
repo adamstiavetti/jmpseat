@@ -113,15 +113,58 @@ const implementationSource = [
   ...dfwSectionRoutes.map((route) => route.source),
 ].join("\n");
 
+function sourceForFunction(name: string) {
+  const start = shellSource.indexOf(`function ${name}`);
+  assert.ok(start >= 0, `${name} should exist`);
+
+  const nextExport = shellSource.indexOf("\nexport function", start + 1);
+  const nextFunction = shellSource.indexOf("\nfunction ", start + 1);
+  const candidates = [nextExport, nextFunction].filter((index) => index > start);
+  const end = candidates.length > 0 ? Math.min(...candidates) : shellSource.length;
+
+  return shellSource.slice(start, end);
+}
+
 test("home dashboard shell uses the canonical utility hierarchy", () => {
   assert.match(shellSource, /Search jmpseat/);
   assert.match(shellSource, /Home Base/);
-  assert.match(shellSource, /Crew Picks/);
-  assert.match(shellSource, /Following/);
-  assert.match(shellSource, /Your Lounges/);
+  assert.match(shellSource, /DFW Hub/);
+  assert.match(shellSource, /DFW Today/);
+  assert.match(shellSource, /Base/);
+  assert.match(shellSource, /Layover/);
+  assert.match(shellSource, /Channels/);
+  assert.match(shellSource, /Recent Useful Threads/);
+  assert.match(shellSource, /Suggested Channels/);
   assert.match(shellSource, /Saved/);
   assert.match(shellSource, /utility dashboard/i);
   assert.doesNotMatch(shellSource, /generic social feed/i);
+});
+
+test("T24A real Home dashboard follows the approved mobile visual hierarchy", () => {
+  const homeSource = sourceForFunction("HomeHubShell");
+
+  assert.match(homeSource, /<AppHeader/);
+  assert.match(homeSource, /<WelcomeBlock/);
+  assert.match(homeSource, /<SearchAffordance/);
+  assert.match(homeSource, /<HubHeroCard/);
+  assert.match(homeSource, /<QuickActionsSection/);
+  assert.match(homeSource, /<RecentUsefulThreadsSection/);
+  assert.match(homeSource, /<SuggestedChannelsSection/);
+  assert.match(homeSource, /<BottomNavVisual active="Home"/);
+
+  assert.match(shellSource, /Open DFW Hub/);
+  assert.match(shellSource, /DFW Today · Base · Layover · Channels/);
+  assert.match(shellSource, /Browse Channels/);
+  assert.match(shellSource, /Find Layover Info/);
+  assert.match(shellSource, /No recent threads yet/);
+  assert.match(shellSource, /DFW Questions/);
+  assert.match(shellSource, /Food & Coffee/);
+  assert.match(shellSource, /Crew Tips/);
+
+  assert.doesNotMatch(homeSource, /<CrewPicksSection/);
+  assert.doesNotMatch(homeSource, /<LayoversSection/);
+  assert.doesNotMatch(homeSource, /<LoungesSection/);
+  assert.doesNotMatch(homeSource, /<FollowingSection/);
 });
 
 test("DFW Hub read-only shell uses product-facing taxonomy labels", () => {
@@ -131,7 +174,7 @@ test("DFW Hub read-only shell uses product-facing taxonomy labels", () => {
   assert.match(shellSource, /Layover/);
   assert.match(shellSource, /Channels/);
   assert.match(shellSource, /Recent Useful Threads/);
-  assert.match(shellSource, /weather, traffic, public airport advisories, app notes/);
+  assert.match(shellSource, /weather placeholder, public advisories, and app notes/);
   assert.match(shellSource, /No live weather or traffic integration is active yet/);
   assert.match(shellSource, /Essentials/);
   assert.match(shellSource, /Recommendations/);
@@ -139,6 +182,61 @@ test("DFW Hub read-only shell uses product-facing taxonomy labels", () => {
   assert.doesNotMatch(shellSource, /Base Board/);
   assert.doesNotMatch(shellSource, /Verified Lounge/);
   assert.doesNotMatch(shellSource, /Layover Guide/);
+});
+
+test("T24A real DFW Hub overview stays section-first and avoids top-level thread/channel actions", () => {
+  const hubSource = sourceForFunction("DfwHubReadOnlyShell");
+
+  assert.match(hubSource, /<AppHeader/);
+  assert.match(hubSource, /DFW Hub/);
+  assert.match(hubSource, /Browse Hub Sections/);
+  assert.match(hubSource, /Search within DFW/);
+  assert.match(shellSource, /title: "DFW Today"/);
+  assert.match(shellSource, /title: "Base"/);
+  assert.match(shellSource, /title: "Layover"/);
+  assert.match(shellSource, /title: "Channels"/);
+  assert.match(shellSource, /title: "Recent Useful Threads"/);
+  assert.match(hubSource, /<BottomNavVisual active="Hubs"/);
+
+  assert.doesNotMatch(hubSource, /Open DFW Hub/);
+  assert.doesNotMatch(hubSource, /Start a Thread/);
+  assert.doesNotMatch(hubSource, /Request a Channel/);
+  assert.doesNotMatch(hubSource, /DfwChannelRequestCallout/);
+});
+
+test("T24A production Home and Hub avoid retired product-facing labels and DB scope", () => {
+  const productionUiSource = [
+    sourceForFunction("HomeHubShell"),
+    sourceForFunction("DfwHubReadOnlyShell"),
+    sourceForFunction("HubHeroCard"),
+    sourceForFunction("QuickActionsSection"),
+    sourceForFunction("RecentUsefulThreadsSection"),
+    sourceForFunction("SuggestedChannelsSection"),
+    sourceForFunction("BottomNavVisual"),
+  ].join("\n");
+
+  for (const retiredLabel of [
+    "Baseboard",
+    "Base Board",
+    "Layover Boards",
+    "Verified Rooms",
+    "Ask Your Base",
+    "Browse Rooms",
+    "Intel",
+    "Brief",
+    "Subboards",
+    "Routes",
+    "Groups",
+    "Communities",
+    "Layover Guide",
+    "Deadhead Club",
+  ]) {
+    assert.doesNotMatch(productionUiSource, new RegExp(retiredLabel));
+  }
+
+  assert.doesNotMatch(productionUiSource, /createChannelAction|create_channel|hub_channel|list_open_hub_channels/);
+  assert.doesNotMatch(productionUiSource, /Boards/);
+  assert.doesNotMatch(productionUiSource, /Profile/);
 });
 
 test("skip-for-now state does not fake-assign DFW as Home Base", () => {
@@ -285,20 +383,15 @@ test("DFW Baseboard list cards link to private post detail", () => {
 });
 
 test("Request a Channel is an in-section Channels action only", () => {
-  const channelsIndex = shellSource.indexOf("DFW Channels");
-  const requestIndex = shellSource.indexOf("Request a Channel");
-  const recentThreadsIndex = shellSource.indexOf("Recent Useful Threads");
+  const hubOverviewSource = sourceForFunction("DfwHubReadOnlyShell");
+  const postsSectionSource = sourceForFunction("DfwBaseboardPostsSection");
 
-  assert.ok(channelsIndex >= 0, "Channels section should be present");
-  assert.ok(requestIndex > channelsIndex, "Request a Channel should appear after Channels");
-  assert.ok(
-    recentThreadsIndex === -1 || requestIndex < recentThreadsIndex,
-    "Request a Channel should be associated with Channels, not a later top-level section",
-  );
   assert.match(shellSource, /Request a Channel/);
+  assert.match(postsSectionSource, /DfwChannelRequestCallout/);
   assert.match(shellSource, /Reviewed request/);
   assert.match(shellSource, /Admin approval required/);
   assert.match(shellSource, /free user-created channels are not live/i);
+  assert.doesNotMatch(hubOverviewSource, /Request a Channel|DfwChannelRequestCallout/);
   assert.doesNotMatch(shellSource, /createChannelAction/);
 });
 
@@ -317,9 +410,9 @@ test("DFW Hub cards link to read-only section route shells", () => {
   }
 
   assert.match(shellSource, /DFW Today/);
-  assert.match(shellSource, /DFW Base/);
-  assert.match(shellSource, /DFW Layover/);
-  assert.match(shellSource, /DFW Channels/);
+  assert.match(shellSource, /title: "Base"/);
+  assert.match(shellSource, /title: "Layover"/);
+  assert.match(shellSource, /title: "Channels"/);
   assert.match(shellSource, /Recent Useful Threads/);
   assert.match(shellSource, /DFW Lounges route/);
   assert.match(shellSource, /Coming later/);

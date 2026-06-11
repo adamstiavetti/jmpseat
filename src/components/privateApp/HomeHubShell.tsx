@@ -43,6 +43,8 @@ type DashboardItem = {
 
 type DfwHubSectionItem = DashboardItem & {
   href?: string;
+  cta?: string;
+  icon: "today" | "base" | "layover" | "channels" | "threads";
 };
 
 export type DfwHubSectionKey = "baseboard" | "layovers" | "lounges" | "crew-picks";
@@ -82,83 +84,67 @@ type DfwBaseboardPostDetailShellProps = {
 type QuickAction = {
   title: string;
   detail: string;
-  tone: "ask" | "layover" | "lounge" | "saved";
+  href?: string;
+  icon: "plane" | "chat" | "pin" | "bookmark";
+  tone: "hub" | "channels" | "layover" | "saved";
 };
 
-const crewPicks: readonly DashboardItem[] = [
+type SuggestedChannel = DashboardItem & {
+  href: string;
+  icon: "question" | "coffee" | "crew";
+};
+
+const suggestedChannels: readonly SuggestedChannel[] = [
   {
-    title: "DFW basics",
-    detail: "Useful launch intel will appear here once posts and guides exist.",
-    meta: "Admin curated placeholder",
+    title: "DFW Questions",
+    detail: "Ask and get answers from verified aviation workers.",
+    href: "/app/hubs/dfw/baseboard",
+    icon: "question",
+    meta: "Channel preview",
   },
   {
-    title: "Layover utility",
-    detail: "Saved-driven picks will later surface practical crew recommendations.",
-    meta: "Ranking not implemented",
+    title: "Food & Coffee",
+    detail: "Useful local picks stay inside scoped DFW discussion.",
+    href: "/app/hubs/dfw/baseboard",
+    icon: "coffee",
+    meta: "Channel preview",
   },
   {
-    title: "Crew Q&A",
-    detail: "High-signal answers belong here after posting and moderation land.",
-    meta: "Read-only shell",
+    title: "Crew Tips",
+    detail: "Helpful practical notes from experienced workers.",
+    href: "/app/hubs/dfw/baseboard",
+    icon: "crew",
+    meta: "Channel preview",
   },
 ];
 
 const quickActions: readonly QuickAction[] = [
   {
-    title: "Open Channels",
-    detail: "Scoped posts",
-    tone: "ask",
+    title: "Open DFW Hub",
+    detail: "Your Hub",
+    href: "/app/hubs/dfw",
+    icon: "plane",
+    tone: "hub",
   },
   {
-    title: "Find Layover",
-    detail: "Utility later",
+    title: "Browse Channels",
+    detail: "Scoped threads",
+    href: "/app/hubs/dfw/baseboard",
+    icon: "chat",
+    tone: "channels",
+  },
+  {
+    title: "Find Layover Info",
+    detail: "DFW utility",
+    href: "/app/hubs/dfw/layovers",
+    icon: "pin",
     tone: "layover",
   },
   {
-    title: "Browse Lounges",
-    detail: "Membership gated",
-    tone: "lounge",
-  },
-  {
     title: "Saved",
-    detail: "Library later",
+    detail: "Coming later",
+    icon: "bookmark",
     tone: "saved",
-  },
-];
-
-const layoverPreviews: readonly DashboardItem[] = [
-  {
-    title: "MIA",
-    detail: "Passing-through tips without hotel or live-location details.",
-    meta: "Coming soon",
-  },
-  {
-    title: "LAX",
-    detail: "Food, transit, coffee, and safe area utility later.",
-    meta: "Placeholder",
-  },
-  {
-    title: "ORD",
-    detail: "Airport and city intel after posting and moderation exist.",
-    meta: "Placeholder",
-  },
-  {
-    title: "DEN",
-    detail: "Followable Layovers are planned after discovery work.",
-    meta: "Placeholder",
-  },
-];
-
-const loungePreviews: readonly DashboardItem[] = [
-  {
-    title: "Flight Attendants",
-    detail: "Restricted content stays hidden until membership exists.",
-    meta: "Locked",
-  },
-  {
-    title: "New Hires",
-    detail: "Request and Crew Lead review flows arrive later.",
-    meta: "Coming soon",
   },
 ];
 
@@ -166,34 +152,42 @@ const dfwHubSections: readonly DfwHubSectionItem[] = [
   {
     title: "DFW Today",
     detail:
-      "Curated current context for weather, traffic, public airport advisories, app notes, and recently updated sections. No live weather or traffic integration is active yet.",
-    meta: "Curated placeholder",
+      "Curated current info: weather placeholder, public advisories, and app notes. No live weather or traffic integration is active yet.",
+    icon: "today",
+    meta: "Curated current info",
   },
   {
-    title: "DFW Base",
+    title: "Base",
     detail:
-      "Based-worker utility for commuting, parking, new-to-DFW, base life, and practical airport information without operationally sensitive claims.",
+      "Commuting, parking, new-to-DFW, and base life utility without operationally sensitive claims.",
+    icon: "base",
     meta: "Based-worker utility",
   },
   {
-    title: "DFW Layover",
+    title: "Layover",
     detail:
-      "Essentials, Recommendations, Questions, Crew Tips, Getting Around, Food & Coffee, Things To Do, Short Layover, and Long Layover utility inside the Hub.",
+      "Essentials, Food & Coffee, Getting Around, and Crew Tips for safe layover utility.",
+    cta: "View Layover",
     href: "/app/hubs/dfw/layovers",
+    icon: "layover",
     meta: "Layover utility",
   },
   {
-    title: "DFW Channels",
+    title: "Channels",
     detail:
-      "Focused scoped discussion for DFW Questions, Commuting & Parking, Food & Coffee, New to DFW, Base Life, Crew Tips, and App Feedback. Request a Channel is a reviewed in-section action.",
+      "Browse DFW Questions, Commuting & Parking, Food & Coffee, and Crew Tips.",
+    cta: "Browse Channels",
     href: "/app/hubs/dfw/baseboard",
+    icon: "channels",
     meta: "Scoped discussion",
   },
   {
     title: "Recent Useful Threads",
     detail:
-      "High-signal posts from existing safe post/comment/report/moderation primitives. Useful threads appear as verified workers contribute.",
+      "No useful DFW threads yet. Helpful discussions will appear as verified workers contribute.",
+    cta: "View Threads",
     href: "/app/hubs/dfw/crew-picks",
+    icon: "threads",
     meta: "Useful signal",
   },
 ];
@@ -319,6 +313,118 @@ export const dfwHubSectionShells: Record<DfwHubSectionKey, DfwHubSectionShell> =
   },
 };
 
+function AppIcon({
+  name,
+  className,
+}: {
+  name: QuickAction["icon"] | SuggestedChannel["icon"] | DfwHubSectionItem["icon"] | "bell" | "search";
+  className?: string;
+}) {
+  const commonProps = {
+    "aria-hidden": true,
+    className,
+    focusable: false,
+    viewBox: "0 0 24 24",
+  } as const;
+
+  switch (name) {
+    case "bell":
+      return (
+        <svg {...commonProps}>
+          <path d="M15.7 17.2H8.3a2.1 2.1 0 0 0 3.7 1.2 2.1 2.1 0 0 0 3.7-1.2Z" />
+          <path d="M5.5 16.2h13l-1.4-2.3v-3.5a5.1 5.1 0 0 0-3.7-4.9 1.5 1.5 0 0 0-2.8 0 5.1 5.1 0 0 0-3.7 4.9v3.5l-1.4 2.3Z" />
+        </svg>
+      );
+    case "search":
+      return (
+        <svg {...commonProps}>
+          <circle cx="10.7" cy="10.7" r="5.9" />
+          <path d="m15.1 15.1 4 4" />
+        </svg>
+      );
+    case "plane":
+      return (
+        <svg {...commonProps}>
+          <path d="m3.5 13.2 7.2-1.8 5.8-6.8c.7-.8 2-.2 1.8.9l-1.1 5.9 3.7 3.5-4.7 1.1-2.2 4.5-2.1-4-5.7 1.3-2.7-4.6Z" />
+        </svg>
+      );
+    case "chat":
+      return (
+        <svg {...commonProps}>
+          <path d="M5.2 5.8h13.6v9.5H9.1l-3.9 3.2V5.8Z" />
+          <path d="M8.8 10.2h.1M12 10.2h.1M15.2 10.2h.1" />
+        </svg>
+      );
+    case "pin":
+      return (
+        <svg {...commonProps}>
+          <path d="M12 21s6.2-5.9 6.2-11a6.2 6.2 0 1 0-12.4 0C5.8 15.1 12 21 12 21Z" />
+          <circle cx="12" cy="10" r="2.2" />
+        </svg>
+      );
+    case "bookmark":
+      return (
+        <svg {...commonProps}>
+          <path d="M7 4.5h10v15l-5-3.2-5 3.2v-15Z" />
+        </svg>
+      );
+    case "today":
+      return (
+        <svg {...commonProps}>
+          <path d="M7.3 15.8a5.4 5.4 0 0 1 10.5 0" />
+          <path d="M12.5 5.4v2M5.4 8.5l1.4 1.4M19.6 8.5l-1.4 1.4M4.7 16.2h14.8" />
+        </svg>
+      );
+    case "base":
+      return (
+        <svg {...commonProps}>
+          <path d="M6.2 10.3 8 6h8l1.8 4.3" />
+          <path d="M5.5 10.3h13v6.2h-13v-6.2ZM7.4 16.5v1.8M16.6 16.5v1.8" />
+          <circle cx="8.2" cy="13.4" r=".9" />
+          <circle cx="15.8" cy="13.4" r=".9" />
+        </svg>
+      );
+    case "layover":
+      return (
+        <svg {...commonProps}>
+          <path d="M8 4.5h8l.8 3H7.2l.8-3ZM6.5 7.5h11v12h-11v-12Z" />
+          <path d="M9.2 19.5v1.8M14.8 19.5v1.8M10 10.2h4" />
+        </svg>
+      );
+    case "channels":
+    case "crew":
+      return (
+        <svg {...commonProps}>
+          <circle cx="8.5" cy="9" r="2.4" />
+          <circle cx="15.5" cy="9" r="2.4" />
+          <path d="M4.5 18a4.1 4.1 0 0 1 8 0M11.5 18a4.1 4.1 0 0 1 8 0" />
+        </svg>
+      );
+    case "threads":
+      return (
+        <svg {...commonProps}>
+          <path d="M5 5.8h14v9.4H9.4L5 18.3V5.8Z" />
+        </svg>
+      );
+    case "question":
+      return (
+        <svg {...commonProps}>
+          <path d="M9.1 8.3a3.2 3.2 0 1 1 4.2 3c-.9.4-1.3 1-1.3 2" />
+          <path d="M12 17h.1" />
+        </svg>
+      );
+    case "coffee":
+      return (
+        <svg {...commonProps}>
+          <path d="M6.8 8.2h9.4v5.4a4.7 4.7 0 0 1-9.4 0V8.2Z" />
+          <path d="M16.2 9.7h1.1a2.2 2.2 0 0 1 0 4.4h-1.1M8.5 4.2v2M12 4.2v2" />
+        </svg>
+      );
+  }
+
+  return null;
+}
+
 function AppHeader({
   subtitle,
   showBackLink = false,
@@ -342,7 +448,9 @@ function AppHeader({
         </Link>
       ) : (
         <div className={styles.headerTools} aria-hidden="true">
-          <span className={styles.headerIcon}>!</span>
+          <span className={styles.headerIcon}>
+            <AppIcon name="bell" className={styles.inlineIcon} />
+          </span>
           <span className={styles.profileChip}>JS</span>
         </div>
       )}
@@ -361,6 +469,7 @@ function WelcomeBlock({
     <section className={styles.welcomeBlock} aria-label="Private app status">
       <p className={styles.welcomeTitle}>Welcome back</p>
       <p className={styles.statusLine}>
+        <span aria-hidden="true" className={styles.verifiedDot}>V</span>
         <strong>Verified</strong>
         <span aria-hidden="true">.</span>
         <span>Aviation worker</span>
@@ -374,40 +483,10 @@ function WelcomeBlock({
 function SearchAffordance({ label = "Search jmpseat" }: { label?: string }) {
   return (
     <section className={styles.searchBand} aria-label={label}>
-      <span>{label}...</span>
       <span aria-hidden="true" className={styles.searchIcon}>
-        <span aria-hidden="true" className={styles.searchGlyph}>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            x="0px"
-            y="0px"
-            viewBox="0 0 40 40"
-            aria-hidden="true"
-            focusable="false"
-            className={styles.searchIconSvg}
-          >
-            <linearGradient
-              id="search-ico-gradient"
-              x1="31.916"
-              x2="25.088"
-              y1="31.849"
-              y2="26.05"
-              gradientUnits="userSpaceOnUse"
-            >
-              <stop offset="0" stopColor="#7a7a7a" />
-              <stop offset=".999" />
-            </linearGradient>
-            <polygon
-              fill="url(#search-ico-gradient)"
-              points="29.976,27 24.451,27.176 33.95,36.778 36.778,33.95"
-            />
-            <path
-              fill="#7a7a7a"
-              d="M24.313,27c-1.788,1.256-3.962,2-6.313,2c-6.075,0-11-4.925-11-11S11.925,7,18,7s11,4.925,11,11	c0,2.659-0.944,5.098-2.515,7h4.776C32.368,22.909,33,20.53,33,18c0-8.284-6.716-15-15-15S3,9.716,3,18c0,8.284,6.716,15,15,15	c4.903,0,9.243-2.363,11.98-6H24.313z"
-            />
-          </svg>
-        </span>
+        <AppIcon name="search" className={styles.inlineIcon} />
       </span>
+      <span>{label}...</span>
     </section>
   );
 }
@@ -419,27 +498,29 @@ function HubHeroCard({
 }) {
   return (
     <section className={styles.hubCard} aria-labelledby="home-hub-title">
+      <Image
+        alt=""
+        className={styles.hubCardImage}
+        fill
+        priority
+        sizes="(max-width: 460px) 100vw, 460px"
+        src="/images/dallas4.jpg"
+      />
       <div className={styles.hubCardCopy}>
         <span className={styles.cardLabel}>
           {hasDfwHomeBase ? "Your Hub" : "DFW launch"}
         </span>
+        <strong className={styles.heroCode}>DFW</strong>
         <h1 id="home-hub-title">DFW Hub</h1>
-        <p>DFW Today, Base, Layover, Channels, and Recent Useful Threads.</p>
+        <p>DFW Today · Base · Layover · Channels</p>
         <Link className={styles.primaryButton} href="/app/hubs/dfw">
-          Open DFW Hub
+          <span>Open DFW Hub</span>
+          <span aria-hidden="true">&gt;</span>
         </Link>
       </div>
-      <div className={styles.hubCardArt} aria-hidden="true">
-        <Image
-          alt=""
-          className={styles.hubCardImage}
-          fill
-          priority
-          sizes="140px"
-          src="/images/dallas4.jpg"
-        />
-        <span>DFW</span>
-      </div>
+      <span aria-hidden="true" className={styles.heroPlane}>
+        <AppIcon name="plane" className={styles.inlineIcon} />
+      </span>
     </section>
   );
 }
@@ -497,139 +578,87 @@ function QuickActionsSection() {
         <h2 id="quick-actions-title">Quick Actions</h2>
       </div>
       <div className={styles.quickGrid}>
-        {quickActions.map((action) => (
-          <button
-            className={styles.quickAction}
-            data-tone={action.tone}
-            disabled
-            key={action.title}
-            type="button"
-          >
-            <span aria-hidden="true" className={styles.quickIcon}>
-              {action.title.slice(0, 1)}
+        {quickActions.map((action) => {
+          if (action.href) {
+            return (
+              <Link
+                className={styles.quickAction}
+                data-tone={action.tone}
+                href={action.href}
+                key={action.title}
+              >
+                <span aria-hidden="true" className={styles.quickIcon}>
+                  <AppIcon name={action.icon} className={styles.inlineIcon} />
+                </span>
+                <strong>{action.title}</strong>
+                <small>{action.detail}</small>
+              </Link>
+            );
+          }
+
+          return (
+            <button
+              className={styles.quickAction}
+              data-tone={action.tone}
+              disabled
+              key={action.title}
+              type="button"
+            >
+              <span aria-hidden="true" className={styles.quickIcon}>
+                <AppIcon name={action.icon} className={styles.inlineIcon} />
+              </span>
+              <strong>{action.title}</strong>
+              <small>{action.detail}</small>
+            </button>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
+function RecentUsefulThreadsSection() {
+  return (
+    <section className={styles.panelSection} aria-labelledby="recent-useful-threads-title">
+      <div className={styles.sectionTitleRow}>
+        <h2 id="recent-useful-threads-title">Recent Useful Threads</h2>
+      </div>
+      <article className={styles.emptyUsefulCard}>
+        <span aria-hidden="true" className={styles.emptyUsefulIcon}>
+          <AppIcon name="threads" className={styles.inlineIcon} />
+        </span>
+        <h3>No recent threads yet</h3>
+        <p>Useful threads from across DFW Hub will appear here when verified aviation workers contribute.</p>
+      </article>
+    </section>
+  );
+}
+
+function SuggestedChannelsSection() {
+  return (
+    <section className={styles.panelSection} aria-labelledby="suggested-channels-title">
+      <div className={styles.sectionTitleRow}>
+        <h2 id="suggested-channels-title">Suggested Channels</h2>
+        <Link className={styles.viewAll} href="/app/hubs/dfw/baseboard">
+          View all
+        </Link>
+      </div>
+      <div className={styles.suggestedChannelList}>
+        {suggestedChannels.map((item) => (
+          <Link className={styles.suggestedChannelRow} href={item.href} key={item.title}>
+            <span aria-hidden="true" className={styles.channelIcon} data-channel={item.icon}>
+              <AppIcon name={item.icon} className={styles.inlineIcon} />
             </span>
-            <strong>{action.title}</strong>
-            <small>{action.detail}</small>
-          </button>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-function CrewPicksSection() {
-  return (
-    <section className={styles.panelSection} aria-labelledby="crew-picks-title">
-      <div className={styles.sectionTitleRow}>
-        <div>
-          <h2 id="crew-picks-title">Crew Picks</h2>
-          <p>Useful, not generic trending. Admin-curated until saves and ranking exist.</p>
-        </div>
-      </div>
-      <div className={styles.crewPickList}>
-        {crewPicks.map((item) => (
-          <article className={styles.compactCard} key={item.title}>
-            <span className={styles.cardMeta}>{item.meta}</span>
-            <h3>{item.title}</h3>
-            <p>{item.detail}</p>
-          </article>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-function LayoversSection() {
-  return (
-    <section className={styles.railSection} aria-labelledby="layovers-title">
-      <div className={styles.sectionTitleRow}>
-        <div>
-          <h2 id="layovers-title">Layovers</h2>
-          <p>Placeholder destination previews. No exact hotel or live-location intel.</p>
-        </div>
-        <span className={styles.viewAll}>Coming soon</span>
-      </div>
-      <div className={styles.layoverRail}>
-        {layoverPreviews.map((item) => (
-          <article className={styles.layoverCard} key={item.title}>
-            <span>{item.title}</span>
-            <small>{item.meta}</small>
-          </article>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-function LoungesSection() {
-  return (
-    <section className={styles.panelSection} aria-labelledby="lounges-title">
-      <div className={styles.sectionTitleRow}>
-        <div>
-          <h2 id="lounges-title">Your Lounges</h2>
-          <p>Restricted spaces stay membership gated.</p>
-        </div>
-        <span className={styles.viewAll}>Locked</span>
-      </div>
-      <div className={styles.loungeList}>
-        {loungePreviews.map((item) => (
-          <article className={styles.loungeRow} key={item.title}>
-            <span aria-hidden="true" className={styles.loungeIcon}>
-              {item.title.slice(0, 1)}
-            </span>
-            <div>
+            <span>
               <h3>{item.title}</h3>
               <p>{item.detail}</p>
-            </div>
-            <span className={styles.rowState}>{item.meta}</span>
-          </article>
+            </span>
+            <span aria-hidden="true" className={styles.rowChevron}>
+              &gt;
+            </span>
+          </Link>
         ))}
       </div>
-    </section>
-  );
-}
-
-function FollowingSection({ hasDfwHomeBase }: { hasDfwHomeBase: boolean }) {
-  return (
-    <section className={styles.panelSection} aria-labelledby="following-title">
-      <div className={styles.sectionTitleRow}>
-        <div>
-          <h2 id="following-title">Following</h2>
-          <p>
-            Following initially means boards. It does not grant lounge or
-            restricted content access.
-          </p>
-        </div>
-      </div>
-      <article className={styles.compactCard}>
-        <span className={styles.cardMeta}>
-          {hasDfwHomeBase ? "Home Base follow" : "Empty state"}
-        </span>
-        <h3>{hasDfwHomeBase ? "DFW Hub Channels" : "No followed boards yet"}</h3>
-        <p>
-          {hasDfwHomeBase
-            ? "Auto-followed only when a user explicitly starts with DFW."
-            : "Start with DFW or follow boards later when board discovery exists."}
-        </p>
-      </article>
-    </section>
-  );
-}
-
-function SavedSection() {
-  return (
-    <section className={styles.panelSection} aria-labelledby="saved-title">
-      <div className={styles.sectionTitleRow}>
-        <div>
-          <h2 id="saved-title">Saved</h2>
-          <p>Your personal knowledge library after saves exist.</p>
-        </div>
-      </div>
-      <article className={styles.compactCard}>
-        <span className={styles.cardMeta}>Empty state</span>
-        <h3>No saved items yet</h3>
-        <p>Saved content is future utility state, not an onboarding requirement.</p>
-      </article>
     </section>
   );
 }
@@ -945,6 +974,8 @@ function DfwBaseboardPostsSection({
           </p>
         </article>
       )}
+
+      <DfwChannelRequestCallout />
     </section>
   );
 }
@@ -1174,14 +1205,16 @@ function DfwBaseboardCommentsSection({
   );
 }
 
-function BottomNavVisual() {
+function BottomNavVisual({ active }: { active: "Home" | "Hubs" }) {
+  const navItems = ["Home", "Hubs", "Search", "Saved", "Me"] as const;
+
   return (
     <nav className={styles.bottomNav} aria-label="Private app visual navigation">
-      <span data-active="true">Home</span>
-      <span>Boards</span>
-      <span>Search</span>
-      <span>Saved</span>
-      <span>Profile</span>
+      {navItems.map((item) => (
+        <span data-active={item === active ? "true" : undefined} key={item}>
+          {item}
+        </span>
+      ))}
     </nav>
   );
 }
@@ -1219,12 +1252,9 @@ export function HomeHubShell({
         )}
 
         <QuickActionsSection />
-        <CrewPicksSection />
-        <LayoversSection />
-        <LoungesSection />
-        <FollowingSection hasDfwHomeBase={hasDfwHomeBase} />
-        <SavedSection />
-        <BottomNavVisual />
+        <RecentUsefulThreadsSection />
+        <SuggestedChannelsSection />
+        <BottomNavVisual active="Home" />
       </div>
     </main>
   );
@@ -1234,72 +1264,80 @@ export function DfwHubReadOnlyShell() {
   return (
     <main className={styles.shell}>
       <div className={styles.mobileFrame}>
-        <AppHeader subtitle="DFW Hub read-only shell" showBackLink />
+        <AppHeader />
+
+        <nav className={styles.hubTitleBar} aria-label="DFW Hub navigation">
+          <Link className={styles.inlineBackLink} href="/app">
+            Back
+          </Link>
+          <span>DFW Hub</span>
+        </nav>
 
         <section className={styles.destinationHero} aria-labelledby="dfw-hub-title">
-          <span className={styles.cardLabel}>Dallas/Fort Worth</span>
-          <h1 id="dfw-hub-title">DFW Hub</h1>
-          <p>
-            A curated, read-heavy utility shell for the first launch Hub with
-            scoped community participation underneath.
-          </p>
+          <Image
+            alt=""
+            className={styles.destinationHeroImage}
+            fill
+            priority
+            sizes="(max-width: 460px) 100vw, 460px"
+            src="/images/dallas4.jpg"
+          />
+          <div className={styles.destinationHeroCopy}>
+            <strong className={styles.heroCode}>DFW</strong>
+            <span className={styles.cardLabel}>Dallas/Fort Worth</span>
+            <h1 id="dfw-hub-title">DFW Hub</h1>
+            <p>A utility home for DFW aviation workers.</p>
+            <a className={styles.secondaryHeroButton} href="#dfw-hub-sections">
+              <span>Browse Hub Sections</span>
+              <span aria-hidden="true">&gt;</span>
+            </a>
+          </div>
         </section>
 
         <SearchAffordance label="Search within DFW" />
 
-        <section className={styles.hubSurfaceGrid} aria-labelledby="hub-surfaces-title">
-          <div className={styles.sectionTitleRow}>
-            <div>
-              <h2 id="hub-surfaces-title">Hub surfaces</h2>
-              <p>
-                DFW Today, Base, Layover, Channels, and Recent Useful Threads
-                are the current Hub sections.
-              </p>
-            </div>
-          </div>
-          <div className={styles.surfaceGrid}>
+        <section
+          className={styles.hubSurfaceGrid}
+          aria-labelledby="hub-surfaces-title"
+          id="dfw-hub-sections"
+        >
+          <h2 className={styles.visuallyHidden} id="hub-surfaces-title">
+            DFW Hub sections
+          </h2>
+          <div className={styles.sectionList}>
             {dfwHubSections.map((item) =>
               item.href ? (
-                <Link className={styles.surfaceCard} href={item.href} key={item.title}>
-                  <span className={styles.cardMeta}>{item.meta}</span>
-                  <h3>{item.title}</h3>
-                  <p>{item.detail}</p>
+                <Link className={styles.sectionCard} href={item.href} key={item.title}>
+                  <span aria-hidden="true" className={styles.sectionIcon} data-section={item.icon}>
+                    <AppIcon name={item.icon} className={styles.inlineIcon} />
+                  </span>
+                  <span className={styles.sectionCardBody}>
+                    <h3>{item.title}</h3>
+                    <p>{item.detail}</p>
+                    <small>{item.meta}</small>
+                  </span>
+                  <span className={styles.sectionCta}>{item.cta ?? "View"}</span>
+                  <span aria-hidden="true" className={styles.rowChevron}>
+                    &gt;
+                  </span>
                 </Link>
               ) : (
-                <article className={styles.surfaceCard} key={item.title}>
-                  <span className={styles.cardMeta}>{item.meta}</span>
-                  <h3>{item.title}</h3>
-                  <p>{item.detail}</p>
+                <article className={styles.sectionCard} key={item.title}>
+                  <span aria-hidden="true" className={styles.sectionIcon} data-section={item.icon}>
+                    <AppIcon name={item.icon} className={styles.inlineIcon} />
+                  </span>
+                  <span className={styles.sectionCardBody}>
+                    <h3>{item.title}</h3>
+                    <p>{item.detail}</p>
+                    <small>{item.meta}</small>
+                  </span>
+                  <span className={styles.sectionCta}>Coming soon</span>
+                  <span aria-hidden="true" className={styles.rowChevron}>
+                    &gt;
+                  </span>
                 </article>
               ),
             )}
-          </div>
-        </section>
-
-        <section className={styles.hubSurfaceGrid} aria-labelledby="dfw-channels-title">
-          <div className={styles.sectionTitleRow}>
-            <div>
-              <h2 id="dfw-channels-title">DFW Channels</h2>
-              <p>Focused discussion spaces with reviewed channel expansion.</p>
-            </div>
-          </div>
-          <div className={styles.surfaceGrid}>
-            {[
-              "DFW Questions",
-              "Commuting & Parking",
-              "Food & Coffee",
-              "New to DFW",
-              "Base Life",
-              "Crew Tips",
-              "App Feedback",
-            ].map((channel) => (
-              <article className={styles.surfaceCard} key={channel}>
-                <span className={styles.cardMeta}>Default channel</span>
-                <h3>{channel}</h3>
-                <p>Uses existing safe post/comment/report/moderation primitives.</p>
-              </article>
-            ))}
-            <DfwChannelRequestCallout />
           </div>
         </section>
 
@@ -1319,6 +1357,7 @@ export function DfwHubReadOnlyShell() {
             not part of the open Hub section model.
           </p>
         </section>
+        <BottomNavVisual active="Hubs" />
       </div>
     </main>
   );

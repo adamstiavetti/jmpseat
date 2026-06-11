@@ -34,6 +34,11 @@ Current controlling docs for Hub work:
   future UI polish. No functionality blocker remains, so the next work should
   move into narrow Home / DFW Hub implementation planning rather than more
   prototype polishing.
+- [FBMVP-T24A Real Home + DFW Hub Visual Refresh](ops/fbmvp-t24a-real-home-dfw-hub-visual-refresh.md) - local implementation note for the
+  narrow production Home/dashboard and real DFW Hub overview visual refresh,
+  using the approved post-Hub-pivot direction while preserving existing access
+  gates, safe data paths, internal Baseboard primitives, and the deferred
+  DB/RPC-backed Channels scope.
 
 Wireframe source pack:
 
@@ -117,6 +122,12 @@ Supplemental epoch-specific ticket packs:
 - [FBMVP-T22 Hub Channels IA / Data Model Lock](ops/fbmvp-t22-hub-channels-ia-data-model-lock.md) - docs-only decision record locking the next Channels model: Hub maps to `bases` plus the current parent/base board container, Channel maps to child `boards` rows, Thread maps to `board_posts`, comments map to `board_post_comments`, and reporting/moderation keep using the T12-T20 primitives. It recommends `FBMVP-T23A` DFW Hub Channels UX Wireframe before DB implementation unless implementation needs to proceed directly to `FBMVP-T23` DFW Hub Channels Foundation.
 - [FBMVP-T23A Full Mobile Hub Wireframes](ops/fbmvp-t23a-full-mobile-hub-wireframes.md) - docs/design packet for the post-pivot mobile private-beta experience, including Home, DFW Hub sections, Channels browsing, Channel detail, Thread detail, Start a Thread, replies, reporting, saved/empty states, and bottom navigation while avoiding app code, migrations, runtime changes, live integrations, media uploads, free channel creation, and database renames. Visual mockup review approved the overall direction and recorded required cleanup before `FBMVP-T23B`: use compact rows/lists for repeatable items, remove fake scale claims, avoid mutually exclusive states on one screen, keep report affordances quiet, and make Request a Channel secondary. T23B must use fake/mock/static data only, make no Supabase content RPC calls, query/display no real `board_posts`, comments, reports, author IDs, reporter identity, or runtime UGC, and avoid runtime mutation, migrations, and DB/RPC-backed Channels.
 - `FBMVP-T23B Protected Static Hub Wireframe Prototype Route` - locally implemented protected admin design route at `/app/admin/design/dfw-hub-wireframes`, rendering the approved T23A mobile screens with fake/static data only. It uses the existing admin-shell authorization boundary and does not call Supabase content RPCs, import community content fetchers, query/display live posts/comments/reports, implement DB/RPC-backed Channels, create migrations, mutate runtime data, or add the route to normal user navigation. Manual beta visual review is recorded in [FBMVP-T23B Static Wireframe Prototype Manual Review](ops/fbmvp-t23b-static-wireframe-prototype-manual-review.md): approved with future UI polish, no functionality blocker, and no need for further prototype polishing before implementation planning.
+- [FBMVP-T24A Real Home + DFW Hub Visual Refresh](ops/fbmvp-t24a-real-home-dfw-hub-visual-refresh.md) - locally refreshes the real private-app
+  Home/dashboard and real `/app/hubs/dfw` overview using the approved mobile
+  visual direction. It keeps Home utility-first, gives DFW Hub a richer hero
+  and section-first overview, keeps Request a Channel secondary inside the
+  Channels section, and adds no migrations, runtime mutation, new content RPCs,
+  live integrations, or DB/RPC-backed Channels.
 - [First-Base MVP Implementation Ticket Pack](epochs/first-base-mvp-implementation-ticket-pack.md) - translates the pivot strategy docs into the ordered `FBMVP` implementation sequence; the immediate post-Epoch-5 narrow lane is first reconciled in `ops/private-beta-readiness-bridge.md`, and auth email branding/custom SMTP is now tracked as a deferred beta-readiness polish TODO rather than the active next auth-flow implementation task.
 - [FBMVP-T01: Freeze User-Facing Proof Verification Surfaces](epochs/fbmvp-t01-freeze-user-facing-proof-verification-surfaces.md) - freezes normal proof-upload UX while preserving historical proof infrastructure, cleanup, audit, and admin/operator safety.
 - [FBMVP-T02: Airline Email Verification Access State Design](epochs/fbmvp-t02-airline-email-verification-access-state-design.md) - defines the forward `airline_email_verified` app-level eligibility state and how it maps from existing work-email verification foundations.
