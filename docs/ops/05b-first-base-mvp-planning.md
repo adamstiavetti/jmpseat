@@ -82,6 +82,19 @@ mixed Baseboards toward airport/base Hubs with `[AIRPORT] Today`, Base,
 Layover, Channels, an in-section Request a Channel action, and Recent Useful
 Threads.
 
+Use `docs/ops/fbmvp-t21-dfw-hub-product-framing-runtime-smoke.md` and
+`docs/ops/fbmvp-t22-hub-channels-ia-data-model-lock.md` as the current
+controlling post-T21 docs for Hub implementation planning. T21 records the
+manual beta UI smoke and expected UX debt. T22 locks the Channels IA/data-model
+decision: reuse/extend `public.boards` as child channel boards rather than
+creating a standalone `channels` table yet.
+
+Wireframe agents should use the current product language `[AIRPORT] Hub`,
+`[AIRPORT] Today`, Base, Layover, Channels, Recent Useful Threads, and Request
+a Channel inside Channels. DFW default Channels are DFW Questions, Commuting &
+Parking, Food & Coffee, New to DFW, Base Life, Crew Tips, and App Feedback.
+Do not design around real UGC yet; none exists in production.
+
 Use `docs/strategy/hub-board-taxonomy.md` as historical/canonical background for
 the first Hub shell and existing T08-T11 route taxonomy, but do not treat
 Baseboard as the main public-facing product concept for the next implementation
@@ -391,6 +404,7 @@ The current implementation sequence is:
 16. `FBMVP-T19` DFW Baseboard comments foundation, merged and runtime-applied
 17. `FBMVP-T20` DFW Baseboard comment reporting/moderation review integration, merged and runtime-applied
 18. `FBMVP-T21` DFW Hub product framing, implemented locally with no migration
+19. `FBMVP-T22` Hub Channels IA/data-model lock, docs-only
 
 T20 runtime-pass docs are committed. The First Base / DFW Baseboard safety loop
 is complete. The approved pivot is recorded in `ops/hub-pivot-plan.md`.
@@ -413,6 +427,19 @@ This is a shell/framing pass with expected UX debt, not final Hub UX completion.
 Request a Channel should become a lower-priority secondary action inside
 Channels. Existing test/seed post content is not production community UGC and is
 not a data-migration blocker.
+
+T22 locks the real Channels model before implementation. Existing
+`public.boards` can partially model Channels and should be reused/extended:
+Hub maps to `public.bases` plus the current parent/base board container,
+Channel maps to child `public.boards` rows under the DFW base board, Thread
+maps to `public.board_posts`, Comments map to `public.board_post_comments`, and
+reports/moderation continue to use the existing post/comment primitives.
+`board_posts.category` alone is too weak for real Channels. Future DB/RPC work
+should add a `hub_channel` board type, seed DFW child channel boards, and add
+channel-aware safe RPCs rather than creating a standalone `channels` table now.
+The recommended next ticket is `FBMVP-T23A: DFW Hub Channels UX Wireframe`
+before DB implementation unless there is a strong reason to proceed directly to
+`FBMVP-T23: DFW Hub Channels Foundation`.
 
 Recommended direction:
 
@@ -594,10 +621,14 @@ Recommended direction:
   internal foundation for Channels and Recent Useful Threads.
 - T21 runtime smoke is documented in
   `ops/fbmvp-t21-dfw-hub-product-framing-runtime-smoke.md`. The next narrow
-  implementation lane should be product/UX polish for Channels and thread
-  interaction, or a focused DFW Hub section polish pass. Do not start free
-  channel creation, media/photo uploads, or live weather/traffic integrations
-  without separate scope.
+  implementation lane should follow
+  `ops/fbmvp-t22-hub-channels-ia-data-model-lock.md`: prefer
+  `FBMVP-T23A: DFW Hub Channels UX Wireframe` before DB implementation while
+  localhost inspection is unavailable and wireframes are being generated
+  externally. If implementation proceeds directly, use `FBMVP-T23: DFW Hub
+  Channels Foundation` with child `boards` rows and channel-aware RPCs. Do not
+  start free channel creation, media/photo uploads, or live weather/traffic
+  integrations without separate scope.
 
 Pre-closeout access baseline: public `jmpseat.com` and `www.jmpseat.com` are
 marketing/waitlist-only through `bad2110 fix: gate private app on public

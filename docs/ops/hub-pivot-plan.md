@@ -20,6 +20,27 @@ This is the current planning model. It can change later, but implementation
 should use this language and structure until a newer controlling decision
 replaces it.
 
+## Current Controlling Docs For Hub Work
+
+Use this source pack for Hub implementation, product planning, and wireframes:
+
+- `docs/ops/hub-pivot-plan.md` - approved Hub product model and naming.
+- `docs/ops/fbmvp-t21-dfw-hub-product-framing-runtime-smoke.md` - manual beta
+  UI smoke for the T21 DFW Hub shell and expected UX debt.
+- `docs/ops/fbmvp-t22-hub-channels-ia-data-model-lock.md` - current
+  Channels IA/data-model decision.
+
+Wireframe source pack:
+
+- Product language: `[AIRPORT] Hub`, `[AIRPORT] Today`, Base, Layover,
+  Channels, Recent Useful Threads, and Request a Channel inside Channels.
+- DFW default Channels: DFW Questions, Commuting & Parking, Food & Coffee, New
+  to DFW, Base Life, Crew Tips, and App Feedback.
+- Known UX debt: placeholder-heavy shell, card stacking needs polish, Channels
+  needs thread creation/reading/reply hierarchy, and Request a Channel should
+  become a secondary action.
+- Do not design around real UGC yet. None exists in production.
+
 ## Proven Baseline
 
 The current First Base / DFW Baseboard safety loop is complete through T20:
@@ -286,14 +307,67 @@ Protected surfaces must remain server-gated and must not rely on client-side
 hiding alone. Existing access, moderation, RLS, admin, and reporting controls
 must not be weakened.
 
+## T22 Channels IA / Data Model Decision
+
+`FBMVP-T22` locks the recommended Channels internal model before implementation:
+
+- Existing `public.boards` can partially model Channels.
+- Recommended internal model: reuse/extend `public.boards`, not a new
+  standalone `channels` table yet.
+- Hub maps to `public.bases` plus the current parent/base board container.
+- Channel maps to child `public.boards` rows under the DFW base board.
+- Thread maps to `public.board_posts`.
+- Comments map to `public.board_post_comments`.
+- Reports/moderation use existing post/comment report and moderation
+  primitives.
+- Current DFW RPCs still target the single active DFW `base_board`; real
+  channel routing/posting will need channel-aware wrappers/RPCs later.
+- `board_posts.category` alone is too weak for real Channels.
+
+Recommended future minimal implementation:
+
+- Add a `hub_channel` board type.
+- Seed DFW child channel boards:
+  - `dfw-questions`
+  - `commuting-parking`
+  - `food-coffee`
+  - `new-to-dfw`
+  - `base-life`
+  - `crew-tips`
+  - `app-feedback`
+- Add safe channel-aware RPCs later:
+  - `list_open_hub_channels(p_base_code)`
+  - `list_open_hub_channel_posts(p_base_code, p_channel_slug, p_limit)`
+  - `create_open_hub_channel_post(p_base_code, p_channel_slug, ...)`
+  - `get_open_hub_channel_post(p_base_code, p_channel_slug, p_post_id)`
+
+No real production UGC exists yet, so UGC data-loss is not a blocker for this
+model choice. Database table/RPC renames remain out of scope unless a separate
+refactor plans them.
+
 ## Recommended Next Implementation Ticket
 
 Recommended next ticket:
 
-`FBMVP-T21: DFW Hub Product Framing`
+`FBMVP-T23A: DFW Hub Channels UX Wireframe`
 
-Status: implemented locally in the product shell. This ticket is UI/product
-framing only and does not require a runtime migration.
+Reason: the Channels model is locked, localhost inspection is not available
+during the workday, and wireframes are being generated externally. A focused
+wireframe pass should clarify Channels layout, thread hierarchy, and Request a
+Channel placement before DB/RPC-backed child channel boards are implemented.
+
+Alternative implementation ticket:
+
+`FBMVP-T23: DFW Hub Channels Foundation`
+
+Use this if implementation proceeds directly. Scope it to the `hub_channel`
+board type, seeded DFW child channel boards, and safe channel-aware RPCs.
+
+Prior ticket:
+
+`FBMVP-T21: DFW Hub Product Framing` is implemented locally in the product
+shell. This ticket is UI/product framing only and does not require a runtime
+migration.
 
 Runtime smoke: manual beta UI smoke passed for commit
 `8abf799 feat: reframe dfw surface as hub`. The smoke confirmed DFW Hub, DFW

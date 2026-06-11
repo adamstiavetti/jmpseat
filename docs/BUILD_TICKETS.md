@@ -7,6 +7,27 @@ This is a prioritized implementation plan for a future build phase. No app code 
 
 Labels used: docs, product, foundation, auth, verification, community, moderation, AI, monetization, admin, later.
 
+Current controlling docs for Hub work:
+
+- [Hub Pivot Plan](ops/hub-pivot-plan.md) - approved post-T20 Hub product model
+  and naming.
+- [FBMVP-T21 DFW Hub Product Framing Runtime Smoke](ops/fbmvp-t21-dfw-hub-product-framing-runtime-smoke.md) - manual beta UI smoke for the
+  T21 DFW Hub shell and expected UX debt.
+- [FBMVP-T22 Hub Channels IA / Data Model Lock](ops/fbmvp-t22-hub-channels-ia-data-model-lock.md) - current source of truth for real Hub
+  Channels: reuse/extend `public.boards` as child channel boards, preserve
+  T12-T20 primitives, and do not create a standalone `channels` table yet.
+
+Wireframe source pack:
+
+- Current product language: `[AIRPORT] Hub`, `[AIRPORT] Today`, Base, Layover,
+  Channels, Recent Useful Threads, and Request a Channel inside Channels.
+- DFW default Channels: DFW Questions, Commuting & Parking, Food & Coffee, New
+  to DFW, Base Life, Crew Tips, and App Feedback.
+- Current UX debt: placeholder-heavy shell, card stacking needs polish,
+  Channels needs thread creation/reading/reply hierarchy, and Request a Channel
+  should become a secondary action.
+- Do not design around real UGC yet. None exists in production.
+
 Supplemental epoch-specific ticket packs:
 
 - [Epoch 02: Private App Foundation Ticket Pack](epochs/epoch-02-private-app-foundation-tickets.md)
@@ -75,6 +96,7 @@ Supplemental epoch-specific ticket packs:
 - [Hub Pivot Plan](ops/hub-pivot-plan.md) - locks the approved post-T20 product direction away from raw mixed Baseboards and toward airport/base Hubs with `[AIRPORT] Today`, Base, Layover, Channels, in-section Request a Channel, and Recent Useful Threads while preserving T12-T20 safety primitives and avoiding database renames until separately planned.
 - `FBMVP-T21 DFW Hub Product Framing` - implemented locally as a UI/product-framing shell update with no migration: DFW Hub now presents DFW Today, Base, Layover, Channels with in-section Request a Channel, and Recent Useful Threads while preserving existing post/comment/report/moderation primitives and internal Baseboard route/RPC/table names.
 - [FBMVP-T21 DFW Hub Product Framing Runtime Smoke](ops/fbmvp-t21-dfw-hub-product-framing-runtime-smoke.md) - records manual beta UI smoke for `8abf799`, confirms DFW Hub, DFW Today, Base, Layover, Channels, Request a Channel inside Channels, and Recent Useful Threads render, marks T21 smoke passed with expected UX debt, and confirms no live weather/traffic, free channel creation, photo uploads, migrations, runtime mutation, or table renames were introduced.
+- [FBMVP-T22 Hub Channels IA / Data Model Lock](ops/fbmvp-t22-hub-channels-ia-data-model-lock.md) - docs-only decision record locking the next Channels model: Hub maps to `bases` plus the current parent/base board container, Channel maps to child `boards` rows, Thread maps to `board_posts`, comments map to `board_post_comments`, and reporting/moderation keep using the T12-T20 primitives. It recommends `FBMVP-T23A` DFW Hub Channels UX Wireframe before DB implementation unless implementation needs to proceed directly to `FBMVP-T23` DFW Hub Channels Foundation.
 - [First-Base MVP Implementation Ticket Pack](epochs/first-base-mvp-implementation-ticket-pack.md) - translates the pivot strategy docs into the ordered `FBMVP` implementation sequence; the immediate post-Epoch-5 narrow lane is first reconciled in `ops/private-beta-readiness-bridge.md`, and auth email branding/custom SMTP is now tracked as a deferred beta-readiness polish TODO rather than the active next auth-flow implementation task.
 - [FBMVP-T01: Freeze User-Facing Proof Verification Surfaces](epochs/fbmvp-t01-freeze-user-facing-proof-verification-surfaces.md) - freezes normal proof-upload UX while preserving historical proof infrastructure, cleanup, audit, and admin/operator safety.
 - [FBMVP-T02: Airline Email Verification Access State Design](epochs/fbmvp-t02-airline-email-verification-access-state-design.md) - defines the forward `airline_email_verified` app-level eligibility state and how it maps from existing work-email verification foundations.

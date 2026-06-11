@@ -329,6 +329,10 @@ Product definition:
 
 - `ops/hub-pivot-plan.md` is the current controlling post-T20 product direction
   for Hub naming and IA.
+- `ops/fbmvp-t21-dfw-hub-product-framing-runtime-smoke.md` records the manual
+  beta UI smoke for the first DFW Hub shell and expected UX debt.
+- `ops/fbmvp-t22-hub-channels-ia-data-model-lock.md` is the current
+  controlling IA/data-model decision for real Hub Channels.
 - `strategy/hub-board-taxonomy.md` is historical/canonical background for the
   first Hub shell, but the approved working product language now pivots away
   from Baseboard as the main public-facing concept.
@@ -360,6 +364,21 @@ Current data model implication:
 - T12 shared posts should attach to `boards`, allowing Baseboard, Layovers, and
   later access-aware lounge content to reuse one post/thread primitive while
   keeping product UX utility-first.
+- T22 locks the recommended Channels model as reuse/extension of
+  `public.boards`, not a standalone `channels` table. Hub maps to `bases` plus
+  the current parent/base board container; Channel maps to child `boards` rows;
+  Thread maps to `board_posts`; Comments map to `board_post_comments`; and
+  reports/moderation keep using existing post/comment primitives.
+- `board_posts.category` alone is too weak for real Channels because it does
+  not provide channel names, slugs, descriptions, status, ordering, request
+  lifecycle, or future channel-level routing/follow/access behavior.
+- A future minimal Channels migration should add a controlled `hub_channel`
+  board type, seed DFW child channel boards, and add safe channel-aware RPCs
+  such as `list_open_hub_channels`, `list_open_hub_channel_posts`,
+  `create_open_hub_channel_post`, and `get_open_hub_channel_post`.
+- No real production UGC exists yet, so UGC data-loss is not a blocker for the
+  choice of model. Table/RPC/database renames remain out of scope unless a
+  separate refactor plans them.
 
 DFW launch model:
 
