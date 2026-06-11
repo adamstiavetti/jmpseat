@@ -89,6 +89,22 @@ manual beta UI smoke and expected UX debt. T22 locks the Channels IA/data-model
 decision: reuse/extend `public.boards` as child channel boards rather than
 creating a standalone `channels` table yet.
 
+Use `docs/ops/fbmvp-t23a-full-mobile-hub-wireframes.md` as the current
+mobile-first wireframe packet for Home, DFW Hub, DFW Today, Base, Layover,
+Channels, Channel detail, Thread detail, Start a Thread, replies, reports,
+saved/empty states, and bottom navigation before starting visual or DB/RPC
+implementation. T23A visual mockup review approved the overall direction but
+requires cleanup before prototyping: compact rows for repeatable Channels,
+threads, comments, search results, and saved items; cards reserved for major
+destinations, empty states, safety reminders, and detail containers; beta-safe
+placeholders instead of fake scale claims; no mutually exclusive states shown
+together; and Request a Channel kept secondary.
+
+The likely T23B protected static prototype must use fake/mock/static data only,
+call no Supabase content RPCs, query/display no real `board_posts`, comments,
+reports, author IDs, reporter identity, or runtime UGC, mutate no runtime data,
+apply no migrations, and avoid DB/RPC-backed Channels.
+
 Wireframe agents should use the current product language `[AIRPORT] Hub`,
 `[AIRPORT] Today`, Base, Layover, Channels, Recent Useful Threads, and Request
 a Channel inside Channels. DFW default Channels are DFW Questions, Commuting &
@@ -405,6 +421,7 @@ The current implementation sequence is:
 17. `FBMVP-T20` DFW Baseboard comment reporting/moderation review integration, merged and runtime-applied
 18. `FBMVP-T21` DFW Hub product framing, implemented locally with no migration
 19. `FBMVP-T22` Hub Channels IA/data-model lock, docs-only
+20. `FBMVP-T23A` full mobile Hub wireframes, docs/design-only
 
 T20 runtime-pass docs are committed. The First Base / DFW Baseboard safety loop
 is complete. The approved pivot is recorded in `ops/hub-pivot-plan.md`.
@@ -440,6 +457,28 @@ channel-aware safe RPCs rather than creating a standalone `channels` table now.
 The recommended next ticket is `FBMVP-T23A: DFW Hub Channels UX Wireframe`
 before DB implementation unless there is a strong reason to proceed directly to
 `FBMVP-T23: DFW Hub Channels Foundation`.
+
+T23A adds the mobile-first wireframe packet for the updated private-beta Hub
+experience. It defines Home/dashboard, DFW Hub overview, DFW Today, Base,
+Layover, Channels overview, Channel detail/thread list, Thread detail, Start a
+Thread, reply/comment, report, saved/empty states, and bottom navigation. It is
+design documentation only and does not add app implementation, migrations,
+runtime data, DB/RPC changes, media uploads, live weather/traffic, saves,
+reactions, search, or free channel creation.
+
+T23A visual mockup review approved the polished mobile dashboard direction and
+confirmed the action hierarchy: Channels overview is browse-first, Request a
+Channel is a secondary Channels action, Start a Thread belongs inside a
+selected Channel detail page, and Thread detail centers reply/report behavior.
+Before implementation, T23B should create a protected static prototype route,
+likely `/app/admin/design/dfw-hub-wireframes`, and apply the T23A revisions:
+compact rows/lists for repeated items, no fake scale claims, one state per
+screen, quiet report affordances, concise safety helper text, and consistent
+Home/Hubs/Search/Saved/Me bottom navigation with Hubs active for Hub-derived
+screens. T23B must use fake/mock/static data only, call no Supabase content
+RPCs, query/display no real `board_posts`, comments, reports, author IDs,
+reporter identity, or runtime UGC, mutate no runtime data, apply no migrations,
+and avoid DB/RPC-backed Channels.
 
 Recommended direction:
 
@@ -623,12 +662,20 @@ Recommended direction:
   `ops/fbmvp-t21-dfw-hub-product-framing-runtime-smoke.md`. The next narrow
   implementation lane should follow
   `ops/fbmvp-t22-hub-channels-ia-data-model-lock.md`: prefer
-  `FBMVP-T23A: DFW Hub Channels UX Wireframe` before DB implementation while
-  localhost inspection is unavailable and wireframes are being generated
+  the `FBMVP-T23A` full mobile Hub wireframe packet in
+  `ops/fbmvp-t23a-full-mobile-hub-wireframes.md` before DB implementation
+  while localhost inspection is unavailable and wireframes are being generated
   externally. If implementation proceeds directly, use `FBMVP-T23: DFW Hub
   Channels Foundation` with child `boards` rows and channel-aware RPCs. Do not
-  start free channel creation, media/photo uploads, or live weather/traffic
-  integrations without separate scope.
+  start free channel creation, media/photo uploads, saves/reactions/search, or
+  live weather/traffic integrations without separate scope.
+- After T23A visual approval, the likely next ticket is
+  `FBMVP-T23B: Protected Static Hub Wireframe Prototype Route`, probably at
+  `/app/admin/design/dfw-hub-wireframes`. T23B should be static/protected only
+  and should not start DB/RPC-backed Channels. It must use fake/mock/static
+  data only, make no Supabase content RPC calls, query/display no real
+  `board_posts`, comments, reports, author IDs, reporter identity, or runtime
+  UGC, mutate no runtime data, and apply no migrations.
 
 Pre-closeout access baseline: public `jmpseat.com` and `www.jmpseat.com` are
 marketing/waitlist-only through `bad2110 fix: gate private app on public

@@ -29,6 +29,9 @@ Use this source pack for Hub implementation, product planning, and wireframes:
   UI smoke for the T21 DFW Hub shell and expected UX debt.
 - `docs/ops/fbmvp-t22-hub-channels-ia-data-model-lock.md` - current
   Channels IA/data-model decision.
+- `docs/ops/fbmvp-t23a-full-mobile-hub-wireframes.md` - mobile-first
+  wireframe packet for the post-pivot private-beta Hub experience, including
+  approved visual mockup direction and required prototype cleanup.
 
 Wireframe source pack:
 
@@ -347,14 +350,61 @@ refactor plans them.
 
 ## Recommended Next Implementation Ticket
 
-Recommended next ticket:
+Current design packet:
 
 `FBMVP-T23A: DFW Hub Channels UX Wireframe`
 
-Reason: the Channels model is locked, localhost inspection is not available
-during the workday, and wireframes are being generated externally. A focused
-wireframe pass should clarify Channels layout, thread hierarchy, and Request a
-Channel placement before DB/RPC-backed child channel boards are implemented.
+Status: documented in `docs/ops/fbmvp-t23a-full-mobile-hub-wireframes.md`.
+Visual mockup direction is approved with required revisions before static
+prototype implementation.
+
+Scope:
+
+- mobile Home/dashboard
+- DFW Hub overview
+- DFW Today
+- Base
+- Layover
+- Channels overview
+- Channel detail/thread list
+- Thread detail
+- Start a Thread composer
+- reply/comment flow
+- report flow
+- saved/empty states
+- bottom navigation
+
+Reason for this packet: the Channels model is locked, localhost inspection is
+not available during the workday, and wireframes are being generated
+externally. A focused wireframe pass should clarify Channels layout, thread
+hierarchy, and Request a Channel placement before DB/RPC-backed child channel
+boards are implemented.
+
+Required prototype revisions:
+
+- use compact rows/lists for repeated Channels, threads, comments, search
+  results, and saved items
+- reserve cards for major destinations, empty states, safety reminders, and
+  detail containers
+- remove fake scale claims and use beta-safe placeholders
+- do not show mutually exclusive states together
+- keep Home/Hubs/Search/Saved/Me bottom navigation consistent, with Hubs active
+  for DFW Hub and nested Hub flows
+- keep report affordances accessible but visually quiet
+- keep Request a Channel secondary and Start a Thread inside selected Channel
+  detail
+
+Next likely implementation ticket:
+
+`FBMVP-T23B: Protected Static Hub Wireframe Prototype Route`
+
+Likely route: `/app/admin/design/dfw-hub-wireframes`.
+
+T23B must use fake/mock/static data only. It must not call Supabase content
+RPCs, query or display real `board_posts`, comments, reports, author IDs,
+reporter identity, or runtime UGC, mutate runtime data, apply migrations, or
+start DB/RPC-backed Channels. It also should not start free channel creation,
+media uploads, live integrations, saves, reactions, or search.
 
 Alternative implementation ticket:
 
