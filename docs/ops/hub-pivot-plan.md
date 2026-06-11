@@ -1,0 +1,315 @@
+# Hub Pivot Plan
+
+Date: 2026-06-11
+
+Brand note: jmpseat is the canonical product and app name. This document does
+not claim legal or trademark clearance for the name.
+
+## Purpose
+
+This note locks the current working product direction after the First Base /
+DFW Baseboard safety loop. It is a planning and naming record only. It does
+not implement app code, change database tables, apply migrations, deploy, or
+change runtime settings.
+
+The approved direction is to pivot away from treating Baseboards as open mixed
+discussion boards. The product should move toward airport/base Hubs: curated,
+read-heavy utility pages with scoped community participation underneath.
+
+This is the current planning model. It can change later, but implementation
+should use this language and structure until a newer controlling decision
+replaces it.
+
+## Proven Baseline
+
+The current First Base / DFW Baseboard safety loop is complete through T20:
+
+- T12 added the shared `board_posts` foundation.
+- T13 added server-controlled post creation through `public.create_board_post`.
+- T14 added safe DFW Baseboard post reads.
+- T15 added the minimal DFW Baseboard title/body composer.
+- T16 added post reporting plus operator hide/remove RPC safety.
+- T17 added read-only DFW Baseboard post detail.
+- T18 added DFW Baseboard report review for `operator.community_moderation`.
+- T19 added top-level DFW Baseboard comments plus operator hide/remove comment
+  safety.
+- T20 added comment reporting and comment report review integration.
+
+All T12 through T20 runtime-pass docs are committed. Known Supabase migration
+history drift remains preserved, so broad `supabase db push` remains unsafe.
+Future runtime changes should continue to use targeted preflight/apply.
+
+Pre-closeout access fixes are also part of the baseline:
+
+- `bad2110 fix: gate private app on public domain` keeps `jmpseat.com` and
+  `www.jmpseat.com` marketing/waitlist-only and keeps private app entry on
+  `beta.jmpseat.com`.
+- `5e65f7b fix: require admin authorization for admin shell` requires reviewer
+  authorization or an active operator grant before rendering `/app/admin`.
+
+## Why Pivot
+
+Raw Baseboards create a mixed-pot risk. If the top-level base surface becomes a
+chronological discussion board, practical airport utility, temporary layover
+needs, localized questions, social chatter, app feedback, and moderation
+signals can collapse into one noisy feed.
+
+That shape weakens the core jmpseat principle:
+
+- utility first
+- community second
+- social feed last
+- verified privately, anonymous publicly, accountable internally
+
+The Hub model keeps the first screen useful by default. Community participation
+still exists, but it lives inside scoped sections and channels with clear
+governance.
+
+## Approved Hub Model
+
+Each airport/base has a Hub. The Hub is curated and useful by default. The
+top-level Hub should not be a raw chronological feed.
+
+The working structure is:
+
+- `[AIRPORT] Hub`
+- `[AIRPORT] Today`
+- `Base`
+- `Layover`
+- `Channels`
+- `Recent Useful Threads`
+
+Example:
+
+- `MIA Hub`
+  - `MIA Today`
+  - `Base`
+  - `Layover`
+  - `Channels`
+  - `Recent Useful Threads`
+
+A DFW-based user can discover `MIA Layover` through search, recommendations, or
+popular layovers, but the canonical home is `MIA Hub > Layover`, not
+`DFW Hub > MIA Layover`.
+
+## Locked Working Naming
+
+Use these as the current product-facing labels:
+
+- Top-level airport/base surface: `[AIRPORT] Hub`, for example `DFW Hub`.
+- Current curated module: `[AIRPORT] Today`, for example `DFW Today`.
+- Based-worker utility section: `Base`.
+- Layover utility/UGC section: `Layover`.
+- Focused discussion spaces: `Channels`.
+- Channel request action: `Request a Channel`.
+- High-signal community surface: `Recent Useful Threads`.
+
+Do not use these as primary product-facing labels:
+
+- `Baseboard` as the main public-facing concept.
+- `Intel`.
+- `Brief`.
+- `Subboards`.
+- `Routes`.
+- `Groups`.
+- `Communities`.
+- `Layover Guide` as the primary layover product name.
+
+Internal database/table names do not need to be renamed as part of the pivot.
+Any internal schema rename should be planned separately as a later refactor.
+
+## DFW Private Beta Structure
+
+The DFW private beta should default to:
+
+- `DFW Hub`
+  - `DFW Today`
+  - `Base`
+  - `Layover`
+  - `Channels`
+    - includes an in-section `Request a Channel` action/button
+  - `Recent Useful Threads`
+
+Default DFW Channels:
+
+- `DFW Questions`
+- `Commuting & Parking`
+- `Food & Coffee`
+- `New to DFW`
+- `Base Life`
+- `Crew Tips`
+- `App Feedback`
+
+## Section Model
+
+### DFW Today
+
+`DFW Today` contains admin/founder/approved curated current items such as:
+
+- weather
+- traffic
+- public airport advisories
+- app notes
+- recently updated sections
+
+AI may assist drafting or summarizing updates, but AI should not be the final
+publisher for operationally sensitive, verification-sensitive, or
+safety-sensitive information.
+
+### Base
+
+`Base` contains evergreen and semi-evergreen information for people based at or
+working from that airport.
+
+Examples include commuting, parking, food, reserve-life patterns, airport
+basics, and other airport/base utility content that should not be buried in a
+raw feed.
+
+### Layover
+
+`Layover` contains practical layover information, recommendations, questions,
+and crew-sourced updates for people temporarily there.
+
+Do not model layovers as a totally separate `Layover Guide` product right now.
+Layover content lives inside the airport Hub as a `Layover` section.
+
+Layover section content can include:
+
+- `Essentials`
+- `Recommendations`
+- `Questions`
+- `Crew Tips`
+- `Getting Around`
+- `Food & Coffee`
+- `Things To Do`
+- `Short Layover`
+- `Long Layover`
+
+### Channels
+
+`Channels` contain focused scoped discussion. Users may request a Channel from
+inside the Channels section, but should not freely create channels in V1.
+Admin/founder review is required before new channels are created.
+
+Important UX clarification: `Request a Channel` is not a full top-level Hub
+section. It is an action/button inside the `Channels` section.
+
+### Recent Useful Threads
+
+`Recent Useful Threads` is the high-signal community surface. It should surface
+useful, current, or recently active conversations from scoped community areas
+without turning the top-level Hub into a raw chronological feed.
+
+## Channel Request Governance
+
+A channel request should require:
+
+- requester is verified/private-beta eligible
+- topic is aviation-worker utility related
+- no duplicate existing channel
+- no live ops-sensitive topic
+- no passenger private information
+- no airport/security-sensitive procedures
+- no exact public crew hotel exposure
+- no dating/social clique behavior
+- clear name, purpose, and rules
+- admin approval
+
+Channel requests should be reviewed before any channel is created. Do not add
+free user-created channels in V1.
+
+## Layover UGC And Curation Boundary
+
+User-generated layover recommendations can exist, but admins/founders decide
+what becomes curated or promoted content.
+
+Users may:
+
+- add recommendations
+- ask questions
+- comment
+- save
+- mark helpful
+- suggest updates
+- report content
+
+Users should not directly edit curated/admin content.
+
+Future photos may be allowed only with strict safety moderation.
+
+Layover safety boundaries:
+
+- no exact crew hotel exposure
+- no live crew movement/location
+- no passenger private information
+- no airport/security-sensitive procedures
+- no company-confidential documents or policies
+- no dating/social meetup behavior
+
+## AI And Admin Curation Boundary
+
+AI can assist with drafting, summarizing, clustering, or suggesting updates.
+AI should not be the final publisher for:
+
+- operationally sensitive information
+- verification-sensitive information
+- safety-sensitive information
+- moderation decisions
+- eligibility decisions
+- channel approval decisions
+
+Admins/founders remain accountable for curated/promoted content and channel
+creation decisions.
+
+## Out Of Scope
+
+This pivot direction does not add:
+
+- app code
+- database migrations
+- runtime changes
+- deployment changes
+- free user-created channels
+- comments/replies expansion
+- saves/reactions/search implementation
+- public sharing
+- generic social media
+- schedule scraping
+- public nearby crew tracking
+- AI final moderation or verification decisions
+- lounge/restricted posting expansion
+- proof-upload scope
+- direct edits to curated/admin content by users
+- internal database table renames
+
+Protected surfaces must remain server-gated and must not rely on client-side
+hiding alone. Existing access, moderation, RLS, admin, and reporting controls
+must not be weakened.
+
+## Recommended Next Implementation Ticket
+
+Recommended next ticket:
+
+`FBMVP-T21: DFW Hub Product Framing`
+
+Scope:
+
+- Convert DFW Baseboard product framing to the DFW Hub shell.
+- Introduce `DFW Today`, `Base`, `Layover`, `Channels`, and
+  `Recent Useful Threads` sections.
+- Place `Request a Channel` as an in-section action inside `Channels`.
+- Preserve existing posts, comments, reporting, and moderation primitives.
+- Do not remove existing safety controls.
+- Do not introduce free user-created channels yet.
+- Do not rename database tables unless separately planned as a later internal
+  refactor.
+
+Acceptance boundaries:
+
+- docs and UI copy may shift from Baseboard-first to Hub-first language.
+- existing runtime primitives remain available behind their current safe
+  gates.
+- no runtime migration is required unless implementation discovers a narrow,
+  repo-backed need.
+- no new public sharing, schedule scraping, crew tracking, proof-upload,
+  unrestricted channel creation, or generic social-feed behavior is introduced.

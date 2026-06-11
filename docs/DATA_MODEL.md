@@ -327,19 +327,30 @@ Relationships:
 
 Product definition:
 
-- `strategy/hub-board-taxonomy.md` is the canonical taxonomy for Hubs,
-  Baseboard, Layovers, Lounges, and Crew Picks.
+- `ops/hub-pivot-plan.md` is the current controlling post-T20 product direction
+  for Hub naming and IA.
+- `strategy/hub-board-taxonomy.md` is historical/canonical background for the
+  first Hub shell, but the approved working product language now pivots away
+  from Baseboard as the main public-facing concept.
 - A Hub is the product-facing top-level airport/location container.
 - A Hub is not itself a discussion board.
-- Baseboard, Layovers, Lounges, and Crew Picks are product-facing surfaces
-  under a Hub.
+- The working Hub sections are `[AIRPORT] Today`, Base, Layover, Channels, and
+  Recent Useful Threads.
+- Channels contain focused scoped discussion. `Request a Channel` is an action
+  inside Channels, not a top-level Hub section, and admin/founder approval is
+  required before channels are created.
+- Layover content lives inside the airport Hub as the Layover section; do not
+  model `Layover Guide` as a separate primary product right now.
 - Boards should not recursively contain other boards by default.
 
 Current data model implication:
 
 - `bases` are the closest current data-model anchor for Hub-like airport/base
   containers.
-- `boards` remain user-facing spaces.
+- `boards` remain the existing internal content/community primitive for
+  posts/comments/reporting/moderation. Do not rename database tables as part of
+  the Hub product-framing pivot unless a later internal refactor separately
+  plans it.
 - `board_types` classify `base_board`, `layover_board`, and
   `verified_lounge`.
 - Product-facing Hub navigation can be introduced before a dedicated `hubs`
@@ -353,18 +364,32 @@ Current data model implication:
 DFW launch model:
 
 - DFW Hub
-- Baseboard
-- Layovers
-- Lounges
-- Crew Picks
+- DFW Today
+- Base
+- Layover
+- Channels
+- Recent Useful Threads
 
-MVP seeded Layovers strategy:
+Default DFW Channels:
 
-- DFW Hub is the full MVP Hub.
-- selected common DFW crew layover destinations may have admin-seeded Layovers
-  content before those destinations become full Hubs
-- seeded Layovers are bridge content, not throwaway content
-- seeded Layovers can later graduate into full Hubs when demand justifies it
+- DFW Questions
+- Commuting & Parking
+- Food & Coffee
+- New to DFW
+- Base Life
+- Crew Tips
+- App Feedback
+
+Layover section strategy:
+
+- Each airport/base has a Hub.
+- Layover content is canonical under that airport Hub's Layover section.
+- A DFW-based user may discover MIA Layover through search, recommendations, or
+  popular layovers, but the canonical home is MIA Hub > Layover rather than DFW
+  Hub > MIA Layover.
+- User-generated layover recommendations may exist, but admins/founders decide
+  what becomes curated or promoted content.
+- Users should not directly edit curated/admin content.
 
 Layovers safety boundaries:
 
@@ -375,6 +400,7 @@ Layovers safety boundaries:
 - no airport security procedures
 - no operationally sensitive information
 - no exact current meetup/location tied to crew identity
+- no dating/social meetup behavior
 
 ## VerifiedLoungeAccess
 

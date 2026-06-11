@@ -72,6 +72,7 @@ Supplemental epoch-specific ticket packs:
 - [FBMVP-T19 DFW Baseboard Comments Foundation Runtime Pass](ops/fbmvp-t19-dfw-baseboard-comments-foundation-runtime-pass.md) - records targeted runtime application of `20260611001000 create_board_post_comments_foundation` to the intended `jmpseat` Supabase project, verifies comment table RLS/grants, read/create/moderation RPC grants and safe return posture, confirms no comment/post/report content was read or printed, and confirms no posts, reports, moderation records, comments, replies, saves, reactions, search indexes, or user/community content were created by T19 migration/apply.
 - [FBMVP-T20 DFW Baseboard Comment Reporting + Moderation Review](ops/fbmvp-t20-dfw-baseboard-comment-reporting-review.md) - runtime-applied comment reporting and moderation review integration for top-level DFW Baseboard comments, adding private comment report storage, safe report/review RPCs, compact comment report UI, and an operator-scoped comment report section in the existing Community Moderation route while using the existing comment hide/remove action/RPC and adding no nested replies, saves, reactions, search, Crew Picks, Layovers, public sharing, lounge/restricted posting, media, AI moderation, bans, appeals, proof-upload scope, direct `board_posts` write policies, direct anon/authenticated comment report table access, content creation, or broad Supabase `db push`.
 - [FBMVP-T20 DFW Baseboard Comment Reporting + Moderation Review Runtime Pass](ops/fbmvp-t20-dfw-baseboard-comment-reporting-review-runtime-pass.md) - records targeted runtime application of `20260611014500 create_board_post_comment_reports` to the intended `jmpseat` Supabase project, verifies comment report table RLS/grants, report/review RPC grants and safe return posture, confirms no comment report/review RPCs were called for live row output, confirms no post/comment/report content was read or printed, and confirms no posts, reports, moderation records, comments, replies, saves, reactions, search indexes, or user/community content were created by T20 migration/apply.
+- [Hub Pivot Plan](ops/hub-pivot-plan.md) - locks the approved post-T20 product direction away from raw mixed Baseboards and toward airport/base Hubs with `[AIRPORT] Today`, Base, Layover, Channels, in-section Request a Channel, and Recent Useful Threads while preserving T12-T20 safety primitives and avoiding database renames until separately planned.
 - [First-Base MVP Implementation Ticket Pack](epochs/first-base-mvp-implementation-ticket-pack.md) - translates the pivot strategy docs into the ordered `FBMVP` implementation sequence; the immediate post-Epoch-5 narrow lane is first reconciled in `ops/private-beta-readiness-bridge.md`, and auth email branding/custom SMTP is now tracked as a deferred beta-readiness polish TODO rather than the active next auth-flow implementation task.
 - [FBMVP-T01: Freeze User-Facing Proof Verification Surfaces](epochs/fbmvp-t01-freeze-user-facing-proof-verification-surfaces.md) - freezes normal proof-upload UX while preserving historical proof infrastructure, cleanup, audit, and admin/operator safety.
 - [FBMVP-T02: Airline Email Verification Access State Design](epochs/fbmvp-t02-airline-email-verification-access-state-design.md) - defines the forward `airline_email_verified` app-level eligibility state and how it maps from existing work-email verification foundations.
@@ -300,8 +301,13 @@ Current sequence:
 18. `FBMVP-T20` DFW Baseboard comment reporting/moderation review integration, merged and runtime-applied
 
 T20 runtime-pass docs are committed. The First Base / DFW Baseboard safety loop
-is complete. The next default step is an epoch closeout/readiness record and
-Baseboards pivot workshop, not another feature by default.
+is complete. The approved post-T20 direction is now recorded in
+`ops/hub-pivot-plan.md`: move away from raw mixed Baseboards toward curated
+airport/base Hubs with `[AIRPORT] Today`, Base, Layover, Channels, an in-section
+Request a Channel action, and Recent Useful Threads. The next implementation
+ticket should convert DFW Baseboard product framing to the DFW Hub shell while
+preserving existing posts/comments/reporting/moderation primitives and avoiding
+database table renames unless separately planned.
 
 Recommended direction:
 
@@ -460,8 +466,12 @@ Recommended direction:
 - Known migration drift remains preserved and broad Supabase `db push` remains
   unsafe.
 - T20 runtime-pass docs are committed. The First Base / DFW Baseboard safety
-  loop is complete. The next default step is an epoch closeout/readiness record
-  and Baseboards pivot workshop, not another feature by default.
+  loop is complete. The approved Hub pivot direction is recorded in
+  `ops/hub-pivot-plan.md`: Baseboards should no longer be the main
+  product-facing concept, and the next implementation ticket should reframe DFW
+  around `DFW Hub`, `DFW Today`, Base, Layover, Channels, and Recent Useful
+  Threads without weakening existing safety controls or renaming database
+  tables in the same step.
 
 Do not let older broad V1/backlog sections below turn this into an unsequenced
 social feed or marketplace build. For the current lane, keep proof uploads,

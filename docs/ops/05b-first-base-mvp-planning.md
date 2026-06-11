@@ -26,14 +26,20 @@ the whole product concept.
 Current DFW framing:
 
 - first launch base: DFW
-- first available base board: DFW Base Board
+- first available community/data primitive: DFW Base Board / Baseboard
 - DFW is the only live base in the initial rollout
 - the data model should support many bases and boards from the start
+- post-T20 product framing should pivot toward `DFW Hub` as a curated,
+  read-heavy utility surface with scoped community participation underneath
 
 The current MVP direction includes:
 
-- Base Boards
-- Layover Boards
+- airport/base Hubs
+- `[AIRPORT] Today`
+- Base
+- Layover
+- Channels
+- Recent Useful Threads
 - Verified Lounges / role-based spaces under or associated with bases
 - user profiles
 - following users
@@ -70,9 +76,16 @@ Use `docs/strategy/verified-lounge-access-model.md` as the canonical product
 definition for Verified Lounge access, request lifecycle, and Crew Lead scope
 before implementing `FBMVP-T07`.
 
-Use `docs/strategy/hub-board-taxonomy.md` as the canonical product taxonomy for
-Hubs, Baseboard, Layovers, Lounges, and Crew Picks before implementing board
-discovery, dashboard destinations, or posting surfaces.
+Use `docs/ops/hub-pivot-plan.md` as the current controlling post-T20 product
+direction for Hub naming and IA. The approved direction pivots away from raw
+mixed Baseboards toward airport/base Hubs with `[AIRPORT] Today`, Base,
+Layover, Channels, an in-section Request a Channel action, and Recent Useful
+Threads.
+
+Use `docs/strategy/hub-board-taxonomy.md` as historical/canonical background for
+the first Hub shell and existing T08-T11 route taxonomy, but do not treat
+Baseboard as the main public-facing product concept for the next implementation
+ticket.
 
 Use `docs/strategy/seeded-layovers-editorial-model.md` as the canonical
 editorial/product definition for Seeded Layovers before creating seeded layover
@@ -340,19 +353,21 @@ Rationale:
 Product-facing navigation should treat DFW as the first Hub:
 
 - DFW Hub
-- Baseboard
-- Layovers
-- Lounges
-- Crew Picks
+- DFW Today
+- Base
+- Layover
+- Channels
+- Recent Useful Threads
 
-For MVP, DFW Hub is the full launch surface. Selected common DFW crew layover
-destinations may have admin-seeded Layovers content so DFW-based users get
-utility outside DFW. Those seeded destinations are lightweight layover surfaces,
-not full Hubs yet, and can later graduate into full Hubs when demand justifies
-launching them.
+For MVP, DFW Hub is the first launch surface, but the approved post-T20 model is
+not DFW-only. Each airport/base should have a Hub. Layover content is canonical
+inside the airport Hub as the Layover section. A DFW-based user can discover MIA
+Layover through search, recommendations, or popular layovers, but the canonical
+home is MIA Hub > Layover, not DFW Hub > MIA Layover.
 
-Layovers and Lounges are siblings of Baseboard in the Hub taxonomy. Boards
-should not recursively contain other boards by default.
+Channels contain focused scoped discussion. `Request a Channel` is an action
+inside the Channels section, not a top-level Hub section. Users should not
+freely create channels in V1; admin/founder approval is required.
 
 ## 9. Ordered Ticket Sequence
 
@@ -377,8 +392,13 @@ The current implementation sequence is:
 17. `FBMVP-T20` DFW Baseboard comment reporting/moderation review integration, merged and runtime-applied
 
 T20 runtime-pass docs are committed. The First Base / DFW Baseboard safety loop
-is complete. The next default step is an epoch closeout/readiness record and
-Baseboards pivot workshop, not another feature by default.
+is complete. The approved pivot is recorded in `ops/hub-pivot-plan.md`.
+Baseboards should no longer be treated as open mixed discussion boards. The next
+implementation ticket should convert DFW Baseboard product framing to the DFW
+Hub shell, introduce DFW Today / Base / Layover / Channels / Recent Useful
+Threads, place Request a Channel inside Channels, preserve existing
+posts/comments/reporting/moderation primitives, avoid free user-created
+channels, and avoid database table renames unless separately planned.
 
 Recommended direction:
 
@@ -548,8 +568,11 @@ Recommended direction:
 - Known migration drift remains preserved and broad Supabase `db push` remains
   unsafe.
 - T20 runtime-pass docs are committed. The First Base / DFW Baseboard safety
-  loop is complete. The next default step is an epoch closeout/readiness record
-  and Baseboards pivot workshop, not another feature by default.
+  loop is complete. The approved Hub pivot direction is recorded in
+  `ops/hub-pivot-plan.md`. The next implementation ticket should be DFW Hub
+  product framing, not another raw Baseboard feature: introduce DFW Today,
+  Base, Layover, Channels, and Recent Useful Threads, with Request a Channel as
+  an in-section Channels action and no free user-created channels.
 
 Pre-closeout access baseline: public `jmpseat.com` and `www.jmpseat.com` are
 marketing/waitlist-only through `bad2110 fix: gate private app on public
