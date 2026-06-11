@@ -406,6 +406,12 @@ reporter identity, or runtime UGC, mutate runtime data, apply migrations, or
 start DB/RPC-backed Channels. It also should not start free channel creation,
 media uploads, live integrations, saves, reactions, or search.
 
+Status: locally implemented as `/app/admin/design/dfw-hub-wireframes`.
+The route uses the existing admin-shell authorization boundary and isolated
+static prototype UI with local fake data only. It is not linked from normal user
+navigation, does not import community content fetchers, does not call Supabase
+content RPCs, and does not implement real Channels.
+
 Alternative implementation ticket:
 
 `FBMVP-T23: DFW Hub Channels Foundation`

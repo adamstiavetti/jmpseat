@@ -105,6 +105,12 @@ call no Supabase content RPCs, query/display no real `board_posts`, comments,
 reports, author IDs, reporter identity, or runtime UGC, mutate no runtime data,
 apply no migrations, and avoid DB/RPC-backed Channels.
 
+T23B is locally implemented at `/app/admin/design/dfw-hub-wireframes` as a
+protected admin-only static prototype route. It uses existing admin-shell
+authorization, local fake/static arrays, isolated route styles, and no
+community content fetchers or Supabase content RPCs. It remains a design review
+surface only, not a real Channels implementation.
+
 Wireframe agents should use the current product language `[AIRPORT] Hub`,
 `[AIRPORT] Today`, Base, Layover, Channels, Recent Useful Threads, and Request
 a Channel inside Channels. DFW default Channels are DFW Questions, Commuting &
@@ -422,6 +428,8 @@ The current implementation sequence is:
 18. `FBMVP-T21` DFW Hub product framing, implemented locally with no migration
 19. `FBMVP-T22` Hub Channels IA/data-model lock, docs-only
 20. `FBMVP-T23A` full mobile Hub wireframes, docs/design-only
+21. `FBMVP-T23B` protected static Hub wireframe prototype route, local
+    implementation only with no migration or runtime mutation
 
 T20 runtime-pass docs are committed. The First Base / DFW Baseboard safety loop
 is complete. The approved pivot is recorded in `ops/hub-pivot-plan.md`.
@@ -675,7 +683,9 @@ Recommended direction:
   and should not start DB/RPC-backed Channels. It must use fake/mock/static
   data only, make no Supabase content RPC calls, query/display no real
   `board_posts`, comments, reports, author IDs, reporter identity, or runtime
-  UGC, mutate no runtime data, and apply no migrations.
+  UGC, mutate no runtime data, and apply no migrations. T23B is now locally
+  implemented as that protected admin-only static prototype route, with no
+  normal-user navigation and no runtime apply/deploy yet.
 
 Pre-closeout access baseline: public `jmpseat.com` and `www.jmpseat.com` are
 marketing/waitlist-only through `bad2110 fix: gate private app on public
