@@ -126,12 +126,19 @@ test("home dashboard shell uses the canonical utility hierarchy", () => {
 
 test("DFW Hub read-only shell uses product-facing taxonomy labels", () => {
   assert.match(shellSource, /DFW Hub/);
-  assert.match(shellSource, /Baseboard/);
-  assert.match(shellSource, /Layovers/);
-  assert.match(shellSource, /Lounges/);
-  assert.match(shellSource, /Crew Picks/);
+  assert.match(shellSource, /DFW Today/);
+  assert.match(shellSource, /Base/);
+  assert.match(shellSource, /Layover/);
+  assert.match(shellSource, /Channels/);
+  assert.match(shellSource, /Recent Useful Threads/);
+  assert.match(shellSource, /weather, traffic, public airport advisories, app notes/);
+  assert.match(shellSource, /No live weather or traffic integration is active yet/);
+  assert.match(shellSource, /Essentials/);
+  assert.match(shellSource, /Recommendations/);
+  assert.match(shellSource, /Getting Around/);
   assert.doesNotMatch(shellSource, /Base Board/);
   assert.doesNotMatch(shellSource, /Verified Lounge/);
+  assert.doesNotMatch(shellSource, /Layover Guide/);
 });
 
 test("skip-for-now state does not fake-assign DFW as Home Base", () => {
@@ -219,17 +226,17 @@ test("DFW Baseboard shell supports empty, populated, and minimal composer states
   assert.match(shellSource, /baseboardPostsUnavailable\?: boolean/);
   assert.match(shellSource, /createBaseboardPostAction\?:/);
   assert.match(shellSource, /baseboardPostStatus\?:/);
-  assert.match(shellSource, /No DFW Baseboard posts yet\./);
+  assert.match(shellSource, /No useful DFW threads yet\./);
   assert.match(
     shellSource,
-    /Published DFW Baseboard posts will appear here when they exist\. Replies, saves, reactions, and search are not live in this minimal composer foundation\./,
+    /Useful DFW threads will appear here when verified workers contribute and moderators or admins surface high-signal posts\./,
   );
-  assert.match(shellSource, /Minimal composer foundation/);
-  assert.match(shellSource, /Post to DFW Baseboard/);
+  assert.match(shellSource, /Channel post foundation/);
+  assert.match(shellSource, /Post to DFW Channels/);
   assert.match(shellSource, /name="title"/);
   assert.match(shellSource, /name="body"/);
   assert.match(shellSource, /type="submit"/);
-  assert.match(shellSource, /Your DFW Baseboard post is live\./);
+  assert.match(shellSource, /Your DFW Hub post is live\./);
   assert.match(shellSource, /Add a title and body before posting/);
   assert.match(shellSource, /jmpseat could not publish that post right now/);
   assert.match(shellSource, /authorLabel/);
@@ -270,11 +277,29 @@ test("DFW Baseboard list cards link to private post detail", () => {
   assert.match(shellSource, /getDfwBaseboardPostHref/);
   assert.match(shellSource, /href=\{getDfwBaseboardPostHref\(post\.id\)\}/);
   assert.match(shellSource, /DfwBaseboardPostDetailShell/);
-  assert.match(shellSource, /Back to DFW Baseboard/);
+  assert.match(shellSource, /Back to DFW Channels/);
   assert.match(shellSource, /supports top-level comments and reporting/);
   assert.match(shellSource, /Nested replies, saves, reactions, search, and public sharing/);
   assert.match(shellSource, /Report this post/);
   assert.doesNotMatch(shellSource, /share button|copy link|public URL|external post/i);
+});
+
+test("Request a Channel is an in-section Channels action only", () => {
+  const channelsIndex = shellSource.indexOf("DFW Channels");
+  const requestIndex = shellSource.indexOf("Request a Channel");
+  const recentThreadsIndex = shellSource.indexOf("Recent Useful Threads");
+
+  assert.ok(channelsIndex >= 0, "Channels section should be present");
+  assert.ok(requestIndex > channelsIndex, "Request a Channel should appear after Channels");
+  assert.ok(
+    recentThreadsIndex === -1 || requestIndex < recentThreadsIndex,
+    "Request a Channel should be associated with Channels, not a later top-level section",
+  );
+  assert.match(shellSource, /Request a Channel/);
+  assert.match(shellSource, /Reviewed request/);
+  assert.match(shellSource, /Admin approval required/);
+  assert.match(shellSource, /free user-created channels are not live/i);
+  assert.doesNotMatch(shellSource, /createChannelAction/);
 });
 
 test("DFW Baseboard composer is not wired into non-Baseboard hub sections", () => {
@@ -287,23 +312,27 @@ test("DFW Baseboard composer is not wired into non-Baseboard hub sections", () =
 });
 
 test("DFW Hub cards link to read-only section route shells", () => {
-  for (const route of dfwSectionRoutes) {
+  for (const route of dfwSectionRoutes.filter((item) => item.section !== "dfw-lounges")) {
     assert.match(shellSource, new RegExp(`href: "${route.route.replaceAll("/", "\\/")}"`));
-    assert.match(shellSource, new RegExp(route.label));
   }
 
-  assert.match(shellSource, /DFW Baseboard/);
-  assert.match(shellSource, /DFW Layovers/);
-  assert.match(shellSource, /DFW Lounges/);
-  assert.match(shellSource, /DFW Crew Picks/);
+  assert.match(shellSource, /DFW Today/);
+  assert.match(shellSource, /DFW Base/);
+  assert.match(shellSource, /DFW Layover/);
+  assert.match(shellSource, /DFW Channels/);
+  assert.match(shellSource, /Recent Useful Threads/);
+  assert.match(shellSource, /DFW Lounges route/);
   assert.match(shellSource, /Coming later/);
   assert.match(shellSource, /read-only placeholder/);
 });
 
 test("DFW section shells keep lounge access and Layovers safety boundaries explicit", () => {
-  assert.match(shellSource, /No exact crew hotel locations/);
-  assert.match(shellSource, /No live crew tracking/);
-  assert.match(shellSource, /No security-sensitive or operationally sensitive information/);
+  assert.match(shellSource, /No exact crew hotel exposure/);
+  assert.match(shellSource, /No live crew movement or location/);
+  assert.match(shellSource, /No passenger private information/);
+  assert.match(shellSource, /No airport or security-sensitive procedures/);
+  assert.match(shellSource, /No company-confidential documents or policies/);
+  assert.match(shellSource, /No dating or social meetup behavior/);
   assert.match(shellSource, /Home Base does not grant lounge access/);
   assert.match(shellSource, /Board follows do not grant lounge access/);
   assert.match(shellSource, /Self-declared profile fields do not grant lounge access/);

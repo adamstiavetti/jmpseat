@@ -42,7 +42,7 @@ type DashboardItem = {
 };
 
 type DfwHubSectionItem = DashboardItem & {
-  href: string;
+  href?: string;
 };
 
 export type DfwHubSectionKey = "baseboard" | "layovers" | "lounges" | "crew-picks";
@@ -105,13 +105,13 @@ const crewPicks: readonly DashboardItem[] = [
 
 const quickActions: readonly QuickAction[] = [
   {
-    title: "Ask Baseboard",
-    detail: "Posting later",
+    title: "Open Channels",
+    detail: "Scoped posts",
     tone: "ask",
   },
   {
-    title: "Find Layovers",
-    detail: "Discovery later",
+    title: "Find Layover",
+    detail: "Utility later",
     tone: "layover",
   },
   {
@@ -164,77 +164,95 @@ const loungePreviews: readonly DashboardItem[] = [
 
 const dfwHubSections: readonly DfwHubSectionItem[] = [
   {
-    title: "Baseboard",
-    detail: "DFW-based community questions, updates, and practical base knowledge.",
-    href: "/app/hubs/dfw/baseboard",
-    meta: "Primary hub surface",
+    title: "DFW Today",
+    detail:
+      "Curated current context for weather, traffic, public airport advisories, app notes, and recently updated sections. No live weather or traffic integration is active yet.",
+    meta: "Curated placeholder",
   },
   {
-    title: "Layovers",
-    detail: "Passing-through utility for food, transport, coffee, gyms, and area tips.",
+    title: "DFW Base",
+    detail:
+      "Based-worker utility for commuting, parking, new-to-DFW, base life, and practical airport information without operationally sensitive claims.",
+    meta: "Based-worker utility",
+  },
+  {
+    title: "DFW Layover",
+    detail:
+      "Essentials, Recommendations, Questions, Crew Tips, Getting Around, Food & Coffee, Things To Do, Short Layover, and Long Layover utility inside the Hub.",
     href: "/app/hubs/dfw/layovers",
-    meta: "Seed content later",
+    meta: "Layover utility",
   },
   {
-    title: "Lounges",
-    detail: "Restricted membership spaces managed by scoped Crew Leads.",
-    href: "/app/hubs/dfw/lounges",
-    meta: "Membership gated",
+    title: "DFW Channels",
+    detail:
+      "Focused scoped discussion for DFW Questions, Commuting & Parking, Food & Coffee, New to DFW, Base Life, Crew Tips, and App Feedback. Request a Channel is a reviewed in-section action.",
+    href: "/app/hubs/dfw/baseboard",
+    meta: "Scoped discussion",
   },
   {
-    title: "Crew Picks",
-    detail: "Saved-driven and admin-curated useful content for the hub.",
+    title: "Recent Useful Threads",
+    detail:
+      "High-signal posts from existing safe post/comment/report/moderation primitives. Useful threads appear as verified workers contribute.",
     href: "/app/hubs/dfw/crew-picks",
-    meta: "Access aware later",
+    meta: "Useful signal",
   },
 ];
 
 export const dfwHubSectionShells: Record<DfwHubSectionKey, DfwHubSectionShell> = {
   baseboard: {
     key: "baseboard",
-    title: "DFW Baseboard",
-    eyebrow: "Based-there community",
+    title: "DFW Channels",
+    eyebrow: "Focused scoped discussion",
     purpose:
-      "A minimal posting surface for published DFW aviation-worker Q&A, updates, practical notes, and useful discussion.",
+      "Focused DFW discussion channels built on the existing safe post, comment, report, and moderation primitives.",
     placeholders: [
       {
-        title: "No DFW Baseboard posts yet.",
+        title: "No useful DFW threads yet.",
         detail:
-          "Published DFW Baseboard posts will appear here when they exist. Replies, saves, reactions, and search are not live in this minimal composer foundation.",
-        meta: "No posts yet",
+          "Useful DFW threads will appear here when verified workers contribute and moderators or admins surface high-signal posts.",
+        meta: "No useful threads yet",
       },
       {
-        title: "Minimal composer foundation",
-        detail: "This route supports title and body posting only. Replies and richer post tools remain outside this UI.",
+        title: "Channel post foundation",
+        detail:
+          "This route supports title and body posting only through the existing server action. Free user-created channels are not live.",
         meta: "Scope boundary",
       },
     ],
   },
   layovers: {
     key: "layovers",
-    title: "DFW Layovers",
-    eyebrow: "Passing-through utility",
+    title: "DFW Layover",
+    eyebrow: "Layover utility",
     purpose:
-      "A read-only shell for crew layover utility: food, coffee, gyms, transportation basics, weather basics, quick recommendations, and Q&A.",
+      "Layover utility and future UGC inside DFW Hub: essentials, recommendations, questions, crew tips, getting around, food and coffee, things to do, and short or long layover planning.",
     safetyNotes: [
-      "No exact crew hotel locations.",
-      "No live crew tracking.",
-      "No security-sensitive or operationally sensitive information.",
+      "No exact crew hotel exposure.",
+      "No live crew movement or location.",
+      "No passenger private information.",
+      "No airport or security-sensitive procedures.",
+      "No company-confidential documents or policies.",
+      "No dating or social meetup behavior.",
     ],
     placeholders: [
       {
-        title: "Recommendations coming later",
+        title: "Essentials",
+        detail: "Basics for passing through DFW will stay curated and safety-reviewed.",
+        meta: "Curated later",
+      },
+      {
+        title: "Recommendations",
         detail: "Food, coffee, transport, and practical tips need content and moderation first.",
         meta: "No seed content",
       },
       {
-        title: "Layover Q&A coming later",
+        title: "Questions and Crew Tips",
         detail: "Question and answer flows are not implemented in this shell.",
         meta: "Read-only",
       },
       {
-        title: "Seeded destination strategy remains future",
-        detail: "No layover content was added by this ticket.",
+        title: "Getting Around, Things To Do, Short Layover, Long Layover",
+        detail: "No live APIs, photo uploads, or separate layover guide product are added here.",
         meta: "Future lane",
       },
     ],
@@ -271,10 +289,10 @@ export const dfwHubSectionShells: Record<DfwHubSectionKey, DfwHubSectionShell> =
   },
   "crew-picks": {
     key: "crew-picks",
-    title: "DFW Crew Picks",
+    title: "Recent Useful Threads",
     eyebrow: "Useful signal",
     purpose:
-      "A read-only shell for high-signal useful content curated by admins or saved-driven over time.",
+      "A read-only shell for high-signal community posts surfaced from safe DFW Hub primitives over time.",
     safetyNotes: [
       "No ranking is live.",
       "No AI surfacing is live.",
@@ -282,14 +300,15 @@ export const dfwHubSectionShells: Record<DfwHubSectionKey, DfwHubSectionShell> =
     ],
     placeholders: [
       {
-        title: "Useful posts coming later",
-        detail: "Posts and guides need the content foundation before they can appear here.",
-        meta: "No posts yet",
+        title: "No useful threads yet",
+        detail:
+          "Useful threads will appear as verified workers contribute and moderators or admins surface high-signal posts.",
+        meta: "Empty state",
       },
       {
-        title: "Layover picks coming later",
-        detail: "Layover recommendations require seeded content and safety review.",
-        meta: "Future lane",
+        title: "Existing safety primitives remain",
+        detail: "Posts, comments, reports, and moderation controls stay in place for future surfaced threads.",
+        meta: "Safety preserved",
       },
       {
         title: "Access-aware content later",
@@ -405,7 +424,7 @@ function HubHeroCard({
           {hasDfwHomeBase ? "Your Hub" : "DFW launch"}
         </span>
         <h1 id="home-hub-title">DFW Hub</h1>
-        <p>Baseboard, Layovers, Lounges, and Crew Picks.</p>
+        <p>DFW Today, Base, Layover, Channels, and Recent Useful Threads.</p>
         <Link className={styles.primaryButton} href="/app/hubs/dfw">
           Open DFW Hub
         </Link>
@@ -586,7 +605,7 @@ function FollowingSection({ hasDfwHomeBase }: { hasDfwHomeBase: boolean }) {
         <span className={styles.cardMeta}>
           {hasDfwHomeBase ? "Home Base follow" : "Empty state"}
         </span>
-        <h3>{hasDfwHomeBase ? "DFW Baseboard" : "No followed boards yet"}</h3>
+        <h3>{hasDfwHomeBase ? "DFW Hub Channels" : "No followed boards yet"}</h3>
         <p>
           {hasDfwHomeBase
             ? "Auto-followed only when a user explicitly starts with DFW."
@@ -675,6 +694,22 @@ function getDfwBaseboardCommentReportStatusMessage(
       : commentReportStatus === DFW_BASEBOARD_COMMENT_REPORT_FAILED_STATUS
         ? "jmpseat could not submit that report right now. Try again in a moment."
         : null;
+}
+
+function DfwChannelRequestCallout() {
+  return (
+    <article className={styles.channelRequestCard}>
+      <span className={styles.cardMeta}>Reviewed request</span>
+      <h3>Request a Channel</h3>
+      <p>
+        Request a focused aviation-worker utility channel from inside Channels.
+        Admin approval required; free user-created channels are not live.
+      </p>
+      <button className={styles.disabledButton} type="button" disabled>
+        Request a Channel coming soon
+      </button>
+    </article>
+  );
 }
 
 function DfwBaseboardReportForm({
@@ -785,7 +820,7 @@ function DfwBaseboardPostsSection({
 }) {
   const statusMessage =
     postStatus === DFW_BASEBOARD_POST_CREATED_STATUS
-      ? "Your DFW Baseboard post is live."
+      ? "Your DFW Hub post is live."
       : postStatus === DFW_BASEBOARD_POST_INVALID_STATUS
         ? "Add a title and body before posting. Titles can be up to 120 characters and posts up to 4,000 characters."
         : postStatus === DFW_BASEBOARD_POST_FAILED_STATUS
@@ -799,8 +834,11 @@ function DfwBaseboardPostsSection({
     <section className={styles.hubSurfaceGrid} aria-labelledby="baseboard-posts-title">
       <div className={styles.sectionTitleRow}>
         <div>
-          <h2 id="baseboard-posts-title">Recent Baseboard posts</h2>
-          <p>Minimal composer foundation. Replies, saves, reactions, and search are not live.</p>
+          <h2 id="baseboard-posts-title">Recent Useful Threads</h2>
+          <p>
+            Channel post foundation. Replies, saves, reactions, and search are
+            not live.
+          </p>
         </div>
       </div>
 
@@ -812,8 +850,11 @@ function DfwBaseboardPostsSection({
         >
           <div>
             <span className={styles.cardMeta}>Title and body only</span>
-            <h3 id="baseboard-composer-title">Post to DFW Baseboard</h3>
-            <p>Published posts appear here after the server action completes.</p>
+            <h3 id="baseboard-composer-title">Post to DFW Channels</h3>
+            <p>
+              Published channel posts appear here after the existing server
+              action completes.
+            </p>
           </div>
           <label className={styles.composerField}>
             <span>Title</span>
@@ -861,7 +902,7 @@ function DfwBaseboardPostsSection({
 
       {unavailable ? (
         <p className={styles.actionFeedback}>
-          Published DFW Baseboard posts are unavailable right now.
+          Published DFW Hub posts are unavailable right now.
         </p>
       ) : null}
 
@@ -896,11 +937,11 @@ function DfwBaseboardPostsSection({
       ) : (
         <article className={styles.postEmptyState}>
           <span className={styles.cardMeta}>No posts yet</span>
-          <h3>No DFW Baseboard posts yet.</h3>
+          <h3>No useful DFW threads yet.</h3>
           <p>
-            Published DFW Baseboard posts will appear here when they exist.
-            Replies, saves, reactions, and search are not live in this minimal
-            composer foundation.
+            Useful DFW threads will appear here when verified workers contribute
+            and moderators or admins surface high-signal posts. Replies, saves,
+            reactions, and search are not live in this channel post foundation.
           </p>
         </article>
       )}
@@ -935,22 +976,22 @@ export function DfwBaseboardPostDetailShell({
       <div className={styles.mobileFrame}>
         <AppHeader
           backHref="/app/hubs/dfw/baseboard"
-          backLabel="Baseboard"
-          subtitle="DFW Baseboard post"
+          backLabel="Channels"
+          subtitle="DFW Hub thread"
           showBackLink
         />
 
-        <nav className={styles.breadcrumb} aria-label="DFW Baseboard breadcrumb">
+        <nav className={styles.breadcrumb} aria-label="DFW Hub thread breadcrumb">
           <Link href="/app/hubs/dfw">DFW Hub</Link>
           <span aria-hidden="true">/</span>
-          <Link href="/app/hubs/dfw/baseboard">Baseboard</Link>
+          <Link href="/app/hubs/dfw/baseboard">Channels</Link>
           <span aria-hidden="true">/</span>
-          <span>Post</span>
+          <span>Thread</span>
         </nav>
 
         <section className={styles.postDetailSurface} aria-labelledby="baseboard-post-detail-title">
           <Link className={styles.inlineBackLink} href="/app/hubs/dfw/baseboard">
-            Back to DFW Baseboard
+            Back to DFW Channels
           </Link>
 
           {reportStatusMessage ? (
@@ -990,9 +1031,9 @@ export function DfwBaseboardPostDetailShell({
           ) : (
             <article className={styles.postEmptyState}>
               <span className={styles.cardMeta}>Unavailable</span>
-              <h1 id="baseboard-post-detail-title">That DFW Baseboard post is unavailable.</h1>
+              <h1 id="baseboard-post-detail-title">That DFW Hub thread is unavailable.</h1>
               <p>
-                jmpseat can only show published DFW Baseboard posts available to
+                jmpseat can only show published DFW Hub threads available to
                 this private app surface.
               </p>
             </article>
@@ -1094,7 +1135,7 @@ function DfwBaseboardCommentsSection({
 
       {unavailable ? (
         <p className={styles.actionFeedback}>
-          DFW Baseboard comments are unavailable right now.
+          DFW Hub thread comments are unavailable right now.
         </p>
       ) : null}
 
@@ -1126,7 +1167,7 @@ function DfwBaseboardCommentsSection({
         <article className={styles.postEmptyState}>
           <span className={styles.cardMeta}>No comments yet</span>
           <h3>No comments yet.</h3>
-          <p>Top-level comments on this DFW Baseboard post will appear here.</p>
+          <p>Top-level comments on this DFW Hub thread will appear here.</p>
         </article>
       )}
     </section>
@@ -1199,9 +1240,8 @@ export function DfwHubReadOnlyShell() {
           <span className={styles.cardLabel}>Dallas/Fort Worth</span>
           <h1 id="dfw-hub-title">DFW Hub</h1>
           <p>
-            A read-only destination shell for the first launch Hub. This page
-            shows the intended surfaces without implementing posts, search,
-            saves, lounge requests, or Crew Lead tooling.
+            A curated, read-heavy utility shell for the first launch Hub with
+            scoped community participation underneath.
           </p>
         </section>
 
@@ -1211,27 +1251,72 @@ export function DfwHubReadOnlyShell() {
           <div className={styles.sectionTitleRow}>
             <div>
               <h2 id="hub-surfaces-title">Hub surfaces</h2>
-              <p>Baseboard, Layovers, Lounges, and Crew Picks are read-only here.</p>
+              <p>
+                DFW Today, Base, Layover, Channels, and Recent Useful Threads
+                are the current Hub sections.
+              </p>
             </div>
           </div>
           <div className={styles.surfaceGrid}>
-            {dfwHubSections.map((item) => (
-              <Link className={styles.surfaceCard} href={item.href} key={item.title}>
-                <span className={styles.cardMeta}>{item.meta}</span>
-                <h3>{item.title}</h3>
-                <p>{item.detail}</p>
-              </Link>
+            {dfwHubSections.map((item) =>
+              item.href ? (
+                <Link className={styles.surfaceCard} href={item.href} key={item.title}>
+                  <span className={styles.cardMeta}>{item.meta}</span>
+                  <h3>{item.title}</h3>
+                  <p>{item.detail}</p>
+                </Link>
+              ) : (
+                <article className={styles.surfaceCard} key={item.title}>
+                  <span className={styles.cardMeta}>{item.meta}</span>
+                  <h3>{item.title}</h3>
+                  <p>{item.detail}</p>
+                </article>
+              ),
+            )}
+          </div>
+        </section>
+
+        <section className={styles.hubSurfaceGrid} aria-labelledby="dfw-channels-title">
+          <div className={styles.sectionTitleRow}>
+            <div>
+              <h2 id="dfw-channels-title">DFW Channels</h2>
+              <p>Focused discussion spaces with reviewed channel expansion.</p>
+            </div>
+          </div>
+          <div className={styles.surfaceGrid}>
+            {[
+              "DFW Questions",
+              "Commuting & Parking",
+              "Food & Coffee",
+              "New to DFW",
+              "Base Life",
+              "Crew Tips",
+              "App Feedback",
+            ].map((channel) => (
+              <article className={styles.surfaceCard} key={channel}>
+                <span className={styles.cardMeta}>Default channel</span>
+                <h3>{channel}</h3>
+                <p>Uses existing safe post/comment/report/moderation primitives.</p>
+              </article>
             ))}
+            <DfwChannelRequestCallout />
           </div>
         </section>
 
         <section className={styles.safetyBand} aria-labelledby="hub-safety-title">
           <span className={styles.cardLabel}>Safety boundary</span>
-          <h2 id="hub-safety-title">Layovers must stay safe and non-sensitive.</h2>
+          <h2 id="hub-safety-title">Layover content must stay safe and non-sensitive.</h2>
           <p>
-            No exact crew hotel exposure, live location tracking, passenger
-            private information, airport security procedures, or operationally
-            sensitive information belongs in this shell.
+            No exact crew hotel exposure, live crew movement or location,
+            passenger private information, airport or security-sensitive
+            procedures, company-confidential documents or policies, or dating
+            and social meetup behavior belongs in this shell.
+          </p>
+          <p>
+            Existing restricted lounge access remains membership gated and
+            available through the preserved{" "}
+            <Link href="/app/hubs/dfw/lounges">DFW Lounges route</Link>; it is
+            not part of the open Hub section model.
           </p>
         </section>
       </div>

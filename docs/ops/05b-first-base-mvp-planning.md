@@ -390,6 +390,7 @@ The current implementation sequence is:
 15. `FBMVP-T18` DFW Baseboard moderation review, merged and runtime-applied
 16. `FBMVP-T19` DFW Baseboard comments foundation, merged and runtime-applied
 17. `FBMVP-T20` DFW Baseboard comment reporting/moderation review integration, merged and runtime-applied
+18. `FBMVP-T21` DFW Hub product framing, implemented locally with no migration
 
 T20 runtime-pass docs are committed. The First Base / DFW Baseboard safety loop
 is complete. The approved pivot is recorded in `ops/hub-pivot-plan.md`.
@@ -399,6 +400,11 @@ Hub shell, introduce DFW Today / Base / Layover / Channels / Recent Useful
 Threads, place Request a Channel inside Channels, preserve existing
 posts/comments/reporting/moderation primitives, avoid free user-created
 channels, and avoid database table renames unless separately planned.
+
+T21 implements that product-framing step locally with no migration. Existing
+internal Baseboard route, RPC, helper, and table names remain in place while the
+user-facing DFW Hub shell presents DFW Today, Base, Layover, Channels, Request a
+Channel inside Channels, and Recent Useful Threads.
 
 Recommended direction:
 
@@ -573,6 +579,11 @@ Recommended direction:
   product framing, not another raw Baseboard feature: introduce DFW Today,
   Base, Layover, Channels, and Recent Useful Threads, with Request a Channel as
   an in-section Channels action and no free user-created channels.
+- T21 implements that product framing locally without migrations, runtime
+  mutation, database table renames, free user-created channels, live
+  weather/traffic integrations, image uploads, or safety-control weakening.
+  Existing posts, comments, reporting, and moderation primitives remain the
+  internal foundation for Channels and Recent Useful Threads.
 
 Pre-closeout access baseline: public `jmpseat.com` and `www.jmpseat.com` are
 marketing/waitlist-only through `bad2110 fix: gate private app on public

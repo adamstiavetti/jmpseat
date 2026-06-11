@@ -292,6 +292,9 @@ Recommended next ticket:
 
 `FBMVP-T21: DFW Hub Product Framing`
 
+Status: implemented locally in the product shell. This ticket is UI/product
+framing only and does not require a runtime migration.
+
 Scope:
 
 - Convert DFW Baseboard product framing to the DFW Hub shell.
@@ -313,3 +316,17 @@ Acceptance boundaries:
   repo-backed need.
 - no new public sharing, schedule scraping, crew tracking, proof-upload,
   unrestricted channel creation, or generic social-feed behavior is introduced.
+
+Implementation note:
+
+- Existing internal route, helper, RPC, and table names may still use
+  Baseboard/board terminology. T21 intentionally changes product framing first
+  and leaves internal naming alone to avoid churn and preserve runtime safety.
+- The existing `/app/hubs/dfw/baseboard` route now represents `DFW Channels`
+  and `Recent Useful Threads` product framing while continuing to use the
+  proven post/comment/report/moderation primitives.
+- The existing `/app/hubs/dfw/layovers` route is framed as `DFW Layover`.
+- The existing `/app/hubs/dfw/crew-picks` route is framed as
+  `Recent Useful Threads`.
+- The existing `/app/hubs/dfw/lounges` route remains preserved as a restricted
+  membership-gated route, but it is not part of the open Hub section model.
