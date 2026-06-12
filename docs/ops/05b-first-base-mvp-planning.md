@@ -310,8 +310,17 @@ Final passing T26D create-redirect browser smoke is recorded in
 the authenticated browser UI, the browser redirected directly to the new detail
 route, the detail route rendered the post, the selected-channel thread list
 showed it exactly once, and public-domain/no-cookie/product/security boundaries
-held. T26B list and T26C detail regressions passed. T26D create redirect can be
-treated as functionally closed after the smoke record is reviewed and committed.
+held. T26B list and T26C detail regressions passed. T26D create redirect is
+functionally closed.
+
+T27A local implementation is recorded in
+`docs/ops/fbmvp-t27a-dfw-today-lightweight-baseline.md`. It adds the protected
+read-only `/app/hubs/dfw/today` route with static/config-backed quick checks,
+curated utility cards, safety boundary copy, and safe links into existing DFW
+Channels. It adds no database migration, runtime mutation, live operations
+data, external integration, AI, posting, comments, reports, moderation controls,
+Request a Channel workflow, broad database push, or deploy. Browser smoke is
+pending after deployment.
 
 The remaining functional backlog from checkpoint `c2bbd73` to narrow
 private-beta MVP is recorded in
@@ -679,6 +688,10 @@ The current implementation sequence is:
     because the browser stayed on the selected-channel page after submit; the
     local redirect/navigation fix is implemented and needs no runtime migration,
     and final deployed browser create-redirect smoke passed after `82f4399`
+30. `FBMVP-T27A` DFW Today lightweight baseline, locally implemented with a
+    protected read-only `/app/hubs/dfw/today` route and static/config-backed
+    utility content; no migration or runtime apply is needed, and browser smoke
+    is pending after deployment
 
 T20 runtime-pass docs are committed. The First Base / DFW Baseboard safety loop
 is complete. The approved pivot is recorded in `ops/hub-pivot-plan.md`.
@@ -723,11 +736,11 @@ channel page instead of redirecting to detail. A local app-side redirect fix now
 returns a safe created detail `href` and navigates client-side on success; it
 passed deployed browser create-redirect smoke after `82f4399`, with one
 additional authorized safe post, direct redirect to detail, and passing T26B
-list plus T26C detail regressions. T26D create redirect can be treated as
-functionally closed after the smoke record is reviewed and committed.
-The recommended next ticket is `FBMVP-T23A: DFW Hub Channels UX Wireframe`
-before DB implementation unless there is a strong reason to proceed directly to
-`FBMVP-T23: DFW Hub Channels Foundation`.
+list plus T26C detail regressions. T26D create redirect is functionally closed.
+The next work should keep advancing the four DFW Hub MVP pillars. T27A starts
+the DFW Today pillar as a static/read-only utility baseline. Base and Layover
+still need lightweight functional baselines before MVP, and any further
+Channels work should stay scoped to the documented ticket lane.
 
 T23A adds the mobile-first wireframe packet for the updated private-beta Hub
 experience. It defines Home/dashboard, DFW Hub overview, DFW Today, Base,

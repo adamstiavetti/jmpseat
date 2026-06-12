@@ -180,17 +180,27 @@ ticket.
 
 ### DFW Today
 
-`DFW Today` contains admin/founder/approved curated current items such as:
+`DFW Today` is the current utility snapshot for an airport/base Hub.
 
-- weather
-- traffic
-- public airport advisories
-- app notes
-- recently updated sections
+The T27A MVP baseline is a protected, read-only, static/config-backed route:
 
-AI may assist drafting or summarizing updates, but AI should not be the final
-publisher for operationally sensitive, verification-sensitive, or
-safety-sensitive information.
+- `/app/hubs/dfw/today`
+
+It contains safe private-beta utility content such as:
+
+- quick orientation checks
+- commute/parking reminders
+- terminal/ground logistics reminders
+- food/coffee/break pointers at a high level
+- links into relevant Channels
+- static safety boundary copy
+
+The T27A baseline intentionally does not include live weather, live traffic,
+live airport/flight operations, external integrations, AI-generated operational
+advice, user posting, comments, reports, moderation controls, or admin CMS.
+Future curated/admin-maintained current items can be scoped separately, but
+they must continue to avoid operationally sensitive, verification-sensitive, and
+safety-sensitive claims unless reviewed through an approved process.
 
 ### Base
 
@@ -514,9 +524,11 @@ recorded in
 `docs/ops/fbmvp-t26c-channel-post-detail-read-foundation-runtime-apply.md`;
 runtime now has
 `public.get_open_hub_channel_post(p_base_code text, p_channel_slug text, p_post_id uuid)`.
-Browser smoke remains pending; composer, comments, reports, moderation review
-changes, Request a Channel workflow, DFW Today/Base/Layover baselines, broad
-database push, and deploy remain out of scope.
+Initial browser smoke was partial, and post-fix browser smoke later confirmed
+happy-path detail rendering for valid child-channel posts. Composer, comments,
+reports, moderation review changes, Request a Channel workflow,
+DFW Today/Base/Layover baselines, broad database push, and deploy remained out
+of scope for T26C.
 
 T26D local implementation is recorded in
 `docs/ops/fbmvp-t26d-channel-composer-create-foundation.md`. It adds
@@ -529,9 +541,19 @@ is recorded in
 `docs/ops/fbmvp-t26d-channel-composer-create-foundation-runtime-apply.md`;
 runtime now has
 `public.create_open_hub_channel_post(p_base_code text, p_channel_slug text, p_title text, p_body text, p_content_type text, p_category text)`.
-Browser smoke remains pending; comments, reports, moderation review changes, Request a
-Channel workflow, DFW Today/Base/Layover baselines, broad database push, and
-deploy remain out of scope.
+Final create-redirect browser smoke passed after the local redirect/navigation
+fix at `82f4399`: create redirected to detail, the selected-channel list showed
+the new post exactly once, and T26B/T26C regressions passed. Comments, reports,
+moderation review changes, Request a Channel workflow, DFW Today/Base/Layover
+baselines, broad database push, and deploy remained out of scope for T26D.
+
+T27A local implementation is recorded in
+`docs/ops/fbmvp-t27a-dfw-today-lightweight-baseline.md`. It adds the protected
+read-only `/app/hubs/dfw/today` route using static/config-backed utility
+content, safety boundary copy, and links into existing DFW Channels. It adds no
+migration, runtime mutation, live operations data, external integration, AI,
+posting, comments, reports, moderation controls, Request a Channel workflow,
+broad database push, or deploy. Browser smoke is pending after deployment.
 
 The current DFW Hub + Channels foundation checkpoint is recorded in
 `docs/ops/fbmvp-checkpoint-dfw-hub-channels-foundation-level-set.md` at

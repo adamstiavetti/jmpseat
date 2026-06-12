@@ -18,6 +18,8 @@ or commit.
 - Current surface: `DFW Hub`
 - Current functional foundation: Channels metadata route plus runtime RPC
 - Current route foundation: `/app/hubs/dfw/channels`
+- Current DFW Today baseline: local protected read-only route
+  `/app/hubs/dfw/today`
 - Current runtime functions:
   - `public.list_open_hub_channels(p_base_code text)`
   - `public.list_open_hub_channel_posts(p_base_code text, p_channel_slug text, p_limit integer)`
@@ -61,6 +63,13 @@ documented through runtime apply. The current gap is not whether Channels
 metadata/read foundations exist; the gap is completing the DFW Hub utility loop
 across the four MVP pillars below.
 
+T27A is locally implemented as the first DFW Today lightweight baseline. It adds
+the protected read-only `/app/hubs/dfw/today` route with static/config-backed
+quick checks, utility cards, safety boundary copy, and links into existing DFW
+Channels. It adds no migration, runtime apply, live operations data, external
+integration, AI, posting, comments, reports, moderation controls, or Request a
+Channel workflow. Browser smoke remains pending after deployment.
+
 ## Narrow DFW MVP Pillars
 
 Channels are not the entire MVP. The narrow DFW Hub MVP should include four
@@ -85,10 +94,12 @@ Purpose:
 
 MVP baseline:
 
-- curated/admin-managed cards or static editorial sections
-- pinned useful item or small set of useful items
-- high-signal updates
-- clear timestamp/source framing if updates are manually maintained
+- protected read-only route at `/app/hubs/dfw/today`
+- static/config-backed quick checks
+- curated utility cards
+- safe links into existing DFW Channels
+- safety copy that avoids live operations and security-sensitive details
+- clear private-beta/static framing instead of fake freshness claims
 
 Out of scope:
 
@@ -166,12 +177,12 @@ Out of scope:
 
 Recommended order:
 
-1. Review and commit the final T26D create-redirect smoke pass record.
-2. `T26E` channel comments/reporting/moderation integration, if still in the
-   active Channels lane.
-3. DFW Today MVP baseline.
-4. Base MVP baseline.
-5. Layover MVP baseline.
+1. Review and commit T27A DFW Today lightweight baseline.
+2. Browser-smoke `/app/hubs/dfw/today` after deployment.
+3. Base MVP baseline.
+4. Layover MVP baseline.
+5. `T26E` channel comments/reporting/moderation integration, only if Channels
+   remains the active lane.
 6. Private-beta policy/ops readiness.
 7. Route-by-route UI/UX polish.
 
@@ -194,13 +205,18 @@ Completed prerequisites:
 - Final T26D create-redirect browser smoke pass with one additional safe post:
   create redirected to detail, T26B list regression passed, and T26C detail
   regression passed.
+- T27A local DFW Today lightweight baseline: protected read-only route,
+  static/config-backed quick checks and utility cards, safety boundary copy,
+  and safe links into existing DFW Channels; no migration or runtime apply.
 - Stale test cleanup:
   - `test/community/hubChannelSeeds.test.mts`
   - `test/community/boardPostActions.test.mts`
   - `test/community/boardPostDetail.test.mts`
 
-DFW Today, Base, and Layover can be scoped as lightweight functional baselines.
-They should not require live integrations or scraping for MVP.
+Base and Layover can still be scoped as lightweight functional baselines. They
+should not require live integrations or scraping for MVP. DFW Today now has a
+local baseline and needs deployment/browser smoke before it is treated as
+runtime-verified.
 
 ## UI/UX Rule
 

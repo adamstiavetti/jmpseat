@@ -42,6 +42,14 @@ const dfwSelectedChannelRouteSource = existsSync(
       "utf8",
     )
   : "";
+const dfwTodayRouteSource = existsSync(
+  new URL("../../app/app/hubs/dfw/today/page.tsx", import.meta.url),
+)
+  ? readFileSync(
+      new URL("../../app/app/hubs/dfw/today/page.tsx", import.meta.url),
+      "utf8",
+    )
+  : "";
 const dfwSectionRoutes = [
   {
     label: "DFW Baseboard",
@@ -116,6 +124,7 @@ const combinedSource = [
   shellStyles,
   dfwHubRouteSource,
   dfwHubAccessSource,
+  dfwTodayRouteSource,
   dfwChannelsRouteSource,
   dfwSelectedChannelRouteSource,
   ...dfwSectionRoutes.map((route) => route.source),
@@ -128,6 +137,7 @@ const implementationSource = [
   homeBaseActionsSource,
   dfwHubRouteSource,
   dfwHubAccessSource,
+  dfwTodayRouteSource,
   dfwChannelsRouteSource,
   dfwSelectedChannelRouteSource,
   ...dfwSectionRoutes.map((route) => route.source),
@@ -194,8 +204,9 @@ test("DFW Hub read-only shell uses product-facing taxonomy labels", () => {
   assert.match(shellSource, /Layover/);
   assert.match(shellSource, /Channels/);
   assert.match(shellSource, /Recent Useful Threads/);
-  assert.match(shellSource, /weather placeholder, public advisories, and app notes/);
-  assert.match(shellSource, /No live weather or traffic integration is active yet/);
+  assert.match(shellSource, /A read-only DFW utility snapshot with quick checks and safe links into Channels/);
+  assert.match(shellSource, /Private beta baseline/);
+  assert.match(shellSource, /A quick, verified-worker utility snapshot for DFW\./);
   assert.match(shellSource, /Essentials/);
   assert.match(shellSource, /Recommendations/);
   assert.match(shellSource, /Getting Around/);
@@ -321,6 +332,17 @@ test("DFW Hub section routes exist and remain behind the private gate and audit 
     assert.match(route.source, new RegExp(`section: "${route.section}"`));
     assert.match(route.source, /DfwHubSectionReadOnlyShell/);
   }
+});
+
+test("DFW Today route is private gated and renders the read-only utility baseline", () => {
+  assert.match(dfwTodayRouteSource, /dynamic = "force-dynamic"/);
+  assert.match(dfwTodayRouteSource, /requireDfwHubRouteAccess/);
+  assert.match(dfwTodayRouteSource, /\/app\/hubs\/dfw\/today/);
+  assert.match(dfwTodayRouteSource, /section: "dfw-today"/);
+  assert.match(dfwTodayRouteSource, /DfwTodayShell/);
+  assert.match(dfwTodayRouteSource, /dfwTodayQuickChecks/);
+  assert.match(dfwTodayRouteSource, /dfwTodayUtilityCards/);
+  assert.doesNotMatch(dfwTodayRouteSource, /\.insert\(|\.update\(|\.delete\(|\.rpc\(|fetch\(/);
 });
 
 test("DFW Channels overview route is private gated and reads channel metadata only after the gate", () => {
@@ -457,6 +479,7 @@ test("DFW Hub cards link to read-only section route shells", () => {
   }
 
   assert.match(shellSource, /DFW Today/);
+  assert.match(shellSource, /href: "\/app\/hubs\/dfw\/today"/);
   assert.match(shellSource, /title: "Base"/);
   assert.match(shellSource, /title: "Layover"/);
   assert.match(shellSource, /title: "Channels"/);

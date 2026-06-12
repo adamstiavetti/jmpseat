@@ -33,6 +33,10 @@ import {
   type DfwHubChannelPostActionState,
   type DfwHubChannelPostStatus,
 } from "../../lib/community/hubChannelPostActionState";
+import type {
+  DfwTodayQuickCheck,
+  DfwTodayUtilityCard,
+} from "../../lib/privateApp/dfwToday";
 
 import { DfwChannelPostComposerForm } from "./DfwChannelPostComposerForm";
 import styles from "./homeHubShell.module.css";
@@ -71,6 +75,13 @@ type DfwHubSectionShell = {
 type DfwChannelsOverviewShellProps = {
   channels?: readonly HubChannelListItem[];
   channelsUnavailable?: boolean;
+};
+
+type DfwTodayShellProps = {
+  futureNote: string;
+  quickChecks: readonly DfwTodayQuickCheck[];
+  safetyBoundary: string;
+  utilityCards: readonly DfwTodayUtilityCard[];
 };
 
 type DfwChannelThreadListShellProps = {
@@ -186,9 +197,11 @@ const dfwHubSections: readonly DfwHubSectionItem[] = [
   {
     title: "DFW Today",
     detail:
-      "Curated current info: weather placeholder, public advisories, and app notes. No live weather or traffic integration is active yet.",
+      "A read-only DFW utility snapshot with quick checks and safe links into Channels.",
+    cta: "Open Today",
+    href: "/app/hubs/dfw/today",
     icon: "today",
-    meta: "Curated current info",
+    meta: "Private beta baseline",
   },
   {
     title: "Base",
@@ -1412,6 +1425,94 @@ export function DfwHubReadOnlyShell() {
             not part of the open Hub section model.
           </p>
         </section>
+        <BottomNavVisual active="Hubs" />
+      </div>
+    </main>
+  );
+}
+
+export function DfwTodayShell({
+  futureNote,
+  quickChecks,
+  safetyBoundary,
+  utilityCards,
+}: DfwTodayShellProps) {
+  return (
+    <main className={styles.shell}>
+      <div className={styles.mobileFrame}>
+        <AppHeader
+          backHref="/app/hubs/dfw"
+          backLabel="Back to DFW Hub"
+          subtitle="DFW Hub Today"
+          showBackLink
+        />
+
+        <nav className={styles.breadcrumb} aria-label="DFW Today breadcrumb">
+          <Link href="/app/hubs/dfw">DFW Hub</Link>
+          <span aria-hidden="true">/</span>
+          <span>Today</span>
+        </nav>
+
+        <section className={styles.destinationHero} aria-labelledby="dfw-today-title">
+          <span className={styles.cardLabel}>Private beta baseline</span>
+          <h1 id="dfw-today-title">DFW Today</h1>
+          <p>A quick, verified-worker utility snapshot for DFW.</p>
+        </section>
+
+        <section className={styles.hubSurfaceGrid} aria-labelledby="dfw-today-checks-title">
+          <div className={styles.sectionTitleRow}>
+            <div>
+              <h2 id="dfw-today-checks-title">Quick checks</h2>
+              <p>
+                Static reminders for starting your DFW day without claiming
+                live airport or employer operational status.
+              </p>
+            </div>
+          </div>
+          <div className={styles.surfaceGrid}>
+            {quickChecks.map((item) => (
+              <article className={styles.surfaceCard} key={item.title}>
+                <span className={styles.cardMeta}>Read-only</span>
+                <h3>{item.title}</h3>
+                <p>{item.detail}</p>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section className={styles.hubSurfaceGrid} aria-labelledby="dfw-today-useful-title">
+          <div className={styles.sectionTitleRow}>
+            <div>
+              <h2 id="dfw-today-useful-title">Useful today</h2>
+              <p>
+                Safe starting points for common DFW questions. These links go
+                to existing DFW Channels.
+              </p>
+            </div>
+          </div>
+          <div className={styles.surfaceGrid}>
+            {utilityCards.map((item) => (
+              <Link className={styles.surfaceCard} href={item.href} key={item.title}>
+                <span className={styles.cardMeta}>{item.meta}</span>
+                <h3>{item.title}</h3>
+                <p>{item.detail}</p>
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        <section className={styles.safetyBand} aria-labelledby="dfw-today-safety-title">
+          <span className={styles.cardLabel}>Safety boundary</span>
+          <h2 id="dfw-today-safety-title">Use official sources for live details.</h2>
+          <p>{safetyBoundary}</p>
+        </section>
+
+        <article className={styles.postEmptyState}>
+          <span className={styles.cardMeta}>Private beta baseline</span>
+          <h2>More curated updates can come later.</h2>
+          <p>{futureNote}</p>
+        </article>
+
         <BottomNavVisual active="Hubs" />
       </div>
     </main>
