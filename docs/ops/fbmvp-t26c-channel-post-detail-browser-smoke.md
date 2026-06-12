@@ -176,7 +176,9 @@ post created during T26D smoke:
 
 The next implementation task should investigate the T26D create/action return
 handling and T26C detail-read mismatch before additional smoke posts are
-created.
+created. Follow-up diagnosis found malformed app-side UUID validation as the
+local root cause, and the fix is recorded in
+`docs/ops/fbmvp-t26d-channel-composer-uuid-validation-fix.md`.
 
 UI/UX polish remains deferred.
 
@@ -228,4 +230,4 @@ Browser smoke docs needed?
   behavior.
 - Happy-path browser smoke was later attempted during T26D smoke and failed for
   the created safe child-channel post. Follow-up smoke remains needed after the
-  defect is fixed.
+  local UUID validation fix is deployed.

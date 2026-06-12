@@ -1,6 +1,7 @@
 import "server-only";
 
 import { createClient } from "../supabase/server";
+import { isUuid } from "./uuid";
 
 const DEFAULT_CHANNEL_POST_LIMIT = 20;
 const FALLBACK_AUTHOR_LABEL = "jmpseat member";
@@ -72,12 +73,6 @@ export function isDfwHubChannelPostStatus(
   value: string | string[] | undefined,
 ): value is DfwHubChannelPostStatus {
   return typeof value === "string" && dfwHubChannelPostStatuses.has(value);
-}
-
-function isUuid(value: string) {
-  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{12}$/i.test(
-    value,
-  );
 }
 
 function mapOpenHubChannelRow(row: OpenHubChannelRpcRow): HubChannelListItem {

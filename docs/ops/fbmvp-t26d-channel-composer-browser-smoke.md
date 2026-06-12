@@ -194,13 +194,15 @@ Likely follow-up area:
 - mismatch between create RPC output, list RPC output, and detail RPC
   expectations
 
-This is a follow-up investigation target, not a confirmed root cause.
+Follow-up diagnosis found the confirmed local root cause: malformed app-side
+UUID validation in the selected-channel create and detail helpers. The local fix
+is recorded in
+`docs/ops/fbmvp-t26d-channel-composer-uuid-validation-fix.md`.
 
 ## Remaining Work
 
-The next implementation task should investigate the T26D create/action return
-handling and T26C detail-read mismatch before more composer smoke posts are
-created.
+The next step is deployment and browser re-smoke. Reuse the existing safe post
+for detail verification before creating any additional smoke content.
 
 UI/UX polish remains deferred.
 
@@ -256,5 +258,5 @@ Runtime apply docs needed?
 Browser smoke docs needed?
 
 - Satisfied by this record for the failed/partial T26D browser smoke.
-- Follow-up browser smoke will be needed after the create/detail defect is
-  fixed.
+- Follow-up browser smoke will be needed after the local UUID validation fix is
+  deployed.

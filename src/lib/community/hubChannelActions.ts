@@ -17,6 +17,7 @@ import {
   DFW_HUB_CHANNEL_POST_INVALID_STATUS,
   DFW_HUB_CHANNEL_POST_STATUS_PARAM,
 } from "./hubChannels";
+import { isUuid } from "./uuid";
 
 const allowedHubChannelContentTypes = new Set([
   "note",
@@ -48,12 +49,6 @@ function isAllowedHubChannelContentType(value: string) {
 
 function isAllowedHubChannelCategory(value: string) {
   return allowedHubChannelCategories.has(value);
-}
-
-function isUuid(value: string) {
-  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{12}$/i.test(
-    value,
-  );
 }
 
 function getDfwHubChannelHref(channelSlug: string) {

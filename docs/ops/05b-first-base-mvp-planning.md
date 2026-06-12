@@ -277,6 +277,13 @@ post. No additional smoke posts should be created until the create/action return
 handling and detail-read mismatch are investigated. Product, access,
 public-domain, and privacy boundaries held.
 
+The local UUID validation fix is recorded in
+`docs/ops/fbmvp-t26d-channel-composer-uuid-validation-fix.md`. The root cause was
+malformed app-side selected-channel UUID validation in the create and detail
+helpers. No runtime migration is needed. After deployment, re-smoke should reuse
+the existing safe post `7f93f9a9-3dd1-4718-979a-2acc8194a999` before creating
+any additional smoke content.
+
 The remaining functional backlog from checkpoint `c2bbd73` to narrow
 private-beta MVP is recorded in
 `docs/ops/fbmvp-remaining-functional-backlog.md`. It clarifies that Channels
@@ -636,7 +643,8 @@ The current implementation sequence is:
     action, and protected selected-channel title/body composer; browser smoke
     failed/partially passed because the post was created and shown in the thread
     list, but the create flow reported failure and the detail route did not
-    render the created post
+    render the created post; the local UUID validation fix is implemented and
+    deployment/browser re-smoke remains pending
 
 T20 runtime-pass docs are committed. The First Base / DFW Baseboard safety loop
 is complete. The approved pivot is recorded in `ops/hub-pivot-plan.md`.
@@ -672,8 +680,9 @@ channel board seeds only. T26A adds and runtime-applies the first safe
 channel-list metadata RPC and adds the DFW Channels overview route. Channel post
 list reads start in T26B with `board_posts.board_id` membership; channel post
 detail reads start in T26C. Channel post creation starts in T26D. T26D browser
-smoke found a create/detail mismatch that should be investigated before
-additional composer smoke posts are created.
+smoke found a create/detail mismatch caused by malformed app-side UUID
+validation. The local fix is implemented; browser re-smoke should reuse the
+existing safe post after deployment.
 The recommended next ticket is `FBMVP-T23A: DFW Hub Channels UX Wireframe`
 before DB implementation unless there is a strong reason to proceed directly to
 `FBMVP-T23: DFW Hub Channels Foundation`.

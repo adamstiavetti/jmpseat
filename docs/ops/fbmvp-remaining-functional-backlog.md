@@ -44,7 +44,8 @@ or commit.
   passed: exactly one safe post was created in `dfw-q-and-a` and appeared in the
   selected-channel thread list, but the create flow reported failure instead of
   redirecting to detail, and direct detail navigation rendered the safe
-  unavailable state.
+  unavailable state. The local UUID validation fix is implemented and needs
+  deployment/browser re-smoke.
 
 T25B, T26A, T26B, T26C, and T26D are implemented, committed, runtime-applied, and
 documented through runtime apply. The current gap is not whether Channels
@@ -156,10 +157,10 @@ Out of scope:
 
 Recommended order:
 
-1. Investigate and fix the T26D create/action return handling and T26C
-   detail-read mismatch before creating more smoke posts.
-2. Re-run T26D authenticated create smoke and T26C happy-path post detail smoke
-   with the existing safe child-channel post if possible.
+1. Deploy the local UUID validation fix and re-run T26D authenticated create
+   smoke plus T26C happy-path post detail smoke.
+2. Reuse the existing safe child-channel smoke post for detail re-smoke before
+   creating any additional smoke content.
 3. `T26E` channel comments/reporting/moderation integration.
 4. DFW Today MVP baseline.
 5. Base MVP baseline.
@@ -175,6 +176,7 @@ Completed prerequisites:
 - T26D targeted runtime apply.
 - T26D failed/partial authenticated browser smoke with one safe child-channel
   smoke post created.
+- T26D local UUID validation fix.
 - Stale test cleanup:
   - `test/community/hubChannelSeeds.test.mts`
   - `test/community/boardPostActions.test.mts`

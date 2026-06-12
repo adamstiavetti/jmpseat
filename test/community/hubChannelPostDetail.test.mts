@@ -29,6 +29,7 @@ const helperSource = readFileSync(
   new URL("../../src/lib/community/hubChannels.ts", import.meta.url),
   "utf8",
 );
+const uuidSource = readOptionalSource("../../src/lib/community/uuid.ts");
 const selectedChannelRouteSource = readFileSync(
   new URL("../../app/app/hubs/dfw/channels/[channelSlug]/page.tsx", import.meta.url),
   "utf8",
@@ -54,6 +55,13 @@ const docsSource = [
       : "",
   )
   .join("\n\n");
+
+const smokePostId = "7f93f9a9-3dd1-4718-979a-2acc8194a999";
+const expectedUuidPatternSource =
+  "^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$";
+const malformedUuidPatternSource =
+  "^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{12}$";
+const expectedUuidPattern = new RegExp(expectedUuidPatternSource, "i");
 
 function sourceForExportedFunction(name: string) {
   const start = shellSource.indexOf(`export function ${name}`);
@@ -174,6 +182,25 @@ test("T26C helper reads one selected-channel post through the safe RPC only", ()
   assert.doesNotMatch(detailHelperSource, /from\("boards"\)|from\("board_posts"\)|createBrowserClient/);
   assert.doesNotMatch(detailHelperSource, /boardId|baseId|parentBoardId|userId|authorUserId|reporter|verification|storagePath|signedUrl/i);
   assert.doesNotMatch(detailHelperSource, /\.insert\(|\.update\(|\.delete\(/);
+});
+
+test("T26C detail helper accepts the real smoke post UUID before calling the RPC", () => {
+  const detailHelperSource = sourceForHelperFunction("getDfwHubChannelPost");
+
+  assert.equal(expectedUuidPattern.test(smokePostId), true);
+  assert.equal(expectedUuidPattern.test("not-a-uuid"), false);
+  assert.equal(expectedUuidPattern.test("7f93f9a9-3dd1-4718-zzzz-2acc8194a999"), false);
+  assert.match(detailHelperSource, /isUuid\(normalizedPostId\)/);
+  assert.match(helperSource, /import \{ isUuid \} from "\.\/uuid"/);
+  assert.match(detailHelperSource, /get_open_hub_channel_post/);
+  assert.ok(
+    uuidSource.includes(expectedUuidPatternSource),
+    "detail helper should use a five-group UUID pattern that accepts the smoke post id",
+  );
+  assert.ok(
+    !uuidSource.includes(malformedUuidPatternSource),
+    "detail helper should not use the malformed four-hyphen UUID pattern from failed smoke",
+  );
 });
 
 test("T26C selected-channel post detail route is private gated before reading", () => {

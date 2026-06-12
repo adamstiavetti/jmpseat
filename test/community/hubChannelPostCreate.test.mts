@@ -28,6 +28,7 @@ function readOptionalSource(relativePath: string) {
 const actionSource = readOptionalSource(
   "../../src/lib/community/hubChannelActions.ts",
 );
+const uuidSource = readOptionalSource("../../src/lib/community/uuid.ts");
 const selectedChannelRouteSource = readFileSync(
   new URL("../../app/app/hubs/dfw/channels/[channelSlug]/page.tsx", import.meta.url),
   "utf8",
@@ -38,6 +39,8 @@ const shellSource = readFileSync(
 );
 const docsSource = [
   "../../docs/ops/fbmvp-t26d-channel-composer-create-foundation.md",
+  "../../docs/ops/fbmvp-t26d-channel-composer-create-foundation-runtime-apply.md",
+  "../../docs/ops/fbmvp-t26d-channel-composer-browser-smoke.md",
   "../../docs/BUILD_TICKETS.md",
   "../../docs/DATA_MODEL.md",
   "../../docs/ops/05b-first-base-mvp-planning.md",
@@ -50,6 +53,13 @@ const docsSource = [
       : "",
   )
   .join("\n\n");
+
+const smokePostId = "7f93f9a9-3dd1-4718-979a-2acc8194a999";
+const expectedUuidPatternSource =
+  "^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$";
+const malformedUuidPatternSource =
+  "^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{12}$";
+const expectedUuidPattern = new RegExp(expectedUuidPatternSource, "i");
 
 function sourceForExportedFunction(name: string) {
   const start = shellSource.indexOf(`export function ${name}`);
@@ -190,6 +200,24 @@ test("T26D server action validates post input and safely redirects on failures",
   assert.match(actionSource, /DFW_HUB_CHANNEL_POST_FAILED_STATUS/);
 });
 
+test("T26D server action accepts the real smoke post UUID before redirecting to detail", () => {
+  assert.equal(expectedUuidPattern.test(smokePostId), true);
+  assert.equal(expectedUuidPattern.test("not-a-uuid"), false);
+  assert.equal(expectedUuidPattern.test("7f93f9a9-3dd1-4718-zzzz-2acc8194a999"), false);
+  assert.match(actionSource, /isUuid\(createdPost\.id\)/);
+  assert.match(actionSource, /import \{ isUuid \} from "\.\/uuid"/);
+  assert.match(actionSource, /redirect\(getDfwHubChannelPostHref\(normalizedChannelSlug, createdPost\.id\)\)/);
+  assert.match(actionSource, /DFW_HUB_CHANNEL_POST_FAILED_STATUS/);
+  assert.ok(
+    uuidSource.includes(expectedUuidPatternSource),
+    "create action should use a five-group UUID pattern that accepts the smoke post id",
+  );
+  assert.ok(
+    !uuidSource.includes(malformedUuidPatternSource),
+    "create action should not use the malformed four-hyphen UUID pattern from failed smoke",
+  );
+});
+
 test("T26D selected-channel route wires composer action after private route gate", () => {
   assert.match(selectedChannelRouteSource, /searchParams/);
   assert.match(selectedChannelRouteSource, /createDfwHubChannelPostAction/);
@@ -236,18 +264,22 @@ test("T26D selected-channel shell renders composer without comments reports or f
   }
 });
 
-test("T26D docs record local-only composer scope and pending runtime checks", () => {
+test("T26D docs record runtime apply, failed smoke, and follow-up fix boundary", () => {
   assert.match(docsSource, /FBMVP-T26D/i);
   assert.match(docsSource, /Channel Composer \/ Create Post Foundation/i);
   assert.match(docsSource, /create_open_hub_channel_post/i);
   assert.match(docsSource, /\/app\/hubs\/dfw\/channels\/\[channelSlug\]/);
   assert.match(docsSource, /board_posts\.board_id/);
   assert.match(docsSource, /board_posts\.category/);
-  assert.match(docsSource, /runtime apply (is )?pending/i);
-  assert.match(docsSource, /browser smoke (is )?pending/i);
+  assert.match(docsSource, /Runtime apply is complete|Runtime now has/i);
+  assert.match(docsSource, /failed\/partial/i);
+  assert.match(docsSource, /DFW Q&A smoke test thread/i);
+  assert.match(docsSource, /7f93f9a9-3dd1-4718-979a-2acc8194a999/i);
+  assert.match(docsSource, /T26C happy path failed|detail route did not render/i);
+  assert.match(docsSource, /follow-up smoke|Follow-up browser smoke/i);
   assert.match(docsSource, /does not add[\s\S]*comments/i);
   assert.match(docsSource, /does not add[\s\S]*reports/i);
   assert.match(docsSource, /does not add[\s\S]*moderation/i);
   assert.match(docsSource, /DFW Today\/Base\/Layover|DFW Today, Base, Layover/i);
-  assert.doesNotMatch(docsSource, /T26D is runtime-applied|T26D runtime apply passed|T26D browser smoke passed/i);
+  assert.doesNotMatch(docsSource, /T26D browser smoke passed|T26C happy-path browser smoke passed/i);
 });
