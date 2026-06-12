@@ -86,7 +86,10 @@ Route access pattern:
 
 Explicitly not complete or not live at this checkpoint:
 
-- authenticated browser smoke for `/app/hubs/dfw/channels` remains pending.
+- follow-up authenticated browser smoke for `/app/hubs/dfw/channels` is now
+  recorded separately in
+  `docs/ops/fbmvp-t26a-dfw-channels-authenticated-browser-smoke.md`; it passed
+  as functional route smoke with UI/UX polish deferred.
 - channel thread list is not implemented.
 - channel post detail is not implemented.
 - channel post create/composer is not implemented.
@@ -109,11 +112,13 @@ The browser/runtime boundary at this checkpoint is:
 - Public apex private route exposure check passed:
   - public apex did not expose the private app route.
 - Anonymous beta request redirected to login.
-- Authenticated browser route smoke was not completed because no real eligible
-  private-beta browser session/tooling was available.
-- Therefore, do not claim the six channels rendered in an authenticated browser
-  yet.
-- Authenticated `/app/hubs/dfw/channels` smoke remains pending.
+- Authenticated `/app/hubs/dfw/channels` smoke was later completed and recorded
+  in `docs/ops/fbmvp-t26a-dfw-channels-authenticated-browser-smoke.md`.
+- The later smoke confirmed the six runtime-backed DFW channels rendered for an
+  eligible authenticated beta/private-app user with no unavailable/error or
+  empty state.
+- That later smoke was functional only and does not claim final UI/UX polish or
+  MVP-polished visual design.
 
 ## Documentation Consistency
 
@@ -138,8 +143,8 @@ These references are mostly broader V1/full-beta or historical context and
 should not override newer 05B/Hub docs.
 
 No current docs inspected overclaim that channel posting, comments, or
-moderation are live. T26A docs correctly record authenticated browser/route
-smoke as pending.
+moderation are live. Later T26A smoke docs record authenticated browser/route
+smoke as a functional pass with UI/UX polish deferred.
 
 ## Known Stale Tests
 
@@ -209,8 +214,10 @@ Next channel-post modeling guidance:
 Recommended order after this checkpoint:
 
 1. Authenticated browser smoke for `/app/hubs/dfw/channels` with a real
-   eligible beta/private-app account.
-2. Stale test cleanup:
+   eligible beta/private-app account. Completed later in
+   `docs/ops/fbmvp-t26a-dfw-channels-authenticated-browser-smoke.md`.
+2. Stale test cleanup. Completed later in
+   `0cd0ca7 test: align community expectations with hub runtime state`.
    - T25B seed docs runtime-apply expectation.
    - T15 runtime-pending expectation.
    - T17 `Back to DFW Baseboard` expectation.

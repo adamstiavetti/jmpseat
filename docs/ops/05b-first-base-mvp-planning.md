@@ -160,15 +160,24 @@ has `public.list_open_hub_channels(p_base_code text)`. The apply used targeted
 SQL execution only, inserted the exact ledger row
 `20260611203000 create_hub_channel_list_read_rpc`, and made no app code
 changes, no broad `supabase db push`, no migration repair, no `apply_migration`,
-and no deploy. Authenticated browser/route smoke remains pending unless
-separately verified.
+and no deploy.
+
+T26A authenticated beta browser smoke is recorded in
+`docs/ops/fbmvp-t26a-dfw-channels-authenticated-browser-smoke.md`. Functional
+route smoke passed for `https://beta.jmpseat.com/app/hubs/dfw/channels`: an
+eligible authenticated beta/private-app user reached the route, all six
+runtime-backed DFW channel rows rendered, no unavailable/error or empty state
+appeared, anonymous beta access redirected to login, and public apex did not
+expose the private route. The pass is functional only; significant UI/UX polish
+remains deferred and should not block T26B.
 
 A docs-only checkpoint for the current DFW Hub + Channels foundation state is
 recorded in
 `docs/ops/fbmvp-checkpoint-dfw-hub-channels-foundation-level-set.md`. It should
 be read before starting T26B. It records completed/runtime-applied T25B/T26A
-metadata foundations, the pending authenticated `/app/hubs/dfw/channels`
-browser smoke, known stale tests, and the recommended next sequence.
+metadata foundations and the recommended next sequence. The later T26A browser
+smoke record and stale community test cleanup move the next recommended
+functional lane to T26B channel thread-list reads.
 
 The remaining functional backlog from checkpoint `c2bbd73` to narrow
 private-beta MVP is recorded in
@@ -509,6 +518,10 @@ The current implementation sequence is:
     only and no channel post behavior, composer, comments, reports, moderation
     integration, broad database push, migration repair, `apply_migration`, or
     deploy
+26. `FBMVP-T26A` authenticated beta browser smoke for
+    `/app/hubs/dfw/channels`, passed as functional route smoke with six
+    runtime-backed DFW channel rows rendered, access boundaries preserved, and
+    significant UI/UX polish deferred
 
 T20 runtime-pass docs are committed. The First Base / DFW Baseboard safety loop
 is complete. The approved pivot is recorded in `ops/hub-pivot-plan.md`.

@@ -20,7 +20,10 @@ or commit.
 - Current route foundation: `/app/hubs/dfw/channels`
 - Current runtime function: `public.list_open_hub_channels(p_base_code text)`
 - Current channel data model: `hub_channel` child rows in `public.boards`
-- Authenticated browser smoke for `/app/hubs/dfw/channels` remains pending.
+- Authenticated browser smoke for `/app/hubs/dfw/channels` passed as functional
+  route smoke in
+  `docs/ops/fbmvp-t26a-dfw-channels-authenticated-browser-smoke.md`, with
+  significant UI/UX polish deferred.
 
 T25B and T26A are implemented, committed, runtime-applied, and documented. The
 current gap is not whether Channels metadata exists; the gap is completing the
@@ -131,20 +134,23 @@ Out of scope:
 
 Recommended order:
 
-1. Authenticated browser smoke for `/app/hubs/dfw/channels`.
-2. Stale test cleanup:
-   - `test/community/hubChannelSeeds.test.mts`
-   - `test/community/boardPostActions.test.mts`
-   - `test/community/boardPostDetail.test.mts`
-3. `T26B` channel thread-list read foundation.
-4. `T26C` channel post detail.
-5. `T26D` channel composer.
-6. `T26E` channel comments/reporting/moderation integration.
-7. DFW Today MVP baseline.
-8. Base MVP baseline.
-9. Layover MVP baseline.
-10. Private-beta policy/ops readiness.
-11. Route-by-route UI/UX polish.
+1. `T26B` channel thread-list read foundation.
+2. `T26C` channel post detail.
+3. `T26D` channel composer.
+4. `T26E` channel comments/reporting/moderation integration.
+5. DFW Today MVP baseline.
+6. Base MVP baseline.
+7. Layover MVP baseline.
+8. Private-beta policy/ops readiness.
+9. Route-by-route UI/UX polish.
+
+Completed prerequisites:
+
+- Authenticated browser smoke for `/app/hubs/dfw/channels`.
+- Stale test cleanup:
+  - `test/community/hubChannelSeeds.test.mts`
+  - `test/community/boardPostActions.test.mts`
+  - `test/community/boardPostDetail.test.mts`
 
 DFW Today, Base, and Layover can be scoped as lightweight functional baselines.
 They should not require live integrations or scraping for MVP.
