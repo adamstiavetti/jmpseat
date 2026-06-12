@@ -189,8 +189,17 @@ into selected-channel routes. It reads posts by `board_posts.board_id` on the
 resolved `hub_channel` board, not by `board_posts.category`. It does not add
 composer, channel post creation, channel post detail, comments, reports,
 moderation review changes, Request a Channel workflow, DFW Today/Base/Layover
-baseline work, broad database push, runtime apply, or deploy. Runtime apply and
-browser smoke are pending until separately reviewed and recorded.
+baseline work, broad database push, or deploy.
+
+T26B targeted runtime apply is recorded in
+`docs/ops/fbmvp-t26b-channel-thread-list-read-foundation-runtime-apply.md`.
+Runtime now has
+`public.list_open_hub_channel_posts(p_base_code text, p_channel_slug text, p_limit integer)`.
+The apply used targeted SQL execution in one explicit transaction, added only
+ledger row `20260611214500 create_hub_channel_post_list_rpc`, and did not use
+broad database push, migration repair, `apply_migration`, deploy, app code
+changes, staging, or commit. Authenticated browser smoke for
+`/app/hubs/dfw/channels/[channelSlug]` remains pending.
 
 The remaining functional backlog from checkpoint `c2bbd73` to narrow
 private-beta MVP is recorded in
@@ -535,10 +544,9 @@ The current implementation sequence is:
     `/app/hubs/dfw/channels`, passed as functional route smoke with six
     runtime-backed DFW channel rows rendered, access boundaries preserved, and
     significant UI/UX polish deferred
-27. `FBMVP-T26B` selected-channel thread-list read foundation, locally
-    implemented with a safe channel post-list RPC and protected
-    `/app/hubs/dfw/channels/[channelSlug]` route; runtime apply and browser
-    smoke remain pending
+27. `FBMVP-T26B` selected-channel thread-list read foundation, implemented and
+    runtime-applied with a safe channel post-list RPC and protected
+    `/app/hubs/dfw/channels/[channelSlug]` route; browser smoke remains pending
 
 T20 runtime-pass docs are committed. The First Base / DFW Baseboard safety loop
 is complete. The approved pivot is recorded in `ops/hub-pivot-plan.md`.

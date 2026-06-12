@@ -122,16 +122,23 @@ company-confidential content, or live crew movement/location.
 
 ## Runtime Apply
 
-Runtime apply is pending. Use a targeted preflight/apply record before applying
-`20260611214500_create_hub_channel_post_list_rpc.sql` to the intended Supabase
-project. Do not use broad `supabase db push` because known migration-history
-drift remains preserved.
+Runtime apply is recorded in
+`docs/ops/fbmvp-t26b-channel-thread-list-read-foundation-runtime-apply.md`.
+
+The targeted runtime apply added:
+
+- `public.list_open_hub_channel_posts(p_base_code text, p_channel_slug text, p_limit integer)`
+- one migration ledger row:
+  - `20260611214500 create_hub_channel_post_list_rpc`
+
+The apply used targeted SQL execution in one explicit transaction. It did not
+use broad `supabase db push`, migration repair, `apply_migration`, deploy, app
+code changes, staging, or commit.
 
 ## Browser Smoke
 
 Browser smoke is pending until:
 
-- the migration is runtime-applied
 - the app deployment contains the T26B route/helper code
 - an authenticated eligible beta/private-app session can verify
   `/app/hubs/dfw/channels/[channelSlug]`

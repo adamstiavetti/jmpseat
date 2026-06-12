@@ -490,8 +490,16 @@ a server helper, a protected selected-channel route at
 `/app/hubs/dfw/channels/[channelSlug]`, and links from channel overview rows
 into selected-channel routes. It reads published posts by
 `board_posts.board_id` on the resolved `hub_channel` board and does not use
-`board_posts.category` as channel membership. Runtime apply and browser smoke
-remain pending.
+`board_posts.category` as channel membership.
+
+T26B targeted runtime apply is recorded in
+`docs/ops/fbmvp-t26b-channel-thread-list-read-foundation-runtime-apply.md`.
+Runtime now has
+`public.list_open_hub_channel_posts(p_base_code text, p_channel_slug text, p_limit integer)`.
+The apply used targeted SQL execution in one explicit transaction, added only
+ledger row `20260611214500 create_hub_channel_post_list_rpc`, and did not use
+broad database push, migration repair, `apply_migration`, deploy, app code
+changes, staging, or commit. Selected-channel browser smoke remains pending.
 
 The current DFW Hub + Channels foundation checkpoint is recorded in
 `docs/ops/fbmvp-checkpoint-dfw-hub-channels-foundation-level-set.md` at

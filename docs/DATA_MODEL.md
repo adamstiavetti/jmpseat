@@ -411,8 +411,13 @@ Current data model implication:
   verification fields, storage paths, signed URLs, comments, or reports.
 - T26B does not add channel post creation, channel post detail, composer,
   comments, reports, moderation review changes, Request a Channel workflow,
-  broad database push, runtime apply, or deploy. Runtime apply and browser
-  smoke remain pending until separately reviewed and recorded.
+  broad database push, or deploy.
+- T26B is runtime-applied as
+  `20260611214500 create_hub_channel_post_list_rpc`. The runtime apply used
+  targeted SQL execution in one explicit transaction, added only the matching
+  ledger row, and did not use broad database push, migration repair,
+  `apply_migration`, deploy, app code changes, staging, or commit. Authenticated
+  browser/route smoke remains pending.
 - Future multi-airport channel expansion may need airport-prefixed slugs or a
   scoped uniqueness model because `boards.slug` is currently globally unique.
   Once meaningful user content exists in channel boards, slugs should be
@@ -445,8 +450,10 @@ metadata-only ticket.
 
 Runtime note: the six T25B child channel board rows now exist in the intended
 `jmpseat` Supabase runtime. T26A adds the real Channels overview metadata route,
-and T26B locally adds the selected-channel post-list RPC and route. T26B runtime
-apply is still pending.
+and T26B adds the selected-channel post-list RPC and route. T26B runtime apply
+is recorded in
+`ops/fbmvp-t26b-channel-thread-list-read-foundation-runtime-apply.md`; selected
+channel browser smoke remains pending.
 
 T26A local implementation and targeted runtime apply start surfacing channel
 metadata through the real DFW Channels overview route. T26B starts the selected

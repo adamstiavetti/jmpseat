@@ -24,9 +24,9 @@ or commit.
   route smoke in
   `docs/ops/fbmvp-t26a-dfw-channels-authenticated-browser-smoke.md`, with
   significant UI/UX polish deferred.
-- T26B locally adds selected-channel thread-list reads and
-  `/app/hubs/dfw/channels/[channelSlug]`; runtime apply and browser smoke are
-  pending.
+- T26B adds selected-channel thread-list reads and
+  `/app/hubs/dfw/channels/[channelSlug]`; the T26B RPC is runtime-applied and
+  browser smoke is pending.
 
 T25B and T26A are implemented, committed, runtime-applied, and documented. The
 current gap is not whether Channels metadata exists; the gap is completing the
@@ -137,14 +137,13 @@ Out of scope:
 
 Recommended order:
 
-1. Targeted runtime apply for the T26B channel thread-list read RPC.
-2. Authenticated browser smoke for `/app/hubs/dfw/channels/[channelSlug]`.
-3. `T26C` channel post detail.
-4. `T26D` channel composer.
-5. `T26E` channel comments/reporting/moderation integration.
-6. DFW Today MVP baseline.
-7. Base MVP baseline.
-8. Layover MVP baseline.
+1. Authenticated browser smoke for `/app/hubs/dfw/channels/[channelSlug]`.
+2. `T26C` channel post detail.
+3. `T26D` channel composer.
+4. `T26E` channel comments/reporting/moderation integration.
+5. DFW Today MVP baseline.
+6. Base MVP baseline.
+7. Layover MVP baseline.
 9. Private-beta policy/ops readiness.
 10. Route-by-route UI/UX polish.
 
