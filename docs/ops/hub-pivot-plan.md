@@ -211,6 +211,23 @@ Examples include commuting, parking, food, reserve-life patterns, airport
 basics, and other airport/base utility content that should not be buried in a
 raw feed.
 
+The T27B MVP baseline is a protected, read-only, static/config-backed route:
+
+- `/app/hubs/dfw/base`
+
+It contains safe private-beta utility content such as:
+
+- base orientation reminders
+- commute/parking and terminal/ground logistics pointers at a high level
+- links into relevant Channels
+- a link back to DFW Today
+- static safety boundary copy
+
+The T27B baseline intentionally does not include live operations data, external
+integrations, AI-generated operational advice, user posting, comments, reports,
+moderation controls, admin CMS, or Request a Channel workflow. Browser smoke is
+pending after deployment.
+
 ### Layover
 
 `Layover` contains practical layover information, recommendations, questions,
@@ -555,6 +572,15 @@ migration, runtime mutation, live operations data, external integration, AI,
 posting, comments, reports, moderation controls, Request a Channel workflow,
 broad database push, or deploy. Authenticated browser smoke is recorded in
 `docs/ops/fbmvp-t27a-dfw-today-browser-smoke.md` and passed after deployment.
+
+T27B local implementation is recorded in
+`docs/ops/fbmvp-t27b-dfw-base-lightweight-baseline.md`. It adds the protected
+read-only `/app/hubs/dfw/base` route using static/config-backed base
+orientation content, safety boundary copy, and links into existing DFW Channels
+and DFW Today. It adds no migration, runtime mutation, live operations data,
+external integration, AI, posting, comments, reports, moderation controls,
+Request a Channel workflow, broad database push, or deploy. Authenticated
+browser smoke is pending after deployment.
 
 The current DFW Hub + Channels foundation checkpoint is recorded in
 `docs/ops/fbmvp-checkpoint-dfw-hub-channels-foundation-level-set.md` at

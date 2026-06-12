@@ -37,6 +37,10 @@ import type {
   DfwTodayQuickCheck,
   DfwTodayUtilityCard,
 } from "../../lib/privateApp/dfwToday";
+import type {
+  DfwBaseLinkCard,
+  DfwBaseStartItem,
+} from "../../lib/privateApp/dfwBase";
 
 import { DfwChannelPostComposerForm } from "./DfwChannelPostComposerForm";
 import styles from "./homeHubShell.module.css";
@@ -82,6 +86,14 @@ type DfwTodayShellProps = {
   quickChecks: readonly DfwTodayQuickCheck[];
   safetyBoundary: string;
   utilityCards: readonly DfwTodayUtilityCard[];
+};
+
+type DfwBaseShellProps = {
+  essentialCards: readonly DfwBaseLinkCard[];
+  futureNote: string;
+  safetyBoundary: string;
+  startHere: readonly DfwBaseStartItem[];
+  usefulNextLinks: readonly DfwBaseLinkCard[];
 };
 
 type DfwChannelThreadListShellProps = {
@@ -207,8 +219,10 @@ const dfwHubSections: readonly DfwHubSectionItem[] = [
     title: "Base",
     detail:
       "Commuting, parking, new-to-DFW, and base life utility without operationally sensitive claims.",
+    cta: "Open Base",
+    href: "/app/hubs/dfw/base",
     icon: "base",
-    meta: "Based-worker utility",
+    meta: "Base orientation",
   },
   {
     title: "Layover",
@@ -1510,6 +1524,116 @@ export function DfwTodayShell({
         <article className={styles.postEmptyState}>
           <span className={styles.cardMeta}>Private beta baseline</span>
           <h2>More curated updates can come later.</h2>
+          <p>{futureNote}</p>
+        </article>
+
+        <BottomNavVisual active="Hubs" />
+      </div>
+    </main>
+  );
+}
+
+export function DfwBaseShell({
+  essentialCards,
+  futureNote,
+  safetyBoundary,
+  startHere,
+  usefulNextLinks,
+}: DfwBaseShellProps) {
+  return (
+    <main className={styles.shell}>
+      <div className={styles.mobileFrame}>
+        <AppHeader
+          backHref="/app/hubs/dfw"
+          backLabel="Back to DFW Hub"
+          subtitle="DFW Hub Base"
+          showBackLink
+        />
+
+        <nav className={styles.breadcrumb} aria-label="DFW Base breadcrumb">
+          <Link href="/app/hubs/dfw">DFW Hub</Link>
+          <span aria-hidden="true">/</span>
+          <span>Base</span>
+        </nav>
+
+        <section className={styles.destinationHero} aria-labelledby="dfw-base-title">
+          <span className={styles.cardLabel}>Private beta baseline</span>
+          <h1 id="dfw-base-title">DFW Base</h1>
+          <p>A practical base guide for verified DFW aviation workers.</p>
+        </section>
+
+        <section className={styles.hubSurfaceGrid} aria-labelledby="dfw-base-start-title">
+          <div className={styles.sectionTitleRow}>
+            <div>
+              <h2 id="dfw-base-start-title">Start here</h2>
+              <p>
+                Static orientation reminders for using DFW as a work base
+                without pretending to be a live operations board.
+              </p>
+            </div>
+          </div>
+          <div className={styles.surfaceGrid}>
+            {startHere.map((item) => (
+              <article className={styles.surfaceCard} key={item.title}>
+                <span className={styles.cardMeta}>Read-only</span>
+                <h3>{item.title}</h3>
+                <p>{item.detail}</p>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section className={styles.hubSurfaceGrid} aria-labelledby="dfw-base-essentials-title">
+          <div className={styles.sectionTitleRow}>
+            <div>
+              <h2 id="dfw-base-essentials-title">Base essentials</h2>
+              <p>
+                Safe DFW starting points that link into existing focused
+                Channels for verified-worker questions.
+              </p>
+            </div>
+          </div>
+          <div className={styles.surfaceGrid}>
+            {essentialCards.map((item) => (
+              <Link className={styles.surfaceCard} href={item.href} key={item.title}>
+                <span className={styles.cardMeta}>{item.meta}</span>
+                <h3>{item.title}</h3>
+                <p>{item.detail}</p>
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        <section className={styles.hubSurfaceGrid} aria-labelledby="dfw-base-next-title">
+          <div className={styles.sectionTitleRow}>
+            <div>
+              <h2 id="dfw-base-next-title">Useful next</h2>
+              <p>
+                Keep moving through the DFW Hub without adding live data,
+                posting, or separate Layover functionality here.
+              </p>
+            </div>
+          </div>
+          <div className={styles.surfaceGrid}>
+            {usefulNextLinks.map((item) => (
+              <Link className={styles.surfaceCard} href={item.href} key={item.title}>
+                <span className={styles.cardMeta}>{item.meta}</span>
+                <h3>{item.title}</h3>
+                <p>{item.detail}</p>
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        <section className={styles.safetyBand} aria-labelledby="dfw-base-safety-title">
+          <span className={styles.cardLabel}>Safety boundary</span>
+          <h2 id="dfw-base-safety-title">Use official sources for current policies.</h2>
+          <p>{safetyBoundary}</p>
+        </section>
+
+        <article className={styles.postEmptyState}>
+          <span className={styles.cardMeta}>Private beta baseline</span>
+          <h2>Layover stays separate.</h2>
           <p>{futureNote}</p>
         </article>
 

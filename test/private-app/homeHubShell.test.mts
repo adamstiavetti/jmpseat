@@ -50,6 +50,14 @@ const dfwTodayRouteSource = existsSync(
       "utf8",
     )
   : "";
+const dfwBaseRouteSource = existsSync(
+  new URL("../../app/app/hubs/dfw/base/page.tsx", import.meta.url),
+)
+  ? readFileSync(
+      new URL("../../app/app/hubs/dfw/base/page.tsx", import.meta.url),
+      "utf8",
+    )
+  : "";
 const dfwSectionRoutes = [
   {
     label: "DFW Baseboard",
@@ -125,6 +133,7 @@ const combinedSource = [
   dfwHubRouteSource,
   dfwHubAccessSource,
   dfwTodayRouteSource,
+  dfwBaseRouteSource,
   dfwChannelsRouteSource,
   dfwSelectedChannelRouteSource,
   ...dfwSectionRoutes.map((route) => route.source),
@@ -138,6 +147,7 @@ const implementationSource = [
   dfwHubRouteSource,
   dfwHubAccessSource,
   dfwTodayRouteSource,
+  dfwBaseRouteSource,
   dfwChannelsRouteSource,
   dfwSelectedChannelRouteSource,
   ...dfwSectionRoutes.map((route) => route.source),
@@ -345,6 +355,18 @@ test("DFW Today route is private gated and renders the read-only utility baselin
   assert.doesNotMatch(dfwTodayRouteSource, /\.insert\(|\.update\(|\.delete\(|\.rpc\(|fetch\(/);
 });
 
+test("DFW Base route is private gated and renders the read-only utility baseline", () => {
+  assert.match(dfwBaseRouteSource, /dynamic = "force-dynamic"/);
+  assert.match(dfwBaseRouteSource, /requireDfwHubRouteAccess/);
+  assert.match(dfwBaseRouteSource, /\/app\/hubs\/dfw\/base/);
+  assert.match(dfwBaseRouteSource, /section: "dfw-base"/);
+  assert.match(dfwBaseRouteSource, /DfwBaseShell/);
+  assert.match(dfwBaseRouteSource, /dfwBaseStartHere/);
+  assert.match(dfwBaseRouteSource, /dfwBaseEssentialCards/);
+  assert.match(dfwBaseRouteSource, /dfwBaseUsefulNextLinks/);
+  assert.doesNotMatch(dfwBaseRouteSource, /\.insert\(|\.update\(|\.delete\(|\.rpc\(|fetch\(/);
+});
+
 test("DFW Channels overview route is private gated and reads channel metadata only after the gate", () => {
   assert.match(dfwChannelsRouteSource, /dynamic = "force-dynamic"/);
   assert.match(dfwChannelsRouteSource, /requireDfwHubRouteAccess/);
@@ -481,6 +503,7 @@ test("DFW Hub cards link to read-only section route shells", () => {
   assert.match(shellSource, /DFW Today/);
   assert.match(shellSource, /href: "\/app\/hubs\/dfw\/today"/);
   assert.match(shellSource, /title: "Base"/);
+  assert.match(shellSource, /href: "\/app\/hubs\/dfw\/base"/);
   assert.match(shellSource, /title: "Layover"/);
   assert.match(shellSource, /title: "Channels"/);
   assert.match(shellSource, /href: "\/app\/hubs\/dfw\/channels"/);
