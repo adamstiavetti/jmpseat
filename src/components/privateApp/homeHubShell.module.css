@@ -1044,7 +1044,24 @@ a.surfaceCard:hover {
   border: 1px solid rgba(217, 225, 236, 0.95);
   border-radius: var(--app-radius);
   padding: 0.88rem;
+  color: inherit;
   background: linear-gradient(180deg, #ffffff, #f8fbff);
+  text-decoration: none;
+  transition:
+    border-color 140ms ease,
+    box-shadow 140ms ease,
+    transform 140ms ease;
+}
+
+a.channelRow:hover {
+  border-color: rgba(15, 76, 154, 0.32);
+  box-shadow: 0 0.7rem 1.4rem rgba(15, 23, 42, 0.08);
+  transform: translateY(-1px);
+}
+
+a.channelRow:focus-visible {
+  outline: 3px solid var(--app-amber);
+  outline-offset: 3px;
 }
 
 .channelShortName {

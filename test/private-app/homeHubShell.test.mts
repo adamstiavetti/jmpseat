@@ -30,6 +30,14 @@ const dfwChannelsRouteSource = readFileSync(
   new URL("../../app/app/hubs/dfw/channels/page.tsx", import.meta.url),
   "utf8",
 );
+const dfwSelectedChannelRouteSource = existsSync(
+  new URL("../../app/app/hubs/dfw/channels/[channelSlug]/page.tsx", import.meta.url),
+)
+  ? readFileSync(
+      new URL("../../app/app/hubs/dfw/channels/[channelSlug]/page.tsx", import.meta.url),
+      "utf8",
+    )
+  : "";
 const dfwSectionRoutes = [
   {
     label: "DFW Baseboard",
@@ -105,6 +113,7 @@ const combinedSource = [
   dfwHubRouteSource,
   dfwHubAccessSource,
   dfwChannelsRouteSource,
+  dfwSelectedChannelRouteSource,
   ...dfwSectionRoutes.map((route) => route.source),
   t08DocsSource,
 ].join("\n");
@@ -116,6 +125,7 @@ const implementationSource = [
   dfwHubRouteSource,
   dfwHubAccessSource,
   dfwChannelsRouteSource,
+  dfwSelectedChannelRouteSource,
   ...dfwSectionRoutes.map((route) => route.source),
 ].join("\n");
 
@@ -321,6 +331,18 @@ test("DFW Channels overview route is private gated and reads channel metadata on
   assert.doesNotMatch(dfwChannelsRouteSource, /\.insert\(|\.update\(|\.delete\(/);
 });
 
+test("DFW selected Channel route is private gated and reads thread list only after the gate", () => {
+  assert.match(dfwSelectedChannelRouteSource, /dynamic = "force-dynamic"/);
+  assert.match(dfwSelectedChannelRouteSource, /requireDfwHubRouteAccess/);
+  assert.match(dfwSelectedChannelRouteSource, /section: "dfw-channel"/);
+  assert.match(dfwSelectedChannelRouteSource, /await requireDfwHubRouteAccess[\s\S]*await listDfwHubChannels/s);
+  assert.match(dfwSelectedChannelRouteSource, /listDfwHubChannelPosts/);
+  assert.match(dfwSelectedChannelRouteSource, /DfwChannelThreadListShell/);
+  assert.match(dfwSelectedChannelRouteSource, /postsUnavailable/);
+  assert.doesNotMatch(dfwSelectedChannelRouteSource, /createDfwBaseboardPostAction|reportDfwBaseboardPostAction|createDfwBaseboardCommentAction/);
+  assert.doesNotMatch(dfwSelectedChannelRouteSource, /\.insert\(|\.update\(|\.delete\(/);
+});
+
 test("DFW Baseboard route fetches read-only posts only after the private gate", () => {
   assert.match(dfwBaseboardRouteSource, /requireDfwHubRouteAccess/);
   assert.match(dfwBaseboardRouteSource, /await requireDfwHubRouteAccess[\s\S]*await listDfwBaseboardPosts/s);
@@ -439,6 +461,38 @@ test("DFW Hub cards link to read-only section route shells", () => {
   assert.match(shellSource, /read-only placeholder/);
 });
 
+test("DFW Channels selected-channel shell stays read-only and avoids old labels", () => {
+  const selectedChannelSource = sourceForFunction("DfwChannelThreadListShell");
+
+  assert.match(selectedChannelSource, /DFW Hub Channel/);
+  assert.match(selectedChannelSource, /Back to DFW Channels/);
+  assert.match(selectedChannelSource, /Channel Threads/);
+  assert.match(selectedChannelSource, /No threads in this Channel yet/);
+  assert.match(selectedChannelSource, /post\.authorLabel/);
+  assert.match(selectedChannelSource, /formatPostMetaValue\(post\.contentType\)/);
+  assert.match(selectedChannelSource, /formatPostMetaValue\(post\.category\)/);
+  assert.doesNotMatch(selectedChannelSource, /Start a Thread|Publish post|composer|textarea|comment form|Report this post|moderation controls|fake activity|thread count|activity count/i);
+
+  for (const retiredLabel of [
+    "Baseboard",
+    "Base Board",
+    "Layover Boards",
+    "Verified Rooms",
+    "Ask Your Base",
+    "Browse Rooms",
+    "Intel",
+    "Brief",
+    "Subboards",
+    "Routes",
+    "Groups",
+    "Communities",
+    "Layover Guide",
+    "Deadhead Club",
+  ]) {
+    assert.doesNotMatch(selectedChannelSource, new RegExp(retiredLabel));
+  }
+});
+
 test("DFW section shells keep lounge access and Layovers safety boundaries explicit", () => {
   assert.match(shellSource, /No exact crew hotel exposure/);
   assert.match(shellSource, /No live crew movement or location/);
@@ -495,6 +549,7 @@ test("T08 expected files exist", () => {
   );
   for (const route of [
     "../../app/app/hubs/dfw/channels/page.tsx",
+    "../../app/app/hubs/dfw/channels/[channelSlug]/page.tsx",
     "../../app/app/hubs/dfw/baseboard/page.tsx",
     "../../app/app/hubs/dfw/layovers/page.tsx",
     "../../app/app/hubs/dfw/lounges/page.tsx",

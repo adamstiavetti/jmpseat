@@ -480,15 +480,25 @@ has `public.list_open_hub_channels(p_base_code text)`. The apply used targeted
 SQL execution only, inserted the exact ledger row
 `20260611203000 create_hub_channel_list_read_rpc`, and made no app code
 changes, no broad `supabase db push`, no migration repair, no `apply_migration`,
-and no deploy. Authenticated browser/route smoke remains pending unless
-separately verified.
+and no deploy. Authenticated browser smoke for `/app/hubs/dfw/channels` later
+passed as functional route smoke with UI/UX polish deferred.
+
+T26B local implementation is recorded in
+`docs/ops/fbmvp-t26b-channel-thread-list-read-foundation.md`. It adds
+`public.list_open_hub_channel_posts(p_base_code text, p_channel_slug text, p_limit integer default 20)`,
+a server helper, a protected selected-channel route at
+`/app/hubs/dfw/channels/[channelSlug]`, and links from channel overview rows
+into selected-channel routes. It reads published posts by
+`board_posts.board_id` on the resolved `hub_channel` board and does not use
+`board_posts.category` as channel membership. Runtime apply and browser smoke
+remain pending.
 
 The current DFW Hub + Channels foundation checkpoint is recorded in
 `docs/ops/fbmvp-checkpoint-dfw-hub-channels-foundation-level-set.md` at
 `0249e0d`. It records that T25B/T26A are implemented, runtime-applied, and
-documented; authenticated browser smoke for `/app/hubs/dfw/channels` is still
-pending; known stale tests need cleanup; and T26B should start with channel
-thread-list reads, not composer or comment/report expansion.
+documented. Later docs record that authenticated browser smoke for
+`/app/hubs/dfw/channels` passed and stale tests were cleaned. T26B starts with
+channel thread-list reads, not composer or comment/report expansion.
 
 Alternative implementation ticket:
 

@@ -24,7 +24,10 @@ import {
   DFW_BASEBOARD_REPORT_REPORTED_STATUS,
   type DfwBaseboardReportStatus,
 } from "../../lib/community/boardPostSafetyActionState";
-import type { HubChannelListItem } from "../../lib/community/hubChannels";
+import type {
+  HubChannelListItem,
+  HubChannelPostListItem,
+} from "../../lib/community/hubChannels";
 
 import styles from "./homeHubShell.module.css";
 
@@ -62,6 +65,13 @@ type DfwHubSectionShell = {
 type DfwChannelsOverviewShellProps = {
   channels?: readonly HubChannelListItem[];
   channelsUnavailable?: boolean;
+};
+
+type DfwChannelThreadListShellProps = {
+  channel?: HubChannelListItem | null;
+  posts?: readonly HubChannelPostListItem[];
+  channelsUnavailable?: boolean;
+  postsUnavailable?: boolean;
 };
 
 type DfwHubSectionReadOnlyShellProps = {
@@ -680,6 +690,10 @@ function DfwChannelsRequestFooter() {
       </button>
     </article>
   );
+}
+
+function getDfwHubChannelHref(channelSlug: string) {
+  return `/app/hubs/dfw/channels/${encodeURIComponent(channelSlug)}`;
 }
 
 function formatPostMetaValue(value: string) {
@@ -1428,14 +1442,18 @@ export function DfwChannelsOverviewShell({
           {channels.length > 0 ? (
             <div className={styles.channelList}>
               {channels.map((channel) => (
-                <article className={styles.channelRow} key={channel.slug}>
+                <Link
+                  className={styles.channelRow}
+                  href={getDfwHubChannelHref(channel.slug)}
+                  key={channel.slug}
+                >
                   <span className={styles.channelShortName}>{channel.shortName}</span>
                   <span className={styles.channelRowBody}>
                     <h3>{channel.name}</h3>
                     <p>{channel.description}</p>
                   </span>
                   <span className={styles.rowState}>Active</span>
-                </article>
+                </Link>
               ))}
             </div>
           ) : (
@@ -1450,6 +1468,116 @@ export function DfwChannelsOverviewShell({
           )}
 
           <DfwChannelsRequestFooter />
+        </section>
+
+        <BottomNavVisual active="Hubs" />
+      </div>
+    </main>
+  );
+}
+
+export function DfwChannelThreadListShell({
+  channel = null,
+  posts = [],
+  channelsUnavailable = false,
+  postsUnavailable = false,
+}: DfwChannelThreadListShellProps) {
+  const channelName = channel?.name ?? "DFW Channel";
+  const channelDescription =
+    channel?.description ?? "This DFW Channel is unavailable right now.";
+
+  return (
+    <main className={styles.shell}>
+      <div className={styles.mobileFrame}>
+        <AppHeader
+          backHref="/app/hubs/dfw/channels"
+          backLabel="DFW Channels"
+          subtitle="DFW Hub Channel"
+          showBackLink
+        />
+
+        <nav className={styles.breadcrumb} aria-label="DFW Channel breadcrumb">
+          <Link href="/app/hubs/dfw">DFW Hub</Link>
+          <span aria-hidden="true">/</span>
+          <Link href="/app/hubs/dfw/channels">Channels</Link>
+          <span aria-hidden="true">/</span>
+          <span>{channel?.shortName ?? "Channel"}</span>
+        </nav>
+
+        <section className={styles.destinationHero} aria-labelledby="dfw-channel-title">
+          <span className={styles.cardLabel}>Selected Channel</span>
+          <h1 id="dfw-channel-title">{channelName}</h1>
+          <p>{channelDescription}</p>
+        </section>
+
+        <section className={styles.hubSurfaceGrid} aria-labelledby="dfw-channel-threads-title">
+          <div className={styles.sectionTitleRow}>
+            <div>
+              <h2 id="dfw-channel-threads-title">Channel Threads</h2>
+              <p>
+                Published threads for this DFW Channel. Contribution and
+                review tools are later scoped tickets.
+              </p>
+            </div>
+          </div>
+
+          {channelsUnavailable ? (
+            <p className={styles.actionFeedback}>
+              DFW Channels are unavailable right now.
+            </p>
+          ) : null}
+
+          {postsUnavailable ? (
+            <p className={styles.actionFeedback}>
+              Threads for this DFW Channel are unavailable right now.
+            </p>
+          ) : null}
+
+          {!channel && !channelsUnavailable ? (
+            <article className={styles.postEmptyState}>
+              <span className={styles.cardMeta}>Channel unavailable</span>
+              <h3>This DFW Channel is not available.</h3>
+              <p>
+                Active DFW channel rows appear only when the channel metadata
+                exists and is visible to verified aviation workers.
+              </p>
+              <Link className={styles.inlineBackLink} href="/app/hubs/dfw/channels">
+                Back to DFW Channels
+              </Link>
+            </article>
+          ) : posts.length > 0 ? (
+            <div className={styles.postList}>
+              {posts.map((post) => (
+                <article className={styles.postCard} key={post.id}>
+                  <div className={styles.postHeader}>
+                    <span className={styles.cardMeta}>
+                      {post.isPinned ? "Pinned" : "Channel thread"}
+                    </span>
+                    <span className={styles.postDate}>{formatPostDate(post.createdAt)}</span>
+                  </div>
+                  <h3>{post.title}</h3>
+                  <p>{post.body}</p>
+                  <div className={styles.postMetaRow} aria-label="Thread metadata">
+                    <span>{formatPostMetaValue(post.contentType)}</span>
+                    <span>{formatPostMetaValue(post.category)}</span>
+                    <span>{post.authorLabel}</span>
+                  </div>
+                </article>
+              ))}
+            </div>
+          ) : (
+            <article className={styles.postEmptyState}>
+              <span className={styles.cardMeta}>No threads yet</span>
+              <h3>No threads in this Channel yet.</h3>
+              <p>
+                Published threads for this selected DFW Channel will appear
+                here after channel-specific posting is implemented and used.
+              </p>
+              <Link className={styles.inlineBackLink} href="/app/hubs/dfw/channels">
+                Back to DFW Channels
+              </Link>
+            </article>
+          )}
         </section>
 
         <BottomNavVisual active="Hubs" />

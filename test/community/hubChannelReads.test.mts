@@ -33,6 +33,14 @@ const shellSource = readFileSync(
   "utf8",
 );
 
+function sourceForHelperFunction(name: string) {
+  const start = helperSource.indexOf(`export async function ${name}`);
+  assert.ok(start >= 0, `${name} should exist`);
+
+  const nextExport = helperSource.indexOf("\nexport async function", start + 1);
+  return helperSource.slice(start, nextExport > start ? nextExport : helperSource.length);
+}
+
 test("T26A migration adds a narrow open Hub Channels list RPC", () => {
   const sql = readHubChannelReadMigration();
 
@@ -103,20 +111,19 @@ test("T26A read RPC exposes execute only to authenticated and service_role", () 
 });
 
 test("T26A helper reads DFW channel metadata through the safe RPC only", () => {
-  assert.match(helperSource, /import "server-only"/);
-  assert.match(helperSource, /createClient/);
-  assert.match(helperSource, /list_open_hub_channels/);
-  assert.match(helperSource, /p_base_code: "DFW"/);
-  assert.match(helperSource, /HubChannelListItem/);
-  assert.match(helperSource, /slug/);
-  assert.match(helperSource, /shortName/);
-  assert.match(helperSource, /sortOrder/);
-  assert.match(helperSource, /channels: \[\]/);
-  assert.match(helperSource, /error: null/);
+  const metadataHelperSource = sourceForHelperFunction("listDfwHubChannels");
 
-  assert.doesNotMatch(helperSource, /from\("boards"\)|from\("board_posts"\)|createBrowserClient/);
-  assert.doesNotMatch(helperSource, /id:|boardId|baseId|parentBoardId|userId|author|reporter|verification|storagePath|signedUrl/i);
-  assert.doesNotMatch(helperSource, /\.insert\(|\.update\(|\.delete\(/);
+  assert.match(helperSource, /import "server-only"/);
+  assert.match(metadataHelperSource, /createClient/);
+  assert.match(metadataHelperSource, /list_open_hub_channels/);
+  assert.match(metadataHelperSource, /p_base_code: "DFW"/);
+  assert.match(helperSource, /HubChannelListItem/);
+  assert.match(metadataHelperSource, /channels: \[\]/);
+  assert.match(metadataHelperSource, /error: null/);
+
+  assert.doesNotMatch(metadataHelperSource, /from\("boards"\)|from\("board_posts"\)|createBrowserClient/);
+  assert.doesNotMatch(metadataHelperSource, /id:|boardId|baseId|parentBoardId|userId|author|reporter|verification|storagePath|signedUrl/i);
+  assert.doesNotMatch(metadataHelperSource, /\.insert\(|\.update\(|\.delete\(/);
 });
 
 test("T26A DFW Channels route is private gated and renders the overview only", () => {
@@ -163,4 +170,13 @@ test("T26A Channels overview copy avoids posting and retired labels", () => {
   ]) {
     assert.doesNotMatch(channelsSource, new RegExp(retiredLabel));
   }
+});
+
+test("T26A Channels overview rows link to selected channel routes for T26B", () => {
+  const channelsStart = shellSource.indexOf("export function DfwChannelsOverviewShell");
+  const channelsEnd = shellSource.indexOf("export function DfwChannelThreadListShell");
+  const channelsSource = shellSource.slice(channelsStart, channelsEnd);
+
+  assert.match(channelsSource, /getDfwHubChannelHref\(channel\.slug\)/);
+  assert.match(channelsSource, /href=\{getDfwHubChannelHref\(channel\.slug\)\}/);
 });

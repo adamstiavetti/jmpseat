@@ -129,8 +129,10 @@ execution only, inserted the exact ledger row, and did not use broad
 changes, staging, or commit.
 
 The runtime function now exists, but authenticated browser/route smoke is still
-pending unless separately verified. Channel post list/read/create behavior,
-composer behavior, comments, reports, moderation review changes, and
+recorded separately in
+`docs/ops/fbmvp-t26a-dfw-channels-authenticated-browser-smoke.md` as a
+functional pass with UI/UX polish deferred. Channel post list/read/create
+behavior, composer behavior, comments, reports, moderation review changes, and
 request/create channel workflow remain future scoped work.
 
 ## Validation

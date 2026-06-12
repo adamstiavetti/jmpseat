@@ -381,10 +381,7 @@ Current data model implication:
   used targeted SQL execution only and recorded exactly that ledger row. It did
   not use broad database push, migration repair, deploy, or app code changes.
 - T25B does not add channel-aware RPCs, UI routes, post reads, composer,
-  comments, reports, or moderation review changes. Safe channel-aware RPCs such
-  as
-  `list_open_hub_channel_posts`, `create_open_hub_channel_post`, and
-  `get_open_hub_channel_post` remain future work.
+  comments, reports, or moderation review changes.
 - `FBMVP-T26A` locally adds the first channel-aware read RPC,
   `public.list_open_hub_channels(p_base_code text)`, plus the protected
   `/app/hubs/dfw/channels` overview route. It reads active visible
@@ -398,8 +395,24 @@ Current data model implication:
   `20260611203000 create_hub_channel_list_read_rpc`. The runtime apply used
   targeted SQL execution only and recorded exactly that ledger row. It did not
   use broad database push, migration repair, `apply_migration`, deploy, app code
-  changes, staging, or commit. Authenticated browser/route smoke remains pending
-  unless separately verified.
+  changes, staging, or commit. Authenticated browser/route smoke passed later
+  as functional route smoke with UI/UX polish deferred.
+- `FBMVP-T26B` locally adds the first selected-channel post-list read RPC,
+  `public.list_open_hub_channel_posts(p_base_code text, p_channel_slug text, p_limit integer default 20)`,
+  plus a protected `/app/hubs/dfw/channels/[channelSlug]` route.
+- T26B resolves an active `hub_channel` child board under the active DFW parent
+  `base_board` and lists published `board_posts` by
+  `board_posts.board_id = resolved channel board id`. It intentionally does not
+  use `board_posts.category` as channel membership.
+- T26B returns safe thread-list fields only: `id`, `title`, `body`,
+  `content_type`, `category`, `is_pinned`, `created_at`, `updated_at`, and
+  `author_label`. It returns no board IDs, base IDs, parent board IDs, author
+  user IDs, user IDs, emails, reporter identity, moderation internals,
+  verification fields, storage paths, signed URLs, comments, or reports.
+- T26B does not add channel post creation, channel post detail, composer,
+  comments, reports, moderation review changes, Request a Channel workflow,
+  broad database push, runtime apply, or deploy. Runtime apply and browser
+  smoke remain pending until separately reviewed and recorded.
 - Future multi-airport channel expansion may need airport-prefixed slugs or a
   scoped uniqueness model because `boards.slug` is currently globally unique.
   Once meaningful user content exists in channel boards, slugs should be
@@ -432,11 +445,13 @@ metadata-only ticket.
 
 Runtime note: the six T25B child channel board rows now exist in the intended
 `jmpseat` Supabase runtime. T26A adds the real Channels overview metadata route,
-but channel-aware post RPCs are still incomplete.
+and T26B locally adds the selected-channel post-list RPC and route. T26B runtime
+apply is still pending.
 
 T26A local implementation and targeted runtime apply start surfacing channel
-metadata through the real DFW Channels overview route, but channel posts and
-thread detail remain incomplete until later scoped tickets.
+metadata through the real DFW Channels overview route. T26B starts the selected
+Channel thread-list route, but channel post detail, composer, comments, reports,
+and moderation integration remain incomplete until later scoped tickets.
 
 Layover section strategy:
 
