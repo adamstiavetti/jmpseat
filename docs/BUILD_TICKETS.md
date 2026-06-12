@@ -67,6 +67,11 @@ Current controlling docs for Hub work:
   behavior, composer, comments, reports, moderation review changes,
   request/create workflow, broad database push, migration repair,
   `apply_migration`, deploy, or app code changes during the apply.
+- [FBMVP Checkpoint: DFW Hub + Channels Foundation Level-Set](ops/fbmvp-checkpoint-dfw-hub-channels-foundation-level-set.md) - docs-only
+  checkpoint at `0249e0d` after T26A runtime apply docs. It records the current
+  completed DFW Hub + Channels metadata foundation, the pending authenticated
+  `/app/hubs/dfw/channels` browser smoke, known stale tests, and the recommended
+  sequence before T26B.
 
 Wireframe source pack:
 

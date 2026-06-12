@@ -34,6 +34,9 @@ Use this source pack for Hub implementation, product planning, and wireframes:
   approved visual mockup direction and required prototype cleanup.
 - `docs/ops/fbmvp-t23b-static-wireframe-prototype-manual-review.md` - manual
   beta visual review result for the protected static Hub prototype route.
+- `docs/ops/fbmvp-checkpoint-dfw-hub-channels-foundation-level-set.md` -
+  current checkpoint after T26A runtime apply docs; read before starting T26B
+  channel thread-list work.
 
 Wireframe source pack:
 
@@ -476,6 +479,13 @@ SQL execution only, inserted the exact ledger row
 changes, no broad `supabase db push`, no migration repair, no `apply_migration`,
 and no deploy. Authenticated browser/route smoke remains pending unless
 separately verified.
+
+The current DFW Hub + Channels foundation checkpoint is recorded in
+`docs/ops/fbmvp-checkpoint-dfw-hub-channels-foundation-level-set.md` at
+`0249e0d`. It records that T25B/T26A are implemented, runtime-applied, and
+documented; authenticated browser smoke for `/app/hubs/dfw/channels` is still
+pending; known stale tests need cleanup; and T26B should start with channel
+thread-list reads, not composer or comment/report expansion.
 
 Alternative implementation ticket:
 

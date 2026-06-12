@@ -157,6 +157,13 @@ changes, no broad `supabase db push`, no migration repair, no `apply_migration`,
 and no deploy. Authenticated browser/route smoke remains pending unless
 separately verified.
 
+A docs-only checkpoint for the current DFW Hub + Channels foundation state is
+recorded in
+`docs/ops/fbmvp-checkpoint-dfw-hub-channels-foundation-level-set.md`. It should
+be read before starting T26B. It records completed/runtime-applied T25B/T26A
+metadata foundations, the pending authenticated `/app/hubs/dfw/channels`
+browser smoke, known stale tests, and the recommended next sequence.
+
 Wireframe agents should use the current product language `[AIRPORT] Hub`,
 `[AIRPORT] Today`, Base, Layover, Channels, Recent Useful Threads, and Request
 a Channel inside Channels. Current DFW private-beta channel seed defaults are
