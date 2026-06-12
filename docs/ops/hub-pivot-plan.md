@@ -553,7 +553,8 @@ read-only `/app/hubs/dfw/today` route using static/config-backed utility
 content, safety boundary copy, and links into existing DFW Channels. It adds no
 migration, runtime mutation, live operations data, external integration, AI,
 posting, comments, reports, moderation controls, Request a Channel workflow,
-broad database push, or deploy. Browser smoke is pending after deployment.
+broad database push, or deploy. Authenticated browser smoke is recorded in
+`docs/ops/fbmvp-t27a-dfw-today-browser-smoke.md` and passed after deployment.
 
 The current DFW Hub + Channels foundation checkpoint is recorded in
 `docs/ops/fbmvp-checkpoint-dfw-hub-channels-foundation-level-set.md` at

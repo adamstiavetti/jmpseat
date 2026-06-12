@@ -68,7 +68,8 @@ the protected read-only `/app/hubs/dfw/today` route with static/config-backed
 quick checks, utility cards, safety boundary copy, and links into existing DFW
 Channels. It adds no migration, runtime apply, live operations data, external
 integration, AI, posting, comments, reports, moderation controls, or Request a
-Channel workflow. Browser smoke remains pending after deployment.
+Channel workflow. Authenticated browser smoke passed after deployment and is
+recorded in `docs/ops/fbmvp-t27a-dfw-today-browser-smoke.md`.
 
 ## Narrow DFW MVP Pillars
 
@@ -177,14 +178,13 @@ Out of scope:
 
 Recommended order:
 
-1. Review and commit T27A DFW Today lightweight baseline.
-2. Browser-smoke `/app/hubs/dfw/today` after deployment.
-3. Base MVP baseline.
-4. Layover MVP baseline.
-5. `T26E` channel comments/reporting/moderation integration, only if Channels
+1. Review and commit the T27A DFW Today browser-smoke record.
+2. Base MVP baseline.
+3. Layover MVP baseline.
+4. `T26E` channel comments/reporting/moderation integration, only if Channels
    remains the active lane.
-6. Private-beta policy/ops readiness.
-7. Route-by-route UI/UX polish.
+5. Private-beta policy/ops readiness.
+6. Route-by-route UI/UX polish.
 
 Completed prerequisites:
 
@@ -208,6 +208,9 @@ Completed prerequisites:
 - T27A local DFW Today lightweight baseline: protected read-only route,
   static/config-backed quick checks and utility cards, safety boundary copy,
   and safe links into existing DFW Channels; no migration or runtime apply.
+- T27A authenticated browser smoke: `/app/hubs/dfw/today` rendered on beta,
+  DFW Hub navigation and channel cross-links were verified, no-cookie/public
+  domain boundaries held, and product/security boundaries passed.
 - Stale test cleanup:
   - `test/community/hubChannelSeeds.test.mts`
   - `test/community/boardPostActions.test.mts`
@@ -215,8 +218,7 @@ Completed prerequisites:
 
 Base and Layover can still be scoped as lightweight functional baselines. They
 should not require live integrations or scraping for MVP. DFW Today now has a
-local baseline and needs deployment/browser smoke before it is treated as
-runtime-verified.
+local baseline and authenticated beta browser smoke.
 
 ## UI/UX Rule
 
