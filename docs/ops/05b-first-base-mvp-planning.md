@@ -251,8 +251,19 @@ a server action, and a title/body composer on
 member-postable `hub_channel` board server-side and inserts with
 `board_posts.board_id`, not `board_posts.category`. It does not add comments,
 reports, moderation review changes, Request a Channel workflow, DFW
-Today/Base/Layover baseline work, broad database push, runtime apply, browser
-smoke, or deploy.
+Today/Base/Layover baseline work, broad database push, browser smoke, or
+deploy.
+
+T26D targeted runtime apply is recorded in
+`docs/ops/fbmvp-t26d-channel-composer-create-foundation-runtime-apply.md`.
+Runtime now has
+`public.create_open_hub_channel_post(p_base_code text, p_channel_slug text, p_title text, p_body text, p_content_type text, p_category text)`.
+The apply used targeted SQL execution only, added ledger row
+`20260612044500 create_hub_channel_post_create_rpc`, and did not use broad
+database push, migration repair, `apply_migration`, deploy, Vercel changes,
+app code changes, staging, or commit. Authenticated browser/create smoke remains
+pending, and T26C happy-path post-detail smoke remains pending until a safe
+child-channel post exists and is verified.
 
 The remaining functional backlog from checkpoint `c2bbd73` to narrow
 private-beta MVP is recorded in
@@ -608,9 +619,9 @@ The current implementation sequence is:
     unavailable-state/access browser smoke passed, while happy-path post
     rendering remains pending until a safe child-channel post exists
 29. `FBMVP-T26D` selected-channel composer/create-post foundation, locally
-    implemented with a safe channel post-create RPC, server action, and
-    protected selected-channel title/body composer; runtime apply and browser
-    smoke remain pending
+    implemented and runtime-applied with a safe channel post-create RPC, server
+    action, and protected selected-channel title/body composer; browser smoke
+    remains pending
 
 T20 runtime-pass docs are committed. The First Base / DFW Baseboard safety loop
 is complete. The approved pivot is recorded in `ops/hub-pivot-plan.md`.

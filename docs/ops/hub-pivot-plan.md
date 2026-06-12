@@ -524,8 +524,12 @@ T26D local implementation is recorded in
 a server action, and the selected-channel title/body composer on
 `/app/hubs/dfw/channels/[channelSlug]`. It resolves the selected active
 member-postable `hub_channel` board server-side and inserts posts with
-`board_posts.board_id`, not `board_posts.category`. Runtime apply and browser
-smoke are pending; comments, reports, moderation review changes, Request a
+`board_posts.board_id`, not `board_posts.category`. T26D targeted runtime apply
+is recorded in
+`docs/ops/fbmvp-t26d-channel-composer-create-foundation-runtime-apply.md`;
+runtime now has
+`public.create_open_hub_channel_post(p_base_code text, p_channel_slug text, p_title text, p_body text, p_content_type text, p_category text)`.
+Browser smoke remains pending; comments, reports, moderation review changes, Request a
 Channel workflow, DFW Today/Base/Layover baselines, broad database push, and
 deploy remain out of scope.
 

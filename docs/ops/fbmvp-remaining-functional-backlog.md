@@ -40,9 +40,9 @@ or commit.
 - T26D adds the selected-channel composer/create-post foundation locally through
   `public.create_open_hub_channel_post(...)`, a server action, and the
   protected title/body composer on `/app/hubs/dfw/channels/[channelSlug]`.
-  Runtime apply and browser smoke remain pending.
+  Runtime apply is complete and documented; browser smoke remains pending.
 
-T25B, T26A, T26B, and T26C are implemented, committed, runtime-applied, and
+T25B, T26A, T26B, T26C, and T26D are implemented, committed, runtime-applied, and
 documented through runtime apply. The current gap is not whether Channels
 metadata/read foundations exist; the gap is completing the DFW Hub utility loop
 across the four MVP pillars below.
@@ -154,15 +154,14 @@ Recommended order:
 
 1. T26C happy-path browser smoke when a safe channel-post detail can be
    verified.
-2. T26D targeted runtime apply.
-3. T26D authenticated browser smoke and T26C happy-path post detail smoke using
+2. T26D authenticated browser smoke and T26C happy-path post detail smoke using
    a safely created child-channel post.
-4. `T26E` channel comments/reporting/moderation integration.
-5. DFW Today MVP baseline.
-6. Base MVP baseline.
-7. Layover MVP baseline.
-8. Private-beta policy/ops readiness.
-9. Route-by-route UI/UX polish.
+3. `T26E` channel comments/reporting/moderation integration.
+4. DFW Today MVP baseline.
+5. Base MVP baseline.
+6. Layover MVP baseline.
+7. Private-beta policy/ops readiness.
+8. Route-by-route UI/UX polish.
 
 Completed prerequisites:
 

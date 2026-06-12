@@ -457,7 +457,13 @@ Current data model implication:
   URLs, comments, or reports.
 - T26D does not add comments, reports, moderation review changes, Request a
   Channel workflow, DFW Today/Base/Layover baseline work, broad database push,
-  browser smoke, or deploy. Runtime apply is pending.
+  browser smoke, or deploy.
+- T26D is runtime-applied as
+  `20260612044500 create_hub_channel_post_create_rpc`. The runtime apply used a
+  targeted SQL transaction, added only the matching ledger row, and did not use
+  broad database push, migration repair, `apply_migration`, deploy, app code
+  changes, staging, or commit. Authenticated browser/create smoke remains
+  pending.
 - Future multi-airport channel expansion may need airport-prefixed slugs or a
   scoped uniqueness model because `boards.slug` is currently globally unique.
   Once meaningful user content exists in channel boards, slugs should be

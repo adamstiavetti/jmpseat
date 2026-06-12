@@ -16,9 +16,10 @@ It adds:
 - safe validation/error redirects
 - success redirect to `/app/hubs/dfw/channels/[channelSlug]/[postId]`
 
-Runtime apply is pending. Browser smoke is pending. Do not create runtime-apply
-or browser-smoke closeout docs until the targeted migration apply and deployed
-authenticated route verification actually happen.
+Runtime apply is recorded in
+`docs/ops/fbmvp-t26d-channel-composer-create-foundation-runtime-apply.md`.
+Browser smoke is pending. Do not create browser-smoke closeout docs until
+deployed authenticated route verification actually happens.
 
 ## RPC Scope
 
@@ -136,13 +137,18 @@ live crew movement/location.
 
 ## Runtime Apply
 
-Runtime apply is pending.
+Runtime apply is complete and recorded in
+`docs/ops/fbmvp-t26d-channel-composer-create-foundation-runtime-apply.md`.
 
-When approved, use the established targeted SQL apply pattern for:
+The targeted apply used:
 
 - `supabase/migrations/20260612044500_create_hub_channel_post_create_rpc.sql`
+- one migration ledger row:
+  - `20260612044500 create_hub_channel_post_create_rpc`
 
-Do not use broad Supabase migration sync or `supabase db push`.
+It used targeted SQL execution only. It did not use broad Supabase migration
+sync, `supabase db push`, migration repair, `apply_migration`, deploy tooling,
+or Vercel changes.
 
 ## Browser Smoke
 
