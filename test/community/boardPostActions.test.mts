@@ -164,7 +164,12 @@ test("DFW Baseboard route wires the server action and status after the route gat
   assert.doesNotMatch(dfwBaseboardRouteSource, /create_board_post|\.insert\(|\.update\(|\.delete\(/);
 });
 
-test("T15 docs describe the local composer foundation and runtime-pending boundary", () => {
+test("T15 docs describe the composer foundation and runtime-applied boundary", () => {
+  const t15Docs = readFileSync(
+    new URL("../../docs/ops/fbmvp-t15-minimal-post-composer.md", import.meta.url),
+    "utf8",
+  );
+
   assert.match(docsSource, /FBMVP-T15/i);
   assert.match(docsSource, /Minimal Post Composer/i);
   assert.match(docsSource, /DFW Baseboard/i);
@@ -173,10 +178,14 @@ test("T15 docs describe the local composer foundation and runtime-pending bounda
   assert.match(docsSource, /create_open_baseboard_post/i);
   assert.match(docsSource, /create_board_post/i);
   assert.match(docsSource, /DB-level contribution eligibility|contribution eligibility/i);
-  assert.match(docsSource, /runtime-pending|runtime pending/i);
-  assert.match(docsSource, /targeted runtime preflight\/apply|targeted preflight\/apply/i);
+  assert.match(docsSource, /T15 is runtime-applied/i);
+  assert.match(docsSource, /20260610182000 create_open_baseboard_post/i);
+  assert.match(docsSource, /fbmvp-t15-minimal-post-composer-runtime-pass/i);
+  assert.match(docsSource, /targeted SQL execution only|targeted runtime apply|targeted apply only/i);
   assert.match(docsSource, /broad supabase db push remains unsafe/i);
   assert.match(docsSource, /no user\/community content was created/i);
+  assert.match(docsSource, /Baseboards should no longer be treated as open mixed discussion boards/i);
+  assert.match(docsSource, /user-facing DFW Hub shell presents DFW Today, Base, Layover, Channels/i);
   assert.match(docsSource, /comments/i);
   assert.match(docsSource, /saves/i);
   assert.match(docsSource, /reactions/i);
@@ -186,4 +195,6 @@ test("T15 docs describe the local composer foundation and runtime-pending bounda
   assert.match(docsSource, /Layovers seeded content|seeded Layovers/i);
   assert.match(docsSource, /Crew Picks ranking/i);
   assert.match(docsSource, /proof-upload|proof upload/i);
+  assert.doesNotMatch(docsSource, /runtime-pending|runtime pending/i);
+  assert.doesNotMatch(t15Docs, /hub_channel|list_open_hub_channels|DFW Channels overview/i);
 });

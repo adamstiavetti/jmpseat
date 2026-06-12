@@ -88,8 +88,21 @@ test("T25B migration keeps Channels as board metadata only", () => {
 });
 
 test("T25B docs describe private-beta taxonomy and incomplete Channels behavior", () => {
-  const docs = [
-    "../../docs/ops/fbmvp-t25b-hub-channel-board-type-dfw-seeds.md",
+  const localSeedDocs = readFileSync(
+    new URL(
+      "../../docs/ops/fbmvp-t25b-hub-channel-board-type-dfw-seeds.md",
+      import.meta.url,
+    ),
+    "utf8",
+  );
+  const runtimeApplyDocs = readFileSync(
+    new URL(
+      "../../docs/ops/fbmvp-t25b-hub-channel-board-type-dfw-seeds-runtime-apply.md",
+      import.meta.url,
+    ),
+    "utf8",
+  );
+  const currentDocs = [
     "../../docs/BUILD_TICKETS.md",
     "../../docs/DATA_MODEL.md",
     "../../docs/ops/05b-first-base-mvp-planning.md",
@@ -97,19 +110,29 @@ test("T25B docs describe private-beta taxonomy and incomplete Channels behavior"
   ]
     .map((docPath) => readFileSync(new URL(docPath, import.meta.url), "utf8"))
     .join("\n\n");
+  const docs = [localSeedDocs, runtimeApplyDocs, currentDocs].join("\n\n");
 
   assert.match(docs, /FBMVP-T25B/i);
   assert.match(docs, /hub_channel/i);
   assert.match(docs, /private-beta seed defaults/i);
   assert.match(docs, /six DFW child/i);
-  assert.match(docs, /no UI routes/i);
-  assert.match(docs, /no post reads/i);
-  assert.match(docs, /no composer/i);
-  assert.match(docs, /no comments/i);
-  assert.match(docs, /no reports/i);
-  assert.match(docs, /no moderation review changes/i);
-  assert.match(docs, /no runtime apply/i);
-  assert.match(docs, /DB\/RPC-backed Channels remain incomplete/i);
+  assert.match(localSeedDocs, /T25B does not add:[\s\S]*- UI routes/i);
+  assert.match(localSeedDocs, /T25B does not add:[\s\S]*- post reads/i);
+  assert.match(localSeedDocs, /T25B does not add:[\s\S]*- composer behavior/i);
+  assert.match(localSeedDocs, /T25B does not add:[\s\S]*- comments/i);
+  assert.match(localSeedDocs, /T25B does not add:[\s\S]*- reports/i);
+  assert.match(localSeedDocs, /T25B does not add:[\s\S]*- moderation review changes/i);
+  assert.match(runtimeApplyDocs, /20260611183000/i);
+  assert.match(runtimeApplyDocs, /create_hub_channel_board_type_dfw_seeds/i);
+  assert.match(runtimeApplyDocs, /records the targeted Supabase runtime apply/i);
+  assert.match(runtimeApplyDocs, /The targeted apply added/i);
+  assert.match(runtimeApplyDocs, /T25B does not add:[\s\S]*- UI routes/i);
+  assert.match(runtimeApplyDocs, /T25B does not add:[\s\S]*- channel post list RPCs/i);
+  assert.match(runtimeApplyDocs, /T25B does not add:[\s\S]*- channel create-post RPCs/i);
+  assert.match(runtimeApplyDocs, /T25B does not add:[\s\S]*- channel detail RPCs/i);
+  assert.match(currentDocs, /T26A later adds the real Channels overview metadata route/i);
+  assert.match(currentDocs, /channel-aware post RPCs remain future work/i);
+  assert.match(localSeedDocs, /DB\/RPC-backed Channels remain incomplete/i);
   assert.match(docs, /slugs should be\s+treated as stable unless redirects or aliases are explicitly planned/i);
 
   for (const slug of EXPECTED_CHANNEL_SLUGS) {

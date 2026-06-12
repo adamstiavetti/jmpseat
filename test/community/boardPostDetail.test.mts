@@ -180,8 +180,10 @@ test("T17 list cards link to private detail routes without public sharing", () =
 
 test("T17 detail UI renders safe read-only post detail with report affordance", () => {
   assert.match(shellSource, /DfwBaseboardPostDetailShell/);
-  assert.match(shellSource, /Back to DFW Baseboard/);
-  assert.match(shellSource, /That DFW Baseboard post is unavailable\./);
+  assert.match(shellSource, /Back to DFW Channels/);
+  assert.match(shellSource, /That DFW Hub thread is unavailable\./);
+  assert.doesNotMatch(shellSource, /Back to DFW Baseboard/);
+  assert.doesNotMatch(shellSource, /That DFW Baseboard post is unavailable\./);
   assert.match(shellSource, /post\.title/);
   assert.match(shellSource, /post\.body/);
   assert.match(shellSource, /post\.authorLabel/);
@@ -201,10 +203,12 @@ test("T17 detail UI renders safe read-only post detail with report affordance", 
   assert.doesNotMatch(shellSource, /lounge posting form|seeded layover card|crew picks ranking|proof upload field|public sharing button/i);
 });
 
-test("T17 docs describe local runtime-pending detail scope", () => {
+test("T17 docs describe runtime-applied detail scope", () => {
   assert.match(docsSource, /FBMVP-T17/i);
   assert.match(docsSource, /DFW Baseboard Post Detail/i);
-  assert.match(docsSource, /runtime-pending|runtime pending/i);
+  assert.match(docsSource, /T17 is runtime-applied/i);
+  assert.match(docsSource, /20260610203000 create_open_baseboard_post_detail_rpc/i);
+  assert.match(docsSource, /fbmvp-t17-dfw-baseboard-post-detail-runtime-pass/i);
   assert.match(docsSource, /get_open_baseboard_post/i);
   assert.match(docsSource, /private route gate/i);
   assert.match(docsSource, /safe DB read RPC|safe read RPC/i);
@@ -213,7 +217,7 @@ test("T17 docs describe local runtime-pending detail scope", () => {
   assert.match(docsSource, /hidden\/removed posts are excluded/i);
   assert.match(docsSource, /status = 'published'[\s\S]*visibility = 'board'|published \/ board/i);
   assert.match(docsSource, /broad supabase db push remains unsafe/i);
-  assert.match(docsSource, /targeted runtime preflight\/apply|targeted preflight\/apply/i);
+  assert.match(docsSource, /targeted runtime apply|targeted SQL execution|runtime pass/i);
   assert.match(docsSource, /comments/i);
   assert.match(docsSource, /replies/i);
   assert.match(docsSource, /saves/i);
@@ -225,4 +229,5 @@ test("T17 docs describe local runtime-pending detail scope", () => {
   assert.match(docsSource, /Layovers/i);
   assert.match(docsSource, /Crew Picks/i);
   assert.match(docsSource, /proof-upload|proof upload/i);
+  assert.doesNotMatch(docsSource, /runtime-pending|runtime pending/i);
 });
