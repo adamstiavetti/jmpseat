@@ -25,16 +25,16 @@ import {
   type DfwBaseboardReportStatus,
 } from "../../lib/community/boardPostSafetyActionState";
 import type {
-  DfwHubChannelPostStatus,
   HubChannelListItem,
   HubChannelPostDetail,
   HubChannelPostListItem,
 } from "../../lib/community/hubChannels";
 import {
-  DFW_HUB_CHANNEL_POST_FAILED_STATUS,
-  DFW_HUB_CHANNEL_POST_INVALID_STATUS,
-} from "../../lib/community/hubChannels";
+  type DfwHubChannelPostActionState,
+  type DfwHubChannelPostStatus,
+} from "../../lib/community/hubChannelPostActionState";
 
+import { DfwChannelPostComposerForm } from "./DfwChannelPostComposerForm";
 import styles from "./homeHubShell.module.css";
 
 type HomeHubShellProps = {
@@ -79,7 +79,10 @@ type DfwChannelThreadListShellProps = {
   channelsUnavailable?: boolean;
   postsUnavailable?: boolean;
   postStatus?: DfwHubChannelPostStatus | null;
-  createPostAction?: (formData: FormData) => Promise<void>;
+  createPostAction?: (
+    state: DfwHubChannelPostActionState,
+    formData: FormData,
+  ) => Promise<DfwHubChannelPostActionState>;
 };
 
 type DfwChannelPostDetailShellProps = {
@@ -1506,12 +1509,6 @@ export function DfwChannelThreadListShell({
   const channelName = channel?.name ?? "DFW Channel";
   const channelDescription =
     channel?.description ?? "This DFW Channel is unavailable right now.";
-  const postStatusMessage =
-    postStatus === DFW_HUB_CHANNEL_POST_INVALID_STATUS
-      ? "Add a title and body before posting. Titles can be up to 120 characters and posts up to 4,000 characters."
-      : postStatus === DFW_HUB_CHANNEL_POST_FAILED_STATUS
-        ? "jmpseat could not publish that Channel thread right now. Try again in a moment."
-        : null;
 
   return (
     <main className={styles.shell}>
@@ -1549,51 +1546,10 @@ export function DfwChannelThreadListShell({
           </div>
 
           {channel && createPostAction ? (
-            <form
+            <DfwChannelPostComposerForm
               action={createPostAction}
-              aria-labelledby="channel-composer-title"
-              className={styles.baseboardComposer}
-            >
-              <div>
-                <span className={styles.cardMeta}>Start a Thread</span>
-                <h3 id="channel-composer-title">Post to this DFW Channel</h3>
-                <p>
-                  Keep it useful, non-sensitive, and specific to this selected
-                  Channel. Comments and reports are later scoped tickets.
-                </p>
-              </div>
-              <label className={styles.composerField}>
-                <span>Title</span>
-                <input
-                  maxLength={120}
-                  name="title"
-                  placeholder="Ask a question or share a practical update"
-                  required
-                  type="text"
-                />
-              </label>
-              <label className={styles.composerField}>
-                <span>Body</span>
-                <textarea
-                  maxLength={4000}
-                  name="body"
-                  placeholder="Keep it useful for DFW aviation workers."
-                  required
-                  rows={5}
-                />
-              </label>
-              <input name="contentType" type="hidden" value="note" />
-              <input name="category" type="hidden" value="general" />
-              <button className={styles.composerSubmit} type="submit">
-                Publish thread
-              </button>
-            </form>
-          ) : null}
-
-          {postStatusMessage ? (
-            <p className={styles.actionFeedback} role="status">
-              {postStatusMessage}
-            </p>
+              postStatus={postStatus}
+            />
           ) : null}
 
           {channelsUnavailable ? (

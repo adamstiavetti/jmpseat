@@ -28,6 +28,9 @@ function readOptionalSource(relativePath: string) {
 const actionSource = readOptionalSource(
   "../../src/lib/community/hubChannelActions.ts",
 );
+const composerFormSource = readOptionalSource(
+  "../../src/components/privateApp/DfwChannelPostComposerForm.tsx",
+);
 const uuidSource = readOptionalSource("../../src/lib/community/uuid.ts");
 const selectedChannelRouteSource = readFileSync(
   new URL("../../app/app/hubs/dfw/channels/[channelSlug]/page.tsx", import.meta.url),
@@ -177,7 +180,8 @@ test("T26D server action gates selected channel create before calling the RPC", 
   assert.match(actionSource, /p_content_type: contentType/);
   assert.match(actionSource, /p_category: category/);
   assert.match(actionSource, /revalidatePath\(channelRoute\)/);
-  assert.match(actionSource, /redirect\(getDfwHubChannelPostHref\(normalizedChannelSlug, createdPost\.id\)\)/);
+  assert.match(actionSource, /status: "created"/);
+  assert.match(actionSource, /href: getDfwHubChannelPostHref\(normalizedChannelSlug, createdPost\.id\)/);
 
   assert.match(
     actionSource,
@@ -187,7 +191,7 @@ test("T26D server action gates selected channel create before calling the RPC", 
   assert.doesNotMatch(actionSource, /from\("board_posts"\)|\.insert\(|\.update\(|\.delete\(/);
 });
 
-test("T26D server action validates post input and safely redirects on failures", () => {
+test("T26D server action validates post input and returns safe failure state", () => {
   assert.match(actionSource, /String\(formData\.get\("title"\) \?\? ""\)\.trim\(\)/);
   assert.match(actionSource, /String\(formData\.get\("body"\) \?\? ""\)\.trim\(\)/);
   assert.match(actionSource, /title\.length === 0/);
@@ -198,15 +202,18 @@ test("T26D server action validates post input and safely redirects on failures",
   assert.match(actionSource, /isAllowedHubChannelCategory\(category\)/);
   assert.match(actionSource, /DFW_HUB_CHANNEL_POST_INVALID_STATUS/);
   assert.match(actionSource, /DFW_HUB_CHANNEL_POST_FAILED_STATUS/);
+  assert.match(actionSource, /buildDfwHubChannelPostActionState\(DFW_HUB_CHANNEL_POST_INVALID_STATUS\)/);
+  assert.match(actionSource, /buildDfwHubChannelPostActionState\(DFW_HUB_CHANNEL_POST_FAILED_STATUS\)/);
 });
 
-test("T26D server action accepts the real smoke post UUID before redirecting to detail", () => {
+test("T26D server action accepts the real smoke post UUID before returning detail href", () => {
   assert.equal(expectedUuidPattern.test(smokePostId), true);
   assert.equal(expectedUuidPattern.test("not-a-uuid"), false);
   assert.equal(expectedUuidPattern.test("7f93f9a9-3dd1-4718-zzzz-2acc8194a999"), false);
   assert.match(actionSource, /isUuid\(createdPost\.id\)/);
   assert.match(actionSource, /import \{ isUuid \} from "\.\/uuid"/);
-  assert.match(actionSource, /redirect\(getDfwHubChannelPostHref\(normalizedChannelSlug, createdPost\.id\)\)/);
+  assert.match(actionSource, /href: getDfwHubChannelPostHref\(normalizedChannelSlug, createdPost\.id\)/);
+  assert.doesNotMatch(actionSource, /redirect\(getDfwHubChannelPostHref\(normalizedChannelSlug, createdPost\.id\)\)/);
   assert.match(actionSource, /DFW_HUB_CHANNEL_POST_FAILED_STATUS/);
   assert.ok(
     uuidSource.includes(expectedUuidPatternSource),
@@ -216,6 +223,20 @@ test("T26D server action accepts the real smoke post UUID before redirecting to 
     !uuidSource.includes(malformedUuidPatternSource),
     "create action should not use the malformed four-hyphen UUID pattern from failed smoke",
   );
+});
+
+test("T26D composer uses client-side success navigation after server action result", () => {
+  assert.match(composerFormSource, /"use client"/);
+  assert.match(composerFormSource, /useActionState/);
+  assert.match(composerFormSource, /useRouter/);
+  assert.match(composerFormSource, /router\.push\(state\.href\)/);
+  assert.match(composerFormSource, /state\.status === "created"/);
+  assert.match(composerFormSource, /DFW_HUB_CHANNEL_POST_INVALID_STATUS/);
+  assert.match(composerFormSource, /DFW_HUB_CHANNEL_POST_FAILED_STATUS/);
+  assert.match(composerFormSource, /Start a Thread/);
+  assert.match(composerFormSource, /Post to this DFW Channel/);
+  assert.match(composerFormSource, /Publish thread/);
+  assert.doesNotMatch(composerFormSource, /boardId|baseId|parentBoardId|authorUserId|reporter|moderation|proof|storage|signed/i);
 });
 
 test("T26D selected-channel route wires composer action after private route gate", () => {
@@ -233,11 +254,7 @@ test("T26D selected-channel route wires composer action after private route gate
 test("T26D selected-channel shell renders composer without comments reports or fake counts", () => {
   const selectedChannelShellSource = sourceForExportedFunction("DfwChannelThreadListShell");
 
-  assert.match(selectedChannelShellSource, /Start a Thread/);
-  assert.match(selectedChannelShellSource, /Post to this DFW Channel/);
-  assert.match(selectedChannelShellSource, /Title/);
-  assert.match(selectedChannelShellSource, /Body/);
-  assert.match(selectedChannelShellSource, /Publish thread/);
+  assert.match(selectedChannelShellSource, /DfwChannelPostComposerForm/);
   assert.match(selectedChannelShellSource, /createPostAction/);
   assert.match(selectedChannelShellSource, /postStatus/);
   assert.match(selectedChannelShellSource, /No threads in this Channel yet/);

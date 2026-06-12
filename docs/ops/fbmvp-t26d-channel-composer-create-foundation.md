@@ -13,8 +13,9 @@ It adds:
   `public.create_open_hub_channel_post(p_base_code text, p_channel_slug text, p_title text, p_body text, p_content_type text default null, p_category text default null)`
 - a server action for creating a post in the selected DFW `hub_channel`
 - a title/body composer on `/app/hubs/dfw/channels/[channelSlug]`
-- safe validation/error redirects
-- success redirect to `/app/hubs/dfw/channels/[channelSlug]/[postId]`
+- safe validation/error states
+- client-side success navigation to
+  `/app/hubs/dfw/channels/[channelSlug]/[postId]` from a safe created `href`
 
 Runtime apply is recorded in
 `docs/ops/fbmvp-t26d-channel-composer-create-foundation-runtime-apply.md`.
@@ -31,6 +32,12 @@ resolved detail rendering for valid child-channel post UUIDs, but final
 authorized create-browser smoke still failed the redirect expectation: the post
 was created and list/detail reads passed, while the browser stayed on the
 selected-channel page after submit.
+
+The local redirect/navigation fix is recorded in
+`docs/ops/fbmvp-t26d-channel-composer-redirect-fix.md`. It keeps the runtime RPC
+unchanged, returns a narrow safe created detail `href` from the server action,
+and lets the selected-channel composer push that route on success. Browser
+create-redirect re-smoke remains pending after deployment.
 
 ## RPC Scope
 
@@ -102,8 +109,9 @@ The route:
 - renders a title/body composer only when the selected channel exists
 - keeps selected-channel thread rows linked to post detail routes
 - keeps safe empty/unavailable states
-- redirects successful posts to the selected-channel post detail route
-- uses query-status feedback for invalid/failed submissions
+- navigates successful posts to the selected-channel post detail route through
+  the safe created `href` returned by the server action
+- uses safe action-state feedback for invalid/failed submissions
 
 The composer is a functional baseline only. UI/UX polish remains deferred until
 the route is runtime-applied, browser-smoked, and the remaining MVP surfaces
@@ -193,6 +201,15 @@ Post-fix smoke:
 
 Do not create additional smoke posts until post-submit navigation/redirect
 handling is investigated.
+
+Redirect fix:
+
+- `docs/ops/fbmvp-t26d-channel-composer-redirect-fix.md` records the local
+  app-side navigation fix.
+- Runtime SQL is not implicated and no runtime migration is needed.
+- Existing safe smoke posts remain valid for list/detail regression checks.
+- Deployed browser create-redirect re-smoke remains pending and should create
+  exactly one additional safe post only if explicitly authorized.
 
 ## Validation
 

@@ -13,10 +13,10 @@ import { getPrivateAccessEventType } from "../securityEvents/securityEvents";
 import { recordSecurityEvent } from "../securityEvents/server";
 import { createClient } from "../supabase/server";
 import {
+  type DfwHubChannelPostActionState,
   DFW_HUB_CHANNEL_POST_FAILED_STATUS,
   DFW_HUB_CHANNEL_POST_INVALID_STATUS,
-  DFW_HUB_CHANNEL_POST_STATUS_PARAM,
-} from "./hubChannels";
+} from "./hubChannelPostActionState";
 import { isUuid } from "./uuid";
 
 const allowedHubChannelContentTypes = new Set([
@@ -59,22 +59,42 @@ function getDfwHubChannelPostHref(channelSlug: string, postId: string) {
   return `${getDfwHubChannelHref(channelSlug)}/${encodeURIComponent(postId)}`;
 }
 
-function buildDfwHubChannelPostRedirect(channelSlug: string, status: string) {
-  const search = new URLSearchParams({
-    [DFW_HUB_CHANNEL_POST_STATUS_PARAM]: status,
-  });
-
-  return `${getDfwHubChannelHref(channelSlug)}?${search.toString()}`;
-}
-
 function normalizeFormChoice(value: FormDataEntryValue | null, fallback: string) {
   return String(value ?? fallback).trim().toLowerCase() || fallback;
 }
 
+function buildDfwHubChannelPostActionState(
+  status: DfwHubChannelPostActionState["status"],
+  href: string | null = null,
+): DfwHubChannelPostActionState {
+  if (status === "created" && href) {
+    return {
+      status,
+      href,
+    };
+  }
+
+  if (
+    status === DFW_HUB_CHANNEL_POST_INVALID_STATUS ||
+    status === DFW_HUB_CHANNEL_POST_FAILED_STATUS
+  ) {
+    return {
+      status,
+      href: null,
+    };
+  }
+
+  return {
+    status: "idle",
+    href: null,
+  };
+}
+
 export async function createDfwHubChannelPostAction(
   channelSlug: string,
+  _previousState: DfwHubChannelPostActionState,
   formData: FormData,
-) {
+): Promise<DfwHubChannelPostActionState> {
   const normalizedChannelSlug = channelSlug.trim().toLowerCase();
   const channelRoute = normalizedChannelSlug
     ? getDfwHubChannelHref(normalizedChannelSlug)
@@ -108,7 +128,7 @@ export async function createDfwHubChannelPostAction(
   }
 
   if (!normalizedChannelSlug || !context.authConfigured || !context.user) {
-    redirect(buildDfwHubChannelPostRedirect(normalizedChannelSlug, DFW_HUB_CHANNEL_POST_FAILED_STATUS));
+    return buildDfwHubChannelPostActionState(DFW_HUB_CHANNEL_POST_FAILED_STATUS);
   }
 
   const title = String(formData.get("title") ?? "").trim();
@@ -124,7 +144,7 @@ export async function createDfwHubChannelPostAction(
     !isAllowedHubChannelContentType(contentType) ||
     !isAllowedHubChannelCategory(category)
   ) {
-    redirect(buildDfwHubChannelPostRedirect(normalizedChannelSlug, DFW_HUB_CHANNEL_POST_INVALID_STATUS));
+    return buildDfwHubChannelPostActionState(DFW_HUB_CHANNEL_POST_INVALID_STATUS);
   }
 
   const supabase = await createClient();
@@ -142,9 +162,12 @@ export async function createDfwHubChannelPostAction(
   const [createdPost] = Array.isArray(data) ? data : [];
 
   if (error || !createdPost?.id || !isUuid(createdPost.id)) {
-    redirect(buildDfwHubChannelPostRedirect(normalizedChannelSlug, DFW_HUB_CHANNEL_POST_FAILED_STATUS));
+    return buildDfwHubChannelPostActionState(DFW_HUB_CHANNEL_POST_FAILED_STATUS);
   }
 
   revalidatePath(channelRoute);
-  redirect(getDfwHubChannelPostHref(normalizedChannelSlug, createdPost.id));
+  return {
+    status: "created",
+    href: getDfwHubChannelPostHref(normalizedChannelSlug, createdPost.id),
+  };
 }

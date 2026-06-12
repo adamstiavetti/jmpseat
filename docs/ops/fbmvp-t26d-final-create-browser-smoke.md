@@ -188,11 +188,23 @@ T26C regression:
 No more smoke posts should be created until this redirect behavior is
 investigated.
 
+## Follow-Up Fix
+
+The local app-side redirect/navigation fix is recorded in
+`docs/ops/fbmvp-t26d-channel-composer-redirect-fix.md`.
+
+It keeps runtime SQL unchanged, returns a narrow safe created detail `href` from
+the server action, and uses client-side success navigation from the
+selected-channel composer.
+
+This smoke record remains a partial/fail historical result. Browser
+create-redirect re-smoke remains pending after deployment and should create
+exactly one additional safe post only if explicitly authorized.
+
 ## Remaining Work
 
-Next implementation work should investigate the post-submit navigation/redirect
-handling that leaves the browser on the selected-channel page after a successful
-create.
+Next verification work should deploy and re-smoke the local post-submit
+navigation/redirect fix.
 
 No new runtime migration is needed based on this smoke result unless later
 investigation proves otherwise.

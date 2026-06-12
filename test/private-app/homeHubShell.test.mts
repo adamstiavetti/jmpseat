@@ -10,6 +10,10 @@ const shellSource = readFileSync(
   new URL("../../src/components/privateApp/HomeHubShell.tsx", import.meta.url),
   "utf8",
 );
+const composerFormSource = readFileSync(
+  new URL("../../src/components/privateApp/DfwChannelPostComposerForm.tsx", import.meta.url),
+  "utf8",
+);
 const shellStyles = readFileSync(
   new URL("../../src/components/privateApp/homeHubShell.module.css", import.meta.url),
   "utf8",
@@ -469,9 +473,10 @@ test("DFW Channels selected-channel shell supports scoped composer and avoids ol
   assert.match(selectedChannelSource, /DFW Hub Channel/);
   assert.match(selectedChannelSource, /Back to DFW Channels/);
   assert.match(selectedChannelSource, /Channel Threads/);
-  assert.match(selectedChannelSource, /Start a Thread/);
-  assert.match(selectedChannelSource, /Post to this DFW Channel/);
-  assert.match(selectedChannelSource, /Publish thread/);
+  assert.match(selectedChannelSource, /DfwChannelPostComposerForm/);
+  assert.match(composerFormSource, /Start a Thread/);
+  assert.match(composerFormSource, /Post to this DFW Channel/);
+  assert.match(composerFormSource, /Publish thread/);
   assert.match(selectedChannelSource, /No threads in this Channel yet/);
   assert.match(selectedChannelSource, /post\.authorLabel/);
   assert.match(selectedChannelSource, /formatPostMetaValue\(post\.contentType\)/);

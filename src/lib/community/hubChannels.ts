@@ -1,18 +1,21 @@
 import "server-only";
 
 import { createClient } from "../supabase/server";
+export {
+  DFW_HUB_CHANNEL_POST_FAILED_STATUS,
+  DFW_HUB_CHANNEL_POST_INVALID_STATUS,
+  DFW_HUB_CHANNEL_POST_STATUS_PARAM,
+  type DfwHubChannelPostStatus,
+} from "./hubChannelPostActionState";
+import {
+  type DfwHubChannelPostStatus,
+  DFW_HUB_CHANNEL_POST_FAILED_STATUS,
+  DFW_HUB_CHANNEL_POST_INVALID_STATUS,
+} from "./hubChannelPostActionState";
 import { isUuid } from "./uuid";
 
 const DEFAULT_CHANNEL_POST_LIMIT = 20;
 const FALLBACK_AUTHOR_LABEL = "jmpseat member";
-
-export const DFW_HUB_CHANNEL_POST_STATUS_PARAM = "post";
-export const DFW_HUB_CHANNEL_POST_INVALID_STATUS = "dfw_channel_post_invalid";
-export const DFW_HUB_CHANNEL_POST_FAILED_STATUS = "dfw_channel_post_failed";
-
-export type DfwHubChannelPostStatus =
-  | typeof DFW_HUB_CHANNEL_POST_INVALID_STATUS
-  | typeof DFW_HUB_CHANNEL_POST_FAILED_STATUS;
 
 export type HubChannelListItem = {
   slug: string;

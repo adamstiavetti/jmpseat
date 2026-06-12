@@ -49,7 +49,9 @@ or commit.
   safe post. Final authorized create-browser smoke created one additional safe
   post and confirmed list/detail reads, but T26D remains partial/fail because
   the browser stayed on the selected-channel page instead of redirecting to the
-  new detail route.
+  new detail route. The local redirect/navigation fix is implemented, uses a
+  safe created detail `href` plus client-side success navigation, and needs no
+  runtime migration. Deployed browser create-redirect re-smoke remains pending.
 
 T25B, T26A, T26B, T26C, and T26D are implemented, committed, runtime-applied, and
 documented through runtime apply. The current gap is not whether Channels
@@ -161,8 +163,8 @@ Out of scope:
 
 Recommended order:
 
-1. Investigate the T26D post-submit navigation/redirect defect without creating
-   additional smoke posts.
+1. Deploy and re-smoke the local T26D post-submit navigation/redirect fix,
+   creating exactly one additional safe post only if explicitly authorized.
 2. `T26E` channel comments/reporting/moderation integration after the redirect
    defect is understood or explicitly deferred.
 3. DFW Today MVP baseline.
@@ -185,6 +187,8 @@ Completed prerequisites:
 - Final authorized T26D create-browser smoke with one additional safe post;
   create inserted the post and list/detail reads passed, but redirect still
   failed.
+- Local T26D redirect/navigation fix; runtime SQL is unchanged and browser
+  create-redirect re-smoke remains pending after deployment.
 - Stale test cleanup:
   - `test/community/hubChannelSeeds.test.mts`
   - `test/community/boardPostActions.test.mts`

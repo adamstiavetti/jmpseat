@@ -36,6 +36,10 @@ const shellSource = readFileSync(
   new URL("../../src/components/privateApp/HomeHubShell.tsx", import.meta.url),
   "utf8",
 );
+const composerFormSource = readFileSync(
+  new URL("../../src/components/privateApp/DfwChannelPostComposerForm.tsx", import.meta.url),
+  "utf8",
+);
 
 function sourceForExportedFunction(name: string) {
   const start = shellSource.indexOf(`export function ${name}`);
@@ -164,8 +168,9 @@ test("T26B selected channel shell renders thread list without moderation or out-
   assert.match(selectedChannelShellSource, /Back to DFW Channels/);
   assert.match(selectedChannelShellSource, /Channel Threads/);
   assert.match(selectedChannelShellSource, /Published threads for this DFW Channel/);
-  assert.match(selectedChannelShellSource, /Start a Thread/);
-  assert.match(selectedChannelShellSource, /Post to this DFW Channel/);
+  assert.match(selectedChannelShellSource, /DfwChannelPostComposerForm/);
+  assert.match(composerFormSource, /Start a Thread/);
+  assert.match(composerFormSource, /Post to this DFW Channel/);
   assert.match(selectedChannelShellSource, /No threads in this Channel yet/);
   assert.match(selectedChannelShellSource, /Threads for this DFW Channel are unavailable right now/);
   assert.match(selectedChannelShellSource, /post\.authorLabel/);

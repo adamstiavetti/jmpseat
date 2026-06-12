@@ -298,6 +298,14 @@ browser stayed on `/app/hubs/dfw/channels/dfw-q-and-a` instead of redirecting to
 the new post detail route. No more smoke posts should be created until
 post-submit navigation/redirect handling is investigated.
 
+The local T26D redirect fix is recorded in
+`docs/ops/fbmvp-t26d-channel-composer-redirect-fix.md`. It keeps runtime SQL
+unchanged, returns a narrow safe created detail `href` from the server action,
+and uses client-side success navigation from the selected-channel composer. No
+runtime migration or runtime-apply docs are needed. Deployed browser
+create-redirect re-smoke remains pending and should create exactly one
+additional safe post only if explicitly authorized.
+
 The remaining functional backlog from checkpoint `c2bbd73` to narrow
 private-beta MVP is recorded in
 `docs/ops/fbmvp-remaining-functional-backlog.md`. It clarifies that Channels
@@ -661,7 +669,9 @@ The current implementation sequence is:
     post-fix browser smoke confirms T26B list plus T26C detail now pass using
     the existing safe post; final authorized create-browser smoke created one
     more safe post and confirmed list/detail reads, but redirect still failed
-    because the browser stayed on the selected-channel page after submit
+    because the browser stayed on the selected-channel page after submit; the
+    local redirect/navigation fix is implemented and needs no runtime migration,
+    but deployed browser create-redirect re-smoke remains pending
 
 T20 runtime-pass docs are committed. The First Base / DFW Baseboard safety loop
 is complete. The approved pivot is recorded in `ops/hub-pivot-plan.md`.
@@ -702,7 +712,9 @@ validation. The local fix is implemented, and post-fix browser smoke reused the
 existing safe post to verify T26B list and T26C detail happy paths. T26D full
 create-browser redirect was then tested with one additional authorized safe post
 and remains partial/fail because post-submit navigation stayed on the selected
-channel page instead of redirecting to detail.
+channel page instead of redirecting to detail. A local app-side redirect fix now
+returns a safe created detail `href` and navigates client-side on success; it
+requires deployed browser re-smoke before T26D can be treated as closed.
 The recommended next ticket is `FBMVP-T23A: DFW Hub Channels UX Wireframe`
 before DB implementation unless there is a strong reason to proceed directly to
 `FBMVP-T23: DFW Hub Channels Foundation`.
