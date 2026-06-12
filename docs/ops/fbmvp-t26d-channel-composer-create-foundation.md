@@ -18,8 +18,11 @@ It adds:
 
 Runtime apply is recorded in
 `docs/ops/fbmvp-t26d-channel-composer-create-foundation-runtime-apply.md`.
-Browser smoke is pending. Do not create browser-smoke closeout docs until
-deployed authenticated route verification actually happens.
+Browser smoke is recorded in
+`docs/ops/fbmvp-t26d-channel-composer-browser-smoke.md`. It failed/partially
+passed: one safe post was created and listed, but the UI reported failure
+instead of redirecting to detail, and the detail route could not render the
+created post.
 
 ## RPC Scope
 
@@ -152,18 +155,23 @@ or Vercel changes.
 
 ## Browser Smoke
 
-Browser smoke is pending.
+Browser smoke is recorded in
+`docs/ops/fbmvp-t26d-channel-composer-browser-smoke.md`.
 
-After runtime apply and deployment, smoke should verify:
+Smoke result:
 
-- authenticated eligible beta/private-app user can publish a selected-channel
-  post from `/app/hubs/dfw/channels/[channelSlug]`
-- successful submit redirects to
-  `/app/hubs/dfw/channels/[channelSlug]/[postId]`
-- selected-channel thread list shows the new post after creation
-- post detail happy path renders for the created post
+- failed/partial
+- exactly one safe post was created in `dfw-q-and-a`
+- the selected-channel thread list rendered the created post
+- expected success redirect to detail did not happen
+- the UI returned to `?post=dfw_channel_post_failed`
+- direct navigation to the created post detail rendered a safe unavailable state
+- no raw error leaked
 - no comments, reports, moderation controls, fake counts, IDs, proof/storage
-  fields, or sensitive content are exposed
+  fields, or sensitive content were exposed
+
+Do not create additional smoke posts until the create/action return handling and
+T26C detail-read mismatch are investigated.
 
 ## Validation
 

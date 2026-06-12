@@ -144,13 +144,20 @@ The apply used the established targeted SQL pattern only:
 Partial browser smoke is recorded in
 `docs/ops/fbmvp-t26c-channel-post-detail-browser-smoke.md`.
 
-That smoke verified the selected-channel post detail route shell,
+That initial smoke verified the selected-channel post detail route shell,
 unavailable-state behavior, authenticated beta access, no-cookie beta redirect,
 public-domain non-exposure, and product/security boundaries using a synthetic
 post UUID under `dfw-q-and-a`.
 
-Happy-path browser smoke remains pending until a safe child-channel post detail
-can be verified.
+A later T26D composer smoke created one safe published child-channel post and
+attempted happy-path detail rendering. That happy path failed because the
+created post detail route rendered a safe unavailable state. Follow-up
+investigation should focus on the T26D create/action return handling and T26C
+detail-read mismatch.
+
+Happy-path browser smoke remains pending until the mismatch is fixed and the
+created safe child-channel post, or another explicitly approved safe post, can
+be verified.
 
 Future smoke should verify an authenticated eligible beta/private-app user can
 open a selected-channel post detail route when a channel post exists. If no

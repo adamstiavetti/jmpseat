@@ -229,8 +229,10 @@ Runtime now has
 The apply used targeted SQL transaction only, added ledger row
 `20260612024544 create_hub_channel_post_detail_rpc`, and did not use broad
 database push, migration repair, `apply_migration`, deploy, app code changes,
-staging, or commit. Authenticated browser/route smoke remains pending and may
-require a safe post on a child `hub_channel` board.
+staging, or commit. Authenticated browser/route smoke was initially partial
+unavailable-state/access verification only. A later T26D composer smoke created
+one safe child-channel post, and T26C happy-path detail rendering failed for
+that post.
 
 T26C selected-channel post detail browser smoke is recorded in
 `docs/ops/fbmvp-t26c-channel-post-detail-browser-smoke.md`. It was partial
@@ -240,8 +242,9 @@ navigation into a real detail route were not claimed. The synthetic
 `dfw-q-and-a` detail route rendered the T26C unavailable-state shell for an
 authenticated beta session; no-cookie beta access redirected to login; public
 apex did not expose the private app route; product/security boundaries held.
-Happy-path browser smoke remains deferred until a safe published post exists on
-a child `hub_channel` board.
+A later T26D smoke created one safe published child-channel post, but direct
+detail navigation still rendered the safe unavailable state. Happy-path browser
+smoke remains pending until the create/detail mismatch is fixed.
 
 T26D local implementation is recorded in
 `docs/ops/fbmvp-t26d-channel-composer-create-foundation.md`. It adds
@@ -261,9 +264,18 @@ Runtime now has
 The apply used targeted SQL execution only, added ledger row
 `20260612044500 create_hub_channel_post_create_rpc`, and did not use broad
 database push, migration repair, `apply_migration`, deploy, Vercel changes,
-app code changes, staging, or commit. Authenticated browser/create smoke remains
-pending, and T26C happy-path post-detail smoke remains pending until a safe
-child-channel post exists and is verified.
+app code changes, staging, or commit.
+
+T26D authenticated browser/create smoke is recorded in
+`docs/ops/fbmvp-t26d-channel-composer-browser-smoke.md`. It was failed/partial:
+exactly one safe post was created in `dfw-q-and-a` and appeared in the
+selected-channel thread list, but the create flow returned
+`?post=dfw_channel_post_failed` instead of redirecting to detail, and direct
+navigation to the created post detail rendered the safe unavailable state. This
+also means T26C happy-path post detail smoke failed for the created child-channel
+post. No additional smoke posts should be created until the create/action return
+handling and detail-read mismatch are investigated. Product, access,
+public-domain, and privacy boundaries held.
 
 The remaining functional backlog from checkpoint `c2bbd73` to narrow
 private-beta MVP is recorded in
@@ -617,11 +629,14 @@ The current implementation sequence is:
     implemented and runtime-applied with a safe channel post-detail RPC and
     protected `/app/hubs/dfw/channels/[channelSlug]/[postId]` route; partial
     unavailable-state/access browser smoke passed, while happy-path post
-    rendering remains pending until a safe child-channel post exists
+    rendering failed for the later safe smoke post and remains pending until the
+    create/detail mismatch is fixed
 29. `FBMVP-T26D` selected-channel composer/create-post foundation, locally
     implemented and runtime-applied with a safe channel post-create RPC, server
     action, and protected selected-channel title/body composer; browser smoke
-    remains pending
+    failed/partially passed because the post was created and shown in the thread
+    list, but the create flow reported failure and the detail route did not
+    render the created post
 
 T20 runtime-pass docs are committed. The First Base / DFW Baseboard safety loop
 is complete. The approved pivot is recorded in `ops/hub-pivot-plan.md`.
@@ -656,8 +671,9 @@ T25B adds and runtime-applies the `hub_channel` board type and six DFW child
 channel board seeds only. T26A adds and runtime-applies the first safe
 channel-list metadata RPC and adds the DFW Channels overview route. Channel post
 list reads start in T26B with `board_posts.board_id` membership; channel post
-detail reads start locally in T26C. Channel post creation should follow in a
-later ticket rather than creating a standalone `channels` table now.
+detail reads start in T26C. Channel post creation starts in T26D. T26D browser
+smoke found a create/detail mismatch that should be investigated before
+additional composer smoke posts are created.
 The recommended next ticket is `FBMVP-T23A: DFW Hub Channels UX Wireframe`
 before DB implementation unless there is a strong reason to proceed directly to
 `FBMVP-T23: DFW Hub Channels Foundation`.

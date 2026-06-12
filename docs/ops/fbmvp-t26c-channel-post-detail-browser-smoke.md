@@ -7,9 +7,10 @@ Date: 2026-06-12
 This record captures authenticated browser/runtime smoke for the
 `FBMVP-T26C` selected-channel post detail route.
 
-This was a partial unavailable-state/access-boundary smoke only. It does not
-claim happy-path selected-channel post detail smoke passed because no published
-child-channel post currently exists in runtime.
+This began as a partial unavailable-state/access-boundary smoke only. A later
+T26D browser smoke created one safe published child-channel post and attempted
+happy-path detail rendering. That happy path failed: the created post detail
+route rendered a safe unavailable state instead of the post.
 
 Target host:
 
@@ -161,13 +162,21 @@ confirmed the three channel read RPCs exist, including:
 
 None.
 
-The only blocker to happy-path smoke is expected: no published child-channel
-posts exist yet.
+The later T26D smoke removed the original "no child-channel post exists"
+blocker, but exposed a real happy-path detail failure for the created safe post.
 
 ## Remaining Work
 
-Happy-path selected-channel post detail smoke remains pending until a safe
-published post exists on a child `hub_channel` board.
+Happy-path selected-channel post detail smoke failed for the safe child-channel
+post created during T26D smoke:
+
+- post UUID: `7f93f9a9-3dd1-4718-979a-2acc8194a999`
+- channel: `dfw-q-and-a`
+- title: `DFW Q&A smoke test thread`
+
+The next implementation task should investigate the T26D create/action return
+handling and T26C detail-read mismatch before additional smoke posts are
+created.
 
 UI/UX polish remains deferred.
 
@@ -188,6 +197,7 @@ T26C still does not add:
 Docs updated:
 
 - `docs/ops/fbmvp-t26c-channel-post-detail-browser-smoke.md`
+- `docs/ops/fbmvp-t26d-channel-composer-browser-smoke.md`
 - `docs/BUILD_TICKETS.md`
 - `docs/ops/05b-first-base-mvp-planning.md`
 - `docs/ops/fbmvp-remaining-functional-backlog.md`
@@ -216,5 +226,6 @@ Browser smoke docs needed?
 
 - Partially satisfied by this record for route/access/unavailable-state
   behavior.
-- Happy-path browser smoke remains pending/deferred until a safe published post
-  exists on a child `hub_channel` board.
+- Happy-path browser smoke was later attempted during T26D smoke and failed for
+  the created safe child-channel post. Follow-up smoke remains needed after the
+  defect is fixed.

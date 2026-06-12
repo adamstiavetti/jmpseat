@@ -117,12 +117,11 @@ An authenticated functional RPC call was not run. The available tooling did not
 provide a safe real authenticated user context, so no authenticated RPC result is
 claimed here.
 
-Authenticated browser/create smoke remains pending. The selected-channel
-composer can call the runtime RPC after deployment, but this record does not
-claim browser or route success.
-
-T26C happy-path post-detail browser smoke also remains pending until a safe
-published child-channel post exists and is verified.
+Authenticated browser/create smoke is recorded in
+`docs/ops/fbmvp-t26d-channel-composer-browser-smoke.md`. It failed/partially
+passed: one safe post was created and listed, but the UI reported failure
+instead of redirecting to detail. T26C happy-path post-detail smoke also failed
+for the created post because the detail route rendered a safe unavailable state.
 
 ## Explicitly Still Not Implemented
 
@@ -147,13 +146,15 @@ T26D still does not add:
 
 ## Next Step
 
-After deployment availability, record authenticated browser/create smoke for
-`/app/hubs/dfw/channels/[channelSlug]` by creating a safe child-channel post,
-verifying redirect to `/app/hubs/dfw/channels/[channelSlug]/[postId]`, and
-confirming the T26C happy-path post detail route renders the created post.
+Investigate the T26D create/action return handling and T26C detail-read mismatch
+before creating additional smoke posts. After a fix, re-run authenticated
+browser/create smoke and confirm detail rendering using the existing safe
+child-channel post if possible.
 
 Runtime apply docs are satisfied by this record. Browser smoke docs remain
-needed later.
+satisfied by
+`docs/ops/fbmvp-t26d-channel-composer-browser-smoke.md` for the failed/partial
+smoke. Follow-up smoke remains needed after the defect is fixed.
 
 ## Documentation Governance Status
 
@@ -171,8 +172,8 @@ Docs not updated / why:
 
 - App, migration, and test files were not updated because this task only records
   the already-completed targeted runtime apply.
-- Browser smoke docs were not created because authenticated browser/create
-  smoke has not happened yet.
+- Browser smoke docs are now recorded separately because authenticated
+  browser/create smoke happened after this runtime-apply record.
 
 Scope impact:
 
@@ -186,4 +187,7 @@ Runtime apply docs needed?
 
 Browser smoke docs needed?
 
-- Still needed after deployed authenticated browser/create verification.
+- Satisfied for the failed/partial smoke by
+  `docs/ops/fbmvp-t26d-channel-composer-browser-smoke.md`.
+- Follow-up browser smoke remains needed after the create/detail defect is
+  fixed.

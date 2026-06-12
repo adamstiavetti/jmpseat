@@ -40,7 +40,11 @@ or commit.
 - T26D adds the selected-channel composer/create-post foundation locally through
   `public.create_open_hub_channel_post(...)`, a server action, and the
   protected title/body composer on `/app/hubs/dfw/channels/[channelSlug]`.
-  Runtime apply is complete and documented; browser smoke remains pending.
+  Runtime apply is complete and documented. Browser smoke failed/partially
+  passed: exactly one safe post was created in `dfw-q-and-a` and appeared in the
+  selected-channel thread list, but the create flow reported failure instead of
+  redirecting to detail, and direct detail navigation rendered the safe
+  unavailable state.
 
 T25B, T26A, T26B, T26C, and T26D are implemented, committed, runtime-applied, and
 documented through runtime apply. The current gap is not whether Channels
@@ -152,10 +156,10 @@ Out of scope:
 
 Recommended order:
 
-1. T26C happy-path browser smoke when a safe channel-post detail can be
-   verified.
-2. T26D authenticated browser smoke and T26C happy-path post detail smoke using
-   a safely created child-channel post.
+1. Investigate and fix the T26D create/action return handling and T26C
+   detail-read mismatch before creating more smoke posts.
+2. Re-run T26D authenticated create smoke and T26C happy-path post detail smoke
+   with the existing safe child-channel post if possible.
 3. `T26E` channel comments/reporting/moderation integration.
 4. DFW Today MVP baseline.
 5. Base MVP baseline.
@@ -168,6 +172,9 @@ Completed prerequisites:
 - Authenticated browser smoke for `/app/hubs/dfw/channels`.
 - T26C targeted runtime apply.
 - T26C partial unavailable-state/access browser smoke.
+- T26D targeted runtime apply.
+- T26D failed/partial authenticated browser smoke with one safe child-channel
+  smoke post created.
 - Stale test cleanup:
   - `test/community/hubChannelSeeds.test.mts`
   - `test/community/boardPostActions.test.mts`
