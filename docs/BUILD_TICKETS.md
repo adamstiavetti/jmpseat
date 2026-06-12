@@ -175,9 +175,14 @@ Current controlling docs for Hub work:
   the remaining create redirect defect. Runtime SQL is not implicated: the
   action now returns a narrow safe created `href`, and the selected-channel
   composer uses client-side success navigation to push that detail route.
-  Runtime migration/apply docs are not needed. Browser create-redirect re-smoke
-  remains pending after deployment and should create exactly one additional safe
-  post only if explicitly authorized.
+  Runtime migration/apply docs are not needed.
+- [FBMVP-T26D Final Create Redirect Browser Smoke Pass](ops/fbmvp-t26d-final-create-redirect-browser-smoke-pass.md) - records the successful
+  authenticated beta browser smoke after `82f4399`. Exactly one additional safe
+  `dfw-q-and-a` post was created, the browser redirected directly to the new
+  selected-channel post detail route, T26B list and T26C detail regressions
+  passed, and product/security/public-domain boundaries held. T26D create
+  redirect can be considered closed after this docs record is reviewed and
+  committed. UI/UX polish remains deferred.
 - [FBMVP Checkpoint: DFW Hub + Channels Foundation Level-Set](ops/fbmvp-checkpoint-dfw-hub-channels-foundation-level-set.md) - docs-only
   checkpoint at `0249e0d` after T26A runtime apply docs. It records the current
   completed DFW Hub + Channels metadata foundation and the sequence before
@@ -339,8 +344,11 @@ Supplemental epoch-specific ticket packs:
   [FBMVP-T26D Final Create Browser Smoke](ops/fbmvp-t26d-final-create-browser-smoke.md); one additional safe post was created, but redirect still failed.
   The local app-side redirect fix is recorded in
   [FBMVP-T26D Channel Composer Redirect Fix](ops/fbmvp-t26d-channel-composer-redirect-fix.md);
-  it changes success navigation only, needs no runtime migration, and still
-  requires deployed browser re-smoke before T26D can be closed.
+  it changes success navigation only and needs no runtime migration. Final
+  passing create-redirect smoke is recorded in
+  [FBMVP-T26D Final Create Redirect Browser Smoke Pass](ops/fbmvp-t26d-final-create-redirect-browser-smoke-pass.md);
+  after `82f4399`, create redirect, T26B list regression, and T26C detail
+  regression passed.
 - [First-Base MVP Implementation Ticket Pack](epochs/first-base-mvp-implementation-ticket-pack.md) - translates the pivot strategy docs into the ordered `FBMVP` implementation sequence; the immediate post-Epoch-5 narrow lane is first reconciled in `ops/private-beta-readiness-bridge.md`, and auth email branding/custom SMTP is now tracked as a deferred beta-readiness polish TODO rather than the active next auth-flow implementation task.
 - [FBMVP-T01: Freeze User-Facing Proof Verification Surfaces](epochs/fbmvp-t01-freeze-user-facing-proof-verification-surfaces.md) - freezes normal proof-upload UX while preserving historical proof infrastructure, cleanup, audit, and admin/operator safety.
 - [FBMVP-T02: Airline Email Verification Access State Design](epochs/fbmvp-t02-airline-email-verification-access-state-design.md) - defines the forward `airline_email_verified` app-level eligibility state and how it maps from existing work-email verification foundations.

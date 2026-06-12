@@ -203,8 +203,11 @@ exactly one additional safe post only if explicitly authorized.
 
 ## Remaining Work
 
-Next verification work should deploy and re-smoke the local post-submit
-navigation/redirect fix.
+The follow-up deployed browser re-smoke is recorded in
+`docs/ops/fbmvp-t26d-final-create-redirect-browser-smoke-pass.md`. After
+`82f4399`, create redirect passed with exactly one additional safe
+`dfw-q-and-a` post, direct navigation to the new detail route, passing T26B list
+regression, and passing T26C detail regression.
 
 No new runtime migration is needed based on this smoke result unless later
 investigation proves otherwise.
@@ -247,5 +250,6 @@ Runtime apply docs needed?
 Browser smoke docs needed?
 
 - Satisfied by this record for the final T26D create-browser redirect attempt.
-- The result is partial/fail; follow-up defect investigation is required before
-  T26D can be considered fully closed.
+- This record remains a historical partial/fail. The later pass record in
+  `docs/ops/fbmvp-t26d-final-create-redirect-browser-smoke-pass.md` satisfies
+  the final create-redirect browser smoke after the navigation fix.

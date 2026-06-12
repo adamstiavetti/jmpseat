@@ -186,6 +186,11 @@ Final T26D create-browser smoke is recorded in
 safe post and confirmed T26C detail rendering also passes for that new valid
 UUID post.
 
+Final passing T26D create-redirect smoke is recorded in
+`docs/ops/fbmvp-t26d-final-create-redirect-browser-smoke-pass.md`. After
+`82f4399`, T26C detail regression passed again for the newly created valid UUID
+post.
+
 UI/UX polish remains deferred.
 
 T26C still does not add:
@@ -240,3 +245,5 @@ Browser smoke docs needed?
   the created safe child-channel post.
 - Post-fix browser smoke now satisfies the T26C happy-path detail read using the
   existing safe post.
+- Final T26D create-redirect smoke after `82f4399` also satisfies the T26C
+  detail regression for the newly created safe post.

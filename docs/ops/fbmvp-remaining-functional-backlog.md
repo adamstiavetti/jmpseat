@@ -51,7 +51,10 @@ or commit.
   the browser stayed on the selected-channel page instead of redirecting to the
   new detail route. The local redirect/navigation fix is implemented, uses a
   safe created detail `href` plus client-side success navigation, and needs no
-  runtime migration. Deployed browser create-redirect re-smoke remains pending.
+  runtime migration. Final deployed browser create-redirect smoke after
+  `82f4399` passed with one additional authorized safe post; the browser landed
+  on the new detail route, the selected-channel list showed the post exactly
+  once, and T26B/T26C regressions passed.
 
 T25B, T26A, T26B, T26C, and T26D are implemented, committed, runtime-applied, and
 documented through runtime apply. The current gap is not whether Channels
@@ -163,10 +166,9 @@ Out of scope:
 
 Recommended order:
 
-1. Deploy and re-smoke the local T26D post-submit navigation/redirect fix,
-   creating exactly one additional safe post only if explicitly authorized.
-2. `T26E` channel comments/reporting/moderation integration after the redirect
-   defect is understood or explicitly deferred.
+1. Review and commit the final T26D create-redirect smoke pass record.
+2. `T26E` channel comments/reporting/moderation integration, if still in the
+   active Channels lane.
 3. DFW Today MVP baseline.
 4. Base MVP baseline.
 5. Layover MVP baseline.
@@ -188,7 +190,10 @@ Completed prerequisites:
   create inserted the post and list/detail reads passed, but redirect still
   failed.
 - Local T26D redirect/navigation fix; runtime SQL is unchanged and browser
-  create-redirect re-smoke remains pending after deployment.
+  create-redirect re-smoke passed after deployment at `82f4399`.
+- Final T26D create-redirect browser smoke pass with one additional safe post:
+  create redirected to detail, T26B list regression passed, and T26C detail
+  regression passed.
 - Stale test cleanup:
   - `test/community/hubChannelSeeds.test.mts`
   - `test/community/boardPostActions.test.mts`

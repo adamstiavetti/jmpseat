@@ -66,10 +66,10 @@ Existing safe smoke posts remain valid for list/detail regression checks:
 
 No additional smoke post was created during this patch task.
 
-Final browser create-redirect re-smoke remains required after deployment. That
-smoke should create exactly one additional safe post only if explicitly
-authorized, unless an equivalent browser/e2e test is accepted in place of
-runtime smoke.
+Final browser create-redirect re-smoke is now recorded in
+`docs/ops/fbmvp-t26d-final-create-redirect-browser-smoke-pass.md`. That smoke
+created exactly one additional safe post after `82f4399` and confirmed the
+browser redirected to the new selected-channel detail route.
 
 ## Explicitly Not Changed
 
@@ -115,4 +115,5 @@ Runtime apply docs needed?
 
 Browser smoke docs needed?
 
-- Yes. Browser create-redirect re-smoke remains pending after deployment.
+- Satisfied by
+  `docs/ops/fbmvp-t26d-final-create-redirect-browser-smoke-pass.md`.

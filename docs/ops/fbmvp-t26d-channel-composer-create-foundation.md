@@ -36,8 +36,14 @@ selected-channel page after submit.
 The local redirect/navigation fix is recorded in
 `docs/ops/fbmvp-t26d-channel-composer-redirect-fix.md`. It keeps the runtime RPC
 unchanged, returns a narrow safe created detail `href` from the server action,
-and lets the selected-channel composer push that route on success. Browser
-create-redirect re-smoke remains pending after deployment.
+and lets the selected-channel composer push that route on success.
+
+Final create-redirect browser smoke after `82f4399` is recorded in
+`docs/ops/fbmvp-t26d-final-create-redirect-browser-smoke-pass.md`. It created
+exactly one additional safe `dfw-q-and-a` post, redirected directly to the new
+detail route, rendered the post detail, showed the post exactly once in the
+thread list, and passed T26B/T26C regressions plus product/security/domain
+boundaries.
 
 ## RPC Scope
 
@@ -208,8 +214,10 @@ Redirect fix:
   app-side navigation fix.
 - Runtime SQL is not implicated and no runtime migration is needed.
 - Existing safe smoke posts remain valid for list/detail regression checks.
-- Deployed browser create-redirect re-smoke remains pending and should create
-  exactly one additional safe post only if explicitly authorized.
+- `docs/ops/fbmvp-t26d-final-create-redirect-browser-smoke-pass.md` records the
+  deployed browser create-redirect pass after `82f4399`. Exactly one additional
+  safe post was created, create redirected to detail, and T26B list/T26C detail
+  regressions passed.
 
 ## Validation
 
