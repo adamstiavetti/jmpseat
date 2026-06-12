@@ -8,17 +8,32 @@ Current implementation-lane note:
   implementation start.
 - Use `docs/ops/05b-first-base-mvp-planning.md` for the current controlling
   First-Base MVP sequence.
+- Current repo/code and focused checkpoint/current milestone docs override this
+  broader V1 scope when there is conflict. Older broad roadmap docs are
+  historical or V1 context unless updated by a focused decision.
 - DFW is the first launch base and DFW Base Board is the first available base
   board. DFW is not the whole product concept; the model should support many
   bases, base boards, layover boards, Verified Lounges / restricted role-based
   spaces, user profiles, follows, posting, comments, sharing, saves,
   reactions/useful marks, searchable base intel/wiki content, and access-aware
   search over time.
+- At checkpoint `c2bbd73`, T25B/T26A are implemented, runtime-applied, and
+  documented. DFW Hub + Channels metadata foundation exists, but authenticated
+  browser smoke for `/app/hubs/dfw/channels` and stale test cleanup remain
+  pending.
+- The narrow DFW Hub MVP has four pillars: DFW Today, Base, Layover, and
+  Channels. Channels is the current implementation lane, not the entire MVP.
+  DFW Today/Base/Layover still need lightweight functional baselines.
 - For the first implementation sequence, keep proof uploads, manual
   proof/document uploads, generic social-feed work, generic global Crew Rooms
   expansion, media/upload posting, AI auto-publishing, deals/perks marketplace,
   full mobile scope, and anonymous posting unless separately approved out of
   scope.
+- Search, saves, reactions/helpful marks, Request a Channel workflow,
+  AI/Jumpseat utility, NonRev Deals, media/photo uploads, live
+  weather/traffic/ops integrations, multi-airport expansion, and native
+  mobile/app-store work remain deferred from the narrow DFW MVP unless
+  explicitly rescoped.
 - Self-declared profile fields must not become authorization truth. Airline
   email grants broad app eligibility only, not restricted-board membership.
 

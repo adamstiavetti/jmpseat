@@ -12,6 +12,8 @@ Current implementation-lane note:
   controlling first-code sequence for the current 05B start.
 - Use `docs/ops/05b-first-base-mvp-planning.md` for the immediate narrow
   implementation lane.
+- Current repo/code and focused checkpoint/current milestone docs override this
+  first-release shape reference when there is conflict.
 - The first code ticket is `FBMVP-T05: Base, Board, And Board-Type Data Model
   Design`.
 - DFW is the first launch base and DFW Base Board is the first available base
@@ -23,6 +25,18 @@ Current implementation-lane note:
   proof/document uploads, generic social-feed work, generic global Crew Rooms
   expansion, media/upload posting, AI auto-publishing, deals, full mobile scope,
   and anonymous posting unless separately approved out of scope.
+- At checkpoint `c2bbd73`, 05B is active/in progress. T25B/T26A are
+  implemented, runtime-applied, and documented, giving DFW Hub a real Channels
+  metadata foundation. Authenticated browser smoke for
+  `/app/hubs/dfw/channels` and stale test cleanup remain pending.
+- The narrow DFW Hub MVP should preserve four utility pillars: DFW Today, Base,
+  Layover, and Channels. Channels is the current implementation lane, not the
+  whole MVP. DFW Today/Base/Layover still need lightweight functional
+  baselines.
+- Search, saves, reactions/helpful marks, Request a Channel workflow,
+  AI/Jumpseat utility, NonRev Deals, media/photo uploads, live integrations,
+  multi-airport expansion, and native mobile/app-store work remain deferred
+  unless explicitly rescoped.
 
 ## 1. Purpose
 

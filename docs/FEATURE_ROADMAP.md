@@ -8,6 +8,27 @@ Utility first. Community second. Social feed last.
 
 The roadmap should deepen practical utility before expanding into social, marketplace, or integration-heavy features.
 
+Current implementation-lane note:
+
+- This file is a broad feature roadmap. The current narrow lane is
+  `05B / First-Base MVP`, governed by
+  `docs/ops/05b-first-base-mvp-planning.md`,
+  `docs/ops/hub-pivot-plan.md`, the current checkpoint docs, and
+  `docs/ops/fbmvp-remaining-functional-backlog.md`.
+- Current repo/code and focused milestone/checkpoint docs override this broad
+  roadmap when there is conflict.
+- At checkpoint `c2bbd73`, DFW Hub + Channels metadata foundation has progressed
+  through T26A: T25B/T26A are implemented, runtime-applied, and documented.
+  Authenticated browser smoke for `/app/hubs/dfw/channels` and stale test
+  cleanup remain pending.
+- The narrow DFW Hub MVP has four utility pillars: DFW Today, Base, Layover,
+  and Channels. Channels is the current implementation lane, not the entire
+  MVP.
+- Search, saves, reactions/helpful marks, Request a Channel workflow,
+  AI/Jumpseat utility, NonRev Deals, media uploads, live integrations,
+  multi-airport expansion, and native mobile/app-store work remain deferred
+  unless explicitly rescoped.
+
 ## Phase 1: MVP
 
 Goal: prove the verified aviation-worker utility community.

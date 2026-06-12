@@ -17,6 +17,12 @@ Use this doc when deciding what the first code tickets should build right now.
 Do not treat older broad V1 or full-beta docs as the immediate implementation
 lane unless this doc or a newer controlling roadmap doc explicitly says so.
 
+Use `docs/PRODUCT_DELIVERY_OPERATING_MODEL.md` for the permanent
+Documentation Governance for Feature Tickets rule. Future 05B implementation
+work must identify affected docs before implementation, keep this doc, the Hub
+pivot plan, focused ops docs, and the current MVP backlog aligned, and pause
+review if product behavior changes while controlling docs are stale.
+
 ## 2. Current 05B Interpretation
 
 `05B / First-Base MVP` is the first launch package for the personalized
@@ -163,6 +169,12 @@ recorded in
 be read before starting T26B. It records completed/runtime-applied T25B/T26A
 metadata foundations, the pending authenticated `/app/hubs/dfw/channels`
 browser smoke, known stale tests, and the recommended next sequence.
+
+The remaining functional backlog from checkpoint `c2bbd73` to narrow
+private-beta MVP is recorded in
+`docs/ops/fbmvp-remaining-functional-backlog.md`. It clarifies that Channels
+are not the entire MVP and that the DFW Hub MVP should advance four utility
+pillars: DFW Today, Base, Layover, and Channels.
 
 Wireframe agents should use the current product language `[AIRPORT] Hub`,
 `[AIRPORT] Today`, Base, Layover, Channels, Recent Useful Threads, and Request

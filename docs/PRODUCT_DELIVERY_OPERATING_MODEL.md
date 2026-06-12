@@ -218,7 +218,71 @@ Rules:
 
 This is a lightweight discipline rule, not a new documentation-heavy process. The goal is to keep repo truth current without overproducing docs for minor work.
 
-## 9. Codex Plan/Goals Usage
+## 9. Documentation Governance for Feature Tickets
+
+Feature tickets must keep controlling roadmap, ticket, data-model, checkpoint,
+and MVP backlog docs synchronized with product behavior.
+
+Rules:
+
+- Every feature ticket must identify affected docs before implementation.
+- Every implementation prompt should list docs expected to change.
+- Every Codex final report must include:
+  - Docs Updated.
+  - Docs Not Updated / Why.
+  - Scope Impact.
+  - Runtime Apply Docs Needed?
+  - Browser Smoke Docs Needed?
+- Every review must check whether docs stayed aligned with:
+  - `docs/BUILD_TICKETS.md`
+  - `docs/DATA_MODEL.md`
+  - `docs/ops/05b-first-base-mvp-planning.md`
+  - `docs/ops/hub-pivot-plan.md`
+  - current focused ops docs
+  - current MVP remaining backlog
+- Any product pivot, renamed surface, changed milestone, or new MVP/deferred
+  boundary must update the controlling backlog/checkpoint docs.
+- Runtime migration applies require runtime-apply docs.
+- Browser smoke passes or deferrals require smoke/checkpoint docs.
+- If no docs change, the final report must explicitly justify why.
+- Review should fail or pause if implementation changes product behavior but
+  controlling docs are stale.
+- Current focused milestone/checkpoint docs override older broad roadmap docs
+  when there is conflict.
+- Older broad docs should be treated as historical or V1 context unless brought
+  current by a focused decision.
+
+jmpseat-specific continuity requirements:
+
+- Future work must not lose the four DFW MVP utility pillars:
+  - DFW Today
+  - Base
+  - Layover
+  - Channels
+- Future work must keep these concepts separate:
+  - auth state
+  - beta access state
+  - verification state
+  - profile state
+  - admin/reviewer/operator authorization
+  - moderation state
+
+Safety boundaries to preserve:
+
+- no airline portal login
+- no schedule scraping
+- no roster/calendar integrations
+- no public live crew tracking
+- no dating/swiping behavior
+- no exact public crew hotel exposure
+- no passenger private information
+- no airport/security-sensitive procedures
+- no company-confidential content
+- no AI final verification
+- no AI final moderation/bans
+- no public proof exposure
+
+## 10. Codex Plan/Goals Usage
 
 Codex must use Plan/Goals for:
 
@@ -232,7 +296,7 @@ Codex must use Plan/Goals for:
 
 Plan items should be updated as work progresses. Final reports should explicitly state which goals completed and which, if any, did not.
 
-## 10. User Story Intake Rules
+## 11. User Story Intake Rules
 
 Future features should become user stories only after discovery or beta evidence. A story without evidence belongs in an assumption register or backlog note, not in an implementation sprint.
 

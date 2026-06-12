@@ -9,6 +9,11 @@ Labels used: docs, product, foundation, auth, verification, community, moderatio
 
 Current controlling docs for Hub work:
 
+- [Product Delivery Operating Model](PRODUCT_DELIVERY_OPERATING_MODEL.md) -
+  includes the permanent Documentation Governance for Feature Tickets rule:
+  feature work must identify affected docs, final reports must state docs
+  updated/not updated, reviews must check controlling-doc alignment, and product
+  pivots or MVP/deferred-boundary changes must update checkpoint/backlog docs.
 - [Hub Pivot Plan](ops/hub-pivot-plan.md) - approved post-T20 Hub product model
   and naming.
 - [FBMVP-T21 DFW Hub Product Framing Runtime Smoke](ops/fbmvp-t21-dfw-hub-product-framing-runtime-smoke.md) - manual beta UI smoke for the
@@ -72,6 +77,10 @@ Current controlling docs for Hub work:
   completed DFW Hub + Channels metadata foundation, the pending authenticated
   `/app/hubs/dfw/channels` browser smoke, known stale tests, and the recommended
   sequence before T26B.
+- [FBMVP Remaining Functional Backlog](ops/fbmvp-remaining-functional-backlog.md) - docs-only
+  backlog from checkpoint `c2bbd73` to narrow private-beta MVP. It clarifies
+  that Channels are not the entire MVP and records the four DFW utility pillars:
+  DFW Today, Base, Layover, and Channels.
 
 Wireframe source pack:
 

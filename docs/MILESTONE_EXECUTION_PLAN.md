@@ -16,6 +16,24 @@ The plan connects product tickets, beta readiness gates, and private beta operat
 
 Estimates are planning estimates, not commitments. They assume one small team working in bounded branches with review between milestones.
 
+Current reconciliation note:
+
+- This milestone plan remains useful broad planning context, but current
+  implementation truth is controlled by active repo/code, focused checkpoint
+  docs, and current milestone docs.
+- The current active lane is `05B / First-Base MVP`. It is in progress at
+  checkpoint `c2bbd73`, not merely pending.
+- T25B/T26A are implemented, committed, runtime-applied, and documented. The
+  DFW Channels metadata route/RPC foundation exists, while authenticated
+  browser smoke for `/app/hubs/dfw/channels` and stale test cleanup remain
+  pending.
+- The narrow DFW Hub MVP has four pillars: DFW Today, Base, Layover, and
+  Channels. Channels is the current implementation lane, not the whole MVP.
+- DFW Today/Base/Layover should receive lightweight functional baselines before
+  narrow private-beta MVP. Search, saves, reactions, Request a Channel
+  workflow, AI, deals, media, live integrations, multi-airport expansion, and
+  native mobile/app-store work remain deferred unless explicitly rescoped.
+
 ## 2. Source Documents
 
 This plan is based on:

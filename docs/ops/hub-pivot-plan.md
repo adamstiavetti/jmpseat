@@ -37,6 +37,9 @@ Use this source pack for Hub implementation, product planning, and wireframes:
 - `docs/ops/fbmvp-checkpoint-dfw-hub-channels-foundation-level-set.md` -
   current checkpoint after T26A runtime apply docs; read before starting T26B
   channel thread-list work.
+- `docs/ops/fbmvp-remaining-functional-backlog.md` - current docs-only backlog
+  from checkpoint `c2bbd73` to narrow private-beta MVP; it keeps DFW Today,
+  Base, Layover, and Channels together as the four DFW Hub utility pillars.
 
 Wireframe source pack:
 
