@@ -267,7 +267,8 @@ public nearby crew tracking, live crew location, live operations data, external
 integrations, AI-generated operational advice, user posting, comments, reports,
 moderation controls, admin CMS, Request a Channel workflow, NonRev Deals,
 payments, marketplace behavior, or dating/swiping/nightlife-primary behavior.
-Browser smoke is pending after deployment.
+Authenticated browser smoke passed after deployment and is recorded in
+`fbmvp-t27c-dfw-layover-browser-smoke.md`.
 
 ### Channels
 
@@ -612,7 +613,8 @@ DFW Channels, DFW Today, and DFW Base. It adds no migration, runtime mutation,
 exact crew hotel exposure, live crew location, live operations data, external
 integration, AI, posting, comments, reports, moderation controls, Request a
 Channel workflow, broad database push, or deploy. Authenticated browser smoke
-is pending after deployment.
+passed after deployment and is recorded in
+`docs/ops/fbmvp-t27c-dfw-layover-browser-smoke.md`.
 
 The current DFW Hub + Channels foundation checkpoint is recorded in
 `docs/ops/fbmvp-checkpoint-dfw-hub-channels-foundation-level-set.md` at

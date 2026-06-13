@@ -356,8 +356,8 @@ copy, and safe links into existing DFW Channels, DFW Today, and DFW Base. It
 adds no database migration, runtime mutation, exact crew hotel exposure, live
 crew location, live operations data, external integration, AI, posting,
 comments, reports, moderation controls, Request a Channel workflow, broad
-database push, or deploy. Authenticated browser smoke is pending after
-deployment.
+database push, or deploy. Authenticated browser smoke passed after deployment
+and is recorded in `docs/ops/fbmvp-t27c-dfw-layover-browser-smoke.md`.
 
 The remaining functional backlog from checkpoint `c2bbd73` to narrow
 private-beta MVP is recorded in
@@ -736,7 +736,7 @@ The current implementation sequence is:
 32. `FBMVP-T27C` DFW Layover lightweight baseline, locally implemented with a
     protected read-only `/app/hubs/dfw/layover` route and static/config-backed
     layover/local utility content; no migration or runtime apply is needed, and
-    authenticated beta browser smoke is pending after deployment
+    authenticated beta browser smoke passed after deployment
 
 T20 runtime-pass docs are committed. The First Base / DFW Baseboard safety loop
 is complete. The approved pivot is recorded in `ops/hub-pivot-plan.md`.
@@ -786,9 +786,9 @@ The next work should keep advancing the four DFW Hub MVP pillars. T27A starts
 the DFW Today pillar as a static/read-only utility baseline and has passed
 authenticated browser smoke. T27B starts the Base pillar as a static/read-only
 utility baseline and has passed authenticated browser smoke. T27C starts the
-Layover pillar as a static/read-only utility baseline and needs authenticated
-browser smoke after deployment. Any further Channels work should stay scoped to
-the documented ticket lane.
+Layover pillar as a static/read-only utility baseline and has passed
+authenticated browser smoke. Any further Channels work should stay scoped to the
+documented ticket lane.
 
 T23A adds the mobile-first wireframe packet for the updated private-beta Hub
 experience. It defines Home/dashboard, DFW Hub overview, DFW Today, Base,

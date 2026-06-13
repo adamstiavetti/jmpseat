@@ -124,7 +124,8 @@ No broad Supabase database push is needed.
 
 ## Browser Smoke
 
-Authenticated beta browser smoke is pending after deployment.
+Authenticated beta browser smoke passed after deployment and is recorded in
+`docs/ops/fbmvp-t27c-dfw-layover-browser-smoke.md`.
 
 The smoke should verify:
 
@@ -169,14 +170,15 @@ Runtime Apply Docs Needed?
 
 Browser Smoke Docs Needed?
 
-- Yes. Authenticated beta browser smoke should be recorded after deployment.
+- Satisfied by `docs/ops/fbmvp-t27c-dfw-layover-browser-smoke.md` after review
+  and commit.
 
 ## Status
 
-T27C is locally implemented.
+T27C is locally implemented and browser-smoked on beta.
 
 Runtime apply is not applicable.
 
-Browser smoke is pending after deployment.
+Browser smoke passed after deployment.
 
 UI/UX polish remains deferred.
