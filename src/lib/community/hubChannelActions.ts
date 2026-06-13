@@ -13,6 +13,11 @@ import { getPrivateAccessEventType } from "../securityEvents/securityEvents";
 import { recordSecurityEvent } from "../securityEvents/server";
 import { createClient } from "../supabase/server";
 import {
+  DFW_HUB_CHANNEL_REPORT_DUPLICATE_STATUS,
+  DFW_HUB_CHANNEL_REPORT_FAILED_STATUS,
+  DFW_HUB_CHANNEL_REPORT_INVALID_STATUS,
+  DFW_HUB_CHANNEL_REPORT_REPORTED_STATUS,
+  DFW_HUB_CHANNEL_REPORT_STATUS_PARAM,
   type DfwHubChannelPostActionState,
   DFW_HUB_CHANNEL_POST_FAILED_STATUS,
   DFW_HUB_CHANNEL_POST_INVALID_STATUS,
@@ -39,8 +44,22 @@ const allowedHubChannelCategories = new Set([
   "operations_note",
 ]);
 
+const REPORT_REASONS = new Set([
+  "spam",
+  "harassment",
+  "unsafe_info",
+  "privacy",
+  "off_topic",
+  "other",
+]);
+
 type CreatedHubChannelPostRpcRow = {
   id: string;
+};
+
+type ReportHubChannelPostRpcRow = {
+  report_id: string;
+  result_status: "reported" | "already_reported";
 };
 
 function isAllowedHubChannelContentType(value: string) {
@@ -57,6 +76,18 @@ function getDfwHubChannelHref(channelSlug: string) {
 
 function getDfwHubChannelPostHref(channelSlug: string, postId: string) {
   return `${getDfwHubChannelHref(channelSlug)}/${encodeURIComponent(postId)}`;
+}
+
+function buildDfwHubChannelReportRedirect(
+  channelSlug: string,
+  postId: string,
+  status: string,
+) {
+  const search = new URLSearchParams({
+    [DFW_HUB_CHANNEL_REPORT_STATUS_PARAM]: status,
+  });
+
+  return `${getDfwHubChannelPostHref(channelSlug, postId)}?${search.toString()}`;
 }
 
 function normalizeFormChoice(value: FormDataEntryValue | null, fallback: string) {
@@ -170,4 +201,101 @@ export async function createDfwHubChannelPostAction(
     status: "created",
     href: getDfwHubChannelPostHref(normalizedChannelSlug, createdPost.id),
   };
+}
+
+export async function reportDfwHubChannelPostAction(formData: FormData) {
+  const normalizedChannelSlug = String(formData.get("channelSlug") ?? "")
+    .trim()
+    .toLowerCase();
+  const postId = String(formData.get("postId") ?? "").trim();
+  const detailRoute =
+    normalizedChannelSlug && isUuid(postId)
+      ? getDfwHubChannelPostHref(normalizedChannelSlug, postId)
+      : "/app/hubs/dfw/channels";
+
+  const context = await getCurrentAppAccessContext();
+  const gate = getPrivateAppGateResult({
+    routeKind: "private-child",
+    nextPath: detailRoute,
+    context,
+  });
+
+  await recordSecurityEvent({
+    userId: context.user?.id,
+    eventType: getPrivateAccessEventType(gate),
+    route: detailRoute,
+    result: getPrivateRouteAuditResult(gate, context),
+    metadata: {
+      route_kind: "private-child",
+      section: "dfw-channel-post",
+      action: "report_dfw_hub_channel_post",
+      access_source: getPrivateAccessSource(gate),
+      ...(getPrivateAccessSource(gate) === "operator_internal"
+        ? { operator_private_app_access: true }
+        : {}),
+    },
+  });
+
+  if (gate.kind === "redirect") {
+    redirect(gate.path);
+  }
+
+  if (!context.authConfigured || !context.user || !normalizedChannelSlug || !isUuid(postId)) {
+    redirect(
+      normalizedChannelSlug && postId
+        ? buildDfwHubChannelReportRedirect(
+            normalizedChannelSlug,
+            postId,
+            DFW_HUB_CHANNEL_REPORT_FAILED_STATUS,
+          )
+        : "/app/hubs/dfw/channels",
+    );
+  }
+
+  const reason = String(formData.get("reason") ?? "").trim();
+  const details = String(formData.get("details") ?? "").trim();
+
+  if (!REPORT_REASONS.has(reason) || details.length > 1000) {
+    redirect(
+      buildDfwHubChannelReportRedirect(
+        normalizedChannelSlug,
+        postId,
+        DFW_HUB_CHANNEL_REPORT_INVALID_STATUS,
+      ),
+    );
+  }
+
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .rpc("report_open_hub_channel_post", {
+      p_base_code: "DFW",
+      p_channel_slug: normalizedChannelSlug,
+      p_post_id: postId,
+      p_reason: reason,
+      p_details: details || null,
+    })
+    .returns<ReportHubChannelPostRpcRow[]>();
+
+  const [reportResult] = Array.isArray(data) ? data : [];
+
+  if (error || !reportResult?.report_id || !isUuid(reportResult.report_id)) {
+    redirect(
+      buildDfwHubChannelReportRedirect(
+        normalizedChannelSlug,
+        postId,
+        DFW_HUB_CHANNEL_REPORT_FAILED_STATUS,
+      ),
+    );
+  }
+
+  revalidatePath(detailRoute);
+  redirect(
+    buildDfwHubChannelReportRedirect(
+      normalizedChannelSlug,
+      postId,
+      reportResult.result_status === "already_reported"
+        ? DFW_HUB_CHANNEL_REPORT_DUPLICATE_STATUS
+        : DFW_HUB_CHANNEL_REPORT_REPORTED_STATUS,
+    ),
+  );
 }

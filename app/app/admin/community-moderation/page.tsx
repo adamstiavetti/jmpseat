@@ -11,10 +11,14 @@ import {
   getCurrentOperatorAccess,
   hasOperatorScope,
 } from "../../../../src/lib/admin/access";
-import { moderateDfwBaseboardPostAction } from "../../../../src/lib/admin/communityModerationActions";
+import {
+  moderateDfwBaseboardPostAction,
+  moderateDfwHubChannelPostAction,
+} from "../../../../src/lib/admin/communityModerationActions";
 import {
   getDfwBaseboardCommentModerationReports,
   getDfwBaseboardModerationReports,
+  getDfwHubChannelModerationReports,
 } from "../../../../src/lib/admin/communityModerationReports";
 import { moderateDfwBaseboardPostCommentAction } from "../../../../src/lib/community/boardPostCommentActions";
 import { AUTH_ROUTES } from "../../../../src/lib/auth/routes";
@@ -169,8 +173,8 @@ export default async function CommunityModerationPage({
     return (
       <AdminShell
         eyebrow="Community Moderation"
-        title="DFW Baseboard moderation"
-        description="Operator-scoped review for reported DFW Baseboard posts."
+        title="DFW community moderation"
+        description="Operator-scoped review for reported DFW Baseboard and DFW Channel posts."
         currentPath={ADMIN_ROUTES.communityModeration}
         navigation={navigation}
         error={operatorContext.loadError}
@@ -208,32 +212,35 @@ export default async function CommunityModerationPage({
     redirect(AUTH_ROUTES.accessRestricted);
   }
 
-  const [reportResult, commentReportResult] = await Promise.all([
+  const [reportResult, commentReportResult, channelReportResult] = await Promise.all([
     getDfwBaseboardModerationReports(),
     getDfwBaseboardCommentModerationReports(),
+    getDfwHubChannelModerationReports(),
   ]);
 
   return (
     <AdminShell
       eyebrow="Community Moderation"
-      title="DFW Baseboard moderation"
-      description="Review open DFW Baseboard post and comment reports and use scoped hide/remove actions when needed."
+      title="DFW community moderation"
+      description="Review open DFW Baseboard and DFW Channel reports and use scoped hide/remove actions when needed."
       currentPath={ADMIN_ROUTES.communityModeration}
       navigation={navigation}
       error={
-        reportResult.error || commentReportResult.error
-          ? "DFW Baseboard reports are unavailable right now."
+        reportResult.error || commentReportResult.error || channelReportResult.error
+          ? "DFW community reports are unavailable right now."
           : undefined
       }
       message={
         commentModerationStatusMessage ??
         moderationStatusMessage ??
-        "Reporter identity is not shown. Actions use existing moderation RPCs and affect only DFW Baseboard posts or comments."
+        "Reporter identity is not shown. Actions use existing moderation RPCs and affect only reviewed community content available to authorized operators."
       }
       footer={
         <p className={authStyles.hint}>
-          This surface is limited to DFW Baseboard post and comment report
-          review. Replies, saves, reactions, search, Crew Picks, Layovers, and
+          This moderation surface is limited to reviewed community content and
+          DFW Channel reports available to authorized operators. Reporter
+          identity is not shown. Replies, saves, reactions, search, Crew Picks,
+          Layovers, and
           proof-upload scope remain outside this tool.
         </p>
       }
@@ -245,10 +252,77 @@ export default async function CommunityModerationPage({
           </h2>
           <p className={styles.sectionText}>
             This page lists open or reviewing reports for published DFW
-            Baseboard posts and top-level comments. Hide and remove use existing
-            operator-scoped RPCs, and current read surfaces omit hidden or
-            removed content.
+            Baseboard posts, DFW Channel posts, and top-level comments. Hide and
+            remove use existing operator-scoped RPCs, and current read surfaces
+            omit hidden or removed content.
           </p>
+        </section>
+
+        <section className={styles.section} aria-labelledby="channel-moderation-reports">
+          <h2 id="channel-moderation-reports" className={styles.sectionTitle}>
+            Open DFW Channel reports
+          </h2>
+
+          {channelReportResult.reports.length === 0 ? (
+            <p className={styles.sectionText}>
+              No open DFW Channel reports are waiting for review.
+            </p>
+          ) : (
+            <div className={styles.toolGrid}>
+              {channelReportResult.reports.map((report) => (
+                <article className={styles.toolCard} key={report.reportId}>
+                  <div className={styles.toolHeader}>
+                    <h3 className={styles.toolTitle}>{report.postTitle}</h3>
+                    <span className={styles.toolStatus}>
+                      {formatModerationLabel(report.reason)}
+                    </span>
+                  </div>
+                  <p className={styles.toolDescription}>
+                    {report.postBodyPreview}
+                  </p>
+                  <p className={styles.toolReason}>
+                    {report.channelName} / {report.channelSlug} /{" "}
+                    {formatModerationLabel(report.postContentType)} /{" "}
+                    {formatModerationLabel(report.postCategory)} /{" "}
+                    {report.authorLabel} / posted {formatDate(report.postCreatedAt)}
+                  </p>
+                  {report.details ? (
+                    <p className={styles.sectionText}>{report.details}</p>
+                  ) : null}
+                  <p className={styles.toolReason}>
+                    Report status: {formatModerationLabel(report.reportStatus)} /
+                    reported {formatDate(report.reportedAt)}
+                  </p>
+                  <form action={moderateDfwHubChannelPostAction} className={styles.stack}>
+                    <input
+                      name="channelSlug"
+                      type="hidden"
+                      value={report.channelSlug}
+                    />
+                    <input name="postId" type="hidden" value={report.postId} />
+                    <label className={styles.sectionText}>
+                      Moderation reason
+                      <textarea
+                        maxLength={1000}
+                        name="reason"
+                        placeholder="Required internal moderation reason"
+                        required
+                        rows={3}
+                      />
+                    </label>
+                    <div className={styles.toolHeader}>
+                      <button name="moderationAction" type="submit" value="hide">
+                        Hide post
+                      </button>
+                      <button name="moderationAction" type="submit" value="remove">
+                        Remove post
+                      </button>
+                    </div>
+                  </form>
+                </article>
+              ))}
+            </div>
+          )}
         </section>
 
         <section className={styles.section} aria-labelledby="moderation-reports">

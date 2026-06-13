@@ -30,7 +30,12 @@ import type {
   HubChannelPostListItem,
 } from "../../lib/community/hubChannels";
 import {
+  DFW_HUB_CHANNEL_REPORT_DUPLICATE_STATUS,
+  DFW_HUB_CHANNEL_REPORT_FAILED_STATUS,
+  DFW_HUB_CHANNEL_REPORT_INVALID_STATUS,
+  DFW_HUB_CHANNEL_REPORT_REPORTED_STATUS,
   type DfwHubChannelPostActionState,
+  type DfwHubChannelReportStatus,
   type DfwHubChannelPostStatus,
 } from "../../lib/community/hubChannelPostActionState";
 import type {
@@ -125,6 +130,8 @@ type DfwChannelPostDetailShellProps = {
   post?: HubChannelPostDetail | null;
   channelsUnavailable?: boolean;
   postUnavailable?: boolean;
+  reportStatus?: DfwHubChannelReportStatus | null;
+  reportAction?: (formData: FormData) => Promise<void>;
 };
 
 type DfwHubSectionReadOnlyShellProps = {
@@ -819,6 +826,20 @@ function getDfwBaseboardCommentReportStatusMessage(
         : null;
 }
 
+function getDfwHubChannelReportStatusMessage(
+  reportStatus: DfwHubChannelReportStatus | null,
+) {
+  return reportStatus === DFW_HUB_CHANNEL_REPORT_REPORTED_STATUS
+    ? "Thanks — this report was sent for review."
+    : reportStatus === DFW_HUB_CHANNEL_REPORT_DUPLICATE_STATUS
+      ? "You already reported this post."
+      : reportStatus === DFW_HUB_CHANNEL_REPORT_INVALID_STATUS
+        ? "Choose a report reason before submitting."
+        : reportStatus === DFW_HUB_CHANNEL_REPORT_FAILED_STATUS
+          ? "jmpseat could not submit that report right now. Try again in a moment."
+          : null;
+}
+
 function DfwChannelRequestCallout() {
   return (
     <article className={styles.channelRequestCard}>
@@ -848,6 +869,53 @@ function DfwBaseboardReportForm({
 
   return (
     <form action={reportAction} className={styles.reportForm}>
+      <input name="postId" type="hidden" value={postId} />
+      <label className={styles.reportField}>
+        <span>Report this post</span>
+        <select name="reason" required defaultValue="">
+          <option disabled value="">
+            Choose a reason
+          </option>
+          <option value="spam">Spam</option>
+          <option value="harassment">Harassment</option>
+          <option value="unsafe_info">Unsafe information</option>
+          <option value="privacy">Privacy</option>
+          <option value="off_topic">Off topic</option>
+          <option value="other">Other</option>
+        </select>
+      </label>
+      <label className={styles.reportField}>
+        <span>Details</span>
+        <textarea
+          maxLength={1000}
+          name="details"
+          placeholder="Optional context for review"
+          rows={2}
+        />
+      </label>
+      <button className={styles.reportSubmit} type="submit">
+        Submit report
+      </button>
+    </form>
+  );
+}
+
+function DfwChannelPostReportForm({
+  channelSlug,
+  postId,
+  reportAction,
+}: {
+  channelSlug: string;
+  postId: string;
+  reportAction?: (formData: FormData) => Promise<void>;
+}) {
+  if (!reportAction) {
+    return null;
+  }
+
+  return (
+    <form action={reportAction} className={styles.reportForm}>
+      <input name="channelSlug" type="hidden" value={channelSlug} />
       <input name="postId" type="hidden" value={postId} />
       <label className={styles.reportField}>
         <span>Report this post</span>
@@ -1976,12 +2044,18 @@ export function DfwChannelPostDetailShell({
   post = null,
   channelsUnavailable = false,
   postUnavailable = false,
+  reportStatus = null,
+  reportAction,
 }: DfwChannelPostDetailShellProps) {
   const channelSlug = channel?.slug ?? post?.channelSlug ?? "";
   const channelName = channel?.name ?? post?.channelName ?? "DFW Channel";
   const channelHref = channelSlug
     ? getDfwHubChannelHref(channelSlug)
     : "/app/hubs/dfw/channels";
+  const reportStatusMessage = getDfwHubChannelReportStatusMessage(reportStatus);
+  const isReportSuccessStatus =
+    reportStatus === DFW_HUB_CHANNEL_REPORT_REPORTED_STATUS ||
+    reportStatus === DFW_HUB_CHANNEL_REPORT_DUPLICATE_STATUS;
 
   return (
     <main className={styles.shell}>
@@ -2020,6 +2094,15 @@ export function DfwChannelPostDetailShell({
             </p>
           ) : null}
 
+          {reportStatusMessage ? (
+            <p
+              className={isReportSuccessStatus ? styles.actionSuccess : styles.actionFeedback}
+              role="status"
+            >
+              {reportStatusMessage}
+            </p>
+          ) : null}
+
           {post && !postUnavailable ? (
             <article className={styles.postDetailCard}>
               <div className={styles.postHeader}>
@@ -2040,9 +2123,15 @@ export function DfwChannelPostDetailShell({
                 <p className={styles.mutedNote}>Updated {formatPostDate(post.updatedAt)}</p>
               ) : null}
               <p className={styles.mutedNote}>
-                This Channel thread detail is read-only for the current
-                private-beta foundation.
+                This Channel thread detail supports reporting for review.
+                Comments, replies, public report counts, and moderation controls
+                are not live.
               </p>
+              <DfwChannelPostReportForm
+                channelSlug={post.channelSlug}
+                postId={post.id}
+                reportAction={reportAction}
+              />
             </article>
           ) : (
             <article className={styles.postEmptyState}>

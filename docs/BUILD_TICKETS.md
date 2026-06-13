@@ -229,6 +229,14 @@ Current controlling docs for Hub work:
   Channels are complete at lightweight MVP baseline level. It keeps T26E
   comments/reporting/moderation integration, Request a Channel, UI/UX polish,
   and private-beta policy/ops readiness visible as separate remaining lanes.
+- [FBMVP-T26E-A Channel Post Reporting + Moderation Review Foundation](ops/fbmvp-t26e-a-channel-post-reporting-moderation-foundation.md) - local
+  implementation note for the first selected-channel post safety layer. It
+  reuses `public.board_post_reports`, adds channel-scoped reporting/list/review
+  RPCs, wires a report affordance on selected-channel post detail, and extends
+  `/app/admin/community-moderation` for DFW Channel reports. Runtime apply and
+  browser smoke remain pending. Comments, AI decisions, account bans, public
+  reporter identity, public report counts, Request a Channel, live integrations,
+  payments, and marketplace behavior remain out of scope.
 - [FBMVP Checkpoint: DFW Hub + Channels Foundation Level-Set](ops/fbmvp-checkpoint-dfw-hub-channels-foundation-level-set.md) - docs-only
   checkpoint at `0249e0d` after T26A runtime apply docs. It records the current
   completed DFW Hub + Channels metadata foundation and the sequence before

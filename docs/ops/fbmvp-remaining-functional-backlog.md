@@ -99,6 +99,14 @@ lightweight MVP baseline level. This does not close T26E
 comments/reporting/moderation integration, Request a Channel, UI/UX polish, or
 private-beta policy/ops readiness.
 
+T26E-A is locally implemented as the first selected-channel post safety layer.
+It reuses `public.board_post_reports`, adds channel-scoped report/list/moderate
+RPCs, wires a selected-channel post detail report affordance, and extends
+`/app/admin/community-moderation` for DFW Channel reports. It does not implement
+comments, AI moderation decisions, account bans, public reporter identity,
+public report counts, Request a Channel, live integrations, payments, or
+marketplace behavior. Targeted runtime apply and browser smoke remain pending.
+
 ## Narrow DFW MVP Pillars
 
 Channels are not the entire MVP. The narrow DFW Hub MVP should include four
@@ -259,6 +267,10 @@ Completed prerequisites:
   Channels are complete at lightweight MVP baseline level; T26E
   comments/reporting/moderation, Request a Channel, UI/UX polish, and
   private-beta policy/ops readiness remain separate work.
+- T26E-A local selected-channel post reporting/moderation review foundation:
+  channel report/list/moderate RPCs, selected-channel post detail report
+  affordance, and admin community moderation extension are implemented locally;
+  runtime apply and browser smoke are pending.
 - Stale test cleanup:
   - `test/community/hubChannelSeeds.test.mts`
   - `test/community/boardPostActions.test.mts`

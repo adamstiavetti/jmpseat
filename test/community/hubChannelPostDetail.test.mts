@@ -236,8 +236,13 @@ test("T26C selected-channel post detail shell is read-only Hub/Channels copy", (
   assert.match(detailShellSource, /post\.isPinned/);
   assert.match(detailShellSource, /post\.channelName/);
   assert.match(detailShellSource, /Updated/);
+  assert.match(detailShellSource, /DfwChannelPostReportForm/);
+  assert.match(shellSource, /Report this post/);
+  assert.match(shellSource, /Thanks — this report was sent for review\./);
+  assert.match(shellSource, /You already reported this post\./);
+  assert.match(detailShellSource, /Comments, replies, public report counts, and moderation controls/);
 
-  assert.doesNotMatch(detailShellSource, /Start a Thread|Publish post|composer|textarea|comment form|reply form|Report this post|moderation controls|fake activity|thread count|activity count/i);
+  assert.doesNotMatch(detailShellSource, /Start a Thread|Publish post|composer|comment form|reply form|reportCount|reportsCount|reports\.length|moderation controls UI|fake activity|thread count|activity count/i);
   for (const retiredLabel of [
     "Baseboard",
     "Base Board",

@@ -464,6 +464,27 @@ Current data model implication:
   broad database push, migration repair, `apply_migration`, deploy, app code
   changes, staging, or commit. Authenticated browser/create smoke remains
   pending.
+- `FBMVP-T26E-A` locally adds the selected-channel post reporting and moderation
+  review foundation by reusing `public.board_post_reports`. It does not create a
+  new report table.
+- T26E-A adds `public.report_open_hub_channel_post(...)`,
+  `public.list_open_hub_channel_post_reports(...)`, and
+  `public.moderate_open_hub_channel_post(...)`. The report RPC requires
+  authenticated open-board read eligibility and verifies the target post is a
+  published board-visible post inside the resolved active visible `hub_channel`
+  board by `board_posts.board_id`.
+- T26E-A preserves the existing report reason constraint:
+  `spam`, `harassment`, `unsafe_info`, `privacy`, `off_topic`, and `other`.
+  It preserves the existing report status vocabulary:
+  `open`, `reviewing`, `resolved`, and `dismissed`.
+- T26E-A returns only safe report status data to the reporting user and safe
+  channel/post review fields to operators. It does not expose reporter user IDs,
+  author user IDs, emails, verification data, proof-upload data, storage paths,
+  signed URLs, public report counts, comments, AI moderation decisions, account
+  bans, or public moderation feeds.
+- T26E-A requires targeted runtime apply for
+  `20260613091500 create_hub_channel_post_reporting_rpc`. Browser smoke remains
+  pending after runtime/deployment readiness.
 - Future multi-airport channel expansion may need airport-prefixed slugs or a
   scoped uniqueness model because `boards.slug` is currently globally unique.
   Once meaningful user content exists in channel boards, slugs should be

@@ -366,6 +366,17 @@ lightweight MVP baseline level, while T26E channel comments/reporting/moderation
 integration, Request a Channel, UI/UX polish, and private-beta policy/ops
 readiness remain separate work.
 
+T26E-A local implementation is recorded in
+`docs/ops/fbmvp-t26e-a-channel-post-reporting-moderation-foundation.md`. It adds
+the first selected-channel post safety layer by reusing
+`public.board_post_reports`, adding channel-scoped report/list/moderate RPCs,
+wiring a report affordance on selected-channel post detail, and extending
+`/app/admin/community-moderation` for DFW Channel reports. It does not implement
+comments, AI moderation decisions, account bans, public reporter identity, public
+report counts, Request a Channel, live integrations, payments, marketplace
+behavior, broad database push, or deploy. Runtime apply and browser smoke remain
+pending.
+
 The remaining functional backlog from checkpoint `c2bbd73` to narrow
 private-beta MVP is recorded in
 `docs/ops/fbmvp-remaining-functional-backlog.md`. It clarifies that Channels
@@ -749,6 +760,11 @@ The current implementation sequence is:
     at lightweight MVP baseline level, while T26E reporting/moderation,
     Request a Channel, UI/UX polish, and private-beta policy/ops readiness
     remain separate
+34. `FBMVP-T26E-A` selected-channel post reporting and moderation review
+    foundation, locally implemented with channel-scoped report/list/moderate
+    RPCs, selected-channel post detail report affordance, and existing admin
+    community moderation extension; targeted runtime apply and browser smoke are
+    pending.
 
 T20 runtime-pass docs are committed. The First Base / DFW Baseboard safety loop
 is complete. The approved pivot is recorded in `ops/hub-pivot-plan.md`.

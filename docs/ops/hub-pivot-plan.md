@@ -623,6 +623,16 @@ baseline level. Channels still does not include T26E
 comments/reporting/moderation integration, and Request a Channel, UI/UX polish,
 and private-beta policy/ops readiness remain separate work.
 
+T26E-A local implementation is recorded in
+`docs/ops/fbmvp-t26e-a-channel-post-reporting-moderation-foundation.md`. It adds
+the first selected-channel post safety layer by reusing
+`public.board_post_reports`, adding channel-scoped report/list/moderate RPCs,
+wiring a report affordance on selected-channel post detail, and extending
+`/app/admin/community-moderation` for DFW Channel reports. Comments, AI
+moderation decisions, account bans, public reporter identity, public report
+counts, Request a Channel, live integrations, payments, and marketplace behavior
+remain out of scope. Runtime apply and browser smoke are pending.
+
 The current DFW Hub + Channels foundation checkpoint is recorded in
 `docs/ops/fbmvp-checkpoint-dfw-hub-channels-foundation-level-set.md` at
 `0249e0d`. It records that T25B/T26A are implemented, runtime-applied, and
