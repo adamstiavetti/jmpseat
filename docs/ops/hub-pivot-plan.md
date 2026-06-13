@@ -249,6 +249,26 @@ Layover section content can include:
 - `Short Layover`
 - `Long Layover`
 
+The T27C MVP baseline is a protected, read-only, static/config-backed route:
+
+- `/app/hubs/dfw/layover`
+
+It contains safe private-beta utility content such as:
+
+- layover planning reminders
+- short-sit and longer-layover prompts at a high level
+- food, coffee, local, and terminal/ground logistics pointers
+- links into relevant Channels
+- links back to DFW Today, DFW Base, and DFW Channels
+- static safety boundary copy
+
+The T27C baseline intentionally does not include exact crew hotel exposure,
+public nearby crew tracking, live crew location, live operations data, external
+integrations, AI-generated operational advice, user posting, comments, reports,
+moderation controls, admin CMS, Request a Channel workflow, NonRev Deals,
+payments, marketplace behavior, or dating/swiping/nightlife-primary behavior.
+Browser smoke is pending after deployment.
+
 ### Channels
 
 `Channels` contain focused scoped discussion. Users may request a Channel from
@@ -583,6 +603,16 @@ external integration, AI, posting, comments, reports, moderation controls,
 Request a Channel workflow, broad database push, or deploy. Authenticated
 browser smoke is recorded in `docs/ops/fbmvp-t27b-dfw-base-browser-smoke.md`
 and passed after deployment.
+
+T27C local implementation is recorded in
+`docs/ops/fbmvp-t27c-dfw-layover-lightweight-baseline.md`. It adds the
+protected read-only `/app/hubs/dfw/layover` route using static/config-backed
+layover/local utility content, safety boundary copy, and links into existing
+DFW Channels, DFW Today, and DFW Base. It adds no migration, runtime mutation,
+exact crew hotel exposure, live crew location, live operations data, external
+integration, AI, posting, comments, reports, moderation controls, Request a
+Channel workflow, broad database push, or deploy. Authenticated browser smoke
+is pending after deployment.
 
 The current DFW Hub + Channels foundation checkpoint is recorded in
 `docs/ops/fbmvp-checkpoint-dfw-hub-channels-foundation-level-set.md` at

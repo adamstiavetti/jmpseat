@@ -41,6 +41,10 @@ import type {
   DfwBaseLinkCard,
   DfwBaseStartItem,
 } from "../../lib/privateApp/dfwBase";
+import type {
+  DfwLayoverLinkCard,
+  DfwLayoverStartItem,
+} from "../../lib/privateApp/dfwLayover";
 
 import { DfwChannelPostComposerForm } from "./DfwChannelPostComposerForm";
 import styles from "./homeHubShell.module.css";
@@ -94,6 +98,14 @@ type DfwBaseShellProps = {
   safetyBoundary: string;
   startHere: readonly DfwBaseStartItem[];
   usefulNextLinks: readonly DfwBaseLinkCard[];
+};
+
+type DfwLayoverShellProps = {
+  essentialCards: readonly DfwLayoverLinkCard[];
+  futureNote: string;
+  safetyBoundary: string;
+  startHere: readonly DfwLayoverStartItem[];
+  usefulNextLinks: readonly DfwLayoverLinkCard[];
 };
 
 type DfwChannelThreadListShellProps = {
@@ -193,7 +205,7 @@ const quickActions: readonly QuickAction[] = [
   {
     title: "Find Layover Info",
     detail: "DFW utility",
-    href: "/app/hubs/dfw/layovers",
+    href: "/app/hubs/dfw/layover",
     icon: "pin",
     tone: "layover",
   },
@@ -227,11 +239,11 @@ const dfwHubSections: readonly DfwHubSectionItem[] = [
   {
     title: "Layover",
     detail:
-      "Essentials, Food & Coffee, Getting Around, and Crew Tips for safe layover utility.",
+      "Static local and airport-area guidance without live tracking or exact crew hotel exposure.",
     cta: "View Layover",
-    href: "/app/hubs/dfw/layovers",
+    href: "/app/hubs/dfw/layover",
     icon: "layover",
-    meta: "Layover utility",
+    meta: "Private beta baseline",
   },
   {
     title: "Channels",
@@ -1634,6 +1646,116 @@ export function DfwBaseShell({
         <article className={styles.postEmptyState}>
           <span className={styles.cardMeta}>Private beta baseline</span>
           <h2>Layover stays separate.</h2>
+          <p>{futureNote}</p>
+        </article>
+
+        <BottomNavVisual active="Hubs" />
+      </div>
+    </main>
+  );
+}
+
+export function DfwLayoverShell({
+  essentialCards,
+  futureNote,
+  safetyBoundary,
+  startHere,
+  usefulNextLinks,
+}: DfwLayoverShellProps) {
+  return (
+    <main className={styles.shell}>
+      <div className={styles.mobileFrame}>
+        <AppHeader
+          backHref="/app/hubs/dfw"
+          backLabel="Back to DFW Hub"
+          subtitle="DFW Hub Layover"
+          showBackLink
+        />
+
+        <nav className={styles.breadcrumb} aria-label="DFW Layover breadcrumb">
+          <Link href="/app/hubs/dfw">DFW Hub</Link>
+          <span aria-hidden="true">/</span>
+          <span>Layover</span>
+        </nav>
+
+        <section className={styles.destinationHero} aria-labelledby="dfw-layover-title">
+          <span className={styles.cardLabel}>Private beta baseline</span>
+          <h1 id="dfw-layover-title">DFW Layover</h1>
+          <p>A practical layover guide for verified aviation workers passing through DFW.</p>
+        </section>
+
+        <section className={styles.hubSurfaceGrid} aria-labelledby="dfw-layover-start-title">
+          <div className={styles.sectionTitleRow}>
+            <div>
+              <h2 id="dfw-layover-start-title">Start here</h2>
+              <p>
+                Static layover reminders for planning around DFW without
+                pretending to be a live operations or location product.
+              </p>
+            </div>
+          </div>
+          <div className={styles.surfaceGrid}>
+            {startHere.map((item) => (
+              <article className={styles.surfaceCard} key={item.title}>
+                <span className={styles.cardMeta}>Read-only</span>
+                <h3>{item.title}</h3>
+                <p>{item.detail}</p>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section className={styles.hubSurfaceGrid} aria-labelledby="dfw-layover-essentials-title">
+          <div className={styles.sectionTitleRow}>
+            <div>
+              <h2 id="dfw-layover-essentials-title">Layover essentials</h2>
+              <p>
+                Safe DFW starting points for food, breaks, local basics, and
+                ground logistics, with links into existing Channels.
+              </p>
+            </div>
+          </div>
+          <div className={styles.surfaceGrid}>
+            {essentialCards.map((item) => (
+              <Link className={styles.surfaceCard} href={item.href} key={item.title}>
+                <span className={styles.cardMeta}>{item.meta}</span>
+                <h3>{item.title}</h3>
+                <p>{item.detail}</p>
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        <section className={styles.hubSurfaceGrid} aria-labelledby="dfw-layover-next-title">
+          <div className={styles.sectionTitleRow}>
+            <div>
+              <h2 id="dfw-layover-next-title">Useful next</h2>
+              <p>
+                Move between DFW Hub pillars without adding posting, live data,
+                or hotel-location behavior to Layover.
+              </p>
+            </div>
+          </div>
+          <div className={styles.surfaceGrid}>
+            {usefulNextLinks.map((item) => (
+              <Link className={styles.surfaceCard} href={item.href} key={item.title}>
+                <span className={styles.cardMeta}>{item.meta}</span>
+                <h3>{item.title}</h3>
+                <p>{item.detail}</p>
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        <section className={styles.safetyBand} aria-labelledby="dfw-layover-safety-title">
+          <span className={styles.cardLabel}>Safety boundary</span>
+          <h2 id="dfw-layover-safety-title">Keep layover guidance broad and non-sensitive.</h2>
+          <p>{safetyBoundary}</p>
+        </section>
+
+        <article className={styles.postEmptyState}>
+          <span className={styles.cardMeta}>Private beta baseline</span>
+          <h2>No live tracking or hotel directory.</h2>
           <p>{futureNote}</p>
         </article>
 

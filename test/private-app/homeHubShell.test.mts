@@ -58,6 +58,14 @@ const dfwBaseRouteSource = existsSync(
       "utf8",
     )
   : "";
+const dfwLayoverRouteSource = existsSync(
+  new URL("../../app/app/hubs/dfw/layover/page.tsx", import.meta.url),
+)
+  ? readFileSync(
+      new URL("../../app/app/hubs/dfw/layover/page.tsx", import.meta.url),
+      "utf8",
+    )
+  : "";
 const dfwSectionRoutes = [
   {
     label: "DFW Baseboard",
@@ -134,6 +142,7 @@ const combinedSource = [
   dfwHubAccessSource,
   dfwTodayRouteSource,
   dfwBaseRouteSource,
+  dfwLayoverRouteSource,
   dfwChannelsRouteSource,
   dfwSelectedChannelRouteSource,
   ...dfwSectionRoutes.map((route) => route.source),
@@ -148,6 +157,7 @@ const implementationSource = [
   dfwHubAccessSource,
   dfwTodayRouteSource,
   dfwBaseRouteSource,
+  dfwLayoverRouteSource,
   dfwChannelsRouteSource,
   dfwSelectedChannelRouteSource,
   ...dfwSectionRoutes.map((route) => route.source),
@@ -367,6 +377,18 @@ test("DFW Base route is private gated and renders the read-only utility baseline
   assert.doesNotMatch(dfwBaseRouteSource, /\.insert\(|\.update\(|\.delete\(|\.rpc\(|fetch\(/);
 });
 
+test("DFW Layover route is private gated and renders the read-only utility baseline", () => {
+  assert.match(dfwLayoverRouteSource, /dynamic = "force-dynamic"/);
+  assert.match(dfwLayoverRouteSource, /requireDfwHubRouteAccess/);
+  assert.match(dfwLayoverRouteSource, /\/app\/hubs\/dfw\/layover/);
+  assert.match(dfwLayoverRouteSource, /section: "dfw-layover"/);
+  assert.match(dfwLayoverRouteSource, /DfwLayoverShell/);
+  assert.match(dfwLayoverRouteSource, /dfwLayoverStartHere/);
+  assert.match(dfwLayoverRouteSource, /dfwLayoverEssentialCards/);
+  assert.match(dfwLayoverRouteSource, /dfwLayoverUsefulNextLinks/);
+  assert.doesNotMatch(dfwLayoverRouteSource, /\.insert\(|\.update\(|\.delete\(|\.rpc\(|fetch\(/);
+});
+
 test("DFW Channels overview route is private gated and reads channel metadata only after the gate", () => {
   assert.match(dfwChannelsRouteSource, /dynamic = "force-dynamic"/);
   assert.match(dfwChannelsRouteSource, /requireDfwHubRouteAccess/);
@@ -495,7 +517,10 @@ test("DFW Baseboard composer is not wired into non-Baseboard hub sections", () =
 
 test("DFW Hub cards link to read-only section route shells", () => {
   for (const route of dfwSectionRoutes.filter(
-    (item) => item.section !== "dfw-lounges" && item.section !== "dfw-baseboard",
+    (item) =>
+      item.section !== "dfw-lounges" &&
+      item.section !== "dfw-baseboard" &&
+      item.section !== "dfw-layovers",
   )) {
     assert.match(shellSource, new RegExp(`href: "${route.route.replaceAll("/", "\\/")}"`));
   }
@@ -505,6 +530,7 @@ test("DFW Hub cards link to read-only section route shells", () => {
   assert.match(shellSource, /title: "Base"/);
   assert.match(shellSource, /href: "\/app\/hubs\/dfw\/base"/);
   assert.match(shellSource, /title: "Layover"/);
+  assert.match(shellSource, /href: "\/app\/hubs\/dfw\/layover"/);
   assert.match(shellSource, /title: "Channels"/);
   assert.match(shellSource, /href: "\/app\/hubs\/dfw\/channels"/);
   assert.match(shellSource, /Recent Useful Threads/);
@@ -607,6 +633,7 @@ test("T08 expected files exist", () => {
     "../../app/app/hubs/dfw/channels/page.tsx",
     "../../app/app/hubs/dfw/channels/[channelSlug]/page.tsx",
     "../../app/app/hubs/dfw/baseboard/page.tsx",
+    "../../app/app/hubs/dfw/layover/page.tsx",
     "../../app/app/hubs/dfw/layovers/page.tsx",
     "../../app/app/hubs/dfw/lounges/page.tsx",
     "../../app/app/hubs/dfw/crew-picks/page.tsx",

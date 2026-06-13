@@ -82,6 +82,15 @@ comments, reports, moderation controls, or Request a Channel workflow.
 Authenticated browser smoke passed after deployment and is recorded in
 `docs/ops/fbmvp-t27b-dfw-base-browser-smoke.md`.
 
+T27C is locally implemented as the first DFW Layover lightweight baseline. It
+adds the protected read-only `/app/hubs/dfw/layover` route with
+static/config-backed layover planning reminders, layover essentials, useful
+next links, safety boundary copy, and links into existing DFW Channels, DFW
+Today, and DFW Base. It adds no migration, runtime apply, exact crew hotel
+exposure, live crew location, live operations data, external integration, AI,
+posting, comments, reports, moderation controls, or Request a Channel workflow.
+Authenticated browser smoke is pending after deployment.
+
 ## Narrow DFW MVP Pillars
 
 Channels are not the entire MVP. The narrow DFW Hub MVP should include four
@@ -191,8 +200,8 @@ Out of scope:
 
 Recommended order:
 
-1. Review and commit the T27B DFW Base browser-smoke record.
-2. Layover MVP baseline.
+1. Review and commit the T27C DFW Layover implementation.
+2. Authenticated browser smoke for `/app/hubs/dfw/layover`.
 3. `T26E` channel comments/reporting/moderation integration, only if Channels
    remains the active lane.
 4. Private-beta policy/ops readiness.
@@ -231,15 +240,19 @@ Completed prerequisites:
   Hub navigation and channel/utility cross-links were verified,
   no-cookie/public-domain boundaries held, and product/security boundaries
   passed.
+- T27C local DFW Layover lightweight baseline: protected read-only route,
+  static/config-backed layover planning reminders, layover essentials, useful
+  next links, safety boundary copy, and safe links into existing DFW Channels,
+  DFW Today, and DFW Base; no migration or runtime apply.
 - Stale test cleanup:
   - `test/community/hubChannelSeeds.test.mts`
   - `test/community/boardPostActions.test.mts`
   - `test/community/boardPostDetail.test.mts`
 
-Layover can still be scoped as a lightweight functional baseline. It should not
-require live integrations or scraping for MVP. DFW Today now has a local
-baseline and authenticated beta browser smoke; DFW Base now has a local
-baseline and authenticated beta browser smoke.
+Layover has a local lightweight functional baseline and should not require live
+integrations or scraping for MVP. DFW Today and DFW Base both have local
+baselines plus authenticated beta browser smoke; DFW Layover now needs
+authenticated beta browser smoke after deployment.
 
 ## UI/UX Rule
 
