@@ -336,8 +336,17 @@ content, base essentials, useful next links, safety boundary copy, and safe
 links into existing DFW Channels and DFW Today. It adds no database migration,
 runtime mutation, live operations data, external integration, AI, posting,
 comments, reports, moderation controls, Request a Channel workflow, broad
-database push, or deploy. Authenticated browser smoke is pending after
-deployment.
+database push, or deploy.
+
+T27B authenticated browser smoke is recorded in
+`docs/ops/fbmvp-t27b-dfw-base-browser-smoke.md`. The deployed beta route
+rendered DFW Base, start-here guidance, base essentials, useful next links,
+safety boundary copy, private-beta/static future copy, and safe links into
+existing DFW Channels and DFW Today. No-cookie beta and public-domain
+boundaries held, and no live operations data, external integration, AI,
+posting, comments, reports, moderation controls, Request a Channel workflow,
+Baseboard label, IDs, proof data, storage paths, signed URLs, or UUID-like
+internal IDs were exposed.
 
 The remaining functional backlog from checkpoint `c2bbd73` to narrow
 private-beta MVP is recorded in
@@ -712,7 +721,7 @@ The current implementation sequence is:
 31. `FBMVP-T27B` DFW Base lightweight baseline, locally implemented with a
     protected read-only `/app/hubs/dfw/base` route and static/config-backed
     base orientation content; no migration or runtime apply is needed, and
-    authenticated beta browser smoke is pending after deployment
+    authenticated beta browser smoke passed after deployment
 
 T20 runtime-pass docs are committed. The First Base / DFW Baseboard safety loop
 is complete. The approved pivot is recorded in `ops/hub-pivot-plan.md`.
@@ -761,9 +770,9 @@ list plus T26C detail regressions. T26D create redirect is functionally closed.
 The next work should keep advancing the four DFW Hub MVP pillars. T27A starts
 the DFW Today pillar as a static/read-only utility baseline and has passed
 authenticated browser smoke. T27B starts the Base pillar as a static/read-only
-utility baseline and needs authenticated browser smoke after deployment.
-Layover still needs a lightweight functional baseline before MVP, and any
-further Channels work should stay scoped to the documented ticket lane.
+utility baseline and has passed authenticated browser smoke. Layover still
+needs a lightweight functional baseline before MVP, and any further Channels
+work should stay scoped to the documented ticket lane.
 
 T23A adds the mobile-first wireframe packet for the updated private-beta Hub
 experience. It defines Home/dashboard, DFW Hub overview, DFW Today, Base,

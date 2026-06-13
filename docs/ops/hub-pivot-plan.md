@@ -226,7 +226,8 @@ It contains safe private-beta utility content such as:
 The T27B baseline intentionally does not include live operations data, external
 integrations, AI-generated operational advice, user posting, comments, reports,
 moderation controls, admin CMS, or Request a Channel workflow. Browser smoke is
-pending after deployment.
+recorded in `docs/ops/fbmvp-t27b-dfw-base-browser-smoke.md` and passed after
+deployment.
 
 ### Layover
 
@@ -580,7 +581,8 @@ orientation content, safety boundary copy, and links into existing DFW Channels
 and DFW Today. It adds no migration, runtime mutation, live operations data,
 external integration, AI, posting, comments, reports, moderation controls,
 Request a Channel workflow, broad database push, or deploy. Authenticated
-browser smoke is pending after deployment.
+browser smoke is recorded in `docs/ops/fbmvp-t27b-dfw-base-browser-smoke.md`
+and passed after deployment.
 
 The current DFW Hub + Channels foundation checkpoint is recorded in
 `docs/ops/fbmvp-checkpoint-dfw-hub-channels-foundation-level-set.md` at

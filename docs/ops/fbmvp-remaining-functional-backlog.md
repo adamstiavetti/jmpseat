@@ -79,7 +79,8 @@ base orientation content, base essentials, useful next links, safety boundary
 copy, and links into existing DFW Channels and DFW Today. It adds no migration,
 runtime apply, live operations data, external integration, AI, posting,
 comments, reports, moderation controls, or Request a Channel workflow.
-Authenticated browser smoke is pending after deployment.
+Authenticated browser smoke passed after deployment and is recorded in
+`docs/ops/fbmvp-t27b-dfw-base-browser-smoke.md`.
 
 ## Narrow DFW MVP Pillars
 
@@ -190,13 +191,12 @@ Out of scope:
 
 Recommended order:
 
-1. Review and commit the T27B DFW Base implementation.
-2. Authenticated browser smoke for `/app/hubs/dfw/base`.
-3. Layover MVP baseline.
-4. `T26E` channel comments/reporting/moderation integration, only if Channels
+1. Review and commit the T27B DFW Base browser-smoke record.
+2. Layover MVP baseline.
+3. `T26E` channel comments/reporting/moderation integration, only if Channels
    remains the active lane.
-5. Private-beta policy/ops readiness.
-6. Route-by-route UI/UX polish.
+4. Private-beta policy/ops readiness.
+5. Route-by-route UI/UX polish.
 
 Completed prerequisites:
 
@@ -227,6 +227,10 @@ Completed prerequisites:
   static/config-backed base orientation content, base essentials, useful next
   links, safety boundary copy, and safe links into existing DFW Channels and
   DFW Today; no migration or runtime apply.
+- T27B authenticated browser smoke: `/app/hubs/dfw/base` rendered on beta, DFW
+  Hub navigation and channel/utility cross-links were verified,
+  no-cookie/public-domain boundaries held, and product/security boundaries
+  passed.
 - Stale test cleanup:
   - `test/community/hubChannelSeeds.test.mts`
   - `test/community/boardPostActions.test.mts`
@@ -235,7 +239,7 @@ Completed prerequisites:
 Layover can still be scoped as a lightweight functional baseline. It should not
 require live integrations or scraping for MVP. DFW Today now has a local
 baseline and authenticated beta browser smoke; DFW Base now has a local
-baseline and needs authenticated beta browser smoke after deployment.
+baseline and authenticated beta browser smoke.
 
 ## UI/UX Rule
 

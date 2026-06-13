@@ -115,9 +115,11 @@ No broad Supabase database push is needed.
 
 ## Browser Smoke
 
-Authenticated beta browser smoke is pending after deployment.
+Authenticated beta browser smoke passed after deployment and is recorded in:
 
-The smoke should verify:
+- `docs/ops/fbmvp-t27b-dfw-base-browser-smoke.md`
+
+The smoke verified:
 
 - authenticated eligible beta/private-app user can reach `/app/hubs/dfw/base`
 - unauthenticated beta access redirects to login
@@ -158,7 +160,8 @@ Runtime Apply Docs Needed?
 
 Browser Smoke Docs Needed?
 
-- Yes. Authenticated beta browser smoke should be recorded after deployment.
+- Satisfied by `docs/ops/fbmvp-t27b-dfw-base-browser-smoke.md` after that
+  record is reviewed and committed.
 
 ## Status
 
@@ -166,6 +169,6 @@ T27B is locally implemented.
 
 Runtime apply is not applicable.
 
-Browser smoke is pending after deployment.
+Browser smoke passed on beta.
 
 UI/UX polish remains deferred.
