@@ -92,6 +92,13 @@ posting, comments, reports, moderation controls, or Request a Channel workflow.
 Authenticated browser smoke passed after deployment and is recorded in
 `docs/ops/fbmvp-t27c-dfw-layover-browser-smoke.md`.
 
+The DFW Hub baseline pillar checkpoint is recorded in
+`docs/ops/fbmvp-checkpoint-dfw-hub-baseline-pillars-complete.md`. At checkpoint
+`a55a334`, DFW Today, DFW Base, DFW Layover, and Channels are complete at
+lightweight MVP baseline level. This does not close T26E
+comments/reporting/moderation integration, Request a Channel, UI/UX polish, or
+private-beta policy/ops readiness.
+
 ## Narrow DFW MVP Pillars
 
 Channels are not the entire MVP. The narrow DFW Hub MVP should include four
@@ -201,7 +208,7 @@ Out of scope:
 
 Recommended order:
 
-1. Review and commit the T27C DFW Layover browser smoke record.
+1. Review and commit the DFW Hub baseline pillars checkpoint.
 2. `T26E` channel comments/reporting/moderation integration, only if Channels
    remains the active lane.
 3. Private-beta policy/ops readiness.
@@ -248,14 +255,20 @@ Completed prerequisites:
   DFW Hub and Home navigation plus channel/utility cross-links were verified,
   no-cookie/public-domain boundaries held, and product/security boundaries
   passed.
+- DFW Hub baseline pillars checkpoint: DFW Today, DFW Base, DFW Layover, and
+  Channels are complete at lightweight MVP baseline level; T26E
+  comments/reporting/moderation, Request a Channel, UI/UX polish, and
+  private-beta policy/ops readiness remain separate work.
 - Stale test cleanup:
   - `test/community/hubChannelSeeds.test.mts`
   - `test/community/boardPostActions.test.mts`
   - `test/community/boardPostDetail.test.mts`
 
-Layover has a local lightweight functional baseline and should not require live
-integrations or scraping for MVP. DFW Today, DFW Base, and DFW Layover now have
-local baselines plus authenticated beta browser smoke.
+DFW Today, DFW Base, and DFW Layover now have local baselines plus
+authenticated beta browser smoke. Channels has create/read baseline coverage
+through overview, selected-channel thread list, post detail, composer/create,
+and redirect to created detail. The next product-safety gap is T26E channel
+comments/reporting/moderation integration.
 
 ## UI/UX Rule
 

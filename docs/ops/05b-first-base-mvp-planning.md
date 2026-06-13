@@ -359,6 +359,13 @@ comments, reports, moderation controls, Request a Channel workflow, broad
 database push, or deploy. Authenticated browser smoke passed after deployment
 and is recorded in `docs/ops/fbmvp-t27c-dfw-layover-browser-smoke.md`.
 
+The current DFW Hub baseline pillar checkpoint is recorded in
+`docs/ops/fbmvp-checkpoint-dfw-hub-baseline-pillars-complete.md` at `a55a334`.
+It records that DFW Today, DFW Base, DFW Layover, and Channels are complete at
+lightweight MVP baseline level, while T26E channel comments/reporting/moderation
+integration, Request a Channel, UI/UX polish, and private-beta policy/ops
+readiness remain separate work.
+
 The remaining functional backlog from checkpoint `c2bbd73` to narrow
 private-beta MVP is recorded in
 `docs/ops/fbmvp-remaining-functional-backlog.md`. It clarifies that Channels
@@ -737,6 +744,11 @@ The current implementation sequence is:
     protected read-only `/app/hubs/dfw/layover` route and static/config-backed
     layover/local utility content; no migration or runtime apply is needed, and
     authenticated beta browser smoke passed after deployment
+33. `FBMVP Checkpoint` DFW Hub baseline pillars complete, docs-only checkpoint
+    at `a55a334`; DFW Today, DFW Base, DFW Layover, and Channels are complete
+    at lightweight MVP baseline level, while T26E reporting/moderation,
+    Request a Channel, UI/UX polish, and private-beta policy/ops readiness
+    remain separate
 
 T20 runtime-pass docs are committed. The First Base / DFW Baseboard safety loop
 is complete. The approved pivot is recorded in `ops/hub-pivot-plan.md`.
@@ -782,13 +794,14 @@ returns a safe created detail `href` and navigates client-side on success; it
 passed deployed browser create-redirect smoke after `82f4399`, with one
 additional authorized safe post, direct redirect to detail, and passing T26B
 list plus T26C detail regressions. T26D create redirect is functionally closed.
-The next work should keep advancing the four DFW Hub MVP pillars. T27A starts
-the DFW Today pillar as a static/read-only utility baseline and has passed
-authenticated browser smoke. T27B starts the Base pillar as a static/read-only
-utility baseline and has passed authenticated browser smoke. T27C starts the
-Layover pillar as a static/read-only utility baseline and has passed
-authenticated browser smoke. Any further Channels work should stay scoped to the
-documented ticket lane.
+The next work should not reopen the four DFW Hub MVP baseline pillars unless
+explicitly scoped. T27A, T27B, and T27C established static/read-only utility
+baselines for DFW Today, DFW Base, and DFW Layover, and each has passed
+authenticated browser smoke. Channels has a create/read baseline with
+post-create redirect smoke passed. T26E channel comments/reporting/moderation
+integration is the recommended next product-safety lane before broader
+private-beta use, while private-beta policy/ops readiness remains a separate
+launch-readiness lane.
 
 T23A adds the mobile-first wireframe packet for the updated private-beta Hub
 experience. It defines Home/dashboard, DFW Hub overview, DFW Today, Base,

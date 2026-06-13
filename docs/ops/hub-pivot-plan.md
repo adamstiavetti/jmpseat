@@ -616,6 +616,13 @@ Channel workflow, broad database push, or deploy. Authenticated browser smoke
 passed after deployment and is recorded in
 `docs/ops/fbmvp-t27c-dfw-layover-browser-smoke.md`.
 
+The DFW Hub baseline pillars checkpoint is recorded in
+`docs/ops/fbmvp-checkpoint-dfw-hub-baseline-pillars-complete.md` at `a55a334`.
+DFW Today, DFW Base, DFW Layover, and Channels are complete at lightweight MVP
+baseline level. Channels still does not include T26E
+comments/reporting/moderation integration, and Request a Channel, UI/UX polish,
+and private-beta policy/ops readiness remain separate work.
+
 The current DFW Hub + Channels foundation checkpoint is recorded in
 `docs/ops/fbmvp-checkpoint-dfw-hub-channels-foundation-level-set.md` at
 `0249e0d`. It records that T25B/T26A are implemented, runtime-applied, and
